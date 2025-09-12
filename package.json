@@ -73,7 +73,7 @@
   "optionalDependencies": {
     "@context7/mcp-server": "^1.0.0",
     "@playwright/mcp-server": "^1.0.0",
-    "@modelcontextprotocol/server-github": "^1.0.0"
+    "@modelcontextprotocol/server-github": "^2025.4.8"
   },
   "peerDependencies": {
     "git": "*"
