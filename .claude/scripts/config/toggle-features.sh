@@ -162,13 +162,46 @@ load_template() {
     regenerate_workflows
 }
 
+# Regenerate CLAUDE.md based on configuration
+regenerate_claude_md() {
+    print_status "Regenerating CLAUDE.md based on configuration..."
+    
+    local docker_enabled=$(get_feature_status "docker_first_development")
+    local k8s_enabled=$(get_feature_status "kubernetes_devops_testing")
+    local template_file=""
+    local claude_file="$PROJECT_ROOT/../CLAUDE.md"
+    
+    # Determine which template to use
+    if [[ "$docker_enabled" == "true" && "$k8s_enabled" == "true" ]]; then
+        template_file="$PROJECT_ROOT/claude-templates/full-devops.md"
+        print_status "Using Full DevOps CLAUDE.md template"
+    elif [[ "$docker_enabled" == "true" ]]; then
+        template_file="$PROJECT_ROOT/claude-templates/docker-only.md"
+        print_status "Using Docker-only CLAUDE.md template"
+    else
+        template_file="$PROJECT_ROOT/claude-templates/minimal.md"
+        print_status "Using Minimal CLAUDE.md template"
+    fi
+    
+    # Copy template to CLAUDE.md
+    if [[ -f "$template_file" ]]; then
+        cp "$template_file" "$claude_file"
+        print_success "CLAUDE.md updated for current configuration!"
+    else
+        print_warning "Template not found: $template_file"
+    fi
+}
+
 # Regenerate workflows based on current configuration
 regenerate_workflows() {
-    print_status "Regenerating workflows based on configuration..."
+    print_status "Regenerating configuration files..."
     
     local docker_enabled=$(get_feature_status "docker_first_development")
     local k8s_enabled=$(get_feature_status "kubernetes_devops_testing")
     local github_k8s=$(get_feature_status "github_actions_k8s")
+    
+    # Regenerate CLAUDE.md first
+    regenerate_claude_md
     
     # Update docker-tests.yml conditions if needed
     local docker_workflow="$PROJECT_ROOT/../.github/workflows/docker-tests.yml"
@@ -182,7 +215,7 @@ regenerate_workflows() {
         print_status "Kubernetes workflow exists - configuration will take effect on next run"
     fi
     
-    print_success "Workflow configuration updated!"
+    print_success "Configuration files updated!"
 }
 
 # Interactive menu
