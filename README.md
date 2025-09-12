@@ -141,6 +141,75 @@ graph LR
 | Progress hidden in branches | **Transparent audit trail** in GitHub |
 | Manual task coordination | **Intelligent prioritization** with `/pm:next` |
 
+## ⚙️ Configuration Options
+
+ClaudeAutoPM adapts to your development style with **3 distinct configurations**:
+
+### 🏃 **Minimal Configuration**
+**Traditional development workflow**
+- Native tooling (npm, pip, local execution)
+- Standard test runners and frameworks  
+- No Docker/Kubernetes requirements
+- Perfect for: Simple projects, rapid prototyping, learning
+
+```bash
+# Features disabled:
+docker_first_development: false
+kubernetes_devops_testing: false
+github_actions_k8s: false
+```
+
+### 🐳 **Docker-Only Configuration**
+**Container-first development**
+- All code runs in Docker containers
+- No local execution allowed
+- Docker Compose orchestration
+- Hot reload with volume mounts
+- Perfect for: Team consistency, environment parity
+
+```bash
+# Features enabled:
+docker_first_development: true
+enforce_docker_tests: true
+# Kubernetes disabled
+kubernetes_devops_testing: false
+```
+
+### 🚀 **Full DevOps Configuration**  
+**Enterprise-grade Docker + Kubernetes**
+- Local development in Docker containers
+- CI/CD testing in Kubernetes (KIND)
+- Helm charts and security scanning
+- GitHub Actions K8s integration
+- Perfect for: Production deployments, enterprise teams
+
+```bash
+# All features enabled:
+docker_first_development: true
+kubernetes_devops_testing: true
+github_actions_k8s: true
+integration_tests: true
+```
+
+### 🔄 **Dynamic Configuration**
+
+Switch between configurations anytime:
+
+```bash
+# Interactive configuration tool
+autopm config
+
+# During installation
+autopm install  # Choose: 1) Minimal, 2) Docker-only, 3) Full DevOps
+
+# Update preserves your settings
+autopm update   # Keeps your current configuration
+```
+
+**🎯 Smart CLAUDE.md Generation**: Your `CLAUDE.md` file automatically adapts to match your chosen configuration, giving Claude the right development rules for your environment.
+
+---
+
 ## 🌟 Key Features
 
 ### 🤖 **50+ Specialized AI Agents**
@@ -632,6 +701,23 @@ Teams using this system report:
 # Check overall status
 /pm:epic-show memory-system
 ```
+
+## 📚 Documentation
+
+### 📖 **Complete Wiki Available**
+For comprehensive documentation, tutorials, and guides:
+
+**👉 [Visit the ClaudeAutoPM Wiki](https://github.com/rafeekpro/ClaudeAutoPM/wiki)**
+
+### 🎯 **Popular Wiki Pages**
+- **[Quick Start Guide](https://github.com/rafeekpro/ClaudeAutoPM/wiki/Quick-Start)** - Get running in 5 minutes
+- **[Configuration Options](https://github.com/rafeekpro/ClaudeAutoPM/wiki/Configuration-Options)** - Minimal, Docker-only, Full DevOps
+- **[CLI Reference](https://github.com/rafeekpro/ClaudeAutoPM/wiki/CLI-Reference)** - Complete command documentation
+- **[Agent Registry](https://github.com/rafeekpro/ClaudeAutoPM/wiki/Agent-Registry)** - 50+ specialized AI agents
+- **[Docker-First Development](https://github.com/rafeekpro/ClaudeAutoPM/wiki/Docker-First-Development)** - Container workflows
+- **[Kubernetes Integration](https://github.com/rafeekpro/ClaudeAutoPM/wiki/Kubernetes-Integration)** - K8s testing & deployment
+
+---
 
 ## Get Started Now
 
