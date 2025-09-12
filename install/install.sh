@@ -187,6 +187,109 @@ backup_existing() {
     fi
 }
 
+# Create missing files from templates or defaults
+create_missing_file() {
+    local item="$1"
+    local target_path="$2"
+    
+    case "$item" in
+        "COMMIT_CHECKLIST.md")
+            print_step "Creating: $item (from template)"
+            mkdir -p "$(dirname "$target_path")"
+            cat > "$target_path" << 'EOF'
+# Commit Checklist
+
+## Before Committing
+
+- [ ] Tests written and passing
+- [ ] Code follows style guide
+- [ ] Documentation updated
+- [ ] No hardcoded values
+- [ ] Error handling implemented
+- [ ] Security considerations addressed
+- [ ] Performance acceptable
+
+## Code Quality
+
+- [ ] No code duplication
+- [ ] Functions are single-purpose
+- [ ] Variable names are descriptive
+- [ ] Comments explain "why", not "what"
+- [ ] No debugging code left behind
+
+## Testing
+
+- [ ] Unit tests cover new functionality
+- [ ] Integration tests updated if needed
+- [ ] Manual testing completed
+- [ ] Edge cases considered
+
+## Documentation
+
+- [ ] README updated if needed
+- [ ] API documentation current
+- [ ] Changelog entry added
+- [ ] Breaking changes documented
+EOF
+            print_success "Created: $item (from template)"
+            ;;
+        *)
+            print_warning "Cannot create template for: $item - file missing from source"
+            ;;
+    esac
+}
+
+# List detailed changes for directories/files
+list_changed_files() {
+    local source_path="$1"
+    local target_path="$2" 
+    local item="$3"
+    
+    if [ -d "$source_path" ]; then
+        print_msg "$BLUE" "    📁 Directory changes in $item:"
+        # Find new files
+        if command -v find >/dev/null 2>&1; then
+            local new_files
+            new_files=$(find "$source_path" -type f -newer "$target_path" 2>/dev/null | head -10)
+            if [ -n "$new_files" ]; then
+                echo "$new_files" | while read -r file; do
+                    local rel_path="${file#$source_path/}"
+                    print_msg "$GREEN" "      ➕ $rel_path"
+                done
+            fi
+        fi
+    else
+        print_msg "$BLUE" "    📄 File: $item"
+    fi
+}
+
+# List files being installed
+list_installing_files() {
+    local source_path="$1"
+    local item="$2"
+    
+    if [ -d "$source_path" ]; then
+        print_msg "$BLUE" "    📁 Installing directory: $item"
+        if command -v find >/dev/null 2>&1; then
+            local file_count
+            file_count=$(find "$source_path" -type f | wc -l | tr -d ' ')
+            print_msg "$GREEN" "      📋 Files to install: $file_count"
+            
+            # Show first few files as examples
+            find "$source_path" -type f | head -5 | while read -r file; do
+                local rel_path="${file#$source_path/}"
+                print_msg "$GREEN" "      ➕ $rel_path"
+            done
+            
+            if [ "$file_count" -gt 5 ]; then
+                print_msg "$GREEN" "      ... and $((file_count - 5)) more files"
+            fi
+        fi
+    else
+        print_msg "$BLUE" "    📄 Installing file: $item"
+    fi
+}
+
 # Install or update files
 install_files() {
     local source_dir="$1"
@@ -197,7 +300,8 @@ install_files() {
         local target_path="$TARGET_DIR/$item"
         
         if [ ! -e "$source_path" ]; then
-            print_warning "Source not found: $item (skipping)"
+            # Try to create missing files from templates or defaults
+            create_missing_file "$item" "$target_path"
             continue
         fi
         
@@ -205,6 +309,7 @@ install_files() {
             if [ "$is_update" = true ]; then
                 if file_changed "$source_path" "$target_path"; then
                     print_step "Updating: $item"
+                    list_changed_files "$source_path" "$target_path" "$item"
                     rm -rf "$target_path"
                     cp -r "$source_path" "$target_path"
                     print_success "Updated: $item"
@@ -216,6 +321,7 @@ install_files() {
             fi
         else
             print_step "Installing: $item"
+            list_installing_files "$source_path" "$item"
             cp -r "$source_path" "$target_path"
             print_success "Installed: $item"
         fi
