@@ -10,6 +10,7 @@
     "integration_tests": true
   },
   "docker": {
+    "enabled": true,
     "default_base_images": {
       "python": "python:3.11-slim",
       "node": "node:20-alpine",
@@ -55,6 +56,8 @@
       "git",
       "docker",
       "docker compose",
+      "kubectl",
+      "helm",
       "make"
     ]
   }

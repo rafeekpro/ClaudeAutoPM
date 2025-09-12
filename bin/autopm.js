@@ -125,6 +125,7 @@ const showHelp = () => {
   log('  init               Initialize new project with ClaudeAutoPM');
   log('  version            Show version information');
   log('  help               Show this help message');
+  log('  config             Configure development features (Docker/K8s toggles)');
   log('');
   log('GLOBAL OPTIONS:', 'yellow');
   log('  --help, -h         Show help');
@@ -140,6 +141,7 @@ const showHelp = () => {
   log('  autopm setup-env                  # Configure .env interactively');
   log('  autopm setup-env ~/my-project     # Configure .env for specific project');
   log('  autopm init my-new-project        # Initialize new project');
+  log('  autopm config                     # Configure Docker/K8s features');
   log('');
   log('INSTALLATION MODES:', 'yellow');
   log('  🆕 Fresh Install   - Sets up complete ClaudeAutoPM framework');
@@ -303,6 +305,12 @@ const main = () => {
       checkPrerequisites();
       printBanner();
       initProject(parsed.path);
+      break;
+
+    case 'config':
+      printBanner();
+      info('Starting ClaudeAutoPM configuration...');
+      executeBashScript(path.join(PACKAGE_DIR, '.claude', 'scripts', 'config', 'toggle-features.sh'), []);
       break;
 
     default:

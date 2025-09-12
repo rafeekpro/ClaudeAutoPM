@@ -360,6 +360,71 @@ install_files() {
     done
 }
 
+# Choose configuration template
+choose_configuration() {
+    local config_file="$TARGET_DIR/.claude/config.json"
+    
+    # Skip if config already exists and this is an update
+    if [ "$is_update" = true ] && [ -f "$config_file" ]; then
+        print_msg "$CYAN" "🔧 Keeping existing configuration"
+        return
+    fi
+    
+    print_msg "$YELLOW" "\n🔧 Choose your development configuration:"
+    echo ""
+    echo "  1) 🏃 Minimal     - Traditional development (no Docker/K8s)"
+    echo "  2) 🐳 Docker-only - Docker-first development without Kubernetes"  
+    echo "  3) 🚀 Full DevOps - All features (Docker + Kubernetes + CI/CD)"
+    echo "  4) ⚙️  Custom     - Use existing config.json template"
+    echo ""
+    
+    while true; do
+        echo -n "Your choice [1-4]: "
+        read -r choice
+        
+        case "$choice" in
+            1)
+                print_step "Setting up minimal configuration..."
+                cp "$PACKAGE_DIR/.claude/config-templates/minimal.json" "$config_file"
+                print_success "Minimal configuration applied!"
+                break
+                ;;
+            2)
+                print_step "Setting up Docker-only configuration..."
+                cp "$PACKAGE_DIR/.claude/config-templates/docker-only.json" "$config_file"
+                print_success "Docker-only configuration applied!"
+                break
+                ;;
+            3)
+                print_step "Setting up full DevOps configuration..."
+                cp "$PACKAGE_DIR/.claude/config-templates/full-devops.json" "$config_file"
+                print_success "Full DevOps configuration applied!"
+                print_msg "$CYAN" "  📋 This enables Docker-first development and Kubernetes testing"
+                print_msg "$CYAN" "  📋 GitHub Actions will run comprehensive CI/CD pipelines"
+                break
+                ;;
+            4)
+                if [ -f "$PACKAGE_DIR/.claude/config.json" ]; then
+                    print_step "Using default configuration template..."
+                    cp "$PACKAGE_DIR/.claude/config.json" "$config_file"
+                    print_success "Default configuration applied!"
+                else
+                    print_warning "Default config not found, using Docker-only template..."
+                    cp "$PACKAGE_DIR/.claude/config-templates/docker-only.json" "$config_file"
+                fi
+                break
+                ;;
+            *)
+                print_warning "Invalid choice. Please enter 1, 2, 3, or 4."
+                ;;
+        esac
+    done
+    
+    print_msg "$CYAN" "\n💡 You can change these settings later with:"
+    print_msg "$CYAN" "   /config:toggle-features"
+    print_msg "$CYAN" "   or: .claude/scripts/config/toggle-features.sh"
+}
+
 # Handle CLAUDE.md migration
 handle_claude_md() {
     local source_dir="$1"
@@ -827,6 +892,11 @@ main() {
     fi
     
     install_files "$source_dir" "$is_update"
+    
+    # Choose configuration template (only for fresh installs)
+    if [ "$is_update" = false ]; then
+        choose_configuration
+    fi
     
     # Handle CLAUDE.md
     handle_claude_md "$source_dir"
