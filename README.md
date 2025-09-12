@@ -1,31 +1,31 @@
-# AUTOPM
+# ClaudeAutoPM
 
-[![MIT License](https://img.shields.io/badge/License-MIT-28a745)](https://github.com/rlagowski/autopm/blob/main/LICENSE)
+[![NPM Version](https://img.shields.io/npm/v/claude-autopm)](https://www.npmjs.com/package/claude-autopm)
+[![NPM Downloads](https://img.shields.io/npm/dm/claude-autopm)](https://www.npmjs.com/package/claude-autopm)
+[![MIT License](https://img.shields.io/badge/License-MIT-28a745)](https://github.com/rafeekpro/ClaudeAutoPM/blob/main/LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/rafeekpro/ClaudeAutoPM?style=social)](https://github.com/rafeekpro/ClaudeAutoPM)
 &nbsp;
-[![Follow on 𝕏](https://img.shields.io/badge/𝕏-@rlagowski-1c9bf0)](http://x.com/intent/follow?screen_name=rlagowski)
-&nbsp;
-[![Star this repo](https://img.shields.io/badge/★-Star%20this%20repo-e7b10b)](https://github.com/rlagowski/autopm)
+[![Follow on 𝕏](https://img.shields.io/badge/𝕏-@rafeekpro-1c9bf0)](http://x.com/intent/follow?screen_name=rafeekpro)
 
 ## Automated project management system to ship ~~faster~~ _better_ using spec-driven development, GitHub issues, Git worktrees, and multiple AI agents running in parallel
 
 Stop losing context. Stop blocking on tasks. Stop shipping bugs. This battle-tested system turns PRDs into epics, epics into GitHub issues, and issues into production code – with full traceability at every step.
 
-
 ## Table of Contents
 
+- [🚀 Installation](#-installation)
 - [Background](#background)
 - [The Workflow](#the-workflow)
 - [What Makes This Different?](#what-makes-this-different)
 - [Why GitHub Issues?](#why-github-issues)
 - [Core Principle: No Vibe Coding](#core-principle-no-vibe-coding)
+- [🎆 Key Features](#-key-features)
 - [System Architecture](#system-architecture)
 - [Workflow Phases](#workflow-phases)
 - [Command Reference](#command-reference)
 - [The Parallel Execution System](#the-parallel-execution-system)
-- [Key Features & Benefits](#key-features--benefits)
 - [Proven Results](#proven-results)
 - [Example Flow](#example-flow)
-- [Get Started Now](#get-started-now)
 - [Local vs Remote](#local-vs-remote)
 - [Technical Notes](#technical-notes)
 - [Support This Project](#support-this-project)
@@ -40,6 +40,68 @@ Every team struggles with the same problems:
 - **Progress becomes invisible** until the very end
 
 This system solves all of that.
+
+## 🚀 Installation
+
+### Global Installation (Recommended)
+
+```bash
+npm install -g claude-autopm
+claude-autopm --help
+```
+
+### Quick Start Commands
+
+```bash
+# Install AUTOPM framework to current project
+claude-autopm install
+
+# Install to specific directory
+claude-autopm install ./my-project
+
+# Update existing AUTOPM installation
+claude-autopm update
+
+# Generate AI-powered CLAUDE.md merge prompts
+claude-autopm merge
+
+# Interactive .env configuration
+claude-autopm setup-env
+
+# Create new project with AUTOPM
+claude-autopm init my-new-project
+```
+
+### Alternative Installation Methods
+
+#### Use without global installation
+```bash
+npx claude-autopm install
+npx claude-autopm merge
+```
+
+#### Manual installation (legacy)
+```bash
+# Unix/Linux/macOS
+curl -sSL https://raw.githubusercontent.com/rafeekpro/ClaudeAutoPM/main/install/install.sh | bash
+
+# Windows PowerShell
+iwr -useb https://raw.githubusercontent.com/rafeekpro/ClaudeAutoPM/main/install/install.sh | iex
+```
+
+### System Requirements
+
+- **Node.js** >= 16.0.0
+- **npm** >= 8.0.0
+- **Git** (system installation)
+- **Claude Code** or compatible AI coding assistant
+
+### Package Information
+
+- **Package**: `claude-autopm`
+- **Current Version**: `1.0.0`
+- **Registry**: https://www.npmjs.com/package/claude-autopm
+- **Repository**: https://github.com/rafeekpro/ClaudeAutoPM
 
 ## The Workflow
 
@@ -74,6 +136,111 @@ graph LR
 | "Vibe coding" from memory | **Spec-driven** with full traceability |
 | Progress hidden in branches | **Transparent audit trail** in GitHub |
 | Manual task coordination | **Intelligent prioritization** with `/pm:next` |
+
+## 🌟 Key Features
+
+### 🤖 **50+ Specialized AI Agents**
+
+**Language Experts:**
+- **Python**: `python-backend-engineer` - FastAPI, SQLAlchemy, async development
+- **JavaScript/TypeScript**: `javascript-frontend-engineer`, `nodejs-backend-engineer`
+- **Bash**: `bash-scripting-expert` - System automation, CI/CD scripts
+
+**Framework Specialists:**
+- **React**: `react-frontend-engineer` - Modern React, TypeScript, Next.js
+- **Backend APIs**: `fastapi-backend-engineer`, `flask-backend-engineer`
+- **Testing**: `playwright-test-engineer`, `playwright-mcp-frontend-tester`
+
+**UI Framework Agents:**
+- **Material-UI**: `mui-react-expert` - Enterprise DataGrid, theming
+- **Chakra UI**: `chakra-ui-expert` - Accessibility-first design systems
+- **Ant Design**: `antd-react-expert` - Enterprise admin interfaces
+- **Bootstrap**: `bootstrap-ui-expert` - Rapid prototyping
+- **Tailwind CSS**: `tailwindcss-expert` - Custom design systems
+- **UX Design**: `ux-design-expert` - User experience optimization
+
+**Cloud & Infrastructure:**
+- **AWS**: `aws-cloud-architect` - EKS, Lambda, CloudFormation
+- **Azure**: `azure-cloud-architect` - AKS, Functions, ARM templates
+- **GCP**: `gcp-cloud-architect` - GKE, Cloud Run, Terraform
+- **Kubernetes**: `kubernetes-orchestrator` - Helm charts, GitOps
+- **Terraform**: `terraform-infrastructure-expert` - Multi-cloud IaC
+
+**DevOps & Operations:**
+- **GitHub Actions**: `github-operations-specialist`
+- **Azure DevOps**: `azure-devops-specialist` - Complete enterprise integration
+- **Docker**: `docker-expert`, `docker-compose-expert`, `docker-development-orchestrator`
+- **Proxy & Networking**: `traefik-proxy-expert`
+- **SSH Management**: `ssh-operations-expert`
+
+**Database Specialists:**
+- **PostgreSQL**: `postgresql-expert` - Query optimization, migrations
+- **MongoDB**: `mongodb-expert` - Document modeling, aggregations
+- **Redis**: `redis-expert` - Caching, pub/sub, data structures
+- **BigQuery**: `bigquery-expert` - Data warehousing, ML
+- **Cosmos DB**: `cosmosdb-expert` - Multi-model, global distribution
+
+**AI & Integration:**
+- **OpenAI**: `openai-python-expert` - GPT models, embeddings, fine-tuning
+- **Google Gemini**: `gemini-api-expert` - Multimodal AI, function calling
+- **LangGraph**: `langgraph-workflow-expert` - AI workflow orchestration
+
+**Data Engineering:**
+- **Apache Airflow**: `airflow-orchestration-expert` - ETL/ELT pipelines
+- **Kedro**: `kedro-pipeline-expert` - Reproducible data science
+- **NATS**: `nats-messaging-expert` - High-performance messaging
+
+**Core Utilities:**
+- **file-analyzer** - Smart file and log analysis
+- **code-analyzer** - Bug detection and logic tracing  
+- **test-runner** - Comprehensive test execution with analysis
+- **parallel-worker** - Multi-stream parallel execution coordinator
+
+### 🔧 **Advanced Installation System**
+
+- **Smart Detection** - Automatically detects existing vs fresh installations
+- **Safe Updates** - Automatic backups with timestamps
+- **File Change Detection** - Only updates modified files  
+- **Cross-Platform** - Windows (Git Bash/WSL), macOS, Linux support
+- **Error Recovery** - Graceful failures with rollback information
+
+### 🤝 **CLAUDE.md Management**
+
+- **Intelligent Merging** - AI-powered configuration combining
+- **Conflict Resolution** - Preserves user customizations while adding framework updates
+- **Migration Tools** - Automatic migration from CLAUDE_BASIC.md
+- **Backup System** - Never lose your customizations
+
+### 🌐 **MCP (Model Context Protocol) Integration**
+
+- **Context7** - Documentation and codebase context management
+- **Playwright MCP** - Browser automation and visual testing
+- **GitHub MCP** - Repository operations and workflow management
+- **Extensible** - Add custom MCP servers for team-specific integrations
+
+### 📋 **Enterprise Azure DevOps Integration**
+
+- **38+ Commands** - Complete project management suite
+- **Bidirectional Sync** - GitHub ↔ Azure DevOps synchronization
+- **User Stories** - PRD to User Story mapping with automatic task breakdown
+- **Sprint Management** - Complete agile workflow with burndown tracking
+- **Work Item Automation** - Automated task creation, assignment, and tracking
+
+### 🛡️ **DevOps Troubleshooting Playbook**
+
+- **Kubernetes Debugging** - Standard procedures for pod, service, and deployment issues
+- **ConfigMap Size Limits** - Solutions for "ConfigMap too long" errors with Kaniko
+- **Database Strategy** - Environment-specific database management patterns
+- **Security Best Practices** - Secret management and incident response templates
+- **Emergency Procedures** - Quick rollback and debugging commands
+
+### ⚙️ **Development Quality Enforcement**
+
+- **TDD Mandatory** - Test-Driven Development cycle enforcement
+- **Code Quality Gates** - Automatic linting, formatting, and validation
+- **Git Hooks** - Pre-commit and pre-push quality checks
+- **Commit Safety** - Comprehensive commit checklist and validation
+- **Performance Guidelines** - Built-in performance optimization patterns
 
 ## Why GitHub Issues?
 
@@ -292,6 +459,7 @@ The system includes 13 specialized agents that work together to handle different
 The system provides commands organized by category:
 
 ### Project Management (`/pm:*`)
+
 Core workflow commands for PRDs, epics, and issues - see [Command Reference](#command-reference) above.
 
 ### Specialized Commands
@@ -391,21 +559,27 @@ GitHub doesn't need to know HOW the work got done – just that it IS done.
 ## Key Features & Benefits
 
 ### 🧠 **Context Preservation**
+
 Never lose project state again. Each epic maintains its own context, agents read from `.claude/context/`, and updates locally before syncing.
 
 ### ⚡ **Parallel Execution**
+
 Ship faster with multiple agents working simultaneously. Tasks marked `parallel: true` enable conflict-free concurrent development.
 
 ### 🔗 **GitHub Native**
+
 Works with tools your team already uses. Issues are the source of truth, comments provide history, and there is no dependency on the Projects API.
 
 ### 🤖 **Agent Specialization**
+
 Right tool for every job. Different agents for UI, API, and database work. Each reads requirements and posts updates automatically.
 
 ### 📊 **Full Traceability**
+
 Every decision is documented. PRD → Epic → Task → Issue → Code → Commit. Complete audit trail from idea to production.
 
 ### 🚀 **Developer Productivity**
+
 Focus on building, not managing. Intelligent prioritization, automatic context loading, and incremental sync when ready.
 
 ## Proven Results
@@ -448,29 +622,36 @@ Teams using this system report:
 
 ## Get Started Now
 
-### Quick Setup (2 minutes)
+### Quick Setup (30 seconds)
 
-1. **Install this repository into your project**:
+#### Modern Installation (Recommended)
 
-   #### Unix/Linux/macOS
+```bash
+# Install globally via npm
+npm install -g claude-autopm
 
-   ```bash
-   cd path/to/your/project/
-   curl -sSL https://raw.githubusercontent.com/rlagowski/autopm/main/autopm.sh | bash
-   # or: wget -qO- https://raw.githubusercontent.com/rlagowski/autopm/main/autopm.sh | bash
-   ```
+# Navigate to your project
+cd path/to/your/project/
 
-   #### Windows (PowerShell)
+# Install AUTOPM framework
+claude-autopm install
+```
 
-   ```bash
-   cd path/to/your/project/
-   iwr -useb https://raw.githubusercontent.com/rlagowski/autopm/main/autopm.bat | iex
-   ```
+#### Legacy Installation Methods
 
-   > ⚠️ **IMPORTANT**: If you already have a `.claude` directory, clone this repository to a different directory and copy the contents of the cloned `.claude` directory to your project's `.claude` directory.
+**Unix/Linux/macOS:**
+```bash
+cd path/to/your/project/
+curl -sSL https://raw.githubusercontent.com/rafeekpro/ClaudeAutoPM/main/install/install.sh | bash
+```
 
-   See full/other installation options in the [installation guide ›](https://github.com/rlagowski/autopm/tree/main/install)
+**Windows (PowerShell):**
+```bash
+cd path/to/your/project/
+iwr -useb https://raw.githubusercontent.com/rafeekpro/ClaudeAutoPM/main/install/install.sh | iex
+```
 
+> 💡 **TIP**: The npm installation is faster, safer, and includes automatic updates. Legacy methods are provided for compatibility.
 
 2. **Initialize the PM system**:
 
@@ -550,11 +731,18 @@ AUTOPM was developed by **Rafal Lagowski** for developers who ship, by developer
 
 If AUTOPM helps your team ship better software:
 
-- ⭐ **[Star this repository](https://github.com/rlagowski/autopm)** to show your support
-- 🐦 **[Follow @rlagowski on X](https://x.com/rlagowski)** for updates and tips
+- ⭐ **[Star this repository](https://github.com/rafeekpro/ClaudeAutoPM)** to show your support
+- 📦 **[Try on npm](https://www.npmjs.com/package/claude-autopm)** - `npm install -g claude-autopm`
+- 🐦 **[Follow @rafeekpro on X](https://x.com/rafeekpro)** for updates and tips
 
 ---
 
 ## Star History
 
-![Star History Chart](https://api.star-history.com/svg?repos=rlagowski/autopm)
+## 📦 Package Stats
+
+[![NPM Version](https://img.shields.io/npm/v/claude-autopm?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/claude-autopm)
+[![NPM Downloads](https://img.shields.io/npm/dm/claude-autopm?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/claude-autopm)
+[![GitHub Release Date](https://img.shields.io/github/release-date/rafeekpro/ClaudeAutoPM?style=for-the-badge&logo=github)](https://github.com/rafeekpro/ClaudeAutoPM/releases)
+
+![Star History Chart](https://api.star-history.com/svg?repos=rafeekpro/ClaudeAutoPM)
