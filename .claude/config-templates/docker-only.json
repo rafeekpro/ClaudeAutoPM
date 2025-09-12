@@ -5,11 +5,12 @@
     "block_local_execution": true,
     "auto_create_dockerfile": true,
     "sync_with_ci": true,
-    "kubernetes_devops_testing": true,
-    "github_actions_k8s": true,
-    "integration_tests": true
+    "kubernetes_devops_testing": false,
+    "github_actions_k8s": false,
+    "integration_tests": false
   },
   "docker": {
+    "enabled": true,
     "default_base_images": {
       "python": "python:3.11-slim",
       "node": "node:20-alpine",
@@ -27,25 +28,25 @@
     }
   },
   "kubernetes": {
-    "enabled": true,
+    "enabled": false,
     "testing": {
-      "integration_tests": true,
-      "helm_chart_tests": true,
-      "kubectl_smoke_tests": true
+      "integration_tests": false,
+      "helm_chart_tests": false,
+      "kubectl_smoke_tests": false
     },
     "environments": {
-      "minikube": true,
-      "kind": true,
+      "minikube": false,
+      "kind": false,
       "k3d": false
     },
     "manifests": {
-      "auto_generate": true,
-      "validate_yaml": true,
-      "security_policies": true
+      "auto_generate": false,
+      "validate_yaml": false,
+      "security_policies": false
     }
   },
   "github_actions": {
-    "kubernetes_tests": true,
+    "kubernetes_tests": false,
     "docker_integration": true,
     "matrix_testing": true,
     "cache_optimization": true

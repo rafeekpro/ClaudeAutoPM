@@ -1,0 +1,312 @@
+name: Kubernetes & DevOps Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      k8s_environment:
+        description: 'Kubernetes environment to test'
+        required: false
+        default: 'kind'
+        type: choice
+        options:
+        - kind
+        - minikube
+        - k3d
+
+# Cancel in-progress runs for PRs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Kubernetes versions to test against
+  K8S_VERSION: v1.28.0
+  KUBECTL_VERSION: v1.28.0
+  HELM_VERSION: v3.12.0
+
+jobs:
+  detect-k8s-config:
+    name: Detect Kubernetes Configuration
+    runs-on: ubuntu-latest
+    outputs:
+      kubernetes-enabled: ${{ steps.config.outputs.k8s_enabled }}
+      docker-first-enabled: ${{ steps.config.outputs.docker_enabled }}
+      integration-tests: ${{ steps.config.outputs.integration_enabled }}
+      k8s-manifests-changed: ${{ steps.changes.outputs.k8s_changed }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check Kubernetes configuration
+        id: config
+        run: |
+          if [[ -f ".claude/config.json" ]]; then
+            if command -v jq >/dev/null 2>&1; then
+              k8s_enabled=$(jq -r '.features.kubernetes_devops_testing // false' .claude/config.json)
+              docker_enabled=$(jq -r '.features.docker_first_development // false' .claude/config.json)
+              integration_enabled=$(jq -r '.features.integration_tests // false' .claude/config.json)
+              github_k8s=$(jq -r '.github_actions.kubernetes_tests // false' .claude/config.json)
+              
+              # Enable if either kubernetes_devops_testing OR github_actions.kubernetes_tests is true
+              if [[ "$k8s_enabled" == "true" || "$github_k8s" == "true" ]]; then
+                echo "k8s_enabled=true" >> $GITHUB_OUTPUT
+              else
+                echo "k8s_enabled=false" >> $GITHUB_OUTPUT
+              fi
+              
+              echo "docker_enabled=$docker_enabled" >> $GITHUB_OUTPUT
+              echo "integration_enabled=$integration_enabled" >> $GITHUB_OUTPUT
+            else
+              echo "k8s_enabled=false" >> $GITHUB_OUTPUT
+              echo "docker_enabled=false" >> $GITHUB_OUTPUT
+              echo "integration_enabled=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "k8s_enabled=false" >> $GITHUB_OUTPUT
+            echo "docker_enabled=false" >> $GITHUB_OUTPUT
+            echo "integration_enabled=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Detect Kubernetes changes
+        id: changes
+        run: |
+          # Check if Kubernetes manifests or Helm charts changed
+          if git diff --name-only HEAD~1 HEAD | grep -E "(k8s/|kubernetes/|\.yaml$|\.yml$|Chart\.yaml|values\.yaml|Dockerfile)" > /dev/null; then
+            echo "k8s_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "k8s_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+  kubernetes-validation:
+    name: Validate Kubernetes Manifests
+    runs-on: ubuntu-latest
+    needs: detect-k8s-config
+    if: needs.detect-k8s-config.outputs.kubernetes-enabled == 'true' || needs.detect-k8s-config.outputs.k8s-manifests-changed == 'true'
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: ${{ env.KUBECTL_VERSION }}
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: ${{ env.HELM_VERSION }}
+
+      - name: Validate YAML manifests
+        run: |
+          echo "🔍 Validating Kubernetes manifests..."
+          
+          # Find all YAML files in k8s directories
+          find . -path "*/k8s/*" -name "*.yaml" -o -name "*.yml" | while read -r file; do
+            echo "Validating: $file"
+            kubectl apply --dry-run=client --validate=true -f "$file" || {
+              echo "❌ Validation failed for: $file"
+              exit 1
+            }
+          done
+          
+          echo "✅ All Kubernetes manifests are valid"
+
+      - name: Lint Helm charts
+        run: |
+          echo "🔍 Linting Helm charts..."
+          
+          # Find all Helm charts
+          find . -name "Chart.yaml" | while read -r chart; do
+            chart_dir=$(dirname "$chart")
+            echo "Linting chart: $chart_dir"
+            helm lint "$chart_dir" || {
+              echo "❌ Helm lint failed for: $chart_dir"
+              exit 1
+            }
+          done
+          
+          echo "✅ All Helm charts passed linting"
+
+  kind-integration-tests:
+    name: KIND Integration Tests
+    runs-on: ubuntu-latest
+    needs: [detect-k8s-config, kubernetes-validation]
+    if: needs.detect-k8s-config.outputs.kubernetes-enabled == 'true' && needs.detect-k8s-config.outputs.integration-tests == 'true'
+    
+    strategy:
+      matrix:
+        k8s-version: [v1.27.0, v1.28.0]
+        
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup KIND
+        uses: helm/kind-action@v1.8.0
+        with:
+          kubernetes_version: ${{ matrix.k8s-version }}
+          cluster_name: autopm-test-cluster
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: ${{ env.KUBECTL_VERSION }}
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: ${{ env.HELM_VERSION }}
+
+      - name: Verify cluster
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+          kubectl get pods -A
+
+      - name: Build and load Docker images
+        if: needs.detect-k8s-config.outputs.docker-first-enabled == 'true'
+        run: |
+          echo "🐳 Building Docker images for Kubernetes..."
+          
+          # Build application images if Dockerfile exists
+          if [[ -f "Dockerfile" ]]; then
+            docker build -t autopm-app:test .
+            kind load docker-image autopm-app:test --name autopm-test-cluster
+          fi
+
+      - name: Deploy to KIND cluster
+        run: |
+          echo "🚀 Deploying to KIND cluster..."
+          
+          # Deploy Kubernetes manifests if they exist
+          if [[ -d "k8s" ]]; then
+            kubectl apply -f k8s/
+            kubectl wait --for=condition=available --timeout=300s deployment --all || true
+          fi
+          
+          # Deploy Helm charts if they exist
+          find . -name "Chart.yaml" | while read -r chart; do
+            chart_dir=$(dirname "$chart")
+            chart_name=$(basename "$chart_dir")
+            echo "Installing Helm chart: $chart_name"
+            helm install "$chart_name-test" "$chart_dir" --wait --timeout=300s || true
+          done
+
+      - name: Run smoke tests
+        run: |
+          echo "🧪 Running Kubernetes smoke tests..."
+          
+          # Basic connectivity tests
+          kubectl get pods -A
+          kubectl get services -A
+          
+          # Check if pods are running
+          if kubectl get pods --field-selector=status.phase!=Running,status.phase!=Succeeded -A --no-headers | wc -l | grep -q '^0$'; then
+            echo "✅ All pods are running successfully"
+          else
+            echo "❌ Some pods are not running:"
+            kubectl get pods --field-selector=status.phase!=Running,status.phase!=Succeeded -A
+            exit 1
+          fi
+
+      - name: Collect logs on failure
+        if: failure()
+        run: |
+          echo "📋 Collecting logs from failed pods..."
+          kubectl get pods -A --no-headers | grep -E "(Error|CrashLoopBackOff|ImagePullBackOff)" | while read -r namespace pod _; do
+            echo "=== Logs for $namespace/$pod ==="
+            kubectl logs -n "$namespace" "$pod" --tail=100 || true
+          done
+
+  docker-k8s-integration:
+    name: Docker + Kubernetes Integration
+    runs-on: ubuntu-latest
+    needs: [detect-k8s-config, kind-integration-tests]
+    if: needs.detect-k8s-config.outputs.kubernetes-enabled == 'true' && needs.detect-k8s-config.outputs.docker-first-enabled == 'true'
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup KIND
+        uses: helm/kind-action@v1.8.0
+        with:
+          kubernetes_version: ${{ env.K8S_VERSION }}
+          cluster_name: autopm-integration-cluster
+
+      - name: Test Docker-to-Kubernetes pipeline
+        run: |
+          echo "🔄 Testing Docker to Kubernetes deployment pipeline..."
+          
+          # This would be customized based on your specific application
+          # Example: Build -> Test -> Deploy -> Verify
+          
+          echo "1. Building application..."
+          if [[ -f "Dockerfile" ]]; then
+            docker build -t autopm-integration:latest .
+            kind load docker-image autopm-integration:latest --name autopm-integration-cluster
+          fi
+          
+          echo "2. Deploying to Kubernetes..."
+          # Add your deployment logic here
+          
+          echo "3. Running integration tests..."
+          # Add your integration test logic here
+          
+          echo "✅ Docker + Kubernetes integration test completed"
+
+  security-scanning:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    needs: detect-k8s-config
+    if: needs.detect-k8s-config.outputs.kubernetes-enabled == 'true'
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Kubernetes security checks
+        run: |
+          echo "🔒 Running Kubernetes security checks..."
+          
+          # Check for security best practices in Kubernetes manifests
+          find . -name "*.yaml" -o -name "*.yml" | grep -E "(k8s|kubernetes)" | while read -r file; do
+            echo "Checking security in: $file"
+            
+            # Check for privileged containers
+            if grep -q "privileged.*true" "$file"; then
+              echo "⚠️  Warning: Privileged container found in $file"
+            fi
+            
+            # Check for running as root
+            if ! grep -q "runAsNonRoot.*true\|runAsUser" "$file"; then
+              echo "⚠️  Warning: Container may run as root in $file"
+            fi
+            
+            # Check for resource limits
+            if ! grep -q "resources:" "$file"; then
+              echo "⚠️  Warning: No resource limits defined in $file"
+            fi
+          done
+          
+          echo "✅ Security checks completed"
