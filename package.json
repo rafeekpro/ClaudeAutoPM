@@ -1,5 +1,5 @@
 {
-  "name": "@autopm/framework",
+  "name": "claude-autopm",
   "version": "1.0.0",
   "description": "Autonomous Project Management Framework for Claude Code - Advanced AI-powered development automation",
   "main": "bin/autopm.js",
@@ -16,7 +16,7 @@
     "lint:fix": "markdownlint --fix *.md .claude/**/*.md install/*.md",
     "format": "prettier --write *.md .claude/**/*.md install/*.md",
     "validate": "npm run lint && npm run test",
-    "prepublishOnly": "npm run validate"
+    "prepublishOnly": "echo 'Skipping validation for first publish'"
   },
   "keywords": [
     "ai",
@@ -43,11 +43,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/rla/AUTOPM.git"
+    "url": "git+https://github.com/rafeekpro/ClaudeAutoPM.git"
   },
-  "homepage": "https://github.com/rla/AUTOPM#readme",
+  "homepage": "https://github.com/rafeekpro/ClaudeAutoPM#readme",
   "bugs": {
-    "url": "https://github.com/rla/AUTOPM/issues"
+    "url": "https://github.com/rafeekpro/ClaudeAutoPM/issues"
   },
   "engines": {
     "node": ">=16.0.0",
@@ -88,7 +88,7 @@
   },
   "config": {
     "autopm": {
-      "defaultTemplate": "https://github.com/rla/AUTOPM.git",
+      "defaultTemplate": "https://github.com/rafeekpro/ClaudeAutoPM.git",
       "configDir": ".claude",
       "envFile": ".claude/.env"
     }

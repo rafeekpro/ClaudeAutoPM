@@ -5,6 +5,7 @@
 ## Before ANY Implementation
 
 ### Required Preparation
+
 1. Check existing codebase for similar functions
 2. Read naming conventions from existing code
 3. Understand current architecture patterns
@@ -12,6 +13,7 @@
 5. Identify which agents to use
 
 ### Codebase Analysis
+
 - Search for existing implementations
 - Verify no duplication will occur
 - Understand dependencies
@@ -21,6 +23,7 @@
 ## During Implementation
 
 ### Mandatory Practices
+
 1. Follow TDD cycle religiously
 2. Use appropriate agents for context management
 3. Never bypass agent pipelines
@@ -28,6 +31,7 @@
 5. Write verbose tests for debugging
 
 ### Quality Checkpoints
+
 - After each test: Verify it fails correctly
 - After each implementation: Verify minimal code
 - After each refactor: Verify tests still pass
@@ -36,6 +40,7 @@
 ## After Implementation
 
 ### Required Verification
+
 1. Run full test suite via test-runner
 2. Use code-analyzer for final review
 3. Update documentation ONLY if requested
@@ -43,6 +48,7 @@
 5. Verify no resource leaks
 
 ### Cleanup Tasks
+
 - Remove any debug code
 - Clean up test artifacts
 - Close any open resources
@@ -52,6 +58,7 @@
 ## Development Patterns
 
 ### Search Before Create
+
 ```
 ALWAYS:
 1. Search for existing function
@@ -66,6 +73,7 @@ NEVER:
 ```
 
 ### Test Before Code
+
 ```
 ALWAYS:
 1. Write failing test first
@@ -82,6 +90,7 @@ NEVER:
 ```
 
 ### Agent Before Direct
+
 ```
 ALWAYS:
 1. Use file-analyzer for file reads
@@ -99,6 +108,7 @@ NEVER:
 ## Error Handling Patterns
 
 ### When Error Occurs
+
 1. Stop immediately
 2. Activate ERROR HANDLING PIPELINE
 3. Write test to reproduce
@@ -107,6 +117,7 @@ NEVER:
 6. Document error pattern
 
 ### Prevention Strategy
+
 - Defensive coding
 - Input validation
 - Resource cleanup
@@ -116,6 +127,7 @@ NEVER:
 ## Performance Considerations
 
 ### Optimization Rules
+
 - Profile before optimizing
 - Optimize algorithms first
 - Then optimize implementation
@@ -123,6 +135,7 @@ NEVER:
 - Batch similar operations
 
 ### Anti-Patterns
+
 - ❌ Premature optimization
 - ❌ Micro-optimizations
 - ❌ Ignoring algorithmic complexity
@@ -131,6 +144,7 @@ NEVER:
 ## Continuous Improvement
 
 ### Learn From Each Task
+
 1. Document new patterns discovered
 2. Update CLAUDE.md with learnings
 3. Create new agent if pattern repeats
@@ -138,6 +152,7 @@ NEVER:
 5. Share knowledge in rules
 
 ### Metrics to Track
+
 - Test coverage percentage
 - Agent utilization rate
 - Context efficiency ratio
@@ -147,6 +162,7 @@ NEVER:
 ## Success Indicators
 
 ### Task Completion
+
 - ✅ All tests passing
 - ✅ No code duplication
 - ✅ Consistent naming
@@ -156,6 +172,7 @@ NEVER:
 - ✅ Patterns documented
 
 ### Quality Markers
+
 - ✅ TDD cycle followed
 - ✅ Agents used appropriately
 - ✅ Context optimized
@@ -165,6 +182,7 @@ NEVER:
 ## Enforcement
 
 ### Violation Response
+
 1. Stop current approach
 2. Identify violation type
 3. Correct using proper workflow
@@ -172,6 +190,7 @@ NEVER:
 5. Update relevant rules
 
 ### Prevention Focus
+
 - Checklists before starting
 - Agent delegation habits
 - TDD discipline

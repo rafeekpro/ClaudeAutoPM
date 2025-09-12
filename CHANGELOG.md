@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Features
 
 #### 🔧 Installation System
+
 - **Smart detection** of existing installations vs fresh installs
 - **Automatic backups** with timestamp (`autopm_backup_YYYYMMDD_HHMMSS/`)
 - **File change detection** - only updates modified files
@@ -32,12 +33,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Error handling** with graceful failures and rollback information
 
 #### 🤖 CLAUDE.md Management
+
 - **Automatic migration** from `CLAUDE_BASIC.md` to `CLAUDE.md`
 - **Conflict detection** when both files exist
 - **AI merge prompts** for intelligent configuration combining
 - **Preservation of user customizations** with framework updates integration
 
 #### 📋 CLI Commands
+
 ```bash
 autopm install [path]     # Install to directory
 autopm update [path]      # Update existing installation  
@@ -48,6 +51,7 @@ autopm --help            # Show usage guide
 ```
 
 #### 🛡️ Safety Features
+
 - Non-destructive updates with confirmation prompts
 - Comprehensive backup system before any changes
 - Dependency validation (Git, Node.js)
@@ -55,6 +59,7 @@ autopm --help            # Show usage guide
 - Detailed error messages and troubleshooting guides
 
 #### 🎨 Developer Experience
+
 - **Colorized output** with clear status indicators
 - **Interactive prompts** for user decisions
 - **Progress feedback** during operations
@@ -64,6 +69,7 @@ autopm --help            # Show usage guide
 ### Technical
 
 #### 🏗️ Architecture
+
 - **Modular design** with separate install and merge scripts
 - **Node.js CLI wrapper** around battle-tested Bash scripts
 - **NPM package structure** with proper bin entries
@@ -71,6 +77,7 @@ autopm --help            # Show usage guide
 - **Semantic versioning** with changelog maintenance
 
 #### 🔌 Integrations
+
 - **MCP (Model Context Protocol)** server configurations
 - **Context7** integration for documentation and codebase context
 - **Playwright MCP** for browser automation testing
@@ -78,6 +85,7 @@ autopm --help            # Show usage guide
 - **Multi-cloud support** (AWS, Azure, GCP) for infrastructure agents
 
 #### 📦 Package Management
+
 - **Scoped package**: `@autopm/framework`
 - **Multiple binary entries**: `autopm`, `autopm-install`, `autopm-merge`
 - **Optional dependencies** for MCP servers
@@ -95,22 +103,26 @@ autopm --help            # Show usage guide
 ### Dependencies
 
 #### Required
+
 - Node.js >= 16.0.0
 - NPM >= 8.0.0
 - Git (system dependency)
 
 #### Optional
+
 - `@context7/mcp-server` - Documentation context management
 - `@playwright/mcp-server` - Browser automation testing
 - `@modelcontextprotocol/server-github` - GitHub integration
 
 #### Development
+
 - `markdownlint-cli` - Markdown linting
 - `prettier` - Code formatting
 
 ## [Unreleased]
 
 ### Planned Features
+
 - 🔄 Auto-update mechanism for framework components
 - 🎨 Custom templates and project scaffolding
 - 📊 Usage analytics and improvement suggestions
@@ -132,18 +144,21 @@ autopm --help            # Show usage guide
 ## Installation
 
 ### Global Installation (Recommended)
+
 ```bash
 npm install -g @autopm/framework
 autopm --help
 ```
 
 ### Use with npx (No Installation)
+
 ```bash
 npx @autopm/framework install
 npx @autopm/framework merge
 ```
 
 ### Local Development
+
 ```bash
 git clone https://github.com/rla/AUTOPM.git
 cd AUTOPM

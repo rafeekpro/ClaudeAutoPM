@@ -5,6 +5,7 @@
 ## Absolute Naming Prohibitions
 
 ### NEVER USE These Suffixes
+
 - ❌ `_advanced`, `_fixed`, `_improved`, `_new`, `_old`
 - ❌ `_v2`, `_v3`, `_backup`, `_copy`, `_temp`
 - ❌ `_updated`, `_modified`, `_changed`
@@ -12,6 +13,7 @@
 - ❌ Version numbers in names (use git for versioning)
 
 ### NEVER CREATE These Documentation Files
+
 - ❌ `CHANGES_[DATE]_[FEATURE].md`
 - ❌ `SUMMARY_OBJECTIVE_[N].md`
 - ❌ `WORKFLOW_SETUP_GUIDE.md`
@@ -22,18 +24,21 @@
 ## Required Naming Patterns
 
 ### Before ANY Implementation
+
 1. Check existing codebase for naming patterns
 2. Read naming conventions from existing code
 3. Follow established patterns exactly
 4. When in doubt, search for similar functions
 
 ### Function/Variable Naming
+
 - Use descriptive names that explain purpose
 - Follow language-specific conventions (camelCase, snake_case)
 - Maintain consistency with existing codebase
 - Prefer clarity over brevity
 
 ### File Naming
+
 - Match existing file naming patterns
 - Use semantic names that describe content
 - No temporary or versioned file names
@@ -42,6 +47,7 @@
 ## Code Quality Standards
 
 ### NEVER TOLERATE
+
 - ❌ Partial implementations
 - ❌ "Simplified" code with TODOs
 - ❌ Duplicate functions (always search first)
@@ -51,6 +57,7 @@
 - ❌ Inconsistent formatting
 
 ### ALWAYS ENFORCE
+
 - ✅ Single responsibility principle
 - ✅ Proper separation of concerns
 - ✅ Resource cleanup (close connections, clear timeouts)
@@ -61,12 +68,14 @@
 ## Anti-Pattern Prevention
 
 ### Over-Engineering
+
 - Don't add unnecessary abstractions
 - Don't create factory patterns when simple functions work
 - Don't add middleware for trivial operations
 - Don't think "enterprise" when you need "working"
 
 ### Under-Engineering
+
 - Don't skip error handling
 - Don't ignore edge cases
 - Don't hardcode values that should be configurable
@@ -75,6 +84,7 @@
 ## Code Review Checklist
 
 Before ANY commit:
+
 1. No naming convention violations
 2. No duplicate code
 3. No resource leaks
@@ -86,6 +96,7 @@ Before ANY commit:
 ## Enforcement
 
 ### Discovery of Violation
+
 1. Stop current work immediately
 2. Fix naming to match conventions
 3. Remove any duplicate code
@@ -93,6 +104,7 @@ Before ANY commit:
 5. Document pattern in CLAUDE.md
 
 ### Prevention Strategy
+
 - Always search before creating new functions
 - Always read existing code for patterns
 - Always use agents for code analysis

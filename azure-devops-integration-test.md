@@ -9,6 +9,7 @@ This document demonstrates the Azure DevOps integration pattern simulation for w
 **Status**: No Azure DevOps environment variables found
 
 **Required Environment Variables:**
+
 - `AZURE_DEVOPS_PAT`: Personal Access Token for authentication
 - `AZURE_DEVOPS_ORG`: Azure DevOps organization name
 - `AZURE_DEVOPS_PROJECT`: Project name

@@ -10,7 +10,8 @@
 
 ## Agent Usage Requirements
 
-### ALWAYS USE file-analyzer WHEN:
+### ALWAYS USE file-analyzer WHEN
+
 - Reading any log file
 - Analyzing test outputs  
 - Reviewing configuration files
@@ -18,7 +19,8 @@
 - Reading multiple files for comparison
 - Extracting key information from large files
 
-### ALWAYS USE code-analyzer WHEN:
+### ALWAYS USE code-analyzer WHEN
+
 - Searching for code patterns
 - Tracing logic flow
 - Investigating bugs
@@ -27,20 +29,23 @@
 - Analyzing dependencies
 - Understanding code structure
 
-### ALWAYS USE test-runner WHEN:
+### ALWAYS USE test-runner WHEN
+
 - Running any tests
 - Validating implementations
 - Checking for regressions
 - Debugging test failures
 - Verifying fixes
 
-### ALWAYS USE parallel-worker WHEN:
+### ALWAYS USE parallel-worker WHEN
+
 - Implementing features with multiple components
 - Working on multiple files simultaneously
 - Decomposing epics into parallel tasks
 - Handling independent work streams
 
-### ALWAYS USE fastapi-expert WHEN:
+### ALWAYS USE fastapi-expert WHEN
+
 - Building FastAPI endpoints
 - Implementing API authentication
 - Optimizing API performance
@@ -50,6 +55,7 @@
 ## Context Firewall Pattern
 
 ### Main Thread (High-Level Only)
+
 - Task coordination
 - Critical decisions
 - User interaction
@@ -57,6 +63,7 @@
 - Next step determination
 
 ### Agent Threads (Heavy Lifting)
+
 - File reading and analysis
 - Code searching and parsing
 - Test execution and analysis
@@ -64,6 +71,7 @@
 - Verbose processing
 
 ### Information Return Rules
+
 - Return only actionable insights
 - Summarize findings to 10-20% of original
 - Focus on decisions needed
@@ -73,12 +81,14 @@
 ## Batch Operation Strategies
 
 ### Parallel Execution
+
 - Use parallel-worker for multi-file changes
 - Group related tests in test-runner
 - Combine searches in code-analyzer
 - Batch similar operations together
 
 ### Sequential When Required
+
 - Dependencies between operations
 - State changes affecting next steps
 - User approval needed between steps
@@ -86,6 +96,7 @@
 ## Anti-Patterns to Avoid
 
 ### NEVER DO
+
 - ❌ Direct grep/find/cat usage
 - ❌ Reading files without file-analyzer
 - ❌ Running tests without test-runner
@@ -94,6 +105,7 @@
 - ❌ Processing logs in main conversation
 
 ### Context Waste Examples
+
 ```
 BAD: Dumping entire log file to main thread
 GOOD: Use file-analyzer to extract key errors
@@ -108,18 +120,21 @@ GOOD: Use test-runner to run and summarize results
 ## Information Hierarchy
 
 ### Priority 1: Critical (Main Thread)
+
 - Blocking errors
 - Security vulnerabilities
 - Data loss risks
 - User decisions required
 
 ### Priority 2: Important (Agent Summary)
+
 - Test failures
 - Performance issues
 - Code quality problems
 - Configuration errors
 
 ### Priority 3: Verbose (Agent Internal)
+
 - Detailed logs
 - Full test output
 - Complete search results
@@ -128,6 +143,7 @@ GOOD: Use test-runner to run and summarize results
 ## Success Metrics
 
 ### Context Efficiency
+
 - ✅ All agents return <20% of processed data
 - ✅ No raw logs in main thread
 - ✅ No direct file reads without agents
@@ -135,6 +151,7 @@ GOOD: Use test-runner to run and summarize results
 - ✅ Clear summaries over raw data
 
 ### Agent Utilization
+
 - ✅ 100% file reads through file-analyzer
 - ✅ 100% code search through code-analyzer
 - ✅ 100% test runs through test-runner
@@ -143,13 +160,16 @@ GOOD: Use test-runner to run and summarize results
 ## Enforcement
 
 ### Violation Detection
+
 If context wastage detected:
+
 1. Stop current approach
 2. Identify appropriate agent
 3. Delegate task to agent
 4. Resume with summary only
 
 ### Continuous Improvement
+
 - Monitor context usage
 - Identify patterns for new agents
 - Update agent capabilities

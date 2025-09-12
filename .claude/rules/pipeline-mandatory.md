@@ -6,6 +6,7 @@
 
 **Trigger**: ANY error encountered
 **Sequence**:
+
 ```
 1. code-analyzer → Identify root cause and affected files
 2. code-analyzer → Implement fix following TDD:
@@ -21,6 +22,7 @@
 
 **Trigger**: Any new feature request
 **Sequence**:
+
 ```
 1. /pm:issue-analyze → Decompose into work streams
 2. parallel-worker → Spawn sub-agents for each stream:
@@ -37,6 +39,7 @@
 
 **Trigger**: Bug reported or discovered
 **Sequence**:
+
 ```
 1. code-analyzer → Trace bug through codebase
 2. Write test that reproduces bug (must fail)
@@ -50,6 +53,7 @@
 
 **Trigger**: Any code exploration need
 **Sequence**:
+
 ```
 1. code-analyzer → Initial search and analysis
 2. file-analyzer → Summarize findings
@@ -60,6 +64,7 @@
 
 **Trigger**: Verbose outputs or logs to analyze
 **Sequence**:
+
 ```
 1. file-analyzer → Extract critical information
 2. Return only actionable insights (10-20% of original)
@@ -70,6 +75,7 @@
 
 **Trigger**: Critical blocker or production issue
 **Sequence**:
+
 ```
 1. /pm:blocked → Document blocker
 2. code-analyzer → Trace bug through codebase
@@ -82,18 +88,21 @@
 ## Pipeline Bypass Violations
 
 ### NEVER ALLOWED
+
 - ❌ Skipping any step in a pipeline
 - ❌ Using direct commands instead of agents
 - ❌ Implementing without the required pipeline
 - ❌ Merging code without pipeline completion
 
 ### Enforcement
+
 - Pipelines are atomic - all steps or none
 - Each step must complete before next
 - Failures require pipeline restart
 - No manual overrides permitted
 
 ## Success Verification
+
 - Pipeline completion logged
 - All agents return success codes
 - Tests pass at pipeline end

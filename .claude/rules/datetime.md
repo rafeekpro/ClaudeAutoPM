@@ -22,6 +22,7 @@ Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ"
 ### Required Format
 
 All dates in frontmatter MUST use ISO 8601 format with UTC timezone:
+
 - Format: `YYYY-MM-DDTHH:MM:SSZ`
 - Example: `2024-01-15T14:30:45Z`
 
@@ -58,6 +59,7 @@ updated: 2024-01-15T14:30:45Z  # Use actual output from date command
 ### Examples
 
 **Creating a new PRD:**
+
 ```bash
 # First, get current datetime
 CURRENT_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
@@ -73,6 +75,7 @@ created: 2024-01-15T14:30:45Z  # Use the actual $CURRENT_DATE value
 ```
 
 **Updating an existing task:**
+
 ```bash
 # Get current datetime for update
 UPDATE_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
@@ -110,6 +113,7 @@ python -c "from datetime import datetime; print(datetime.utcnow().strftime('%Y-%
 ## Rule Priority
 
 This rule has **HIGHEST PRIORITY** and must be followed by all commands that:
+
 - Create new files with frontmatter
 - Update existing files with frontmatter
 - Track timestamps or progress

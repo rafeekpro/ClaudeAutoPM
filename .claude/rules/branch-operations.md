@@ -5,6 +5,7 @@ Git branches enable parallel development by allowing multiple developers to work
 ## Creating Branches
 
 Always create branches from a clean main branch:
+
 ```bash
 # Ensure main is up to date
 git checkout main
@@ -20,12 +21,14 @@ The branch will be created and pushed to origin with upstream tracking.
 ## Working in Branches
 
 ### Agent Commits
+
 - Agents commit directly to the branch
 - Use small, focused commits
 - Commit message format: `Issue #{number}: {description}`
 - Example: `Issue #1234: Add user authentication schema`
 
 ### File Operations
+
 ```bash
 # Working directory is the current directory
 # (no need to change directories like with worktrees)
@@ -42,6 +45,7 @@ git log --oneline -5
 ## Parallel Work in Same Branch
 
 Multiple agents can work in the same branch if they coordinate file access:
+
 ```bash
 # Agent A works on API
 git add src/api/*
@@ -56,6 +60,7 @@ git commit -m "Issue #1235: Add dashboard component"
 ## Merging Branches
 
 When epic is complete, merge back to main:
+
 ```bash
 # From main repository
 git checkout main
@@ -72,6 +77,7 @@ git push origin --delete epic/{name}
 ## Handling Conflicts
 
 If merge conflicts occur:
+
 ```bash
 # Conflicts will be shown
 git status
@@ -85,11 +91,13 @@ git commit
 ## Branch Management
 
 ### List Active Branches
+
 ```bash
 git branch -a
 ```
 
 ### Remove Stale Branch
+
 ```bash
 # Delete local branch
 git branch -d epic/{name}
@@ -99,6 +107,7 @@ git push origin --delete epic/{name}
 ```
 
 ### Check Branch Status
+
 ```bash
 # Current branch info
 git branch -v
@@ -118,6 +127,7 @@ git log --oneline main..epic/{name}
 ## Common Issues
 
 ### Branch Already Exists
+
 ```bash
 # Delete old branch first
 git branch -D epic/{name}
@@ -126,6 +136,7 @@ git push origin --delete epic/{name}
 ```
 
 ### Cannot Push Branch
+
 ```bash
 # Check if branch exists remotely
 git ls-remote origin epic/{name}
@@ -135,6 +146,7 @@ git push -u origin epic/{name}
 ```
 
 ### Merge Conflicts During Pull
+
 ```bash
 # Stash changes if needed
 git stash

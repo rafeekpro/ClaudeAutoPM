@@ -7,6 +7,7 @@
 A feature/task is **DONE** when:
 
 ### ✅ Code Quality
+
 - [ ] Code complete and follows all coding standards
 - [ ] No commented-out code or debug statements
 - [ ] No hardcoded values (use config/env variables)
@@ -16,6 +17,7 @@ A feature/task is **DONE** when:
 - [ ] Logging added for debugging
 
 ### 🧪 Testing
+
 - [ ] Unit tests written and passing (>80% coverage)
 - [ ] Integration tests written and passing
 - [ ] E2E tests for critical paths
@@ -25,6 +27,7 @@ A feature/task is **DONE** when:
 - [ ] All tests run in CI/CD
 
 ### 🎨 UI/UX (if applicable)
+
 - [ ] Responsive design verified (mobile, tablet, desktop)
 - [ ] Cross-browser testing completed
 - [ ] Dark mode supported (if applicable)
@@ -35,6 +38,7 @@ A feature/task is **DONE** when:
 - [ ] Screenshots captured for documentation
 
 ### ♿ Accessibility
+
 - [ ] WCAG 2.1 AA compliance verified
 - [ ] Keyboard navigation functional
 - [ ] Screen reader tested
@@ -44,6 +48,7 @@ A feature/task is **DONE** when:
 - [ ] Alt text for images
 
 ### 🔒 Security
+
 - [ ] Security scan completed (no critical/high vulnerabilities)
 - [ ] Input validation implemented
 - [ ] SQL injection prevention verified
@@ -53,6 +58,7 @@ A feature/task is **DONE** when:
 - [ ] No secrets in code
 
 ### ⚡ Performance
+
 - [ ] Performance requirements met
 - [ ] Database queries optimized
 - [ ] Caching implemented where appropriate
@@ -61,6 +67,7 @@ A feature/task is **DONE** when:
 - [ ] Load testing passed (if applicable)
 
 ### 📝 Documentation
+
 - [ ] Code comments added where necessary
 - [ ] README updated (if needed)
 - [ ] API documentation updated
@@ -70,6 +77,7 @@ A feature/task is **DONE** when:
 - [ ] Inline JSDoc/docstrings complete
 
 ### 👥 Review & Collaboration
+
 - [ ] Code reviewed and approved by peer
 - [ ] Design reviewed (for UI changes)
 - [ ] Product owner acceptance (if applicable)
@@ -78,6 +86,7 @@ A feature/task is **DONE** when:
 - [ ] Commit messages follow convention
 
 ### 🚀 Deployment Readiness
+
 - [ ] CI/CD pipeline passing (all checks green)
 - [ ] Feature flags configured (if applicable)
 - [ ] Database migrations ready and tested
@@ -86,6 +95,7 @@ A feature/task is **DONE** when:
 - [ ] Deployment notes written
 
 ### 🛠️ Technical Debt
+
 - [ ] No new technical debt introduced
 - [ ] Existing debt not increased
 - [ ] Refactoring opportunities documented
@@ -94,6 +104,7 @@ A feature/task is **DONE** when:
 ## DoD by Feature Type
 
 ### API Endpoint
+
 ```markdown
 - [ ] OpenAPI/Swagger spec updated
 - [ ] Request validation implemented
@@ -106,6 +117,7 @@ A feature/task is **DONE** when:
 ```
 
 ### Database Change
+
 ```markdown
 - [ ] Migration script created
 - [ ] Rollback script created
@@ -117,6 +129,7 @@ A feature/task is **DONE** when:
 ```
 
 ### UI Component
+
 ```markdown
 - [ ] Storybook story created
 - [ ] Props documented with types
@@ -129,6 +142,7 @@ A feature/task is **DONE** when:
 ```
 
 ### Bug Fix
+
 ```markdown
 - [ ] Root cause identified
 - [ ] Regression test written
@@ -139,6 +153,7 @@ A feature/task is **DONE** when:
 ```
 
 ### Infrastructure Change
+
 ```markdown
 - [ ] Terraform/IaC updated
 - [ ] Change tested in staging
@@ -152,18 +167,21 @@ A feature/task is **DONE** when:
 ## DoD Verification Process
 
 ### Self-Check (Developer)
+
 1. Review entire DoD checklist
 2. Mark completed items
 3. Document any exceptions with justification
 4. Attach evidence (screenshots, test results)
 
 ### Peer Review
+
 1. Verify developer's checklist
 2. Spot-check critical items
 3. Run tests locally
 4. Review documentation updates
 
 ### Automated Verification
+
 ```yaml
 # CI/CD Pipeline Checks
 - Linting and formatting
@@ -176,6 +194,7 @@ A feature/task is **DONE** when:
 ```
 
 ### Final Verification (Team Lead/PO)
+
 1. Acceptance criteria met
 2. Business value delivered
 3. No blockers for deployment
@@ -184,11 +203,13 @@ A feature/task is **DONE** when:
 ## Exceptions Process
 
 ### When Exceptions Are Allowed
+
 - Emergency hotfixes (document debt)
 - Proof of concepts (marked clearly)
 - Experimental features (behind flags)
 
 ### Exception Requirements
+
 1. Document reason for exception
 2. Create follow-up ticket for completion
 3. Get approval from team lead
@@ -198,12 +219,14 @@ A feature/task is **DONE** when:
 ## DoD Evolution
 
 ### Quarterly Review
+
 - Review DoD effectiveness
 - Add new criteria based on incidents
 - Remove outdated criteria
 - Adjust based on team feedback
 
 ### Continuous Improvement
+
 - Track DoD violations and patterns
 - Automate more checks
 - Simplify where possible
@@ -240,6 +263,7 @@ A feature/task is **DONE** when:
 **"Done" means DONE—not "mostly done" or "done except for..."**
 
 The Definition of Done protects:
+
 - **Users** from broken features
 - **Team** from technical debt
 - **Product** from quality issues

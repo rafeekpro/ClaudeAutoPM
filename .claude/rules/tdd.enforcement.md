@@ -10,6 +10,7 @@
 ## The TDD Cycle
 
 ### 1. RED Phase (Test First)
+
 - Write test that describes desired behavior
 - Test MUST fail initially
 - Test must be meaningful (no trivial assertions)
@@ -17,12 +18,14 @@
 - Never proceed until test is red
 
 ### 2. GREEN Phase (Make It Pass)
+
 - Write MINIMUM code to pass test
 - Don't add features not required by test
 - Focus on making test green, not perfection
 - Resist temptation to over-engineer
 
 ### 3. REFACTOR Phase (Clean Up)
+
 - Improve code structure
 - Remove duplication
 - Enhance readability
@@ -32,12 +35,14 @@
 ## Enforcement Rules
 
 ### ABSOLUTE REQUIREMENTS
+
 - Every new function requires a test FIRST
 - Every bug fix starts with a failing test that reproduces it
 - Every feature begins with failing acceptance tests
 - No code commits without passing tests
 
 ### PROHIBITED PRACTICES
+
 - ❌ Writing implementation before test
 - ❌ Writing "simplified" or "partial" implementations
 - ❌ Leaving TODO comments without test coverage
@@ -47,6 +52,7 @@
 ## Test Quality Standards
 
 ### Test Design Requirements
+
 - Tests must reflect real usage patterns
 - Tests must be designed to reveal flaws
 - Tests must be verbose for debugging
@@ -54,6 +60,7 @@
 - Each test should test ONE thing
 
 ### Coverage Requirements
+
 - 100% test coverage for new code
 - Regression tests for all bug fixes
 - Integration tests for feature interactions
@@ -62,11 +69,13 @@
 ## Integration with Agents
 
 ### MANDATORY Agent Usage
+
 - **test-runner agent**: For ALL test execution
 - **code-analyzer agent**: Review test coverage
 - **parallel-worker agent**: Run tests in parallel streams
 
 ### Pipeline Integration
+
 ```
 Feature Implementation:
 1. Write failing test (RED) → test-runner confirms failure
@@ -78,6 +87,7 @@ Feature Implementation:
 ## Violation Consequences
 
 If TDD is violated:
+
 1. STOP immediately
 2. Delete non-TDD code
 3. Start over with test first
@@ -85,6 +95,7 @@ If TDD is violated:
 5. No exceptions, no excuses
 
 ## Success Metrics
+
 - ✅ 100% of new code has tests written first
 - ✅ Zero commits without test coverage
 - ✅ All tests meaningful and verbose

@@ -7,6 +7,7 @@
 ### 1. FRAMEWORK DECISION MATRIX
 
 **Bootstrap** - Use `bootstrap-ui-expert`:
+
 - Rapid prototyping and MVP development
 - Component-heavy applications (dashboards, admin panels)
 - Team prefers pre-built components
@@ -14,6 +15,7 @@
 - Less custom design requirements
 
 **TailwindCSS** - Use `tailwindcss-expert`:
+
 - Custom design systems and unique branding
 - High-performance applications (smaller bundle sizes)
 - Design flexibility and utility-first approach needed
@@ -21,6 +23,7 @@
 - Modern, cutting-edge UI requirements
 
 **Selection Criteria**:
+
 ```
 IF (rapid_development && pre_built_components) → Bootstrap
 IF (custom_design && performance_critical) → TailwindCSS
@@ -31,12 +34,14 @@ IF (enterprise_consistency) → Bootstrap
 ### 2. RESPONSIVE DESIGN REQUIREMENTS
 
 **MANDATORY Responsive Breakpoints**:
+
 - Mobile First: Design for mobile, enhance for desktop
 - Breakpoints: 576px (sm), 768px (md), 992px (lg), 1200px (xl), 1400px (xxl)
 - Touch-friendly: Minimum 44px touch targets
 - Readable text: Minimum 16px font size on mobile
 
 **Testing Requirements**:
+
 - Test on actual devices, not just browser dev tools
 - Validate touch interactions on mobile devices
 - Ensure content reflows properly at all breakpoints
@@ -45,6 +50,7 @@ IF (enterprise_consistency) → Bootstrap
 ### 3. ACCESSIBILITY STANDARDS (WCAG 2.1 AA)
 
 **MANDATORY Accessibility Features**:
+
 - Semantic HTML structure (headings h1-h6 hierarchy)
 - Alt text for all images and meaningful graphics
 - Proper form labels and error messages
@@ -53,6 +59,7 @@ IF (enterprise_consistency) → Bootstrap
 - Focus indicators visible and high contrast
 
 **Implementation Requirements**:
+
 ```html
 <!-- ALWAYS include proper ARIA labels -->
 <button aria-label="Close modal" aria-expanded="false">×</button>
@@ -71,18 +78,21 @@ IF (enterprise_consistency) → Bootstrap
 ### 4. PERFORMANCE STANDARDS
 
 **Bootstrap Projects**:
+
 - Bundle size limit: < 300KB (CSS + JS gzipped)
 - Custom builds: Include only required components
 - Optimize images: WebP format with fallbacks
 - Minimize DOM depth: < 15 levels deep
 
 **TailwindCSS Projects**:
+
 - PurgeCSS enabled: Remove unused utilities
 - Bundle size limit: < 50KB (CSS gzipped)
 - JIT mode enabled for development
 - Production builds must be optimized
 
 **Performance Metrics** (REQUIRED):
+
 - First Contentful Paint (FCP) < 1.5s
 - Largest Contentful Paint (LCP) < 2.5s
 - Cumulative Layout Shift (CLS) < 0.1
@@ -91,6 +101,7 @@ IF (enterprise_consistency) → Bootstrap
 ### 5. BROWSER COMPATIBILITY REQUIREMENTS
 
 **Supported Browsers** (MINIMUM):
+
 - Chrome/Edge: Last 2 versions
 - Firefox: Last 2 versions  
 - Safari: Last 2 versions
@@ -98,6 +109,7 @@ IF (enterprise_consistency) → Bootstrap
 - Chrome Mobile (Android): Last 2 versions
 
 **Fallback Strategies**:
+
 - Progressive enhancement approach
 - Graceful degradation for unsupported features
 - Polyfills for critical missing features
@@ -106,6 +118,7 @@ IF (enterprise_consistency) → Bootstrap
 ### 6. COMPONENT ARCHITECTURE STANDARDS
 
 **Bootstrap Components**:
+
 ```html
 <!-- ALWAYS use consistent class patterns -->
 <div class="card h-100 shadow-sm">
@@ -120,6 +133,7 @@ IF (enterprise_consistency) → Bootstrap
 ```
 
 **TailwindCSS Components**:
+
 ```html
 <!-- ALWAYS extract component patterns -->
 <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
@@ -136,12 +150,14 @@ IF (enterprise_consistency) → Bootstrap
 ### 7. FORM VALIDATION STANDARDS
 
 **Client-Side Validation** (MANDATORY):
+
 - Real-time validation feedback
 - Clear error messages
 - Visual error indicators
 - Success confirmation states
 
 **Implementation Pattern**:
+
 ```html
 <!-- Bootstrap form validation -->
 <form class="needs-validation" novalidate>
@@ -170,6 +186,7 @@ IF (enterprise_consistency) → Bootstrap
 ### 8. DARK MODE IMPLEMENTATION
 
 **TailwindCSS Dark Mode**:
+
 ```html
 <!-- ALWAYS support dark mode with TailwindCSS -->
 <div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
@@ -179,6 +196,7 @@ IF (enterprise_consistency) → Bootstrap
 ```
 
 **Bootstrap Dark Mode**:
+
 ```html
 <!-- Use Bootstrap 5.3+ dark mode support -->
 <html data-bs-theme="dark">
@@ -193,18 +211,21 @@ IF (enterprise_consistency) → Bootstrap
 ### 9. TESTING REQUIREMENTS
 
 **Visual Testing** (MANDATORY):
+
 - Screenshot testing across breakpoints
 - Cross-browser visual comparison
 - Accessibility audit with tools (axe, WAVE)
 - Color contrast validation
 
 **Functional Testing**:
+
 - Form submission and validation
 - Interactive component behavior
 - Navigation and routing
 - Mobile touch interactions
 
 **Performance Testing**:
+
 - Bundle size monitoring
 - Load time measurement
 - Core Web Vitals tracking
@@ -213,6 +234,7 @@ IF (enterprise_consistency) → Bootstrap
 ### 10. CODE ORGANIZATION STANDARDS
 
 **File Structure**:
+
 ```
 src/
 ├── styles/
@@ -227,6 +249,7 @@ src/
 ```
 
 **Code Quality**:
+
 - Consistent indentation (2 spaces)
 - Meaningful class names and comments
 - Component reusability and modularity
@@ -235,18 +258,21 @@ src/
 ## VIOLATIONS AND ENFORCEMENT
 
 **CRITICAL VIOLATIONS** (Block deployment):
+
 - Missing responsive design implementation
 - Accessibility violations (WCAG 2.1 AA failures)
 - Bundle size exceeds limits
 - No fallback for unsupported browsers
 
 **MAJOR VIOLATIONS** (Require fixes):
+
 - Inconsistent design patterns
 - Missing form validation
 - No dark mode support (for TailwindCSS projects)
 - Performance metrics below thresholds
 
 **MINOR VIOLATIONS** (Address in next iteration):
+
 - Suboptimal component organization
 - Missing hover/focus states
 - Incomplete documentation

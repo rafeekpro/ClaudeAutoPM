@@ -7,6 +7,7 @@ This document provides the practical implementation patterns for running workflo
 To run services like databases during a CI/CD job, `docker-compose` is NOT used. Instead, we create an isolated Kubernetes pod for the service.
 
 **Pattern: Deploying MongoDB**
+
 ```yaml
 - name: 🗄️ Setup MongoDB with kubectl
   run: |

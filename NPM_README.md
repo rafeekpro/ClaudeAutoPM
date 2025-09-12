@@ -57,6 +57,7 @@ your-project/
 ### 🤖 AI Agent Ecosystem
 
 **50+ Specialized Agents:**
+
 - **Languages**: Python, JavaScript/TypeScript, Bash, etc.
 - **Frameworks**: React, FastAPI, Flask, Next.js, etc.
 - **UI Libraries**: MUI, Chakra UI, Ant Design, Bootstrap, Tailwind
@@ -106,27 +107,32 @@ autopm merge
 ## 🎨 Key Features
 
 ### ✅ **Spec-Driven Development**
+
 - PRD → Epic → Issues → Code workflow
 - Full traceability from requirements to deployment
 - No more "vibe coding" - everything documented
 
 ### ✅ **Parallel AI Execution**
+
 - Multiple agents work simultaneously on different tasks
 - Git worktrees prevent conflicts during parallel work
 - Context sharing between agents via MCP protocol
 
 ### ✅ **GitHub Integration**
+
 - Issues become your project database
 - Real-time progress visibility for entire team
 - Automated PR generation and task management
 
 ### ✅ **MCP (Model Context Protocol) Ready**
+
 - Context7 integration for documentation management
 - Playwright MCP for browser automation
 - GitHub MCP for repository operations
 - Extensible with custom MCP servers
 
 ### ✅ **Azure DevOps Integration**
+
 - 38+ commands for complete project management
 - User Stories, Tasks, Features, Sprints
 - Bidirectional sync with GitHub
@@ -135,14 +141,18 @@ autopm merge
 ## 🚀 Installation Modes
 
 ### 🆕 Fresh Installation
+
 Perfect for new projects:
+
 - Installs complete framework structure
 - Creates `CLAUDE.md` from framework defaults
 - Sets up all directories and configuration files
 - Ready to use immediately
 
 ### 🔄 Update/Sync Mode
+
 For existing AUTOPM projects:
+
 - Detects current installation automatically
 - Creates timestamped backup before changes
 - Updates only modified files
@@ -150,7 +160,9 @@ For existing AUTOPM projects:
 - Offers intelligent merge for configuration conflicts
 
 ### 🤖 Smart CLAUDE.md Merging
+
 When framework updates conflict with your customizations:
+
 - AI-generated merge prompts
 - Preserves ALL user customizations (highest priority)
 - Integrates new framework features
@@ -170,6 +182,7 @@ When framework updates conflict with your customizations:
 ## 📊 Proven Results
 
 Teams using AUTOPM report:
+
 - ⚡ **3x faster** feature delivery
 - 🐛 **70% fewer bugs** reaching production  
 - 📈 **90% better** requirement traceability
@@ -178,16 +191,19 @@ Teams using AUTOPM report:
 ## 🎯 Perfect For
 
 ### 👥 **Development Teams**
+
 - Want AI assistance without losing collaboration
 - Need better project management and traceability
 - Struggle with context switching and lost work
 
 ### 🏢 **Enterprise Projects**
+
 - Require comprehensive audit trails
 - Need integration with existing tools (Azure DevOps)
 - Want to scale AI-assisted development
 
 ### 🚀 **Indie Developers**
+
 - Want professional project management without overhead
 - Need structured approach to complex projects
 - Want to ship higher quality software faster
@@ -195,16 +211,19 @@ Teams using AUTOPM report:
 ## 🔧 System Requirements
 
 ### Required
+
 - **Node.js** >= 16.0.0
 - **NPM** >= 8.0.0
 - **Git** (system installation)
 
 ### Supported Platforms
+
 - ✅ macOS (Intel & Apple Silicon)
 - ✅ Linux (Ubuntu, Debian, CentOS, etc.)
 - ✅ Windows (Git Bash, WSL, PowerShell)
 
 ### Optional Integrations
+
 - **Claude Code** - AI coding assistant
 - **GitHub** - Issue tracking and project management
 - **Azure DevOps** - Enterprise project management
@@ -214,11 +233,13 @@ Teams using AUTOPM report:
 ## 📚 Getting Started Guide
 
 ### 1. Install AUTOPM
+
 ```bash
 npm install -g @autopm/framework
 ```
 
 ### 2. Set Up Your Project
+
 ```bash
 # New project
 autopm init my-awesome-project
@@ -230,6 +251,7 @@ autopm install
 ```
 
 ### 3. Configure Environment
+
 ```bash
 # Copy environment template
 cp .claude/.env.example .claude/.env
@@ -239,12 +261,14 @@ nano .claude/.env
 ```
 
 ### 4. Read the Documentation
+
 - 📖 `PLAYBOOK.md` - Complete usage guide
 - 📋 `COMMIT_CHECKLIST.md` - Quality standards
 - ⚙️ `.claude/rules/` - Development workflows
 - 🤖 `.claude/agents/` - Available AI agents
 
 ### 5. Start Building
+
 ```bash
 # Follow the AUTOPM workflow
 # PRD → Epic → Issues → Parallel Execution

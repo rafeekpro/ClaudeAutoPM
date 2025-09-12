@@ -37,6 +37,7 @@ cd AUTOPM
 ### What It Does
 
 ✅ **Installs/Updates Core Components:**
+
 - `.claude/` - Claude Code configuration and rules
 - `.claude-code/` - Claude Code specific settings  
 - `.github/` - GitHub workflows and templates
@@ -46,11 +47,13 @@ cd AUTOPM
 - `LICENSE` - License file
 
 ✅ **Handles CLAUDE.md Migration:**
+
 - Copies `.claude/CLAUDE_BASIC.md` → `CLAUDE.md` (new installations)
 - Detects conflicts with existing `CLAUDE.md`
 - Offers intelligent merge prompts for combining configurations
 
 ✅ **Smart Update Logic:**
+
 - Creates automatic backups during updates
 - Only updates changed files
 - Preserves user customizations
@@ -71,11 +74,13 @@ cd AUTOPM
 ### Installation Modes
 
 #### 🆕 Fresh Installation
+
 - Copies all framework files
 - Creates `CLAUDE.md` from `CLAUDE_BASIC.md`
 - Sets up complete project structure
 
 #### 🔄 Update/Sync Mode
+
 - Detects existing installation
 - Creates automatic backup
 - Updates only changed files
@@ -86,6 +91,7 @@ cd AUTOPM
 ### What It Does
 
 Generates comprehensive AI prompts for intelligently merging:
+
 - Your existing `CLAUDE.md` (with customizations)
 - New `CLAUDE_BASIC.md` (framework updates)
 
@@ -113,18 +119,21 @@ Generates comprehensive AI prompts for intelligently merging:
 The generated prompt instructs AI to:
 
 🎯 **Preserve** (Highest Priority):
+
 - All user customizations and preferences
 - Custom rules and workflows  
 - Project-specific configurations
 - User's tone and behavior settings
 
 🎯 **Integrate** (High Priority):
+
 - New framework agents and capabilities
 - Updated documentation paths
 - New rule files and commands
 - Enhanced patterns and examples
 
 🎯 **Optimize** (Medium Priority):
+
 - Remove duplications
 - Update outdated references
 - Improve organization and structure
@@ -224,12 +233,14 @@ INSTALL_ITEMS+=(
 ### Common Issues
 
 **Permission denied:**
+
 ```bash
 chmod +x install/install.sh
 chmod +x install/merge-claude.sh
 ```
 
 **Missing dependencies:**
+
 ```bash
 # Install git and standard utilities
 sudo apt-get install git diffutils  # Ubuntu/Debian
@@ -237,6 +248,7 @@ brew install git                    # macOS
 ```
 
 **Backup location:**
+
 ```bash
 # Backups are created with timestamp
 ls -la .autopm_backup_*

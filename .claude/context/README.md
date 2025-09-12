@@ -5,6 +5,7 @@ This directory contains project context documentation that provides comprehensiv
 ## Purpose
 
 The context system enables:
+
 - **Fast Agent Onboarding**: New AI agents can quickly understand the project through standardized documentation
 - **Project Continuity**: Maintain knowledge across development sessions and team changes
 - **Consistent Understanding**: Ensure all contributors have access to the same project information
@@ -15,18 +16,21 @@ The context system enables:
 When fully initialized, this directory contains:
 
 ### Project Foundation
+
 - **`project-brief.md`** - Project scope, goals, and key objectives
 - **`project-vision.md`** - Long-term vision and strategic direction
 - **`project-overview.md`** - High-level summary of features and capabilities
 - **`progress.md`** - Current project status, completed work, and immediate next steps
 
 ### Technical Context
+
 - **`tech-context.md`** - Dependencies, technologies, and development tools
 - **`project-structure.md`** - Directory structure and file organization
 - **`system-patterns.md`** - Architectural patterns and design decisions
 - **`project-style-guide.md`** - Coding standards, conventions, and style preferences
 
 ### Product Context
+
 - **`product-context.md`** - Product requirements, target users, and core functionality
 
 ## Context Commands
@@ -34,28 +38,37 @@ When fully initialized, this directory contains:
 Use these commands to manage your project context:
 
 ### Initialize Context
+
 ```bash
 /context:create
 ```
+
 Analyzes your project and creates initial context documentation. Use this when:
+
 - Starting a new project
 - Adding context to an existing project
 - Major project restructuring
 
 ### Load Context
+
 ```bash
 /context:prime
 ```
+
 Loads all context information for a new agent session. Use this when:
+
 - Starting a new development session
 - Onboarding a new team member
 - Getting up to speed on project status
 
 ### Update Context
+
 ```bash
 /context:update
 ```
+
 Updates context documentation to reflect current project state. Use this:
+
 - At the end of development sessions
 - After completing major features
 - When project direction changes
@@ -87,6 +100,7 @@ Updates context documentation to reflect current project state. Use this:
 ## Integration
 
 The context system integrates with:
+
 - **Project Management**: Links with PRDs, epics, and task tracking
 - **Development Workflow**: Supports continuous development sessions
 - **Documentation**: Complements existing project documentation

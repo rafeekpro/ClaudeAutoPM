@@ -39,6 +39,7 @@ project/
 ### 3. DEVELOPMENT WORKFLOW
 
 #### Initial Setup
+
 ```bash
 # 1. Check if Docker files exist
 if [ ! -f "Dockerfile" ]; then
@@ -53,6 +54,7 @@ docker compose -f docker compose.yml -f docker compose.dev.yml up
 ```
 
 #### Code Changes
+
 ```yaml
 # docker compose.dev.yml
 services:
@@ -65,6 +67,7 @@ services:
 ```
 
 #### Running Tests
+
 ```bash
 # Always in container
 docker compose run --rm test pytest
@@ -89,6 +92,7 @@ When docker_first_development is **enabled**:
 ### 5. DOCKERFILE STANDARDS
 
 #### Python Projects
+
 ```dockerfile
 # Dockerfile.dev
 FROM python:3.11-slim AS development
@@ -108,6 +112,7 @@ CMD ["gunicorn", "app:app"]
 ```
 
 #### Node.js Projects
+
 ```dockerfile
 # Dockerfile.dev
 FROM node:20-alpine AS development
@@ -129,6 +134,7 @@ CMD ["node", "server.js"]
 ### 6. docker compose TEMPLATES
 
 #### Base docker compose.yml
+
 ```yaml
 version: '3.9'
 services:
@@ -147,6 +153,7 @@ networks:
 ```
 
 #### Development Override (docker compose.dev.yml)
+
 ```yaml
 version: '3.9'
 services:
@@ -166,6 +173,7 @@ services:
 ```
 
 #### Test Override (docker compose.test.yml)
+
 ```yaml
 version: '3.9'
 services:
@@ -260,40 +268,41 @@ Create a Makefile for common operations:
 
 # Development
 dev:
-	docker compose -f docker compose.yml -f docker compose.dev.yml up
+ docker compose -f docker compose.yml -f docker compose.dev.yml up
 
 dev-build:
-	docker compose -f docker compose.yml -f docker compose.dev.yml build
+ docker compose -f docker compose.yml -f docker compose.dev.yml build
 
 # Testing
 test:
-	docker compose -f docker compose.yml -f docker compose.test.yml run --rm test
+ docker compose -f docker compose.yml -f docker compose.test.yml run --rm test
 
 test-watch:
-	docker compose -f docker compose.yml -f docker compose.test.yml run --rm test npm run test:watch
+ docker compose -f docker compose.yml -f docker compose.test.yml run --rm test npm run test:watch
 
 # Production
 build:
-	docker build -t app:latest .
+ docker build -t app:latest .
 
 run:
-	docker run -p 3000:3000 app:latest
+ docker run -p 3000:3000 app:latest
 
 # Utilities
 shell:
-	docker compose -f docker compose.yml -f docker compose.dev.yml exec app sh
+ docker compose -f docker compose.yml -f docker compose.dev.yml exec app sh
 
 logs:
-	docker compose logs -f app
+ docker compose logs -f app
 
 clean:
-	docker compose down -v
-	docker system prune -f
+ docker compose down -v
+ docker system prune -f
 ```
 
 ## WHEN DISABLED
 
 When `docker_first_development: false` in config:
+
 - Local development is allowed
 - Docker files are optional
 - No enforcement of container usage

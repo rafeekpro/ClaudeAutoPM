@@ -5,17 +5,20 @@
 ## Command Categories
 
 ### Context Management (`/context:*`)
+
 - `/context:create` - Build initial project documentation
 - `/context:update` - Refresh context with recent changes  
 - `/context:prime` - Load context into conversation
 
 ### Testing (`/testing:*`)
+
 - `/testing:prime` - Configure testing framework and detect test runner
 - `/testing:run` - Execute tests via test-runner agent
 
 ### Project Management (`/pm:*`)
 
 #### System Management
+
 - `/pm:init` - Initialize PM system (REQUIRED FIRST)
 - `/pm:status` - Show current PM status
 - `/pm:standup` - Daily standup report
@@ -23,12 +26,14 @@
 - `/pm:sync` - Sync with external systems
 
 #### PRD Management
+
 - `/pm:prd-new` - Create new Product Requirements Document
 - `/pm:prd-parse` - Convert PRD to technical epic
 - `/pm:prd-edit` - Edit existing PRD
 - `/pm:prd-status` - Show PRD status
 
 #### Epic Management
+
 - `/pm:epic-decompose` - Break epic into tasks
 - `/pm:epic-start` - Launch parallel agents for epic
 - `/pm:epic-start-worktree` - Start epic with Git worktree
@@ -37,6 +42,7 @@
 - `/pm:epic-close` - Close completed epic
 
 #### Issue Management
+
 - `/pm:issue-analyze` - Identify parallel work streams
 - `/pm:issue-start` - Begin work on issue
 - `/pm:issue-status` - Show issue status
@@ -44,12 +50,14 @@
 - `/pm:import` - Import GitHub issues
 
 #### Workflow Navigation
+
 - `/pm:next` - Get next task recommendation
 - `/pm:in-progress` - Show current work
 - `/pm:blocked` - Show blocked tasks
 - `/pm:search` - Search PM system
 
 ### Utilities
+
 - `/prompt` - Handle complex prompts with @ references
 - `/re-init` - Update CLAUDE.md with PM rules
 - `/code-rabbit` - Process CodeRabbit review comments
@@ -57,6 +65,7 @@
 ## Mandatory Command Pipelines
 
 ### 1. NEW PROJECT INITIALIZATION
+
 ```
 REQUIRED SEQUENCE:
 1. /pm:init           → Initialize PM system
@@ -66,6 +75,7 @@ REQUIRED SEQUENCE:
 ```
 
 ### 2. FEATURE DEVELOPMENT PIPELINE
+
 ```
 REQUIRED SEQUENCE:
 1. /pm:prd-new <name>        → Create requirements document
@@ -81,6 +91,7 @@ REQUIRED SEQUENCE:
 ```
 
 ### 3. ISSUE RESOLUTION PIPELINE
+
 ```
 REQUIRED SEQUENCE:
 1. /pm:import                → Import from GitHub
@@ -94,6 +105,7 @@ REQUIRED SEQUENCE:
 ```
 
 ### 4. DAILY WORKFLOW PIPELINE
+
 ```
 MORNING SEQUENCE:
 1. /context:prime       → Load project context
@@ -112,6 +124,7 @@ END OF DAY SEQUENCE:
 ```
 
 ### 5. CODE REVIEW PIPELINE
+
 ```
 REQUIRED SEQUENCE:
 1. /code-rabbit        → Paste review comments
@@ -124,28 +137,34 @@ REQUIRED SEQUENCE:
 ## Command Prerequisites
 
 ### PM Commands
+
 - Require `/pm:init` first
 - Must have `.pm/` directory structure
 
 ### Epic Commands
+
 - Require PRD to exist
 - Must have parsed epic file
 
 ### Issue Commands
+
 - Require GitHub integration
 - Must have valid issue ID
 
 ### Testing Commands
+
 - Require framework detection
 - Must have test configuration
 
 ### Context Commands
+
 - Require `.claude/` directory
 - Must have project structure
 
 ## Command Execution Rules
 
-### All Commands MUST:
+### All Commands MUST
+
 1. Validate prerequisites before execution
 2. Use real datetime (`date -u +"%Y-%m-%dT%H:%M:%SZ"`)
 3. Ask before overwriting data
@@ -153,6 +172,7 @@ REQUIRED SEQUENCE:
 5. Delegate to specialized agents
 
 ### Agent Delegation Rules
+
 - **Always use test-runner** for test execution
 - **Always use file-analyzer** for reading logs/outputs
 - **Always use code-analyzer** for code search/analysis
@@ -161,6 +181,7 @@ REQUIRED SEQUENCE:
 ## Command Anti-Patterns
 
 ### NEVER DO
+
 - ❌ Running tests without `/testing:prime`
 - ❌ Starting epics without decomposition
 - ❌ Closing issues without verification
@@ -172,6 +193,7 @@ REQUIRED SEQUENCE:
 ## Success Verification
 
 ### Command Success Indicators
+
 - ✅ Prerequisites validated
 - ✅ Agents properly delegated
 - ✅ Real datetime used
@@ -179,6 +201,7 @@ REQUIRED SEQUENCE:
 - ✅ Next steps clear
 
 ### Pipeline Completion
+
 - ✅ All steps executed in order
 - ✅ No steps skipped
 - ✅ Tests passing

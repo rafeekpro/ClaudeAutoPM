@@ -5,6 +5,7 @@ Standard approach for removing YAML frontmatter before sending content to GitHub
 ## The Problem
 
 YAML frontmatter contains internal metadata that should not appear in GitHub issues:
+
 - status, created, updated fields
 - Internal references and IDs
 - Local file paths
@@ -19,6 +20,7 @@ sed '1,/^---$/d; 1,/^---$/d' input.md > output.md
 ```
 
 This removes:
+
 1. The opening `---` line
 2. All YAML content
 3. The closing `---` line
@@ -26,6 +28,7 @@ This removes:
 ## When to Strip Frontmatter
 
 Always strip frontmatter when:
+
 - Creating GitHub issues from markdown files
 - Posting file content as comments
 - Displaying content to external users
@@ -34,6 +37,7 @@ Always strip frontmatter when:
 ## Examples
 
 ### Creating an issue from a file
+
 ```bash
 # Bad - includes frontmatter
 gh issue create --body-file task.md
@@ -44,6 +48,7 @@ gh issue create --body-file /tmp/clean.md
 ```
 
 ### Posting a comment
+
 ```bash
 # Strip frontmatter before posting
 sed '1,/^---$/d; 1,/^---$/d' progress.md > /tmp/comment.md
@@ -51,6 +56,7 @@ gh issue comment 123 --body-file /tmp/comment.md
 ```
 
 ### In a loop
+
 ```bash
 for file in *.md; do
   # Strip frontmatter from each file
