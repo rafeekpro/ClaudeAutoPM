@@ -290,6 +290,32 @@ list_installing_files() {
     fi
 }
 
+# Check if item should be skipped during updates
+should_skip_update() {
+    local item="$1"
+    local target_path="$2"
+    local is_update="$3"
+    
+    # Skip certain folders/files during updates if they already exist
+    # These likely contain user customizations
+    case "$item" in
+        ".github")
+            # GitHub workflows and settings - user may have customized
+            if [ "$is_update" = true ] && [ -d "$target_path" ]; then
+                return 0  # skip
+            fi
+            ;;
+        ".claude-code")
+            # Claude Code settings - user may have customized
+            if [ "$is_update" = true ] && [ -d "$target_path" ]; then
+                return 0  # skip
+            fi
+            ;;
+    esac
+    
+    return 1  # don't skip
+}
+
 # Install or update files
 install_files() {
     local source_dir="$1"
@@ -306,6 +332,12 @@ install_files() {
         fi
         
         if [ -e "$target_path" ]; then
+            # Check if this item should be skipped during updates
+            if should_skip_update "$item" "$target_path" "$is_update"; then
+                print_msg "$YELLOW" "🔒 Preserving existing: $item (contains user customizations)"
+                continue
+            fi
+            
             if [ "$is_update" = true ]; then
                 if file_changed "$source_path" "$target_path"; then
                     print_step "Updating: $item"
