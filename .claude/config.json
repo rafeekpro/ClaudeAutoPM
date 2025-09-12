@@ -1,0 +1,34 @@
+{
+  "features": {
+    "docker_first_development": true,
+    "enforce_docker_tests": true,
+    "block_local_execution": true,
+    "auto_create_dockerfile": true,
+    "sync_with_ci": true
+  },
+  "docker": {
+    "default_base_images": {
+      "python": "python:3.11-slim",
+      "node": "node:20-alpine",
+      "go": "golang:1.21-alpine"
+    },
+    "volume_mounts": {
+      "source_code": true,
+      "node_modules": false,
+      "python_venv": false
+    },
+    "development": {
+      "hot_reload": true,
+      "debug_ports": true,
+      "local_db": true
+    }
+  },
+  "exceptions": {
+    "allow_local_commands": [
+      "git",
+      "docker",
+      "docker compose",
+      "make"
+    ]
+  }
+}

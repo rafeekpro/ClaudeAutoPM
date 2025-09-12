@@ -1,0 +1,14 @@
+.DS_Store
+CLAUDE.md
+
+# Environment variables with secrets
+.claude/.env
+.env
+
+# MCP server logs and cache
+.claude/mcp-cache/
+.claude/context-pools/
+repomix-output.xml
+autopm-framework-*.tgz
+node_modules/
+package-lock.json

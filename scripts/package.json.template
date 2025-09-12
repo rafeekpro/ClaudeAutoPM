@@ -1,0 +1,42 @@
+{
+  "scripts": {
+    "// Safety Scripts": "Zabezpieczenia przed złymi commitami",
+    "precommit": "npm test && npm run build && npm run lint",
+    "verify": "npm test && npm run build && npm run lint && npm run typecheck",
+    "safe-commit": "./scripts/safe-commit.sh",
+    "prepush": "npm run verify && npm run test:e2e",
+    
+    "// Quick Checks": "Szybkie sprawdzenia",
+    "check": "npm run lint && npm run typecheck",
+    "check:all": "npm run verify",
+    
+    "// Git Helpers": "Pomocnicze komendy git",
+    "commit": "npm run precommit && git add -A && git commit",
+    "push:safe": "npm run prepush && git push",
+    
+    "// CI/CD Simulation": "Lokalna symulacja CI/CD",
+    "ci:local": "npm ci && npm run verify && npm run test:e2e",
+    "ci:validate": "npm run ci:local",
+    
+    "// Emergency": "Awaryjne",
+    "fix": "npm run lint -- --fix && npm run format",
+    "format": "prettier --write .",
+    "clean:hooks": "rm -f .git/hooks/pre-* && npm run setup:hooks",
+    "setup:hooks": "husky install || cp scripts/hooks/* .git/hooks/"
+  },
+  
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run precommit",
+      "pre-push": "npm run prepush",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  
+  "// Przykład użycia": [
+    "npm run safe-commit 'feat: add new feature'",
+    "npm run verify",
+    "npm run push:safe",
+    "npm run ci:local"
+  ]
+}

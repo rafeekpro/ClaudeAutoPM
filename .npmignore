@@ -1,0 +1,78 @@
+# Development files
+.DS_Store
+.env
+.env.local
+.env.*.local
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+coverage/
+.nyc_output/
+test-results/
+.coverage/
+
+# Build artifacts
+dist/
+build/
+*.tgz
+
+# Git
+.git/
+.gitignore
+
+# Documentation drafts
+docs/drafts/
+*.draft.md
+
+# Temporary files
+tmp/
+temp/
+.temp/
+.tmp/
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Node modules (should not be in source anyway)
+node_modules/
+
+# Lock files (let users choose their package manager)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Editor artifacts
+*.sublime-*
+.project
+.settings/
+.classpath
+
+# Backup files
+*.backup
+*.bak
+*.orig
+*.save
+
+# Local configuration overrides
+config.local.*
+settings.local.*
+
+# Development scripts not meant for distribution
+scripts/dev/
+scripts/test/
+.husky/
+
+# Installation backups created by install script
+.autopm_backup_*/

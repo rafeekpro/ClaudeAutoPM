@@ -1,0 +1,96 @@
+{
+  "name": "@autopm/framework",
+  "version": "1.0.0",
+  "description": "Autonomous Project Management Framework for Claude Code - Advanced AI-powered development automation",
+  "main": "bin/autopm.js",
+  "bin": {
+    "autopm": "./bin/autopm.js",
+    "autopm-install": "./bin/autopm.js",
+    "autopm-merge": "./bin/merge-claude.js",
+    "autopm-setup-env": "./bin/setup-env.js"
+  },
+  "scripts": {
+    "postinstall": "echo '🎉 AUTOPM installed! Run: autopm --help'",
+    "test": "bash scripts/test.sh",
+    "lint": "markdownlint *.md .claude/**/*.md install/*.md",
+    "lint:fix": "markdownlint --fix *.md .claude/**/*.md install/*.md",
+    "format": "prettier --write *.md .claude/**/*.md install/*.md",
+    "validate": "npm run lint && npm run test",
+    "prepublishOnly": "npm run validate"
+  },
+  "keywords": [
+    "ai",
+    "automation",
+    "claude",
+    "claude-code",
+    "project-management",
+    "development-tools",
+    "devops",
+    "ci-cd",
+    "github-actions",
+    "azure-devops",
+    "mcp",
+    "model-context-protocol",
+    "tdd",
+    "agents",
+    "workflow",
+    "productivity"
+  ],
+  "author": {
+    "name": "AUTOPM Team",
+    "email": "autopm@example.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rla/AUTOPM.git"
+  },
+  "homepage": "https://github.com/rla/AUTOPM#readme",
+  "bugs": {
+    "url": "https://github.com/rla/AUTOPM/issues"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "preferGlobal": true,
+  "files": [
+    "bin/",
+    ".claude/",
+    ".claude-code/",
+    ".github/",
+    "scripts/",
+    "install/",
+    "PLAYBOOK.md",
+    "COMMIT_CHECKLIST.md",
+    "LICENSE",
+    "README.md"
+  ],
+  "devDependencies": {
+    "markdownlint-cli": "^0.37.0",
+    "prettier": "^3.0.0"
+  },
+  "optionalDependencies": {
+    "@context7/mcp-server": "^1.0.0",
+    "@playwright/mcp-server": "^1.0.0",
+    "@modelcontextprotocol/server-github": "^1.0.0"
+  },
+  "peerDependencies": {
+    "git": "*"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/rla"
+  },
+  "config": {
+    "autopm": {
+      "defaultTemplate": "https://github.com/rla/AUTOPM.git",
+      "configDir": ".claude",
+      "envFile": ".claude/.env"
+    }
+  }
+}
