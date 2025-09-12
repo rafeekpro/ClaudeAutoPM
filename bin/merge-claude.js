@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * AUTOPM Merge CLI - CLAUDE.md Configuration Merger
+ * ClaudeAutoPM Merge CLI - CLAUDE.md Configuration Merger
  * Standalone CLI for merging CLAUDE.md configurations
  */
 
@@ -80,7 +80,7 @@ const executeBashScript = (scriptPath, args = []) => {
 const main = () => {
   const args = process.argv.slice(2);
   
-  log('🤖 AUTOPM CLAUDE.md Merge Helper', 'cyan');
+  log('🤖 ClaudeAutoPM CLAUDE.md Merge Helper', 'cyan');
   log('');
   
   // Pass all arguments to the bash script

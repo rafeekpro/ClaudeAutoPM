@@ -72,10 +72,10 @@ jobs:
             ## Installation
             ```bash
             # Global installation
-            npm install -g @autopm/framework
+            npm install -g claude-autopm
             
             # Or use with npx
-            npx @autopm/framework install
+            npx claude-autopm install
             ```
           draft: false
           prerelease: false

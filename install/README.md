@@ -1,12 +1,12 @@
-# 🚀 AUTOPM Installation Scripts
+# 🚀 ClaudeAutoPM Installation Scripts
 
-This directory contains installation and configuration scripts for the **AUTOPM (Autonomous Project Management)** framework.
+This directory contains installation and configuration scripts for the **ClaudeAutoPM (Autonomous Project Management)** framework.
 
 ## 📁 Contents
 
 | File | Description |
 |------|-------------|
-| `install.sh` | Main installation script for AUTOPM framework |
+| `install.sh` | Main installation script for ClaudeAutoPM framework |
 | `merge-claude.sh` | Helper script for merging CLAUDE.md configurations |
 | `README.md` | This documentation file |
 
@@ -15,8 +15,8 @@ This directory contains installation and configuration scripts for the **AUTOPM 
 ### Fresh Installation
 
 ```bash
-# Clone or download AUTOPM, then run:
-cd AUTOPM
+# Clone or download ClaudeAutoPM, then run:
+cd ClaudeAutoPM
 ./install/install.sh
 
 # Or install to specific directory:
@@ -26,7 +26,7 @@ cd AUTOPM
 ### Update Existing Installation
 
 ```bash
-# Run installer in project with existing AUTOPM:
+# Run installer in project with existing ClaudeAutoPM:
 ./install/install.sh
 
 # It will automatically detect existing installation and offer update
@@ -210,7 +210,7 @@ The installer uses intelligent file comparison to:
 
 ```bash
 # Custom repository URL
-REPO_URL="https://github.com/your-fork/AUTOPM.git"
+REPO_URL="https://github.com/your-fork/ClaudeAutoPM.git"
 
 # Custom temporary directory
 TEMP_DIR="/tmp/my_autopm_install"
@@ -263,7 +263,7 @@ ls -la .autopm_backup_*
 
 ## 📖 Related Documentation
 
-- [`PLAYBOOK.md`](../PLAYBOOK.md) - AUTOPM usage guide
+- [`PLAYBOOK.md`](../PLAYBOOK.md) - ClaudeAutoPM usage guide
 - [`COMMIT_CHECKLIST.md`](../COMMIT_CHECKLIST.md) - Quality standards
 - [`.claude/CLAUDE.md`](../.claude/CLAUDE.md) - Complete configuration
 - [`.claude/rules/`](../.claude/rules/) - Development rules
@@ -275,9 +275,9 @@ After successful installation:
 1. **Review `CLAUDE.md`** - Customize for your project
 2. **Setup `.env`** - Copy `.claude/.env.example` → `.claude/.env`
 3. **Add API keys** - Fill in your service credentials
-4. **Read `PLAYBOOK.md`** - Learn AUTOPM workflows
+4. **Read `PLAYBOOK.md`** - Learn ClaudeAutoPM workflows
 5. **Explore `.claude/rules/`** - Understand development standards
 
 ---
 
-**Ready to install?** Run `./install.sh` and let AUTOPM transform your development workflow! 🚀
+**Ready to install?** Run `./install.sh` and let ClaudeAutoPM transform your development workflow! 🚀

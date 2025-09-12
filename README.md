@@ -9,6 +9,8 @@
 
 ## Automated project management system to ship ~~faster~~ _better_ using spec-driven development, GitHub issues, Git worktrees, and multiple AI agents running in parallel
 
+> **Inspired by [CCPM (Claude Code Project Manager)](https://github.com/automazeio/ccpm)** - This project builds upon the foundational concepts of AI-powered project management to create a comprehensive development framework.
+
 Stop losing context. Stop blocking on tasks. Stop shipping bugs. This battle-tested system turns PRDs into epics, epics into GitHub issues, and issues into production code – with full traceability at every step.
 
 ## Table of Contents
@@ -53,13 +55,13 @@ claude-autopm --help
 ### Quick Start Commands
 
 ```bash
-# Install AUTOPM framework to current project
+# Install ClaudeAutoPM framework to current project
 claude-autopm install
 
 # Install to specific directory
 claude-autopm install ./my-project
 
-# Update existing AUTOPM installation
+# Update existing ClaudeAutoPM installation
 claude-autopm update
 
 # Generate AI-powered CLAUDE.md merge prompts
@@ -68,19 +70,21 @@ claude-autopm merge
 # Interactive .env configuration
 claude-autopm setup-env
 
-# Create new project with AUTOPM
+# Create new project with ClaudeAutoPM
 claude-autopm init my-new-project
 ```
 
 ### Alternative Installation Methods
 
 #### Use without global installation
+
 ```bash
 npx claude-autopm install
 npx claude-autopm merge
 ```
 
 #### Manual installation (legacy)
+
 ```bash
 # Unix/Linux/macOS
 curl -sSL https://raw.githubusercontent.com/rafeekpro/ClaudeAutoPM/main/install/install.sh | bash
@@ -100,8 +104,8 @@ iwr -useb https://raw.githubusercontent.com/rafeekpro/ClaudeAutoPM/main/install/
 
 - **Package**: `claude-autopm`
 - **Current Version**: `1.0.0`
-- **Registry**: https://www.npmjs.com/package/claude-autopm
-- **Repository**: https://github.com/rafeekpro/ClaudeAutoPM
+- **Registry**: <https://www.npmjs.com/package/claude-autopm>
+- **Repository**: <https://github.com/rafeekpro/ClaudeAutoPM>
 
 ## The Workflow
 
@@ -129,7 +133,7 @@ graph LR
 
 ## What Makes This Different?
 
-| Traditional Development | AUTOPM System |
+| Traditional Development | ClaudeAutoPM System |
 |------------------------|----------------------|
 | Context lost between sessions | **Persistent context** across all work |
 | Serial task execution | **Parallel agents** on independent tasks |
@@ -142,16 +146,19 @@ graph LR
 ### 🤖 **50+ Specialized AI Agents**
 
 **Language Experts:**
+
 - **Python**: `python-backend-engineer` - FastAPI, SQLAlchemy, async development
 - **JavaScript/TypeScript**: `javascript-frontend-engineer`, `nodejs-backend-engineer`
 - **Bash**: `bash-scripting-expert` - System automation, CI/CD scripts
 
 **Framework Specialists:**
+
 - **React**: `react-frontend-engineer` - Modern React, TypeScript, Next.js
 - **Backend APIs**: `fastapi-backend-engineer`, `flask-backend-engineer`
 - **Testing**: `playwright-test-engineer`, `playwright-mcp-frontend-tester`
 
 **UI Framework Agents:**
+
 - **Material-UI**: `mui-react-expert` - Enterprise DataGrid, theming
 - **Chakra UI**: `chakra-ui-expert` - Accessibility-first design systems
 - **Ant Design**: `antd-react-expert` - Enterprise admin interfaces
@@ -160,6 +167,7 @@ graph LR
 - **UX Design**: `ux-design-expert` - User experience optimization
 
 **Cloud & Infrastructure:**
+
 - **AWS**: `aws-cloud-architect` - EKS, Lambda, CloudFormation
 - **Azure**: `azure-cloud-architect` - AKS, Functions, ARM templates
 - **GCP**: `gcp-cloud-architect` - GKE, Cloud Run, Terraform
@@ -167,6 +175,7 @@ graph LR
 - **Terraform**: `terraform-infrastructure-expert` - Multi-cloud IaC
 
 **DevOps & Operations:**
+
 - **GitHub Actions**: `github-operations-specialist`
 - **Azure DevOps**: `azure-devops-specialist` - Complete enterprise integration
 - **Docker**: `docker-expert`, `docker-compose-expert`, `docker-development-orchestrator`
@@ -174,6 +183,7 @@ graph LR
 - **SSH Management**: `ssh-operations-expert`
 
 **Database Specialists:**
+
 - **PostgreSQL**: `postgresql-expert` - Query optimization, migrations
 - **MongoDB**: `mongodb-expert` - Document modeling, aggregations
 - **Redis**: `redis-expert` - Caching, pub/sub, data structures
@@ -181,16 +191,19 @@ graph LR
 - **Cosmos DB**: `cosmosdb-expert` - Multi-model, global distribution
 
 **AI & Integration:**
+
 - **OpenAI**: `openai-python-expert` - GPT models, embeddings, fine-tuning
 - **Google Gemini**: `gemini-api-expert` - Multimodal AI, function calling
 - **LangGraph**: `langgraph-workflow-expert` - AI workflow orchestration
 
 **Data Engineering:**
+
 - **Apache Airflow**: `airflow-orchestration-expert` - ETL/ELT pipelines
 - **Kedro**: `kedro-pipeline-expert` - Reproducible data science
 - **NATS**: `nats-messaging-expert` - High-performance messaging
 
 **Core Utilities:**
+
 - **file-analyzer** - Smart file and log analysis
 - **code-analyzer** - Bug detection and logic tracing  
 - **test-runner** - Comprehensive test execution with analysis
@@ -452,7 +465,7 @@ The system includes 13 specialized agents that work together to handle different
 - **azure-devops-specialist** - Azure DevOps integration
 - **mcp-context-manager** - MCP server and context optimization
 
-> All agent definitions are in `.claude/agents/` and are automatically loaded by AUTOPM.
+> All agent definitions are in `.claude/agents/` and are automatically loaded by ClaudeAutoPM.
 
 ## Available Commands
 
@@ -633,19 +646,21 @@ npm install -g claude-autopm
 # Navigate to your project
 cd path/to/your/project/
 
-# Install AUTOPM framework
+# Install ClaudeAutoPM framework
 claude-autopm install
 ```
 
 #### Legacy Installation Methods
 
 **Unix/Linux/macOS:**
+
 ```bash
 cd path/to/your/project/
 curl -sSL https://raw.githubusercontent.com/rafeekpro/ClaudeAutoPM/main/install/install.sh | bash
 ```
 
 **Windows (PowerShell):**
+
 ```bash
 cd path/to/your/project/
 iwr -useb https://raw.githubusercontent.com/rafeekpro/ClaudeAutoPM/main/install/install.sh | iex
@@ -653,7 +668,7 @@ iwr -useb https://raw.githubusercontent.com/rafeekpro/ClaudeAutoPM/main/install/
 
 > 💡 **TIP**: The npm installation is faster, safer, and includes automatic updates. Legacy methods are provided for compatibility.
 
-2. **Initialize the PM system**:
+1. **Initialize the PM system**:
 
    ```bash
    /pm:init
@@ -667,7 +682,7 @@ iwr -useb https://raw.githubusercontent.com/rafeekpro/ClaudeAutoPM/main/install/
    - Create required directories
    - Update .gitignore
 
-3. **Create `CLAUDE.md`** with your repository information
+2. **Create `CLAUDE.md`** with your repository information
 
    ```bash
    /init include rules from .claude/CLAUDE.md
@@ -675,7 +690,7 @@ iwr -useb https://raw.githubusercontent.com/rafeekpro/ClaudeAutoPM/main/install/
 
    > If you already have a `CLAUDE.md` file, run: `/re-init` to update it with important rules from `.claude/CLAUDE.md`.
 
-4. **Prime the system**:
+3. **Prime the system**:
 
    ```bash
    /context:create
@@ -727,9 +742,9 @@ Watch as structured planning transforms into shipped code.
 
 ## Support This Project
 
-AUTOPM was developed by **Rafal Lagowski** for developers who ship, by developers who ship.
+ClaudeAutoPM was developed by **Rafal Lagowski** for developers who ship, by developers who ship.
 
-If AUTOPM helps your team ship better software:
+If ClaudeAutoPM helps your team ship better software:
 
 - ⭐ **[Star this repository](https://github.com/rafeekpro/ClaudeAutoPM)** to show your support
 - 📦 **[Try on npm](https://www.npmjs.com/package/claude-autopm)** - `npm install -g claude-autopm`

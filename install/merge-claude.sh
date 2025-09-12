@@ -46,7 +46,7 @@ You are an expert in Claude Code configuration and project automation. Your task
 
 ## 📋 Merge Context
 
-**Scenario**: User has an existing CLAUDE.md with custom configurations and needs to integrate updates from the AUTOPM framework's CLAUDE_BASIC.md.
+**Scenario**: User has an existing CLAUDE.md with custom configurations and needs to integrate updates from the ClaudeAutoPM framework's CLAUDE_BASIC.md.
 
 **Goal**: Create a unified CLAUDE.md that:
 - ✅ Preserves ALL user customizations and preferences

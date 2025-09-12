@@ -10,7 +10,7 @@
     "autopm-setup-env": "./bin/setup-env.js"
   },
   "scripts": {
-    "postinstall": "echo '🎉 AUTOPM installed! Run: autopm --help'",
+    "postinstall": "echo '🎉 ClaudeAutoPM installed! Run: autopm --help'",
     "test": "bash scripts/test.sh",
     "lint": "markdownlint *.md .claude/**/*.md install/*.md",
     "lint:fix": "markdownlint --fix *.md .claude/**/*.md install/*.md",
@@ -37,7 +37,7 @@
     "productivity"
   ],
   "author": {
-    "name": "AUTOPM Team",
+    "name": "ClaudeAutoPM Team",
     "email": "autopm@example.com"
   },
   "license": "MIT",
