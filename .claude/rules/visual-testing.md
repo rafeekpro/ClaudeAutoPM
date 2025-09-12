@@ -21,6 +21,7 @@
 ## Visual Testing Requirements
 
 ### Pre-Commit Checklist
+
 ```bash
 # Before committing any UI changes:
 - [ ] Responsive design verified (mobile, tablet, desktop)
@@ -38,6 +39,7 @@
 ## Visual Regression Testing
 
 ### Implementation with Playwright
+
 ```javascript
 // Visual regression test example
 describe('Component Visual Tests', () => {
@@ -74,6 +76,7 @@ describe('Component Visual Tests', () => {
 ## UI/UX Best Practices
 
 ### Core Principles
+
 1. **Consistency**: Use established patterns and components
 2. **Feedback**: Provide immediate visual feedback for interactions
 3. **Progressive Enhancement**: Core functionality works without JavaScript
@@ -81,6 +84,7 @@ describe('Component Visual Tests', () => {
 5. **Accessibility**: Design for all users from the start
 
 ### CSS Architecture
+
 ```scss
 // Follow BEM methodology
 .block {}
@@ -102,6 +106,7 @@ describe('Component Visual Tests', () => {
 ## Component Development Standards
 
 ### Component Checklist
+
 ```typescript
 // Every UI component must have:
 - [ ] Props validated with TypeScript/PropTypes
@@ -120,6 +125,7 @@ describe('Component Visual Tests', () => {
 ## Accessibility Requirements
 
 ### WCAG 2.1 AA Compliance
+
 ```html
 <!-- Accessibility checklist -->
 - [ ] Semantic HTML used
@@ -135,6 +141,7 @@ describe('Component Visual Tests', () => {
 ```
 
 ### Automated Accessibility Testing
+
 ```javascript
 // Using axe-core for automated testing
 import { axe } from '@axe-core/react';
@@ -150,6 +157,7 @@ describe('Accessibility', () => {
 ## Design System Compliance
 
 ### Required Elements
+
 - **Colors**: Use only defined color tokens
 - **Typography**: Use only defined type scales
 - **Spacing**: Use only defined spacing units
@@ -160,6 +168,7 @@ describe('Accessibility', () => {
 ## Performance Metrics
 
 ### Visual Performance Targets
+
 - First Contentful Paint (FCP): < 1.5s
 - Largest Contentful Paint (LCP): < 2.5s
 - Cumulative Layout Shift (CLS): < 0.1
@@ -169,12 +178,14 @@ describe('Accessibility', () => {
 ## Agent Integration
 
 ### Required Agents for Visual Testing
+
 - **playwright-test-engineer**: Visual regression tests
 - **playwright-mcp-frontend-tester**: Browser automation
 - **react-frontend-engineer**: Component development
 - **code-analyzer**: Review UI code quality
 
 ### Visual Testing Pipeline
+
 ```
 1. Implement UI change following TDD
 2. playwright-test-engineer → Create visual tests
@@ -187,6 +198,7 @@ describe('Accessibility', () => {
 ## Screenshot Documentation
 
 ### When to Include Screenshots
+
 - ✅ Any UI/UX change
 - ✅ New components or features
 - ✅ Style or layout modifications
@@ -195,6 +207,7 @@ describe('Accessibility', () => {
 - ✅ Error or edge case handling
 
 ### Screenshot Requirements
+
 - Show before and after states
 - Include all responsive breakpoints
 - Capture interaction states
@@ -202,6 +215,7 @@ describe('Accessibility', () => {
 - Use consistent naming convention
 
 ## Success Metrics
+
 - ✅ 100% visual test coverage for UI components
 - ✅ Zero visual regressions in production
 - ✅ All accessibility tests passing

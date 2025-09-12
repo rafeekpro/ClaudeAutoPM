@@ -3,6 +3,7 @@
 ## Installation Commands
 
 ### Material-UI (MUI)
+
 ```bash
 # Install MUI v5
 npm install @mui/material @emotion/react @emotion/styled
@@ -21,6 +22,7 @@ npm install @mui/x-data-grid
 ```
 
 ### Chakra UI
+
 ```bash
 # Install Chakra UI v2
 npm install @chakra-ui/react @emotion/react @emotion/styled framer-motion
@@ -33,6 +35,7 @@ npm install @chakra-ui/theme-tools
 ```
 
 ### Ant Design
+
 ```bash
 # Install Ant Design v5
 npm install antd
@@ -48,6 +51,7 @@ npm install @ant-design/charts
 ```
 
 ### Bootstrap
+
 ```bash
 # Install Bootstrap v5
 npm install bootstrap
@@ -60,6 +64,7 @@ npm install bootstrap-icons
 ```
 
 ### Tailwind CSS
+
 ```bash
 # Install Tailwind CSS
 npm install -D tailwindcss postcss autoprefixer
@@ -80,6 +85,7 @@ npm install @headlessui/react
 ## Setup Commands
 
 ### MUI Theme Setup
+
 ```bash
 # Create theme file
 mkdir -p src/theme
@@ -103,6 +109,7 @@ EOF
 ```
 
 ### Chakra UI Theme Setup
+
 ```bash
 # Create theme file
 mkdir -p src/theme
@@ -126,6 +133,7 @@ EOF
 ```
 
 ### Ant Design Config Setup
+
 ```bash
 # Create config provider setup
 cat > src/App.tsx << 'EOF'
@@ -149,6 +157,7 @@ EOF
 ```
 
 ### Tailwind Configuration
+
 ```bash
 # Update tailwind.config.js
 cat > tailwind.config.js << 'EOF'
@@ -246,6 +255,7 @@ npx tailwindcss -i ./src/input.css -o ./dist/output.css --watch --minify
 ## Validation Commands
 
 ### Linting
+
 ```bash
 # ESLint for React
 npm install -D eslint-plugin-react eslint-plugin-react-hooks
@@ -258,6 +268,7 @@ npm run lint -- --fix
 ```
 
 ### Type Checking
+
 ```bash
 # TypeScript checking
 npx tsc --noEmit
@@ -267,6 +278,7 @@ npm install -D typescript-plugin-css-modules
 ```
 
 ### Accessibility Checking
+
 ```bash
 # Install accessibility linter
 npm install -D eslint-plugin-jsx-a11y
@@ -282,6 +294,7 @@ npx lighthouse http://localhost:3000 --view
 ## Production Commands
 
 ### Build
+
 ```bash
 # Production build
 npm run build
@@ -291,6 +304,7 @@ npx serve -s build
 ```
 
 ### Performance Monitoring
+
 ```bash
 # Add Web Vitals
 npm install web-vitals
@@ -318,6 +332,7 @@ EOF
 ## Troubleshooting Commands
 
 ### Clear Cache
+
 ```bash
 # Clear npm cache
 npm cache clean --force
@@ -332,6 +347,7 @@ npm install
 ```
 
 ### Debug Styling Issues
+
 ```bash
 # Check CSS specificity (for CSS-in-JS)
 # Add this to component for debugging
@@ -348,6 +364,7 @@ npx tailwindcss --help
 ```
 
 ### Version Checking
+
 ```bash
 # Check installed versions
 npm list @mui/material

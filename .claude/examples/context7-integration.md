@@ -5,11 +5,13 @@ This example shows how to use the new agents with context7 documentation integra
 ## Setup
 
 1. **Install context7 MCP server**:
+
 ```bash
 npm install -g @context7/mcp-server
 ```
 
 2. **Configure environment variables**:
+
 ```bash
 export CONTEXT7_API_KEY="your-api-key"
 export CONTEXT7_WORKSPACE="your-workspace"
@@ -26,6 +28,7 @@ export CONTEXT7_WORKSPACE="your-workspace"
 **Command**: `/python:docs-query --topic=fastapi --pattern=authentication --examples`
 
 This will:
+
 - Query latest FastAPI authentication documentation via context7
 - Return current best practices and security patterns
 - Provide code examples using latest FastAPI version
@@ -33,6 +36,7 @@ This will:
 **Follow with**: `/python:api-scaffold user-api --auth=jwt`
 
 The python-backend-engineer agent will:
+
 1. First query context7 for latest FastAPI authentication patterns
 2. Use current JWT implementation best practices
 3. Generate code with latest library versions
@@ -43,6 +47,7 @@ The python-backend-engineer agent will:
 **Command**: `/azure:docs-query --topic=rest-api --version=latest --examples`
 
 This will:
+
 - Fetch latest Azure DevOps REST API documentation
 - Show current authentication methods and endpoints
 - Provide integration examples with current API version
@@ -50,6 +55,7 @@ This will:
 **Follow with**: `/azure:work-item-sync --project=MyProject`
 
 The azure-devops-specialist agent will:
+
 1. Check latest API version and authentication requirements
 2. Use current field mappings and endpoint schemas  
 3. Implement with latest security best practices
@@ -60,6 +66,7 @@ The azure-devops-specialist agent will:
 **Command**: `/mcp:context-setup --server=context7 --pool-name=project-docs --agents=python-backend-engineer,azure-devops-specialist --max-size=100MB`
 
 This will:
+
 - Configure shared documentation pool between agents
 - Set up automatic documentation refresh
 - Optimize context usage across agent interactions
@@ -67,7 +74,7 @@ This will:
 
 ## Workflow Integration
 
-### Complete Feature Development Flow:
+### Complete Feature Development Flow
 
 ```bash
 # 1. Setup context sharing
@@ -101,11 +108,13 @@ This will:
 ## Monitoring
 
 Check documentation cache status:
+
 ```bash
 /mcp:docs-refresh --validate
 ```
 
 View context pool usage:
+
 ```bash  
 /mcp:context-analyze --pool=project-docs --metrics=usage,efficiency
 ```

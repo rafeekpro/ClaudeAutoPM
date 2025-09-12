@@ -6,6 +6,7 @@
 
 **Trigger**: Infrastructure as Code changes
 **Sequence**:
+
 ```
 1. terraform-infrastructure-expert → Validate configuration
 2. Run terraform plan and review changes
@@ -20,6 +21,7 @@
 
 **Trigger**: Dockerfile or container changes
 **Sequence**:
+
 ```
 1. docker-expert → Optimize Dockerfile
 2. Security scan with Trivy/Snyk
@@ -33,6 +35,7 @@
 
 **Trigger**: K8s manifest or Helm chart changes
 **Sequence**:
+
 ```
 1. kubernetes-orchestrator → Validate manifests
 2. Dry-run deployment
@@ -46,6 +49,7 @@
 
 **Trigger**: Serverless function deployment
 **Sequence**:
+
 ```
 1. gcp-cloud-functions-engineer → Optimize function
 2. Set memory/timeout limits
@@ -59,6 +63,7 @@
 
 **Trigger**: GitHub Actions or Azure DevOps setup
 **Sequence**:
+
 ```
 1. github-operations-specialist → Design pipeline
 2. Implement security scanning
@@ -72,6 +77,7 @@
 
 **Trigger**: NATS implementation
 **Sequence**:
+
 ```
 1. nats-messaging-expert → Design topology
 2. Configure JetStream persistence
@@ -85,6 +91,7 @@
 
 **Trigger**: Airflow/Kedro workflow setup
 **Sequence**:
+
 ```
 1. airflow-orchestration-expert/kedro-pipeline-expert → Design DAG/pipeline
 2. Implement idempotent tasks
@@ -97,6 +104,7 @@
 ## Pipeline Requirements
 
 ### NEVER ALLOWED
+
 - ❌ Deploying without staging validation
 - ❌ Pushing unscanned container images
 - ❌ Applying Terraform without plan review
@@ -104,6 +112,7 @@
 - ❌ Ignoring security vulnerabilities
 
 ### ALWAYS REQUIRED
+
 - ✅ Infrastructure as Code for everything
 - ✅ Security scanning at every stage
 - ✅ Staging environment validation
@@ -111,6 +120,7 @@
 - ✅ Comprehensive monitoring
 
 ## Success Metrics
+
 - Zero unplanned downtime
 - All images pass security scan
 - Terraform drift detection active

@@ -3,6 +3,7 @@
 ## Analysis & Audit Tools
 
 ### Accessibility Testing
+
 ```bash
 # Install accessibility testing tools
 npm install -D @axe-core/react
@@ -25,6 +26,7 @@ npx color-contrast-checker "#000000" "#FFFFFF"
 ```
 
 ### Performance Analysis
+
 ```bash
 # Core Web Vitals check
 npx lighthouse http://localhost:3000 --only-categories=performance --view
@@ -41,6 +43,7 @@ npx lighthouse http://localhost:3000 --only-audits=interactive --view
 ```
 
 ### Usability Testing Tools
+
 ```bash
 # Install user testing tools
 npm install -D @hotjar/browser
@@ -63,6 +66,7 @@ npm install rrweb rrweb-player
 ## Design System Setup
 
 ### Design Tokens
+
 ```bash
 # Create design tokens structure
 mkdir -p src/design-system/tokens
@@ -134,6 +138,7 @@ EOF
 ```
 
 ### Component Documentation
+
 ```bash
 # Setup Storybook for component documentation
 npx storybook@latest init
@@ -170,6 +175,7 @@ npm run storybook
 ## UX Metrics Implementation
 
 ### Analytics Setup
+
 ```bash
 # Google Analytics 4
 npm install react-ga4
@@ -209,6 +215,7 @@ EOF
 ```
 
 ### User Feedback Collection
+
 ```bash
 # Install feedback tools
 npm install react-hook-form
@@ -248,6 +255,7 @@ EOF
 ## Responsive Design Testing
 
 ### Device Testing
+
 ```bash
 # Browser device emulation
 # Chrome DevTools: Cmd+Shift+M (Mac) or Ctrl+Shift+M (Windows)
@@ -278,6 +286,7 @@ EOF
 ## A/B Testing Setup
 
 ### Feature Flags
+
 ```bash
 # Install feature flag service
 npm install @growthbook/growthbook-react
@@ -312,6 +321,7 @@ EOF
 ## Visual Regression Testing
 
 ### Percy Setup
+
 ```bash
 # Install Percy
 npm install -D @percy/cli @percy/playwright
@@ -334,6 +344,7 @@ npx percy exec -- npx playwright test tests/visual.spec.js
 ## User Journey Tracking
 
 ### Funnel Analysis
+
 ```bash
 # Track user journey
 cat > src/analytics/journey.js << 'EOF'
@@ -377,6 +388,7 @@ EOF
 ## Form UX Optimization
 
 ### Form Validation
+
 ```bash
 # Real-time validation setup
 cat > src/hooks/useFormValidation.js << 'EOF'
@@ -414,6 +426,7 @@ EOF
 ## Loading State Patterns
 
 ### Skeleton Screens
+
 ```bash
 # Create skeleton component
 cat > src/components/Skeleton.jsx << 'EOF'
@@ -445,6 +458,7 @@ EOF
 ## Error Handling UX
 
 ### User-Friendly Errors
+
 ```bash
 # Error boundary with UX
 cat > src/components/ErrorBoundary.jsx << 'EOF'

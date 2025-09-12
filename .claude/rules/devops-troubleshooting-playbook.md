@@ -66,17 +66,20 @@ This document contains standard procedures for resolving common issues in our CI
 **Debugging Steps:**
 
 1. Check if referenced secrets/configmaps exist:
+
 ```bash
 kubectl get secret YOUR_SECRET_NAME
 kubectl get configmap YOUR_CONFIG_NAME
 ```
 
 2. Verify secret keys match what's expected:
+
 ```bash
 kubectl describe secret YOUR_SECRET_NAME
 ```
 
 3. Check pod events for detailed error:
+
 ```bash
 kubectl describe pod POD_NAME | grep -A 10 Events
 ```
@@ -131,6 +134,7 @@ spec:
 **Alternative Solutions:**
 
 1. **Git Context (Recommended for public repos):**
+
 ```yaml
 args:
   - --context=git://github.com/YOUR/REPO.git#refs/heads/main
@@ -138,6 +142,7 @@ args:
 ```
 
 2. **S3/GCS Bucket for build context:**
+
 ```yaml
 args:
   - --context=s3://your-bucket/build-context.tar.gz
@@ -145,6 +150,7 @@ args:
 ```
 
 3. **Registry-based builds (for layer caching):**
+
 ```yaml
 args:
   - --cache-repo=YOUR_REGISTRY/cache
@@ -367,12 +373,14 @@ kubectl scale deployment/APP_NAME --replicas=3
 ### Structured Logging Requirements
 
 All applications MUST:
+
 1. Log in JSON format for parsing
 2. Include correlation IDs for request tracing
 3. Use appropriate log levels (DEBUG, INFO, WARN, ERROR)
 4. Never log sensitive data (passwords, tokens, PII)
 
 **Example Structured Log:**
+
 ```json
 {
   "timestamp": "2024-01-15T10:30:00Z",

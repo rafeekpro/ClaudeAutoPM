@@ -7,6 +7,7 @@
 ### 🌐 Web Performance Metrics
 
 #### Core Web Vitals
+
 - **LCP (Largest Contentful Paint)**: < 2.5s
 - **FID (First Input Delay)**: < 100ms
 - **CLS (Cumulative Layout Shift)**: < 0.1
@@ -15,6 +16,7 @@
 - **TBT (Total Blocking Time)**: < 300ms
 
 #### Page Load Targets
+
 - **3G Network**: < 3 seconds
 - **4G Network**: < 1.5 seconds
 - **Broadband**: < 1 second
@@ -71,6 +73,7 @@ const budgets = {
 ### 🎯 Optimization Checklist
 
 #### Code Optimization
+
 - [ ] Code splitting implemented
 - [ ] Lazy loading for routes
 - [ ] Tree shaking enabled
@@ -80,6 +83,7 @@ const budgets = {
 - [ ] Source maps in production
 
 #### Asset Optimization
+
 - [ ] Images optimized (WebP with fallback)
 - [ ] Responsive images (srcset)
 - [ ] Lazy loading images
@@ -89,6 +93,7 @@ const budgets = {
 - [ ] Unused CSS removed
 
 #### Caching Strategy
+
 - [ ] Service Worker implemented
 - [ ] Cache headers configured
 - [ ] CDN for static assets
@@ -97,6 +102,7 @@ const budgets = {
 - [ ] Database query caching
 
 #### Runtime Performance
+
 - [ ] Virtual scrolling for long lists
 - [ ] Debounced search inputs
 - [ ] Throttled scroll handlers
@@ -130,6 +136,7 @@ perfObserver.observe({
 ### 🔄 API Optimization
 
 #### Response Time Optimization
+
 - [ ] Database connection pooling
 - [ ] Query optimization (EXPLAIN ANALYZE)
 - [ ] Proper indexing strategy
@@ -139,6 +146,7 @@ perfObserver.observe({
 - [ ] Field filtering (GraphQL/sparse fieldsets)
 
 #### Caching Layers
+
 ```python
 # Caching hierarchy
 1. Browser Cache      → 0ms
@@ -150,6 +158,7 @@ perfObserver.observe({
 ```
 
 #### Concurrency & Scaling
+
 - [ ] Async/await for I/O operations
 - [ ] Worker threads for CPU-intensive tasks
 - [ ] Queue for background jobs
@@ -161,6 +170,7 @@ perfObserver.observe({
 ### 📈 Database Optimization
 
 #### Query Optimization
+
 ```sql
 -- Before optimization
 SELECT * FROM orders o
@@ -181,6 +191,7 @@ CREATE INDEX idx_orders_user_created ON orders(user_id, created_at DESC);
 ```
 
 #### Index Strategy
+
 - [ ] Primary keys on all tables
 - [ ] Foreign key indexes
 - [ ] Composite indexes for common queries
@@ -232,6 +243,7 @@ const scenarios = {
 ## Performance Monitoring Tools
 
 ### Frontend Monitoring
+
 ```javascript
 // Real User Monitoring (RUM)
 - Google Analytics / GA4
@@ -247,6 +259,7 @@ const scenarios = {
 ```
 
 ### Backend Monitoring
+
 ```yaml
 # APM Tools
 - New Relic APM
@@ -264,6 +277,7 @@ const scenarios = {
 ## Performance Budget Enforcement
 
 ### CI/CD Integration
+
 ```yaml
 # Performance gates in pipeline
 performance-check:
@@ -283,12 +297,14 @@ performance-check:
 ### Performance Reviews
 
 #### Weekly Checks
+
 - [ ] Core Web Vitals trends
 - [ ] API response times
 - [ ] Error rates
 - [ ] Database slow query log
 
 #### Monthly Analysis
+
 - [ ] Performance regression analysis
 - [ ] User impact assessment
 - [ ] Infrastructure cost vs performance
@@ -297,6 +313,7 @@ performance-check:
 ## Quick Performance Wins
 
 ### Immediate Improvements
+
 ```bash
 # Frontend
 ✅ Enable compression (gzip/brotli)
@@ -323,6 +340,7 @@ performance-check:
 ## Performance Anti-Patterns
 
 ### Things to Avoid
+
 ```javascript
 // ❌ DON'T DO THIS
 - Synchronous API calls in loops
@@ -350,21 +368,25 @@ performance-check:
 ### Team Responsibilities
 
 #### Developers
+
 - Write performant code
 - Test performance locally
 - Monitor PR impact
 
 #### DevOps
+
 - Infrastructure optimization
 - Monitoring setup
 - Scaling policies
 
 #### Product
+
 - Define performance requirements
 - Prioritize performance work
 - Balance features vs speed
 
 ### Performance Reviews
+
 - Include performance in code reviews
 - Regular performance audits
 - Performance retrospectives

@@ -24,13 +24,17 @@ Requirements:
 ## Output Focus
 
 ### Success
+
 Keep it simple:
+
 ```
 ✅ All tests passed ({count} tests in {time}s)
 ```
 
 ### Failure
+
 Focus on what failed:
+
 ```
 ❌ Test failures: {count}
 
@@ -48,6 +52,7 @@ Focus on what failed:
 ## Cleanup
 
 Always clean up after tests:
+
 ```bash
 pkill -f "jest|mocha|pytest" 2>/dev/null || true
 ```

@@ -12,7 +12,8 @@ Use `ast-grep` (if installed) instead of plain regex or text search when:
 
 ## AST-Grep Command Patterns
 
-### Basic Search Template:
+### Basic Search Template
+
 ```sh
 ast-grep --pattern '$PATTERN' --lang $LANGUAGE $PATH
 ```
@@ -47,12 +48,15 @@ ast-grep --pattern '$PATTERN' --lang $LANGUAGE $PATH
 
 ## Integration Workflow
 
-### Before using ast-grep:
+### Before using ast-grep
+
 1. **Check if ast-grep is installed:**
    If not, skip and fall back to regex/semantic search.
+
    ```sh
    command -v ast-grep >/dev/null 2>&1 || echo "ast-grep not installed, skipping AST search"
    ```
+
 2. **Identify** if the task involves structural code patterns or language-aware refactoring.
 3. **Determine** the appropriate language(s) to search.
 4. **Construct** the pattern using ast-grep syntax.
@@ -64,9 +68,11 @@ ast-grep --pattern '$PATTERN' --lang $LANGUAGE $PATH
 When asked to "find all Ruby service objects that call `perform`":
 
 1. **Check for ast-grep:**
+
    ```sh
    command -v ast-grep >/dev/null 2>&1 && ast-grep --pattern 'perform($$$)' --lang ruby app/services/
    ```
+
 2. **Analyze** results structurally.
 3. **Use** codebase semantic search for additional context if needed.
 4. **Make** informed edits based on structural understanding.
@@ -78,6 +84,7 @@ When asked to "find all Ruby service objects that call `perform`":
 - **edit_file** for making precise, context-aware code changes
 
 ### Advanced Usage
+
 - **JSON output for programmatic processing:**
   `ast-grep --pattern '$PATTERN' --lang $LANG $PATH --json`
 - **Replace patterns:**

@@ -5,6 +5,7 @@
 ## Pre-Deployment Security Checklist
 
 ### 🔑 Authentication & Authorization
+
 - [ ] Multi-factor authentication available
 - [ ] Password complexity requirements enforced
 - [ ] Session management secure (timeout, invalidation)
@@ -15,6 +16,7 @@
 - [ ] Principle of least privilege applied
 
 ### 🔐 Data Protection
+
 - [ ] All sensitive data encrypted at rest (AES-256)
 - [ ] All sensitive data encrypted in transit (TLS 1.2+)
 - [ ] PII data identified and protected
@@ -25,6 +27,7 @@
 - [ ] Data retention policies implemented
 
 ### 🛡️ Input Validation & Sanitization
+
 - [ ] All user inputs validated on server-side
 - [ ] SQL injection prevention (parameterized queries)
 - [ ] XSS protection (output encoding)
@@ -35,6 +38,7 @@
 - [ ] CSRF tokens for state-changing operations
 
 ### 🌐 Network Security
+
 - [ ] HTTPS enforced (HSTS enabled)
 - [ ] Security headers configured:
   - [ ] Content-Security-Policy
@@ -48,6 +52,7 @@
 - [ ] Firewall rules configured
 
 ### 📦 Dependencies & Supply Chain
+
 - [ ] All dependencies scanned for vulnerabilities
 - [ ] No critical or high vulnerabilities
 - [ ] Dependencies up-to-date
@@ -58,6 +63,7 @@
 - [ ] No unnecessary packages installed
 
 ### 🔍 Monitoring & Logging
+
 - [ ] Security events logged
 - [ ] Failed authentication attempts tracked
 - [ ] Suspicious activity alerts configured
@@ -68,6 +74,7 @@
 - [ ] Incident response plan documented
 
 ### 🔧 API Security
+
 - [ ] API authentication required
 - [ ] API rate limiting per user/IP
 - [ ] API versioning implemented
@@ -77,6 +84,7 @@
 - [ ] API keys not exposed in client-side code
 
 ### 🐳 Container & Infrastructure
+
 - [ ] Containers run as non-root user
 - [ ] Read-only root filesystem
 - [ ] Security policies (AppArmor/SELinux)
@@ -87,6 +95,7 @@
 - [ ] Vulnerability scanning in CI/CD
 
 ### 📱 Frontend Security
+
 - [ ] No sensitive data in localStorage
 - [ ] Secure cookie flags (HttpOnly, Secure, SameSite)
 - [ ] Content Security Policy implemented
@@ -96,6 +105,7 @@
 - [ ] Service Worker scope limited
 
 ### 🧪 Testing & Validation
+
 - [ ] Security unit tests written
 - [ ] Penetration testing performed
 - [ ] SAST (Static Analysis) passing
@@ -107,6 +117,7 @@
 ## Security by Feature Type
 
 ### Database Operations
+
 ```sql
 -- ✅ SECURE: Parameterized query
 SELECT * FROM users WHERE id = $1;
@@ -116,6 +127,7 @@ SELECT * FROM users WHERE id = '${userId}';
 ```
 
 ### File Uploads
+
 ```javascript
 // Security checks required:
 - [ ] File type validation (whitelist)
@@ -128,6 +140,7 @@ SELECT * FROM users WHERE id = '${userId}';
 ```
 
 ### Password Handling
+
 ```javascript
 // Requirements:
 - [ ] Minimum 12 characters
@@ -140,6 +153,7 @@ SELECT * FROM users WHERE id = '${userId}';
 ```
 
 ### Session Management
+
 ```javascript
 // Secure session configuration:
 - [ ] Secure cookie flag
@@ -154,6 +168,7 @@ SELECT * FROM users WHERE id = '${userId}';
 ## Incident Response Plan
 
 ### If Security Breach Detected
+
 1. **Immediate Actions**
    - [ ] Isolate affected systems
    - [ ] Preserve evidence
@@ -181,6 +196,7 @@ SELECT * FROM users WHERE id = '${userId}';
 ## Security Tools Integration
 
 ### Required in CI/CD
+
 ```yaml
 # Security scanning pipeline
 pipeline:
@@ -197,6 +213,7 @@ pipeline:
 ```
 
 ### Development Environment
+
 ```bash
 # Pre-commit hooks
 - gitleaks (secret detection)
@@ -208,6 +225,7 @@ pipeline:
 ## Compliance Requirements
 
 ### GDPR (if applicable)
+
 - [ ] Privacy policy updated
 - [ ] Data processing agreements
 - [ ] Right to erasure implemented
@@ -215,6 +233,7 @@ pipeline:
 - [ ] Consent mechanisms in place
 
 ### PCI DSS (if handling cards)
+
 - [ ] Cardholder data encrypted
 - [ ] Network segmentation
 - [ ] Access controls implemented
@@ -222,6 +241,7 @@ pipeline:
 - [ ] Compliance scanning
 
 ### HIPAA (if healthcare)
+
 - [ ] PHI encryption
 - [ ] Access controls
 - [ ] Audit logging
@@ -230,16 +250,19 @@ pipeline:
 ## Security Review Gates
 
 ### Before Code Review
+
 - [ ] Self-assessment complete
 - [ ] SAST scan clean
 - [ ] No hardcoded secrets
 
 ### Before Merge
+
 - [ ] Security review approved
 - [ ] All security tests passing
 - [ ] Dependencies checked
 
 ### Before Deployment
+
 - [ ] Security checklist complete
 - [ ] Penetration test passed (major releases)
 - [ ] Security documentation updated

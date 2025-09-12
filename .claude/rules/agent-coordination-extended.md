@@ -20,18 +20,21 @@ Comprehensive coordination rules for the expanded agent ecosystem.
 ## Technology Stack Coordination
 
 ### Frontend ↔ Backend
+
 - **API Contract**: Shared through OpenAPI/Swagger specs
 - **Type Generation**: Backend generates types for frontend
 - **Testing**: Playwright tests both layers together
 - **Error Handling**: Consistent error format across stack
 
 ### Application ↔ Infrastructure
+
 - **Deployment**: Kubernetes manifests match app requirements
 - **Secrets**: Cloud architects create, apps consume via K8s secrets
 - **Networking**: Infrastructure provides endpoints, apps configure
 - **Scaling**: Apps define needs, infrastructure implements
 
 ### Development ↔ Operations
+
 - **CI/CD**: GitHub Actions validates, deploys what developers build
 - **Monitoring**: Apps expose metrics, infrastructure collects
 - **GitOps**: ArgoCD syncs what GitHub Actions validates
@@ -40,6 +43,7 @@ Comprehensive coordination rules for the expanded agent ecosystem.
 ## MCP Context Pool Architecture
 
 ### Pool Definitions
+
 ```yaml
 python-docs:
   agents: [python-backend-engineer, mcp-context-manager]
@@ -75,6 +79,7 @@ project-context:
 ## Workflow Patterns
 
 ### Full Stack Feature Development
+
 ```mermaid
 graph LR
   A[python-backend-engineer] -->|API Contract| B[react-frontend-engineer]
@@ -85,6 +90,7 @@ graph LR
 ```
 
 ### Infrastructure Migration
+
 ```mermaid
 graph LR
   A[aws-cloud-architect] -->|Infrastructure Ready| B[kubernetes-orchestrator]
@@ -94,6 +100,7 @@ graph LR
 ```
 
 ### Hotfix Deployment
+
 ```mermaid
 graph LR
   A[code-analyzer] -->|Bug Identified| B[python-backend-engineer]
@@ -105,16 +112,19 @@ graph LR
 ## Conflict Resolution Protocol
 
 ### Level 1: Automatic Resolution
+
 - Git can auto-merge (different files)
 - No semantic conflicts
 - Tests still pass
 
 ### Level 2: Agent Coordination
+
 - Same file, different sections
 - Agent negotiates changes via update files
 - Requires test validation
 
 ### Level 3: Human Intervention
+
 - Conflicting business logic
 - Architecture decisions needed
 - Security implications
@@ -122,6 +132,7 @@ graph LR
 ## Communication Channels
 
 ### 1. Git Commits
+
 ```bash
 feat(api): Add user authentication endpoint
 
@@ -132,6 +143,7 @@ Tests: All passing
 ```
 
 ### 2. Update Files
+
 ```markdown
 # Update: Issue #123 - Stream A
 Agent: kubernetes-orchestrator
@@ -141,6 +153,7 @@ Next: aws-cloud-architect needs to provision RDS
 ```
 
 ### 3. MCP Context Messages
+
 ```json
 {
   "agent": "playwright-test-engineer",
@@ -167,22 +180,26 @@ Next: aws-cloud-architect needs to provision RDS
 ## Agent Capabilities
 
 ### Read-Only Agents
+
 - code-analyzer
 - file-analyzer
 - test-runner (only reads, writes test results)
 
 ### Infrastructure Agents
+
 - gcp-cloud-architect
 - azure-cloud-architect  
 - aws-cloud-architect
 - kubernetes-orchestrator
 
 ### Application Agents
+
 - python-backend-engineer
 - react-frontend-engineer
 - playwright-test-engineer
 
 ### Operations Agents
+
 - github-operations-specialist
 - azure-devops-specialist
 - mcp-context-manager
@@ -190,6 +207,7 @@ Next: aws-cloud-architect needs to provision RDS
 ## Coordination Boundaries
 
 ### Never Modify Without Coordination
+
 - Production configurations
 - Security settings
 - API contracts
@@ -199,6 +217,7 @@ Next: aws-cloud-architect needs to provision RDS
 - User data handling
 
 ### Safe for Independent Work
+
 - Documentation
 - Tests (own domain)
 - Logging improvements
@@ -220,18 +239,21 @@ Next: aws-cloud-architect needs to provision RDS
 ## Emergency Protocols
 
 ### System Down
+
 1. kubernetes-orchestrator takes lead
 2. Cloud architect checks infrastructure
 3. python-backend checks application
 4. github-operations prepares rollback
 
 ### Security Breach
+
 1. code-analyzer identifies scope
 2. Cloud architects lock down resources
 3. python-backend patches vulnerability
 4. github-operations deploys fix
 
 ### Data Corruption
+
 1. Cloud architects initiate backup restore
 2. kubernetes-orchestrator stops affected services
 3. python-backend validates data integrity
