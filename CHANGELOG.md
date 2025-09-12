@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the AUTOPM framework will be documented in this file.
+All notable changes to the ClaudeAutoPM framework will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- 🎉 Initial release of AUTOPM framework
-- 📦 NPM package with global CLI installation (`@autopm/framework`)
+- 🎉 Initial release of ClaudeAutoPM framework
+- 📦 NPM package with global CLI installation (`claude-autopm`)
 - 🚀 Complete installation system with `autopm install` command
 - 🤖 AI-powered CLAUDE.md merge helper with `autopm merge`
 - 🎯 Project initialization with `autopm init <project-name>`
@@ -86,7 +86,7 @@ autopm --help            # Show usage guide
 
 #### 📦 Package Management
 
-- **Scoped package**: `@autopm/framework`
+- **Scoped package**: `claude-autopm`
 - **Multiple binary entries**: `autopm`, `autopm-install`, `autopm-merge`
 - **Optional dependencies** for MCP servers
 - **Peer dependencies** validation
@@ -98,7 +98,7 @@ autopm --help            # Show usage guide
 - 🎯 Usage examples and troubleshooting
 - 🎨 ASCII art banners and professional CLI presentation
 - 📋 Comprehensive error handling documentation
-- 🔄 Migration guides for existing AUTOPM installations
+- 🔄 Migration guides for existing ClaudeAutoPM installations
 
 ### Dependencies
 
@@ -146,22 +146,22 @@ autopm --help            # Show usage guide
 ### Global Installation (Recommended)
 
 ```bash
-npm install -g @autopm/framework
+npm install -g claude-autopm
 autopm --help
 ```
 
 ### Use with npx (No Installation)
 
 ```bash
-npx @autopm/framework install
-npx @autopm/framework merge
+npx claude-autopm install
+npx claude-autopm merge
 ```
 
 ### Local Development
 
 ```bash
-git clone https://github.com/rla/AUTOPM.git
-cd AUTOPM
+git clone https://github.com/rla/ClaudeAutoPM.git
+cd ClaudeAutoPM
 npm install
 npm link
 autopm --version

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * AUTOPM Setup-Env CLI - Interactive .env Configuration
+ * ClaudeAutoPM Setup-Env CLI - Interactive .env Configuration
  * Standalone CLI for setting up environment configuration
  */
 
@@ -80,7 +80,7 @@ const executeBashScript = (scriptPath, args = []) => {
 const main = () => {
   const args = process.argv.slice(2);
   
-  log('🔧 AUTOPM Interactive .env Configuration', 'cyan');
+  log('🔧 ClaudeAutoPM Interactive .env Configuration', 'cyan');
   log('');
   
   // Pass all arguments to the bash script

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * AUTOPM CLI - Autonomous Project Management Framework
- * Global command-line interface for installing and managing AUTOPM
+ * ClaudeAutoPM CLI - Autonomous Project Management Framework
+ * Global command-line interface for installing and managing ClaudeAutoPM
  */
 
 const fs = require('fs');
@@ -24,7 +24,7 @@ const colors = {
 
 // Package info
 const packageJson = require('../package.json');
-const AUTOPM_VERSION = packageJson.version;
+const ClaudeAutoPM_VERSION = packageJson.version;
 
 // Paths
 const SCRIPT_DIR = __dirname;
@@ -102,8 +102,8 @@ const executeBashScript = (scriptPath, args = []) => {
 const printBanner = () => {
   log('', 'cyan');
   log('╔══════════════════════════════════════════════╗', 'cyan');
-  log('║              🤖 AUTOPM CLI                   ║', 'cyan');
-  log('║     Autonomous Project Management v' + AUTOPM_VERSION.padEnd(7) + '║', 'cyan');
+  log('║              🤖 ClaudeAutoPM CLI                   ║', 'cyan');
+  log('║     Autonomous Project Management v' + ClaudeAutoPM_VERSION.padEnd(7) + '║', 'cyan');
   log('╚══════════════════════════════════════════════╝', 'cyan');
   log('', 'cyan');
 };
@@ -112,17 +112,17 @@ const printBanner = () => {
 const showHelp = () => {
   printBanner();
   
-  log('🚀 AUTOPM - Autonomous Project Management Framework', 'bright');
+  log('🚀 ClaudeAutoPM - Autonomous Project Management Framework', 'bright');
   log('');
   log('USAGE:', 'yellow');
   log('  autopm [command] [options]');
   log('');
   log('COMMANDS:', 'yellow');
-  log('  install [path]     Install AUTOPM to current directory or specified path');
-  log('  update [path]      Update existing AUTOPM installation');
+  log('  install [path]     Install ClaudeAutoPM to current directory or specified path');
+  log('  update [path]      Update existing ClaudeAutoPM installation');
   log('  merge              Merge CLAUDE.md configurations');
   log('  setup-env [path]   Interactive .env configuration setup');
-  log('  init               Initialize new project with AUTOPM');
+  log('  init               Initialize new project with ClaudeAutoPM');
   log('  version            Show version information');
   log('  help               Show this help message');
   log('');
@@ -142,20 +142,20 @@ const showHelp = () => {
   log('  autopm init my-new-project        # Initialize new project');
   log('');
   log('INSTALLATION MODES:', 'yellow');
-  log('  🆕 Fresh Install   - Sets up complete AUTOPM framework');
+  log('  🆕 Fresh Install   - Sets up complete ClaudeAutoPM framework');
   log('  🔄 Update/Sync     - Updates existing installation with backups');
   log('  🤖 Smart Merge     - AI-assisted configuration merging');
   log('  🔧 Interactive Setup - Step-by-step .env configuration');
   log('');
   log('MORE INFO:', 'yellow');
-  log('  Repository: https://github.com/rla/AUTOPM');
+  log('  Repository: https://github.com/rla/ClaudeAutoPM');
   log('  Documentation: See PLAYBOOK.md after installation');
-  log('  Issues: https://github.com/rla/AUTOPM/issues');
+  log('  Issues: https://github.com/rla/ClaudeAutoPM/issues');
 };
 
 // Show version
 const showVersion = () => {
-  log(`AUTOPM v${AUTOPM_VERSION}`, 'green');
+  log(`ClaudeAutoPM v${ClaudeAutoPM_VERSION}`, 'green');
   log(`Node.js ${process.version}`);
   log(`Platform: ${os.platform()} ${os.arch()}`);
 };
@@ -181,7 +181,7 @@ const initProject = (projectName) => {
     // Initialize git repository
     execSync('git init', { cwd: projectPath, stdio: 'inherit' });
     
-    // Install AUTOPM
+    // Install ClaudeAutoPM
     executeBashScript(INSTALL_SCRIPT, [projectPath]);
     
   } catch (err) {
@@ -276,14 +276,14 @@ const main = () => {
     case 'install':
       checkPrerequisites();
       printBanner();
-      info('Starting AUTOPM installation...');
+      info('Starting ClaudeAutoPM installation...');
       executeBashScript(INSTALL_SCRIPT, parsed.path ? [parsed.path] : []);
       break;
 
     case 'update':
       checkPrerequisites();
       printBanner();
-      info('Updating AUTOPM installation...');
+      info('Updating ClaudeAutoPM installation...');
       executeBashScript(INSTALL_SCRIPT, parsed.path ? [parsed.path] : []);
       break;
 

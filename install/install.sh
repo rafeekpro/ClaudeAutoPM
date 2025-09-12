@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # ============================================
-# AUTOPM Installation Script
+# ClaudeAutoPM Installation Script
 # ============================================
-# This script installs or updates the AUTOPM framework
+# This script installs or updates the ClaudeAutoPM framework
 # including .claude, .claude-code, .github, scripts folders
 # and handles CLAUDE.md migration/merging
 # ============================================
@@ -20,7 +20,7 @@ NC='\033[0m' # No Color
 BOLD='\033[1m'
 
 # Configuration
-REPO_URL="https://github.com/rla/AUTOPM.git"
+REPO_URL="https://github.com/rla/ClaudeAutoPM.git"
 TEMP_DIR="/tmp/autopm_install_$$"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASE_DIR="$(dirname "$SCRIPT_DIR")"
@@ -41,7 +41,7 @@ INSTALL_ITEMS=(
 print_banner() {
     echo -e "${CYAN}${BOLD}"
     echo "╔══════════════════════════════════════════════╗"
-    echo "║           AUTOPM Installation Script         ║"
+    echo "║           ClaudeAutoPM Installation Script         ║"
     echo "║         Autonomous Project Management        ║"
     echo "╚══════════════════════════════════════════════╝"
     echo -e "${NC}"
@@ -643,7 +643,7 @@ main() {
     
     if [ ${#existing_items[@]} -gt 0 ]; then
         is_update=true
-        print_msg "$YELLOW" "📦 Detected existing AUTOPM installation"
+        print_msg "$YELLOW" "📦 Detected existing ClaudeAutoPM installation"
         print_msg "$CYAN" "   Found: ${existing_items[*]}"
         echo ""
         
@@ -655,12 +655,12 @@ main() {
         # Create backup
         backup_dir=$(backup_existing)
     else
-        print_msg "$GREEN" "🚀 Starting fresh AUTOPM installation"
+        print_msg "$GREEN" "🚀 Starting fresh ClaudeAutoPM installation"
         echo ""
         
         if [ "$TARGET_DIR" != "$(pwd)" ]; then
             print_msg "$CYAN" "Target directory: $TARGET_DIR"
-            if ! confirm "Install AUTOPM to this directory?"; then
+            if ! confirm "Install ClaudeAutoPM to this directory?"; then
                 print_msg "$YELLOW" "Installation cancelled"
                 exit 0
             fi
@@ -672,12 +672,12 @@ main() {
     
     # Check if we're running from a local copy or need to clone
     if [ ! -d "$source_dir/.claude" ]; then
-        print_step "Downloading AUTOPM from GitHub..."
+        print_step "Downloading ClaudeAutoPM from GitHub..."
         git clone --quiet "$REPO_URL" "$TEMP_DIR"
         source_dir="$TEMP_DIR"
         print_success "Downloaded successfully"
     else
-        print_msg "$CYAN" "Using local AUTOPM source"
+        print_msg "$CYAN" "Using local ClaudeAutoPM source"
     fi
     
     # Install/update files
@@ -708,7 +708,7 @@ main() {
     
     # Final message
     echo ""
-    print_msg "$GREEN$BOLD" "✨ AUTOPM installation completed successfully!"
+    print_msg "$GREEN$BOLD" "✨ ClaudeAutoPM installation completed successfully!"
     echo ""
     
     if [ "$is_update" = true ] && [ -n "$backup_dir" ]; then
@@ -730,7 +730,7 @@ main() {
         echo "   4. Check PLAYBOOK.md for usage guidelines"
     fi
     echo ""
-    print_msg "$GREEN" "🎉 Happy coding with AUTOPM!"
+    print_msg "$GREEN" "🎉 Happy coding with ClaudeAutoPM!"
 }
 
 # Run main function

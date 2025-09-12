@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ============================================
-# AUTOPM Environment Setup Script
+# ClaudeAutoPM Environment Setup Script
 # ============================================
 # Standalone script for creating .env configuration
 # Can be run independently or as part of installation
@@ -157,7 +157,7 @@ get_input() {
 print_banner() {
     echo -e "${CYAN}${BOLD}"
     echo "╔══════════════════════════════════════════════╗"
-    echo "║           🔧 AUTOPM .env Setup               ║"
+    echo "║           🔧 ClaudeAutoPM .env Setup               ║"
     echo "║         Interactive Configuration            ║"
     echo "╚══════════════════════════════════════════════╝"
     echo -e "${NC}"
@@ -167,7 +167,7 @@ print_banner() {
 show_usage() {
     echo "Usage: $0 [directory]"
     echo ""
-    echo "Creates an interactive .env configuration file for AUTOPM"
+    echo "Creates an interactive .env configuration file for ClaudeAutoPM"
     echo ""
     echo "Arguments:"
     echo "  directory    Target directory (default: current directory)"
@@ -184,14 +184,14 @@ setup_env() {
     
     # Validate directory structure
     if [ ! -d "$TARGET_DIR/.claude" ]; then
-        print_error "AUTOPM not found in $TARGET_DIR"
+        print_error "ClaudeAutoPM not found in $TARGET_DIR"
         print_msg "$YELLOW" "Please run 'autopm install' first or specify correct directory"
         exit 1
     fi
     
     if [ ! -f "$env_example" ]; then
         print_error ".env.example not found at $env_example"
-        print_msg "$YELLOW" "Please ensure AUTOPM is properly installed"
+        print_msg "$YELLOW" "Please ensure ClaudeAutoPM is properly installed"
         exit 1
     fi
     

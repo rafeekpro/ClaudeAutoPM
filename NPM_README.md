@@ -1,11 +1,13 @@
-# 🤖 AUTOPM Framework
+# 🤖 ClaudeAutoPM Framework
 
-[![NPM Version](https://img.shields.io/npm/v/@autopm/framework)](https://www.npmjs.com/package/@autopm/framework)
-[![NPM Downloads](https://img.shields.io/npm/dm/@autopm/framework)](https://www.npmjs.com/package/@autopm/framework)
-[![License: MIT](https://img.shields.io/badge/License-MIT-28a745)](https://github.com/rla/AUTOPM/blob/main/LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/rla/AUTOPM?style=social)](https://github.com/rla/AUTOPM)
+[![NPM Version](https://img.shields.io/npm/v/claude-autopm)](https://www.npmjs.com/package/claude-autopm)
+[![NPM Downloads](https://img.shields.io/npm/dm/claude-autopm)](https://www.npmjs.com/package/claude-autopm)
+[![License: MIT](https://img.shields.io/badge/License-MIT-28a745)](https://github.com/rla/ClaudeAutoPM/blob/main/LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/rla/ClaudeAutoPM?style=social)](https://github.com/rla/ClaudeAutoPM)
 
 **Autonomous Project Management Framework** - Ship better software faster using spec-driven development, GitHub issues, Git worktrees, and multiple AI agents running in parallel.
+
+> **Inspired by [CCPM (Claude Code Project Manager)](https://github.com/automazeio/ccpm)** - This project builds upon the foundational concepts of AI-powered project management to create a comprehensive development framework.
 
 ## ⚡ Quick Start
 
@@ -13,7 +15,7 @@
 
 ```bash
 # Install globally
-npm install -g @autopm/framework
+npm install -g claude-autopm
 
 # Install to current project
 autopm install
@@ -25,14 +27,14 @@ autopm install ~/my-project
 ### Use with npx (No Installation Required)
 
 ```bash
-# Install AUTOPM to current directory
-npx @autopm/framework install
+# Install ClaudeAutoPM to current directory
+npx claude-autopm install
 
 # Initialize new project
-npx @autopm/framework init my-new-project
+npx claude-autopm init my-new-project
 
 # Generate CLAUDE.md merge prompt
-npx @autopm/framework merge
+npx claude-autopm merge
 ```
 
 ## 🎯 What You Get
@@ -77,7 +79,7 @@ your-project/
 ## 📋 CLI Commands
 
 ```bash
-autopm install [path]       # Install AUTOPM framework
+autopm install [path]       # Install ClaudeAutoPM framework
 autopm update [path]        # Update existing installation
 autopm merge                # Generate CLAUDE.md merge prompt
 autopm init <project-name>  # Initialize new project
@@ -94,10 +96,10 @@ autopm install
 # Install to specific project
 autopm install ~/my-awesome-project
 
-# Update existing AUTOPM installation
+# Update existing ClaudeAutoPM installation
 autopm update
 
-# Create new project with AUTOPM
+# Create new project with ClaudeAutoPM
 autopm init my-new-app
 
 # Interactive CLAUDE.md merger
@@ -151,7 +153,7 @@ Perfect for new projects:
 
 ### 🔄 Update/Sync Mode
 
-For existing AUTOPM projects:
+For existing ClaudeAutoPM projects:
 
 - Detects current installation automatically
 - Creates timestamped backup before changes
@@ -169,9 +171,9 @@ When framework updates conflict with your customizations:
 - Interactive console or file output
 - Step-by-step merge instructions
 
-## 🌟 What Makes AUTOPM Different?
+## 🌟 What Makes ClaudeAutoPM Different?
 
-| Traditional Development | AUTOPM Framework |
+| Traditional Development | ClaudeAutoPM Framework |
 |------------------------|------------------|
 | Context lost between sessions | **Persistent context** across all work |
 | Serial task execution | **Parallel agents** on independent tasks |
@@ -181,7 +183,7 @@ When framework updates conflict with your customizations:
 
 ## 📊 Proven Results
 
-Teams using AUTOPM report:
+Teams using ClaudeAutoPM report:
 
 - ⚡ **3x faster** feature delivery
 - 🐛 **70% fewer bugs** reaching production  
@@ -232,10 +234,10 @@ Teams using AUTOPM report:
 
 ## 📚 Getting Started Guide
 
-### 1. Install AUTOPM
+### 1. Install ClaudeAutoPM
 
 ```bash
-npm install -g @autopm/framework
+npm install -g claude-autopm
 ```
 
 ### 2. Set Up Your Project
@@ -270,7 +272,7 @@ nano .claude/.env
 ### 5. Start Building
 
 ```bash
-# Follow the AUTOPM workflow
+# Follow the ClaudeAutoPM workflow
 # PRD → Epic → Issues → Parallel Execution
 ```
 
@@ -290,21 +292,21 @@ autopm update
 
 ## 🤝 Community & Support
 
-- 📖 **Documentation**: [Full README](https://github.com/rla/AUTOPM#readme)
-- 🐛 **Issues**: [GitHub Issues](https://github.com/rla/AUTOPM/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/rla/AUTOPM/discussions)
-- ⭐ **Star us**: [GitHub Repository](https://github.com/rla/AUTOPM)
+- 📖 **Documentation**: [Full README](https://github.com/rla/ClaudeAutoPM#readme)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/rla/ClaudeAutoPM/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/rla/ClaudeAutoPM/discussions)
+- ⭐ **Star us**: [GitHub Repository](https://github.com/rla/ClaudeAutoPM)
 
 ## 📄 License
 
-MIT License - see [LICENSE](https://github.com/rla/AUTOPM/blob/main/LICENSE) file for details.
+MIT License - see [LICENSE](https://github.com/rla/ClaudeAutoPM/blob/main/LICENSE) file for details.
 
 ---
 
 **Ready to transform your development workflow?**
 
 ```bash
-npm install -g @autopm/framework && autopm init my-project
+npm install -g claude-autopm && autopm init my-project
 ```
 
 **Ship better software, faster! 🚀**
