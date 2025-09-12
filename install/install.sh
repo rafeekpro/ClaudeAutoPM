@@ -4,7 +4,7 @@
 # ClaudeAutoPM Installation Script
 # ============================================
 # This script installs or updates the ClaudeAutoPM framework
-# including .claude, .claude-code, .github, scripts folders
+# including .claude, .claude-code, scripts folders
 # and handles CLAUDE.md migration/merging
 # ============================================
 
@@ -30,7 +30,6 @@ TARGET_DIR="${1:-$(pwd)}"
 INSTALL_ITEMS=(
     ".claude"
     ".claude-code"
-    ".github"
     "scripts"
     "PLAYBOOK.md"
     "COMMIT_CHECKLIST.md"
@@ -299,12 +298,6 @@ should_skip_update() {
     # Skip certain folders/files during updates if they already exist
     # These likely contain user customizations
     case "$item" in
-        ".github")
-            # GitHub workflows and settings - user may have customized
-            if [ "$is_update" = true ] && [ -d "$target_path" ]; then
-                return 0  # skip
-            fi
-            ;;
         ".claude-code")
             # Claude Code settings - user may have customized
             if [ "$is_update" = true ] && [ -d "$target_path" ]; then
