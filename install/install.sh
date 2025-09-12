@@ -425,6 +425,49 @@ choose_configuration() {
     print_msg "$CYAN" "   or: .claude/scripts/config/toggle-features.sh"
 }
 
+# Generate CLAUDE.md based on configuration
+generate_claude_md() {
+    local config_file="$TARGET_DIR/.claude/config.json"
+    local target_claude="$TARGET_DIR/CLAUDE.md"
+    local template_file=""
+    
+    # Determine which template to use based on configuration
+    if [ -f "$config_file" ] && command -v jq >/dev/null 2>&1; then
+        local docker_enabled=$(jq -r '.features.docker_first_development // false' "$config_file")
+        local k8s_enabled=$(jq -r '.features.kubernetes_devops_testing // false' "$config_file")
+        
+        if [ "$docker_enabled" = "true" ] && [ "$k8s_enabled" = "true" ]; then
+            template_file="$PACKAGE_DIR/.claude/claude-templates/full-devops.md"
+            print_step "Generating CLAUDE.md for Full DevOps configuration..."
+        elif [ "$docker_enabled" = "true" ]; then
+            template_file="$PACKAGE_DIR/.claude/claude-templates/docker-only.md"
+            print_step "Generating CLAUDE.md for Docker-only configuration..."
+        else
+            template_file="$PACKAGE_DIR/.claude/claude-templates/minimal.md"
+            print_step "Generating CLAUDE.md for Minimal configuration..."
+        fi
+    else
+        # Fallback to original CLAUDE_BASIC.md if no config or jq
+        template_file="$PACKAGE_DIR/.claude/CLAUDE_BASIC.md"
+        print_step "Generating CLAUDE.md from default template..."
+    fi
+    
+    # Copy the appropriate template
+    if [ -f "$template_file" ]; then
+        cp "$template_file" "$target_claude"
+        print_success "Generated CLAUDE.md based on your configuration"
+    else
+        print_warning "Template not found: $template_file"
+        # Fallback to basic template
+        if [ -f "$PACKAGE_DIR/.claude/CLAUDE_BASIC.md" ]; then
+            cp "$PACKAGE_DIR/.claude/CLAUDE_BASIC.md" "$target_claude"
+            print_success "Generated CLAUDE.md from fallback template"
+        else
+            print_error "No CLAUDE.md template available"
+        fi
+    fi
+}
+
 # Handle CLAUDE.md migration
 handle_claude_md() {
     local source_dir="$1"
@@ -898,7 +941,10 @@ main() {
         choose_configuration
     fi
     
-    # Handle CLAUDE.md
+    # Generate configuration-specific CLAUDE.md
+    generate_claude_md
+    
+    # Handle CLAUDE.md migration (for existing files)
     handle_claude_md "$source_dir"
     
     # Interactive .env setup
