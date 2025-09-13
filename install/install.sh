@@ -33,6 +33,7 @@ INSTALL_ITEMS=(
     ".claude/rules"
     ".claude/scripts"
     ".claude/checklists"
+    ".claude/mcp"
     ".claude/.env.example"
     ".claude-code"
     "scripts"

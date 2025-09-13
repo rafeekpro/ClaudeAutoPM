@@ -85,6 +85,9 @@
     "LICENSE",
     "README.md"
   ],
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
   "devDependencies": {
     "markdownlint-cli": "^0.37.0",
     "prettier": "^3.0.0"

@@ -71,5 +71,12 @@
     "release": "pm release",
     "test": "npm test",
     "health": "npm run pm:health"
+  },
+  "mcp": {
+    "activeServers": [
+      "context7-docs",
+      "github-mcp",
+      "filesystem-mcp"
+    ]
   }
 }
