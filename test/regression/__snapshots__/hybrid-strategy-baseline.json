@@ -1,0 +1,22 @@
+{
+  "timestamp": 1757776666170,
+  "files": {
+    ".claude/HYBRID_STRATEGY.md": {
+      "exists": false,
+      "error": "ENOENT: no such file or directory, stat '/Users/rla/Projects/AUTOPM/.claude/HYBRID_STRATEGY.md'"
+    },
+    ".claude/orchestrator.md": {
+      "exists": false,
+      "error": "ENOENT: no such file or directory, stat '/Users/rla/Projects/AUTOPM/.claude/orchestrator.md'"
+    },
+    ".claude/prompts/parallel-execution.md": {
+      "exists": false,
+      "error": "ENOENT: no such file or directory, stat '/Users/rla/Projects/AUTOPM/.claude/prompts/parallel-execution.md'"
+    },
+    ".claude/prompts/context-aggregation.md": {
+      "exists": false,
+      "error": "ENOENT: no such file or directory, stat '/Users/rla/Projects/AUTOPM/.claude/prompts/context-aggregation.md'"
+    }
+  },
+  "checksums": {}
+}
