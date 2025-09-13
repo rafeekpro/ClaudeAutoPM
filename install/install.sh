@@ -27,8 +27,13 @@ BASE_DIR="$(dirname "$SCRIPT_DIR")"
 TARGET_DIR="${1:-$(pwd)}"
 
 # Files and directories to install
+# Note: We're selective about .claude subdirectories - templates are NOT copied
 INSTALL_ITEMS=(
-    ".claude"
+    ".claude/agents"
+    ".claude/commands"
+    ".claude/rules"
+    ".claude/scripts"
+    ".claude/.env.example"
     ".claude-code"
     "scripts"
     "PLAYBOOK.md"
@@ -261,6 +266,12 @@ install_files() {
     local source_dir="$1"
     local is_update="$2"
     
+    # Ensure .claude directory exists since we're copying subdirectories
+    if [ ! -d "$TARGET_DIR/.claude" ]; then
+        mkdir -p "$TARGET_DIR/.claude"
+        print_step "Created .claude directory"
+    fi
+    
     for item in "${INSTALL_ITEMS[@]}"; do
         local source_path="$source_dir/$item"
         local target_path="$TARGET_DIR/$item"
@@ -269,6 +280,12 @@ install_files() {
             # Try to create missing files from templates or defaults
             create_missing_file "$item" "$target_path"
             continue
+        fi
+        
+        # Create parent directory if needed (for .claude/subdirs)
+        local parent_dir="$(dirname "$target_path")"
+        if [ ! -d "$parent_dir" ]; then
+            mkdir -p "$parent_dir"
         fi
         
         if [ -e "$target_path" ]; then
@@ -879,6 +896,12 @@ main() {
     # Choose configuration template (only for fresh installs)
     if [ "$is_update" = false ]; then
         choose_configuration
+    else
+        # For updates, ensure config.json exists
+        if [ ! -f "$TARGET_DIR/.claude/config.json" ]; then
+            print_warning "config.json not found, selecting configuration..."
+            choose_configuration
+        fi
     fi
     
     # Generate configuration-specific CLAUDE.md
