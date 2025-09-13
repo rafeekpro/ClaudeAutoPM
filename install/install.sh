@@ -36,8 +36,6 @@ INSTALL_ITEMS=(
     ".claude/.env.example"
     ".claude-code"
     "scripts"
-    "PLAYBOOK.md"
-    "LICENSE"
 )
 
 # Print banner
@@ -1041,13 +1039,13 @@ main() {
         echo "   1. Review and customize CLAUDE.md for your project"
         echo "   2. ✅ .env file already configured"
         echo "   3. Review .claude/rules/ for development standards"
-        echo "   4. Check PLAYBOOK.md for usage guidelines"
+        echo "   4. Check README.md for usage guidelines"
     else
         print_msg "$CYAN" "📚 Next steps:"
         echo "   1. Review and customize CLAUDE.md for your project"
         echo "   2. Copy .claude/.env.example to .claude/.env and add your API keys"
         echo "   3. Review .claude/rules/ for development standards"
-        echo "   4. Check PLAYBOOK.md for usage guidelines"
+        echo "   4. Check README.md for usage guidelines"
     fi
     echo ""
     print_msg "$GREEN" "🎉 Happy coding with ClaudeAutoPM!"
