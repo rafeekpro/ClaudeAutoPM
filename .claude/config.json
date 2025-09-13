@@ -1,0 +1,61 @@
+{
+  "project": {
+    "name": "ClaudeAutoPM",
+    "type": "framework-development",
+    "version": "1.0.7",
+    "description": "Self-maintaining AI project management framework"
+  },
+  "features": {
+    "self_maintenance": true,
+    "auto_optimization": true,
+    "continuous_improvement": true,
+    "dogfooding": true
+  },
+  "maintenance": {
+    "agents": {
+      "registry_manager": true,
+      "installer_tester": true,
+      "optimization_analyzer": true
+    },
+    "automation": {
+      "daily_validation": true,
+      "weekly_optimization": true,
+      "auto_consolidation": false,
+      "auto_release": false
+    },
+    "thresholds": {
+      "max_agents": 40,
+      "min_coverage": 90,
+      "min_efficiency": 50,
+      "max_context": 70
+    }
+  },
+  "development": {
+    "test_on_commit": true,
+    "validate_on_push": true,
+    "optimize_on_schedule": true
+  },
+  "metrics": {
+    "current": {
+      "total_agents": 35,
+      "active_agents": 30,
+      "deprecated_agents": 12,
+      "context_efficiency": 60,
+      "test_coverage": 95,
+      "installation_success": 98
+    },
+    "targets": {
+      "total_agents": 25,
+      "context_efficiency": 70,
+      "test_coverage": 95,
+      "installation_success": 99
+    }
+  },
+  "commands": {
+    "validate": "pm validate",
+    "optimize": "pm optimize",
+    "release": "pm release",
+    "test": "npm test",
+    "health": "npm run pm:health"
+  }
+}
