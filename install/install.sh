@@ -20,8 +20,7 @@ NC='\033[0m' # No Color
 BOLD='\033[1m'
 
 # Configuration
-REPO_URL="https://github.com/rla/ClaudeAutoPM.git"
-TEMP_DIR="/tmp/autopm_install_$$"
+# Note: No longer using git clone - package contains all needed files locally
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASE_DIR="$(dirname "$SCRIPT_DIR")"
 TARGET_DIR="${1:-$(pwd)}"
@@ -29,14 +28,14 @@ TARGET_DIR="${1:-$(pwd)}"
 # Files and directories to install
 # Note: We're selective about .claude subdirectories - templates are NOT copied
 INSTALL_ITEMS=(
-    "autopm/.claude/agents"
-    "autopm/.claude/commands"
-    "autopm/.claude/rules"
-    "autopm/.claude/scripts"
-    "autopm/.claude/checklists"
-    "autopm/.claude/.env.example"
-    "autopm/.claude-code"
-    "autopm/scripts"
+    ".claude/agents"
+    ".claude/commands"
+    ".claude/rules"
+    ".claude/scripts"
+    ".claude/checklists"
+    ".claude/.env.example"
+    ".claude-code"
+    "scripts"
     "PLAYBOOK.md"
     "LICENSE"
 )
@@ -82,7 +81,13 @@ print_error() {
 confirm() {
     local prompt="$1"
     local response
-    
+
+    # In test mode, auto-answer yes to avoid blocking
+    if [ "$AUTOPM_TEST_MODE" = "1" ]; then
+        print_msg "$CYAN" "❓ $prompt [y/n]: y (auto-answered in test mode)"
+        return 0
+    fi
+
     while true; do
         read -p "$(echo -e ${CYAN}❓ $prompt [y/n]: ${NC})" response
         case "$response" in
@@ -281,7 +286,7 @@ install_files() {
 install_strategy() {
     local mode="$1"
     local strategy_dir="$TARGET_DIR/.claude/strategies"
-    local source_dir="$PACKAGE_DIR/autopm/.claude/templates/strategies-templates"
+    local source_dir="$BASE_DIR/autopm/.claude/templates/strategies-templates"
 
     # Create strategies directory if it doesn't exist
     mkdir -p "$strategy_dir"
@@ -333,27 +338,33 @@ choose_configuration() {
     echo ""
 
     while true; do
-        echo -n "Your choice [1-5]: "
-        read -r choice
+        # In test mode, auto-select Full DevOps configuration (option 3)
+        if [ "$AUTOPM_TEST_MODE" = "1" ]; then
+            choice="3"
+            print_msg "$CYAN" "❓ Your choice [1-5]: 3 (auto-selected Full DevOps in test mode)"
+        else
+            echo -n "Your choice [1-5]: "
+            read -r choice
+        fi
 
         case "$choice" in
             1)
                 print_step "Setting up minimal configuration..."
-                cp "$PACKAGE_DIR/autopm/.claude/templates/config-templates/minimal.json" "$config_file"
+                cp "$BASE_DIR/autopm/.claude/templates/config-templates/minimal.json" "$config_file"
                 print_success "Minimal configuration applied!"
                 print_msg "$CYAN" "  📋 Sequential execution - safe and predictable"
                 break
                 ;;
             2)
                 print_step "Setting up Docker-only configuration..."
-                cp "$PACKAGE_DIR/autopm/.claude/templates/config-templates/docker-only.json" "$config_file"
+                cp "$BASE_DIR/autopm/.claude/templates/config-templates/docker-only.json" "$config_file"
                 print_success "Docker-only configuration applied!"
                 print_msg "$CYAN" "  📋 Adaptive execution - learns and optimizes"
                 break
                 ;;
             3)
                 print_step "Setting up full DevOps configuration..."
-                cp "$PACKAGE_DIR/autopm/.claude/templates/config-templates/full-devops.json" "$config_file"
+                cp "$BASE_DIR/autopm/.claude/templates/config-templates/full-devops.json" "$config_file"
                 print_success "Full DevOps configuration applied!"
                 print_msg "$CYAN" "  📋 Smart Adaptive execution - best balance of speed and safety"
                 print_msg "$CYAN" "  📋 Docker + Kubernetes + intelligent parallelization"
@@ -361,20 +372,20 @@ choose_configuration() {
                 ;;
             4)
                 print_step "Setting up performance configuration..."
-                cp "$PACKAGE_DIR/autopm/.claude/templates/config-templates/performance.json" "$config_file"
+                cp "$BASE_DIR/autopm/.claude/templates/config-templates/performance.json" "$config_file"
                 print_success "Performance configuration applied!"
                 print_msg "$YELLOW" "  ⚡ Maximum parallel execution - for experienced users"
                 print_msg "$YELLOW" "  ⚠️  Higher resource usage, requires good understanding"
                 break
                 ;;
             5)
-                if [ -f "$PACKAGE_DIR/autopm/.claude/config.json" ]; then
+                if [ -f "$BASE_DIR/autopm/.claude/config.json" ]; then
                     print_step "Using default configuration template..."
-                    cp "$PACKAGE_DIR/autopm/.claude/config.json" "$config_file"
+                    cp "$BASE_DIR/autopm/.claude/config.json" "$config_file"
                     print_success "Default configuration applied!"
                 else
                     print_warning "Default config not found, using Docker-only template..."
-                    cp "$PACKAGE_DIR/autopm/.claude/templates/config-templates/docker-only.json" "$config_file"
+                    cp "$BASE_DIR/autopm/.claude/templates/config-templates/docker-only.json" "$config_file"
                 fi
                 break
                 ;;
@@ -393,7 +404,7 @@ choose_configuration() {
 generate_claude_md() {
     local config_file="$TARGET_DIR/.claude/config.json"
     local target_claude="$TARGET_DIR/CLAUDE.md"
-    local base_template="$PACKAGE_DIR/autopm/.claude/templates/claude-templates/base.md"
+    local base_template="$BASE_DIR/autopm/.claude/templates/claude-templates/base.md"
     local workflow_addon=""
     local agents_addon=""
     
@@ -411,16 +422,16 @@ generate_claude_md() {
         local strategy_mode=$(jq -r '.execution_strategy.mode // "adaptive"' "$config_file")
 
         if [ "$docker_enabled" = "true" ] && [ "$k8s_enabled" = "true" ]; then
-            workflow_addon="$PACKAGE_DIR/autopm/.claude/templates/claude-templates/addons/devops-workflow.md"
-            agents_addon="$PACKAGE_DIR/autopm/.claude/templates/claude-templates/addons/devops-agents.md"
+            workflow_addon="$BASE_DIR/autopm/.claude/templates/claude-templates/addons/devops-workflow.md"
+            agents_addon="$BASE_DIR/autopm/.claude/templates/claude-templates/addons/devops-agents.md"
             print_step "Generating CLAUDE.md for Full DevOps configuration..."
         elif [ "$docker_enabled" = "true" ]; then
-            workflow_addon="$PACKAGE_DIR/autopm/.claude/templates/claude-templates/addons/docker-workflow.md"
-            agents_addon="$PACKAGE_DIR/autopm/.claude/templates/claude-templates/addons/docker-agents.md"
+            workflow_addon="$BASE_DIR/autopm/.claude/templates/claude-templates/addons/docker-workflow.md"
+            agents_addon="$BASE_DIR/autopm/.claude/templates/claude-templates/addons/docker-agents.md"
             print_step "Generating CLAUDE.md for Docker-only configuration..."
         else
-            workflow_addon="$PACKAGE_DIR/autopm/.claude/templates/claude-templates/addons/minimal-workflow.md"
-            agents_addon="$PACKAGE_DIR/autopm/.claude/templates/claude-templates/addons/minimal-agents.md"
+            workflow_addon="$BASE_DIR/autopm/.claude/templates/claude-templates/addons/minimal-workflow.md"
+            agents_addon="$BASE_DIR/autopm/.claude/templates/claude-templates/addons/minimal-agents.md"
             print_step "Generating CLAUDE.md for Minimal configuration..."
         fi
 
@@ -429,13 +440,13 @@ generate_claude_md() {
         
         # Set git safety addon if enabled
         if [ "$git_safety" = "true" ]; then
-            git_safety_addon="$PACKAGE_DIR/autopm/.claude/templates/claude-templates/addons/git-safety.md"
+            git_safety_addon="$BASE_DIR/autopm/.claude/templates/claude-templates/addons/git-safety.md"
             print_msg "$CYAN" "  ✓ Git safety hooks enabled"
         fi
     else
         # Fallback to minimal if no config or jq
-        workflow_addon="$PACKAGE_DIR/autopm/.claude/templates/claude-templates/addons/minimal-workflow.md"
-        agents_addon="$PACKAGE_DIR/autopm/.claude/templates/claude-templates/addons/minimal-agents.md"
+        workflow_addon="$BASE_DIR/autopm/.claude/templates/claude-templates/addons/minimal-workflow.md"
+        agents_addon="$BASE_DIR/autopm/.claude/templates/claude-templates/addons/minimal-agents.md"
         print_step "Generating CLAUDE.md from minimal configuration (no config found)..."
     fi
     
@@ -875,8 +886,8 @@ setup_git_safety() {
     fi
     
     # Copy safe-commit script
-    if [ -f "$PACKAGE_DIR/.claude/scripts-templates/safe-commit.sh" ]; then
-        cp "$PACKAGE_DIR/.claude/scripts-templates/safe-commit.sh" "$TARGET_DIR/scripts/safe-commit.sh"
+    if [ -f "$BASE_DIR/.claude/scripts-templates/safe-commit.sh" ]; then
+        cp "$BASE_DIR/.claude/scripts-templates/safe-commit.sh" "$TARGET_DIR/scripts/safe-commit.sh"
         chmod +x "$TARGET_DIR/scripts/safe-commit.sh"
         print_msg "$CYAN" "  ✓ Installed safe-commit script"
     fi
@@ -885,15 +896,15 @@ setup_git_safety() {
     echo ""
     if confirm "Would you like to install git hooks for automated commit/push validation?"; then
         # Install pre-commit hook
-        if [ -f "$PACKAGE_DIR/.claude/hooks-templates/pre-commit" ]; then
-            cp "$PACKAGE_DIR/.claude/hooks-templates/pre-commit" "$TARGET_DIR/.git/hooks/pre-commit"
+        if [ -f "$BASE_DIR/.claude/hooks-templates/pre-commit" ]; then
+            cp "$BASE_DIR/.claude/hooks-templates/pre-commit" "$TARGET_DIR/.git/hooks/pre-commit"
             chmod +x "$TARGET_DIR/.git/hooks/pre-commit"
             print_msg "$CYAN" "  ✓ Installed pre-commit hook"
         fi
         
         # Install pre-push hook
-        if [ -f "$PACKAGE_DIR/.claude/hooks-templates/pre-push" ]; then
-            cp "$PACKAGE_DIR/.claude/hooks-templates/pre-push" "$TARGET_DIR/.git/hooks/pre-push"
+        if [ -f "$BASE_DIR/.claude/hooks-templates/pre-push" ]; then
+            cp "$BASE_DIR/.claude/hooks-templates/pre-push" "$TARGET_DIR/.git/hooks/pre-push"
             chmod +x "$TARGET_DIR/.git/hooks/pre-push"
             print_msg "$CYAN" "  ✓ Installed pre-push hook"
         fi
@@ -949,17 +960,30 @@ main() {
         fi
     fi
     
-    # Determine source directory
-    local source_dir="$BASE_DIR"
-    
-    # Check if we're running from a local copy or need to clone
+    # Determine source directory - use package structure
+    local source_dir="$BASE_DIR/autopm"
+
+    # Check if we have local package files (no internet needed!)
     if [ ! -d "$source_dir/.claude" ]; then
-        print_step "Downloading ClaudeAutoPM from GitHub..."
-        git clone --quiet "$REPO_URL" "$TEMP_DIR"
-        source_dir="$TEMP_DIR"
-        print_success "Downloaded successfully"
+        # Try alternative paths for different installation scenarios
+        if [ -d "$BASE_DIR/.claude" ]; then
+            # Development/local scenario
+            source_dir="$BASE_DIR"
+            print_msg "$CYAN" "Using local development source"
+        elif [ -n "$AUTOPM_PACKAGE_ROOT" ] && [ -d "$AUTOPM_PACKAGE_ROOT/autopm/.claude" ]; then
+            # Test scenario with explicit package root
+            source_dir="$AUTOPM_PACKAGE_ROOT/autopm"
+            print_msg "$CYAN" "Using test package source"
+        else
+            # Last resort - this should not happen in normal npm package usage
+            print_error "ClaudeAutoPM framework files not found!"
+            print_msg "$RED" "Expected location: $source_dir/.claude"
+            print_msg "$YELLOW" "This usually means the package was not installed correctly."
+            print_msg "$YELLOW" "Please try: npm install -g claude-autopm"
+            exit 1
+        fi
     else
-        print_msg "$CYAN" "Using local ClaudeAutoPM source"
+        print_msg "$CYAN" "Using local ClaudeAutoPM package source"
     fi
     
     # Install/update files
@@ -1000,10 +1024,7 @@ main() {
         print_msg "$YELLOW" "⏭️  Skipping .env setup - you can copy .claude/.env.example to .claude/.env manually"
     fi
     
-    # Clean up temp directory if used
-    if [ -d "$TEMP_DIR" ]; then
-        rm -rf "$TEMP_DIR"
-    fi
+    # No cleanup needed - using local package files only
     
     # Final message
     echo ""

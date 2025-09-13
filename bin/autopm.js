@@ -121,7 +121,7 @@ const showHelp = () => {
   log('  install [path]     Install ClaudeAutoPM to current directory or specified path');
   log('  update [path]      Update existing ClaudeAutoPM installation');
   log('  merge              Merge CLAUDE.md configurations');
-  log('  setup-env [path]   Interactive .env configuration setup');
+  log('  setup-env [path]   Interactive .env configuration setup (current dir or specified path)');
   log('  init               Initialize new project with ClaudeAutoPM');
   log('  version            Show version information');
   log('  help               Show this help message');
@@ -138,7 +138,7 @@ const showHelp = () => {
   log('  autopm install ~/my-project       # Install to specific directory');
   log('  autopm update                     # Update existing installation');
   log('  autopm merge                      # Generate CLAUDE.md merge prompt');
-  log('  autopm setup-env                  # Configure .env interactively');
+  log('  autopm setup-env                  # Configure .env in current directory');
   log('  autopm setup-env ~/my-project     # Configure .env for specific project');
   log('  autopm init my-new-project        # Initialize new project');
   log('  autopm config                     # Configure Docker/K8s features');
