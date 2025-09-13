@@ -88,10 +88,14 @@ confirm() {
 
     while true; do
         read -p "$(echo -e ${CYAN}❓ $prompt [y/n]: ${NC})" response
+
+        # Trim whitespace
+        response=$(echo "$response" | tr -d ' \t\r\n')
+
         case "$response" in
-            [yY][eE][sS]|[yY]) return 0 ;;
-            [nN][oO]|[nN]) return 1 ;;
-            *) print_warning "Please answer yes or no." ;;
+            [yY]|[yY][eE][sS]) return 0 ;;
+            [nN]|[nN][oO]) return 1 ;;
+            *) print_warning "Please answer 'y' for yes or 'n' for no." ;;
         esac
     done
 }

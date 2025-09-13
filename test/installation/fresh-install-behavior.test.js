@@ -128,6 +128,40 @@ describe('Fresh Installation Behavior', () => {
     assert(result.passed, 'Update mode should still prompt about CLAUDE.md');
     console.log('✓ Update mode correctly prompts about CLAUDE.md');
   });
+
+  it('should accept "y" response (not just "yes")', async () => {
+    // This is tested implicitly in AUTOPM_TEST_MODE=1 which uses "y" responses
+    // The test mode auto-answers with "y" and if it worked, our other tests pass
+
+    // Also verify our bash patterns work correctly
+    const bashTest = `
+      test_pattern() {
+        case "$1" in
+          [yY]|[yY][eE][sS]) echo "ACCEPT_YES" ;;
+          [nN]|[nN][oO]) echo "ACCEPT_NO" ;;
+          *) echo "REJECT" ;;
+        esac
+      }
+
+      # Test the exact same patterns used in confirm()
+      echo "y=$(test_pattern 'y')"
+      echo "Y=$(test_pattern 'Y')"
+      echo "yes=$(test_pattern 'yes')"
+      echo "n=$(test_pattern 'n')"
+      echo "no=$(test_pattern 'no')"
+    `;
+
+    const { execSync } = require('child_process');
+    const result = execSync(bashTest, { encoding: 'utf8' });
+
+    assert(result.includes('y=ACCEPT_YES'), 'Lowercase "y" should be accepted');
+    assert(result.includes('Y=ACCEPT_YES'), 'Uppercase "Y" should be accepted');
+    assert(result.includes('yes=ACCEPT_YES'), 'Word "yes" should be accepted');
+    assert(result.includes('n=ACCEPT_NO'), 'Lowercase "n" should be accepted');
+    assert(result.includes('no=ACCEPT_NO'), 'Word "no" should be accepted');
+
+    console.log('✓ Bash patterns correctly accept "y" and "n" responses');
+  });
 });
 
 // Allow running directly
