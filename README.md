@@ -60,6 +60,24 @@ pm validate
 
 See [Self-Maintenance Guide](docs/SELF-MAINTENANCE-GUIDE.md) for details.
 
+## 📡 MCP Server Management
+
+ClaudeAutoPM includes comprehensive MCP (Model Context Protocol) server management:
+
+```bash
+# List available MCP servers
+autopm mcp list
+
+# Enable servers in your project
+autopm mcp enable context7-docs
+autopm mcp enable github-mcp
+
+# Sync configuration
+autopm mcp sync
+```
+
+See [MCP Management Guide](docs/MCP-MANAGEMENT-GUIDE.md) for complete documentation.
+
 ## 🚀 Installation
 
 ### Global Installation (Recommended)
