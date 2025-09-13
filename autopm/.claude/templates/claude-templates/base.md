@@ -202,17 +202,17 @@ Key principles:
 ✓ Error handling implemented
 ✓ Security considered
 
-# Run these checks (automated with git hooks)
-npm test          # or pytest
-npm run lint      # or ruff check
-npm run build     # Ensure production build works
-npm run typecheck # TypeScript validation
+# Run project-appropriate checks (automated with git hooks)
+# Test: npm test | pytest | go test | cargo test | mvn test
+# Lint: npm run lint | ruff check | golint | cargo clippy | rubocop
+# Build: npm run build | python setup.py build | go build | cargo build
+# Type check: npm run typecheck | mypy | go vet
 
 # Or use safe-commit script for all checks
 ./scripts/safe-commit.sh "feat: your message"
 
-# Simulate CI locally before push
-npm run ci:local  # Full CI pipeline simulation
+# Simulate CI locally before push (if available)
+# Check package.json, Makefile, or project docs for CI simulation commands
 ```
 
 ### Before Creating PR

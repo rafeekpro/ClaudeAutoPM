@@ -1,3 +1,5 @@
+# Traditional Development Workflow
+
 ## ⚙️ TRADITIONAL DEVELOPMENT WORKFLOW
 
 This project uses a traditional development approach focused on native tooling and direct local execution.
@@ -11,31 +13,35 @@ This project uses a traditional development approach focused on native tooling a
 
 ### 🔧 Getting Started
 
-1. **Install dependencies locally**
+1. **Check project type and install dependencies**
+
    ```bash
-   # Node.js projects
-   npm install
-   
-   # Python projects  
-   pip install -r requirements.txt
-   
-   # Other languages as appropriate
+   # Detect project type from files present
+   # package.json → Node.js/React/Vue/Next.js
+   # requirements.txt/Pipfile → Python/Django/Flask
+   # go.mod → Go
+   # Cargo.toml → Rust
+   # pom.xml → Java/Maven
+   # build.gradle → Java/Gradle
+   # composer.json → PHP
+   # Gemfile → Ruby
    ```
 
-2. **Run development server**
+2. **Install dependencies based on project type**
+
    ```bash
-   # Use standard development commands
-   npm run dev
-   python app.py
-   # etc.
+   # Project-specific installation commands will be used
+   # The framework will detect and use the appropriate commands
    ```
 
-3. **Run tests**
+3. **Run development and tests**
+
    ```bash
-   # Use native test runners
-   npm test
-   pytest
-   # etc.
+   # Commands will be determined from:
+   # - package.json scripts (Node.js)
+   # - Makefile targets (if present)
+   # - Standard conventions for the detected language
+   # - README.md instructions
    ```
 
 ### 📋 Development Rules

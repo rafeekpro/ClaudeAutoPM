@@ -59,7 +59,7 @@ const warning = (message) => {
 const isWindows = os.platform() === 'win32';
 
 // Execute bash script (with Windows compatibility)
-const executeBashScript = (scriptPath, args = []) => {
+const executeBashScript = (scriptPath, args = [], options = {}) => {
   if (!fs.existsSync(scriptPath)) {
     error(`Script not found: ${scriptPath}`);
   }
@@ -67,10 +67,30 @@ const executeBashScript = (scriptPath, args = []) => {
   const command = isWindows ? 'bash' : scriptPath;
   const scriptArgs = isWindows ? [scriptPath, ...args] : args;
 
+  // Prepare environment variables from options
+  const env = { ...process.env };
+
+  if (options.autoAccept) {
+    env.AUTOPM_AUTO_ACCEPT = '1';
+  }
+  if (options.config) {
+    env.AUTOPM_CONFIG_PRESET = options.config;
+  }
+  if (options.skipEnv) {
+    env.AUTOPM_SKIP_ENV = '1';
+  }
+  if (options.skipHooks) {
+    env.AUTOPM_SKIP_HOOKS = '1';
+  }
+  if (options.noBackup) {
+    env.AUTOPM_NO_BACKUP = '1';
+  }
+
   try {
     const result = spawn(command, scriptArgs, {
       stdio: 'inherit',
-      cwd: process.cwd()
+      cwd: process.cwd(),
+      env: env
     });
 
     result.on('error', (err) => {
@@ -102,7 +122,7 @@ const executeBashScript = (scriptPath, args = []) => {
 const printBanner = () => {
   log('', 'cyan');
   log('╔══════════════════════════════════════════════╗', 'cyan');
-  log('║              🤖 ClaudeAutoPM CLI                   ║', 'cyan');
+  log('║                 ClaudeAutoPM CLI             ║', 'cyan');
   log('║     Autonomous Project Management v' + ClaudeAutoPM_VERSION.padEnd(7) + '║', 'cyan');
   log('╚══════════════════════════════════════════════╝', 'cyan');
   log('', 'cyan');
@@ -133,9 +153,17 @@ const showHelp = () => {
   log('  --verbose          Verbose output');
   log('  --no-backup        Skip creating backups (not recommended)');
   log('');
+  log('INSTALL OPTIONS:', 'yellow');
+  log('  --yes, -y          Auto-accept all prompts (non-interactive mode)');
+  log('  --config, -c       Preset configuration: minimal|docker|devops|performance');
+  log('  --no-env           Skip .env setup');
+  log('  --no-hooks         Skip git hooks installation');
+  log('');
   log('EXAMPLES:', 'yellow');
-  log('  autopm install                    # Install to current directory');
+  log('  autopm install                    # Install to current directory (interactive)');
   log('  autopm install ~/my-project       # Install to specific directory');
+  log('  autopm install --yes -c devops    # Non-interactive DevOps setup');
+  log('  autopm install -y --config minimal --no-env  # Minimal, skip .env');
   log('  autopm update                     # Update existing installation');
   log('  autopm merge                      # Generate CLAUDE.md merge prompt');
   log('  autopm setup-env                  # Configure .env in current directory');
@@ -223,7 +251,7 @@ const parseArgs = (args) => {
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
-    
+
     if (arg.startsWith('--') || arg.startsWith('-')) {
       // Handle options
       switch (arg) {
@@ -240,6 +268,26 @@ const parseArgs = (args) => {
           break;
         case '--no-backup':
           parsed.options.noBackup = true;
+          break;
+        case '--config':
+        case '-c':
+          // Configuration preset: minimal, docker, devops, performance
+          if (i + 1 < args.length) {
+            parsed.options.config = args[++i];
+          }
+          break;
+        case '--yes':
+        case '-y':
+          // Auto-accept all prompts
+          parsed.options.autoAccept = true;
+          break;
+        case '--no-env':
+          // Skip .env setup
+          parsed.options.skipEnv = true;
+          break;
+        case '--no-hooks':
+          // Skip git hooks installation
+          parsed.options.skipHooks = true;
           break;
         default:
           warning(`Unknown option: ${arg}`);
@@ -279,7 +327,7 @@ const main = () => {
       checkPrerequisites();
       printBanner();
       info('Starting ClaudeAutoPM installation...');
-      executeBashScript(INSTALL_SCRIPT, parsed.path ? [parsed.path] : []);
+      executeBashScript(INSTALL_SCRIPT, parsed.path ? [parsed.path] : [], parsed.options);
       break;
 
     case 'update':

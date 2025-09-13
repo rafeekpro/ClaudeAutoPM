@@ -22,14 +22,14 @@ This project enforces Docker-first development to ensure consistency and reprodu
 
 2. **Run commands in containers**
    ```bash
-   # Install dependencies
-   docker compose exec app npm install
-   
-   # Run development server
-   docker compose exec app npm run dev
-   
-   # Run tests
-   docker compose exec app npm test
+   # Commands depend on your project type:
+   # Node.js: docker compose exec app npm install
+   # Python: docker compose exec app pip install -r requirements.txt
+   # Go: docker compose exec app go mod download
+   # Ruby: docker compose exec app bundle install
+   # PHP: docker compose exec app composer install
+
+   # Development and testing commands will be project-specific
    ```
 
 3. **View logs**
