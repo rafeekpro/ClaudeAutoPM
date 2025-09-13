@@ -424,6 +424,75 @@ choose_configuration() {
     print_msg "$CYAN" "   or: .claude/scripts/config/toggle-features.sh"
 }
 
+# Choose CI/CD system
+choose_cicd_system() {
+    local config_file="$TARGET_DIR/.claude/config.json"
+
+    # Skip if AUTOPM_CICD_SYSTEM is set (from CLI parameter)
+    if [ -n "$AUTOPM_CICD_SYSTEM" ]; then
+        echo "$AUTOPM_CICD_SYSTEM" > "$TARGET_DIR/.claude/.cicd_choice"
+        return
+    fi
+
+    # Skip if in auto-accept mode with minimal config
+    if [ "$AUTOPM_AUTO_ACCEPT" = "1" ]; then
+        local config_preset="${AUTOPM_CONFIG_PRESET:-devops}"
+        if [ "$config_preset" = "minimal" ]; then
+            # Minimal config - no CI/CD by default
+            echo "none" > "$TARGET_DIR/.claude/.cicd_choice"
+            return
+        else
+            # Other configs - GitHub Actions by default
+            echo "github-actions" > "$TARGET_DIR/.claude/.cicd_choice"
+            return
+        fi
+    fi
+
+
+    print_step "🚀 Choose CI/CD System"
+    print_msg "$CYAN" ""
+    print_msg "$CYAN" "Select your CI/CD platform:"
+    print_msg "$CYAN" "  1) GitHub Actions (Recommended for GitHub repos)"
+    print_msg "$CYAN" "  2) Azure DevOps (Enterprise integration)"
+    print_msg "$CYAN" "  3) GitLab CI/CD"
+    print_msg "$CYAN" "  4) Jenkins"
+    print_msg "$CYAN" "  5) No CI/CD (Local development only)"
+    print_msg "$CYAN" ""
+
+    local choice=""
+    while [ -z "$choice" ]; do
+        echo -n "Your choice [1-5]: "
+        read -r choice
+
+        case "$choice" in
+            1)
+                echo "github-actions" > "$TARGET_DIR/.claude/.cicd_choice"
+                print_success "GitHub Actions selected!"
+                ;;
+            2)
+                echo "azure-devops" > "$TARGET_DIR/.claude/.cicd_choice"
+                print_success "Azure DevOps selected!"
+                ;;
+            3)
+                echo "gitlab-ci" > "$TARGET_DIR/.claude/.cicd_choice"
+                print_success "GitLab CI/CD selected!"
+                ;;
+            4)
+                echo "jenkins" > "$TARGET_DIR/.claude/.cicd_choice"
+                print_success "Jenkins selected!"
+                ;;
+            5)
+                echo "none" > "$TARGET_DIR/.claude/.cicd_choice"
+                print_success "No CI/CD - Local development only!"
+                ;;
+            *)
+                print_warning "Invalid choice. Please select 1-5."
+                choice=""
+                ;;
+        esac
+    done
+}
+
 # Generate CLAUDE.md based on configuration
 generate_claude_md() {
     local config_file="$TARGET_DIR/.claude/config.json"
@@ -431,6 +500,7 @@ generate_claude_md() {
     local base_template="$BASE_DIR/autopm/.claude/templates/claude-templates/base.md"
     local workflow_addon=""
     local agents_addon=""
+    local cicd_addon=""
     
     # Check if base template exists
     if [ ! -f "$base_template" ]; then
@@ -477,9 +547,31 @@ generate_claude_md() {
     # Build the final CLAUDE.md by merging base with addons
     print_step "Merging templates..."
     
+    # Determine CI/CD addon based on choice
+    if [ -f "$TARGET_DIR/.claude/.cicd_choice" ]; then
+        local cicd_choice=$(cat "$TARGET_DIR/.claude/.cicd_choice")
+        case "$cicd_choice" in
+            github-actions)
+                cicd_addon="$BASE_DIR/autopm/.claude/templates/claude-templates/addons/github-actions.md"
+                ;;
+            azure-devops)
+                cicd_addon="$BASE_DIR/autopm/.claude/templates/claude-templates/addons/azure-devops.md"
+                ;;
+            gitlab-ci)
+                cicd_addon="$BASE_DIR/autopm/.claude/templates/claude-templates/addons/gitlab-ci.md"
+                ;;
+            jenkins)
+                cicd_addon="$BASE_DIR/autopm/.claude/templates/claude-templates/addons/jenkins.md"
+                ;;
+            none)
+                cicd_addon="$BASE_DIR/autopm/.claude/templates/claude-templates/addons/no-cicd.md"
+                ;;
+        esac
+    fi
+
     # Start with base template
     cp "$base_template" "$target_claude.tmp"
-    
+
     # Replace WORKFLOW_SECTION with appropriate addon
     if [ -f "$workflow_addon" ]; then
         # Use awk to replace the placeholder
@@ -495,12 +587,27 @@ generate_claude_md() {
         ' "$target_claude.tmp" > "$target_claude.tmp2"
         mv "$target_claude.tmp2" "$target_claude.tmp"
     fi
-    
+
     # Replace AGENT_SELECTION_SECTION with appropriate addon
     if [ -f "$agents_addon" ]; then
         # Use awk to replace the placeholder
         awk -v addon="$agents_addon" '
             /<!-- AGENT_SELECTION_SECTION -->/ {
+                while ((getline line < addon) > 0) {
+                    print line
+                }
+                close(addon)
+                next
+            }
+            { print }
+        ' "$target_claude.tmp" > "$target_claude.tmp2"
+        mv "$target_claude.tmp2" "$target_claude.tmp"
+    fi
+
+    # Replace CICD_SECTION with appropriate CI/CD addon
+    if [ -f "$cicd_addon" ]; then
+        awk -v addon="$cicd_addon" '
+            /<!-- CICD_SECTION -->/ {
                 while ((getline line < addon) > 0) {
                     print line
                 }
@@ -1027,14 +1134,21 @@ main() {
     # Choose configuration template (only for fresh installs)
     if [ "$is_update" = false ]; then
         choose_configuration
+        # Choose CI/CD system for fresh installs
+        choose_cicd_system
     else
         # For updates, ensure config.json exists
         if [ ! -f "$TARGET_DIR/.claude/config.json" ]; then
             print_warning "config.json not found, selecting configuration..."
             choose_configuration
+            choose_cicd_system
+        fi
+        # For updates, check if CI/CD choice exists
+        if [ ! -f "$TARGET_DIR/.claude/.cicd_choice" ]; then
+            choose_cicd_system
         fi
     fi
-    
+
     # Generate configuration-specific CLAUDE.md
     generate_claude_md
 
