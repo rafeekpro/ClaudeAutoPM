@@ -61,6 +61,10 @@ claude-autopm install
 # Install to specific directory
 claude-autopm install ./my-project
 
+# Non-interactive installation with preset configuration
+claude-autopm install --yes --config devops
+claude-autopm install -y -c minimal --no-env --no-hooks
+
 # Update existing ClaudeAutoPM installation
 claude-autopm update
 
@@ -73,6 +77,30 @@ claude-autopm setup-env
 # Create new project with ClaudeAutoPM
 claude-autopm init my-new-project
 ```
+
+### Non-Interactive Installation
+
+For CI/CD pipelines and automated setups, ClaudeAutoPM supports fully non-interactive installation:
+
+```bash
+# Minimal setup (sequential execution, no Docker/K8s)
+claude-autopm install --yes --config minimal --no-env --no-hooks
+
+# DevOps setup (Docker + Kubernetes enabled)
+claude-autopm install -y -c devops
+
+# Performance setup (hybrid parallel execution)
+claude-autopm install --yes --config performance
+
+# Docker-only setup
+claude-autopm install -y -c docker --no-env
+```
+
+**Available Options:**
+- `--yes, -y` - Auto-accept all prompts (non-interactive mode)
+- `--config, -c` - Preset configuration: `minimal`, `docker`, `devops`, `performance`
+- `--no-env` - Skip .env setup
+- `--no-hooks` - Skip git hooks installation
 
 ### Alternative Installation Methods
 

@@ -80,9 +80,13 @@ confirm() {
     local prompt="$1"
     local response
 
-    # In test mode, auto-answer yes to avoid blocking
-    if [ "$AUTOPM_TEST_MODE" = "1" ]; then
-        print_msg "$CYAN" "❓ $prompt [y/n]: y (auto-answered in test mode)"
+    # In test mode or auto-accept mode, auto-answer yes to avoid blocking
+    if [ "$AUTOPM_TEST_MODE" = "1" ] || [ "$AUTOPM_AUTO_ACCEPT" = "1" ]; then
+        if [ "$AUTOPM_TEST_MODE" = "1" ]; then
+            print_msg "$CYAN" "❓ $prompt [y/n]: y (auto-answered in test mode)"
+        else
+            print_msg "$CYAN" "❓ $prompt [y/n]: y (auto-accepted)"
+        fi
         return 0
     fi
 
@@ -330,18 +334,36 @@ choose_configuration() {
         return
     fi
     
-    print_msg "$YELLOW" "\n🔧 Choose your development configuration:"
-    echo ""
-    echo "  1) 🏃 Minimal      - Traditional development (Sequential execution)"
-    echo "  2) 🐳 Docker-only  - Docker-first with Adaptive execution"
-    echo "  3) 🚀 Full DevOps  - All features with Smart Adaptive execution (RECOMMENDED)"
-    echo "  4) ⚡ Performance  - Maximum parallelization for power users"
-    echo "  5) ⚙️  Custom      - Use existing config.json template"
-    echo ""
+    # Only show menu if not using preset
+    if [ -z "$AUTOPM_CONFIG_PRESET" ] && [ "$AUTOPM_TEST_MODE" != "1" ]; then
+        print_msg "$YELLOW" "\n🔧 Choose your development configuration:"
+        echo ""
+        echo "  1) 🏃 Minimal      - Traditional development (Sequential execution)"
+        echo "  2) 🐳 Docker-only  - Docker-first with Adaptive execution"
+        echo "  3) 🚀 Full DevOps  - All features with Smart Adaptive execution (RECOMMENDED)"
+        echo "  4) ⚡ Performance  - Maximum parallelization for power users"
+        echo "  5) ⚙️  Custom      - Use existing config.json template"
+        echo ""
+    fi
 
     while true; do
+        # Handle preset configuration from command line
+        if [ -n "$AUTOPM_CONFIG_PRESET" ]; then
+            case "$AUTOPM_CONFIG_PRESET" in
+                minimal) choice="1" ;;
+                docker) choice="2" ;;
+                devops) choice="3" ;;
+                performance) choice="4" ;;
+                *)
+                    print_warning "Unknown preset: $AUTOPM_CONFIG_PRESET. Using devops."
+                    choice="3"
+                    ;;
+            esac
+            print_msg "$CYAN" "🔧 Using preset configuration: $AUTOPM_CONFIG_PRESET"
+            # Clear the preset after using it once to exit the loop
+            AUTOPM_CONFIG_PRESET=""
         # In test mode, auto-select Full DevOps configuration (option 3)
-        if [ "$AUTOPM_TEST_MODE" = "1" ]; then
+        elif [ "$AUTOPM_TEST_MODE" = "1" ]; then
             choice="3"
             print_msg "$CYAN" "❓ Your choice [1-5]: 3 (auto-selected Full DevOps in test mode)"
         else
@@ -894,9 +916,10 @@ setup_git_safety() {
         print_msg "$CYAN" "  ✓ Installed safe-commit script"
     fi
     
-    # Offer to install git hooks
-    echo ""
-    if confirm "Would you like to install git hooks for automated commit/push validation?"; then
+    # Offer to install git hooks (skip if --no-hooks flag is set)
+    if [ "$AUTOPM_SKIP_HOOKS" != "1" ]; then
+        echo ""
+        if confirm "Would you like to install git hooks for automated commit/push validation?"; then
         # Install pre-commit hook
         if [ -f "$BASE_DIR/.claude/hooks-templates/pre-commit" ]; then
             cp "$BASE_DIR/.claude/hooks-templates/pre-commit" "$TARGET_DIR/.git/hooks/pre-commit"
@@ -911,11 +934,14 @@ setup_git_safety() {
             print_msg "$CYAN" "  ✓ Installed pre-push hook"
         fi
         
-        print_success "Git hooks installed successfully!"
-        print_msg "$YELLOW" "  Note: You can bypass hooks with --no-verify flag in emergencies"
+            print_success "Git hooks installed successfully!"
+            print_msg "$YELLOW" "  Note: You can bypass hooks with --no-verify flag in emergencies"
+        else
+            print_msg "$YELLOW" "  Skipped git hooks installation"
+            print_msg "$CYAN" "  You can manually copy hooks from .claude/hooks-templates/ later"
+        fi
     else
-        print_msg "$YELLOW" "  Skipped git hooks installation"
-        print_msg "$CYAN" "  You can manually copy hooks from .claude/hooks-templates/ later"
+        print_msg "$CYAN" "⏭️  Skipping git hooks installation (--no-hooks flag)"
     fi
 }
 
@@ -1020,12 +1046,16 @@ main() {
     # Setup git safety features if enabled
     setup_git_safety
     
-    # Interactive .env setup
-    echo ""
-    if confirm "🔧 Would you like to set up your .env configuration interactively?"; then
-        create_env_interactive "$source_dir"
+    # Interactive .env setup (skip if --no-env flag is set)
+    if [ "$AUTOPM_SKIP_ENV" != "1" ]; then
+        echo ""
+        if confirm "🔧 Would you like to set up your .env configuration interactively?"; then
+            create_env_interactive "$source_dir"
+        else
+            print_msg "$YELLOW" "⏭️  Skipping .env setup - you can copy .claude/.env.example to .claude/.env manually"
+        fi
     else
-        print_msg "$YELLOW" "⏭️  Skipping .env setup - you can copy .claude/.env.example to .claude/.env manually"
+        print_msg "$CYAN" "⏭️  Skipping .env setup (--no-env flag)"
     fi
     
     # No cleanup needed - using local package files only

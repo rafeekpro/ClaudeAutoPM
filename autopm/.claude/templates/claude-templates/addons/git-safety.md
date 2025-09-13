@@ -38,10 +38,11 @@ The script automatically:
 6. Searches for potential secrets
 7. Stages and commits changes
 
-### NPM Scripts for Verification
+### Verification Scripts
 
-Add these scripts to your `package.json`:
+Add appropriate scripts for your project type:
 
+**Node.js (package.json):**
 ```json
 {
   "scripts": {
@@ -53,17 +54,27 @@ Add these scripts to your `package.json`:
 }
 ```
 
+**Python (Makefile or pyproject.toml):**
+```makefile
+verify: test lint typecheck
+test: pytest
+lint: ruff check .
+typecheck: mypy .
+```
+
+**Other languages:** Configure similar verification workflows
+
 ### CI Simulation
 
 Test exactly what CI/CD will run:
 
 ```bash
 # Simulate full CI pipeline locally
-npm ci
-npm run build
-npm test
-npm run lint
-npm run test:e2e
+# Node.js: npm ci && npm run build && npm test
+# Python: pip install . && pytest && ruff check
+# Go: go test ./... && go build
+# Ruby: bundle exec rspec && rubocop
+# Check your .github/workflows/ for exact commands
 ```
 
 ### Emergency Bypass
@@ -82,15 +93,15 @@ npm run ci:local
 ### Quick Verification Commands
 
 ```bash
-# Before commit
-npm test                  # Tests passing?
-npm run build            # Build successful?
-npm run lint             # Linter clean?
-npm run typecheck        # TypeScript OK?
+# Before commit (use appropriate commands for your project)
+# Test: npm test | pytest | go test | cargo test
+# Build: npm run build | python setup.py build | go build
+# Lint: npm run lint | ruff check | golint | rubocop
+# Type check: npm run typecheck | mypy | go vet
 
 # Before push
-npm run test:e2e         # E2E tests passing?
-npm run ci:local         # CI simulation passing?
+# Run integration/E2E tests for your project
+# Simulate CI pipeline locally
 git log -3               # Commits look OK?
 gh pr checks             # Previous PR checks green?
 ```
@@ -99,17 +110,18 @@ gh pr checks             # Previous PR checks green?
 
 #### If tests fail locally
 ```bash
-npm test -- --verbose              # See details
-npm test -- path/to/test.spec.js   # Run specific test
-npm test -- --detectOpenHandles    # Debug mode
+# Node.js: npm test -- --verbose
+# Python: pytest -vv
+# Go: go test -v ./...
+# Run specific test based on your test framework
 ```
 
 #### If build fails
 ```bash
-rm -rf node_modules package-lock.json
-npm install
-npm run build
-npx tsc --noEmit  # Check TypeScript errors
+# Clean and reinstall dependencies for your project type
+# Node.js: rm -rf node_modules && npm install
+# Python: rm -rf venv && python -m venv venv && pip install -r requirements.txt
+# Check for compilation/build errors specific to your language
 ```
 
 #### If hooks don't work
@@ -125,7 +137,7 @@ chmod +x .git/hooks/*
 Add aliases to `.bashrc` or `.zshrc`:
 ```bash
 alias gc="./scripts/safe-commit.sh"
-alias verify="npm test && npm run build && npm run lint"
+alias verify="[Run your project's verification commands]"
 ```
 
 Configure VS Code for automatic formatting:

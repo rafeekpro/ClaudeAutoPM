@@ -35,22 +35,26 @@ This project uses a hybrid strategy: Docker for local development, Kubernetes fo
 
 2. **Run commands in containers**
    ```bash
-   docker compose exec app npm install
-   docker compose exec app npm run dev
-   docker compose exec app npm test
+   # Commands depend on your project type:
+   # Node.js: docker compose exec app npm install
+   # Python: docker compose exec app pip install -r requirements.txt
+   # Go: docker compose exec app go mod download
+   # Ruby: docker compose exec app bundle install
+   # PHP: docker compose exec app composer install
    ```
 
 3. **Simulate CI locally before push**
    ```bash
-   # Test exactly what CI will run
-   npm ci
-   npm run build
-   npm run test
-   npm run lint
-   npm run test:e2e
-   
-   # Or use shorthand
-   npm run ci:local
+   # Test commands depend on project type:
+   # Node.js: npm ci && npm run build && npm test
+   # Python: pip install . && pytest && ruff check
+   # Go: go test ./... && go build
+   # Ruby: bundle exec rspec && rubocop
+
+   # Check for project-specific CI scripts in:
+   # - package.json scripts
+   # - Makefile targets
+   # - .github/workflows/
    ```
 
 ### ☸️ Kubernetes Testing (CI/CD)
