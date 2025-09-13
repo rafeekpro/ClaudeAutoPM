@@ -11,6 +11,15 @@
     "git_safety_hooks": true,
     "ci_local_simulation": true
   },
+  "execution_strategy": {
+    "mode": "adaptive",
+    "parallel_by_default": false,
+    "max_parallel_agents": 5,
+    "context_optimization": true,
+    "fallback_to_sequential": true,
+    "learning_enabled": true,
+    "complexity_threshold": 5
+  },
   "docker": {
     "enabled": true,
     "default_base_images": {
