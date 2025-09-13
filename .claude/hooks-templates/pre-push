@@ -1,0 +1,77 @@
+#!/bin/bash
+
+# Pre-push hook - Runs comprehensive checks before allowing push
+# Install: cp this file to .git/hooks/pre-push && chmod +x .git/hooks/pre-push
+
+set -e
+
+echo "🚀 Running pre-push checks..."
+
+# Run full test suite including E2E
+if [ -f "package.json" ] && command -v npm &> /dev/null; then
+    if grep -q "\"test:e2e\":" package.json; then
+        echo "Running E2E tests..."
+        npm run test:e2e || {
+            echo "❌ E2E tests failed! Push aborted."
+            exit 1
+        }
+    elif grep -q "\"test\":" package.json; then
+        echo "Running all tests..."
+        npm test || {
+            echo "❌ Tests failed! Push aborted."
+            exit 1
+        }
+    fi
+fi
+
+# Production build check
+if [ -f "package.json" ] && command -v npm &> /dev/null; then
+    if grep -q "\"build\":" package.json; then
+        echo "Checking production build..."
+        npm run build || {
+            echo "❌ Production build failed! Push aborted."
+            exit 1
+        }
+    fi
+fi
+
+# TypeScript type checking
+if [ -f "tsconfig.json" ] && command -v npx &> /dev/null; then
+    echo "Checking TypeScript types..."
+    npx tsc --noEmit || {
+        echo "❌ TypeScript errors found! Push aborted."
+        exit 1
+    }
+fi
+
+# Check for merge conflicts
+if git diff --check HEAD^ 2>/dev/null | grep -q "conflict"; then
+    echo "❌ Merge conflicts detected! Please resolve before pushing."
+    exit 1
+fi
+
+# Check for large files
+LARGE_FILES=$(git diff --stat HEAD^ | awk '$1 > 1000000')
+if [ -n "$LARGE_FILES" ]; then
+    echo "⚠️  Warning: Large files detected (>1MB):"
+    echo "$LARGE_FILES"
+    read -p "Continue with push? (y/N) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 1
+    fi
+fi
+
+# Check for TODO/FIXME comments
+TODO_COUNT=$(git diff HEAD^ | grep -c "TODO\|FIXME" || true)
+if [ "$TODO_COUNT" -gt 0 ]; then
+    echo "⚠️  Found $TODO_COUNT TODO/FIXME comments in changes"
+    git diff HEAD^ | grep -n "TODO\|FIXME" | head -5
+    read -p "Continue with push? (y/N) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 1
+    fi
+fi
+
+echo "✅ All pre-push checks passed!"

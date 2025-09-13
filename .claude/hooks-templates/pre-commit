@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# Pre-commit hook - Runs basic checks before allowing commit
+# Install: cp this file to .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+
+set -e
+
+echo "🔍 Running pre-commit checks..."
+
+# Run tests if available
+if [ -f "package.json" ] && command -v npm &> /dev/null; then
+    if grep -q "\"test\":" package.json; then
+        echo "Running tests..."
+        npm test || {
+            echo "❌ Tests failed! Commit aborted."
+            exit 1
+        }
+    fi
+fi
+
+if command -v pytest &> /dev/null && [ -f "pytest.ini" -o -f "setup.cfg" -o -f "pyproject.toml" ]; then
+    echo "Running Python tests..."
+    pytest -x || {
+        echo "❌ Python tests failed! Commit aborted."
+        exit 1
+    }
+fi
+
+# Check build
+if [ -f "package.json" ] && command -v npm &> /dev/null; then
+    if grep -q "\"build\":" package.json; then
+        echo "Checking build..."
+        npm run build || {
+            echo "❌ Build failed! Commit aborted."
+            exit 1
+        }
+    fi
+fi
+
+# Run linters
+if [ -f "package.json" ] && command -v npm &> /dev/null; then
+    if grep -q "\"lint\":" package.json; then
+        echo "Running linter..."
+        npm run lint || {
+            echo "❌ Linting failed! Commit aborted."
+            exit 1
+        }
+    fi
+fi
+
+if command -v ruff &> /dev/null; then
+    echo "Running Ruff..."
+    ruff check . || {
+        echo "❌ Ruff check failed! Commit aborted."
+        exit 1
+    }
+fi
+
+echo "✅ All pre-commit checks passed!"
