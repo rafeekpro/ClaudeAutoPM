@@ -1,5 +1,4 @@
 .DS_Store
-CLAUDE.md
 
 # Environment variables with secrets
 .claude/.env
