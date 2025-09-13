@@ -57,6 +57,13 @@ Parameters are automatically inferred from legacy agent names.
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, BashOutput, KillBash, Search, Task, Agent
 **Status**: Active
 
+### mcp-manager
+
+**Location**: `.claude/agents/core/mcp-manager.md`
+**Description**: Use this agent for managing Model Context Protocol (MCP) servers including creation, validation, lifecycle management, and integration.
+**Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
+**Status**: Active
+
 ## Framework Agents
 
 ### react-ui-expert (NEW - Consolidated)

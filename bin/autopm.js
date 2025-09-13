@@ -146,6 +146,7 @@ const showHelp = () => {
   log('  merge              Merge CLAUDE.md configurations');
   log('  setup-env [path]   Interactive .env configuration setup (current dir or specified path)');
   log('  init               Initialize new project with ClaudeAutoPM');
+  log('  mcp <command>      Manage MCP (Model Context Protocol) servers');
   log('  version            Show version information');
   log('  help               Show this help message');
   log('  config             Configure development features (Docker/K8s toggles)');
@@ -176,6 +177,9 @@ const showHelp = () => {
   log('  autopm setup-env ~/my-project     # Configure .env for specific project');
   log('  autopm init my-new-project        # Initialize new project');
   log('  autopm config                     # Configure Docker/K8s features');
+  log('  autopm mcp list                   # List available MCP servers');
+  log('  autopm mcp enable github-mcp      # Enable GitHub MCP server');
+  log('  autopm mcp sync                   # Sync MCP configuration');
   log('');
   log('INSTALLATION MODES:', 'yellow');
   log('  🆕 Fresh Install   - Sets up complete ClaudeAutoPM framework');
@@ -222,6 +226,55 @@ const initProject = (projectName) => {
     
   } catch (err) {
     error(`Failed to initialize project: ${err.message}`);
+  }
+};
+
+// Handle MCP commands
+const handleMCPCommand = (args) => {
+  const subcommand = args[0] || 'help';
+  const mcpHandler = path.join(PACKAGE_DIR, 'scripts', 'mcp-handler.js');
+
+  if (!fs.existsSync(mcpHandler)) {
+    error('MCP handler not found. Please reinstall ClaudeAutoPM.');
+  }
+
+  const validCommands = ['list', 'add', 'remove', 'enable', 'disable', 'sync', 'validate', 'info', 'help'];
+
+  if (subcommand === 'help' || !validCommands.includes(subcommand)) {
+    log('\n📡 ClaudeAutoPM MCP Server Management\n', 'bright');
+    log('Usage: autopm mcp <command> [options]\n');
+    log('Commands:');
+    log('  list              List all available MCP servers');
+    log('  add               Add a new MCP server interactively');
+    log('  remove <name>     Remove an MCP server');
+    log('  enable <name>     Enable a server in current project');
+    log('  disable <name>    Disable a server in current project');
+    log('  sync              Sync active servers to configuration');
+    log('  validate          Validate all server definitions');
+    log('  info <name>       Show detailed server information');
+    log('  help              Show this help message');
+    log('\nExamples:');
+    log('  autopm mcp list                    # List all servers');
+    log('  autopm mcp enable context7-docs    # Enable a server');
+    log('  autopm mcp sync                    # Sync configuration');
+    return;
+  }
+
+  // Execute MCP handler with arguments
+  try {
+    const { spawnSync } = require('child_process');
+    const result = spawnSync('node', [mcpHandler, ...args], {
+      stdio: 'inherit',
+      cwd: process.cwd()
+    });
+
+    if (result.error) {
+      error(`Failed to execute MCP command: ${result.error.message}`);
+    }
+
+    process.exit(result.status || 0);
+  } catch (err) {
+    error(`MCP command failed: ${err.message}`);
   }
 };
 
@@ -371,6 +424,11 @@ const main = () => {
       printBanner();
       info('Starting ClaudeAutoPM configuration...');
       executeBashScript(path.join(PACKAGE_DIR, '.claude', 'scripts', 'config', 'toggle-features.sh'), []);
+      break;
+
+    case 'mcp':
+      // Handle MCP subcommands
+      handleMCPCommand(args.slice(1));
       break;
 
     default:
