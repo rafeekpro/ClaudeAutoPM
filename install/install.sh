@@ -369,43 +369,82 @@ choose_configuration() {
 generate_claude_md() {
     local config_file="$TARGET_DIR/.claude/config.json"
     local target_claude="$TARGET_DIR/CLAUDE.md"
-    local template_file=""
+    local base_template="$PACKAGE_DIR/.claude/claude-templates/base.md"
+    local workflow_addon=""
+    local agents_addon=""
     
-    # Determine which template to use based on configuration
+    # Check if base template exists
+    if [ ! -f "$base_template" ]; then
+        print_error "Base template not found: $base_template"
+        return 1
+    fi
+    
+    # Determine which addons to use based on configuration
     if [ -f "$config_file" ] && command -v jq >/dev/null 2>&1; then
         local docker_enabled=$(jq -r '.features.docker_first_development // false' "$config_file")
         local k8s_enabled=$(jq -r '.features.kubernetes_devops_testing // false' "$config_file")
         
         if [ "$docker_enabled" = "true" ] && [ "$k8s_enabled" = "true" ]; then
-            template_file="$PACKAGE_DIR/.claude/claude-templates/full-devops.md"
+            workflow_addon="$PACKAGE_DIR/.claude/claude-templates/addons/devops-workflow.md"
+            agents_addon="$PACKAGE_DIR/.claude/claude-templates/addons/devops-agents.md"
             print_step "Generating CLAUDE.md for Full DevOps configuration..."
         elif [ "$docker_enabled" = "true" ]; then
-            template_file="$PACKAGE_DIR/.claude/claude-templates/docker-only.md"
+            workflow_addon="$PACKAGE_DIR/.claude/claude-templates/addons/docker-workflow.md"
+            agents_addon="$PACKAGE_DIR/.claude/claude-templates/addons/docker-agents.md"
             print_step "Generating CLAUDE.md for Docker-only configuration..."
         else
-            template_file="$PACKAGE_DIR/.claude/claude-templates/minimal.md"
+            workflow_addon="$PACKAGE_DIR/.claude/claude-templates/addons/minimal-workflow.md"
+            agents_addon="$PACKAGE_DIR/.claude/claude-templates/addons/minimal-agents.md"
             print_step "Generating CLAUDE.md for Minimal configuration..."
         fi
     else
-        # Fallback to minimal template if no config or jq
-        template_file="$PACKAGE_DIR/.claude/claude-templates/minimal.md"
-        print_step "Generating CLAUDE.md from minimal template (no config found)..."
+        # Fallback to minimal if no config or jq
+        workflow_addon="$PACKAGE_DIR/.claude/claude-templates/addons/minimal-workflow.md"
+        agents_addon="$PACKAGE_DIR/.claude/claude-templates/addons/minimal-agents.md"
+        print_step "Generating CLAUDE.md from minimal configuration (no config found)..."
     fi
     
-    # Copy the appropriate template
-    if [ -f "$template_file" ]; then
-        cp "$template_file" "$target_claude"
-        print_success "Generated CLAUDE.md based on your configuration"
-    else
-        print_warning "Template not found: $template_file"
-        # Final fallback to minimal template
-        if [ -f "$PACKAGE_DIR/.claude/claude-templates/minimal.md" ]; then
-            cp "$PACKAGE_DIR/.claude/claude-templates/minimal.md" "$target_claude"
-            print_success "Generated CLAUDE.md from minimal template (fallback)"
-        else
-            print_error "No CLAUDE.md template available"
-        fi
+    # Build the final CLAUDE.md by merging base with addons
+    print_step "Merging templates..."
+    
+    # Start with base template
+    cp "$base_template" "$target_claude.tmp"
+    
+    # Replace WORKFLOW_SECTION with appropriate addon
+    if [ -f "$workflow_addon" ]; then
+        # Use awk to replace the placeholder
+        awk -v addon="$workflow_addon" '
+            /<!-- WORKFLOW_SECTION -->/ {
+                while ((getline line < addon) > 0) {
+                    print line
+                }
+                close(addon)
+                next
+            }
+            { print }
+        ' "$target_claude.tmp" > "$target_claude.tmp2"
+        mv "$target_claude.tmp2" "$target_claude.tmp"
     fi
+    
+    # Replace AGENT_SELECTION_SECTION with appropriate addon
+    if [ -f "$agents_addon" ]; then
+        # Use awk to replace the placeholder
+        awk -v addon="$agents_addon" '
+            /<!-- AGENT_SELECTION_SECTION -->/ {
+                while ((getline line < addon) > 0) {
+                    print line
+                }
+                close(addon)
+                next
+            }
+            { print }
+        ' "$target_claude.tmp" > "$target_claude.tmp2"
+        mv "$target_claude.tmp2" "$target_claude.tmp"
+    fi
+    
+    # Move the final file to target location
+    mv "$target_claude.tmp" "$target_claude"
+    print_success "Generated CLAUDE.md based on your configuration"
 }
 
 # Handle CLAUDE.md migration
