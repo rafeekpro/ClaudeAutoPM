@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Pre-commit hook for HYBRID_STRATEGY protection
+# Pre-commit hook for ACTIVE_STRATEGY protection
 # Ensures tests pass before allowing commits
 
 echo "🔒 Running pre-commit validation..."
@@ -34,7 +34,7 @@ run_test() {
 # 1. Check for critical files
 echo "📁 Checking critical files..."
 CRITICAL_FILES=(
-    ".claude/HYBRID_STRATEGY.md"
+    ".claude/strategies/ACTIVE_STRATEGY.md"
     ".claude/base.md"
     "package.json"
 )
@@ -74,10 +74,10 @@ if [ -n "$MODIFIED_TESTS" ]; then
     done
 fi
 
-# 4. Check for HYBRID_STRATEGY modifications
-if git diff --cached --name-only | grep -q "HYBRID_STRATEGY.md"; then
+# 4. Check for ACTIVE_STRATEGY modifications
+if git diff --cached --name-only | grep -q "strategies/ACTIVE_STRATEGY.md"; then
     echo ""
-    echo -e "${YELLOW}⚠️  HYBRID_STRATEGY.md modified!${NC}"
+    echo -e "${YELLOW}⚠️  ACTIVE_STRATEGY.md modified!${NC}"
     echo "  Running full security test suite..."
 
     if [ -f "test/run-security-tests.js" ]; then

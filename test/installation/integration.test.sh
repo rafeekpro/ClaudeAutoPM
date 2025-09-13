@@ -119,11 +119,11 @@ verify_strategy() {
         print_fail "ACTIVE_STRATEGY.md missing"
     fi
 
-    # Check symlink
-    if [ -L "$test_dir/.claude/HYBRID_STRATEGY.md" ]; then
-        print_pass "HYBRID_STRATEGY.md symlink exists"
+    # Check strategy file directly
+    if [ -f "$test_dir/.claude/strategies/ACTIVE_STRATEGY.md" ]; then
+        print_pass "ACTIVE_STRATEGY.md exists"
     else
-        print_fail "HYBRID_STRATEGY.md symlink missing"
+        print_fail "ACTIVE_STRATEGY.md missing"
     fi
 }
 
