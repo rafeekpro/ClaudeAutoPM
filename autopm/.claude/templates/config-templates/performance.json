@@ -5,11 +5,20 @@
     "block_local_execution": true,
     "auto_create_dockerfile": true,
     "sync_with_ci": true,
-    "kubernetes_devops_testing": false,
-    "github_actions_k8s": false,
-    "integration_tests": false,
+    "kubernetes_devops_testing": true,
+    "github_actions_k8s": true,
+    "integration_tests": true,
     "git_safety_hooks": true,
     "ci_local_simulation": true
+  },
+  "execution_strategy": {
+    "mode": "hybrid",
+    "parallel_by_default": true,
+    "max_parallel_agents": 8,
+    "context_optimization": true,
+    "fallback_to_sequential": false,
+    "aggressive_parallelization": true,
+    "min_parallel_threshold": 2
   },
   "docker": {
     "enabled": true,
@@ -30,25 +39,25 @@
     }
   },
   "kubernetes": {
-    "enabled": false,
+    "enabled": true,
     "testing": {
-      "integration_tests": false,
-      "helm_chart_tests": false,
-      "kubectl_smoke_tests": false
+      "integration_tests": true,
+      "helm_chart_tests": true,
+      "kubectl_smoke_tests": true
     },
     "environments": {
-      "minikube": false,
-      "kind": false,
+      "minikube": true,
+      "kind": true,
       "k3d": false
     },
     "manifests": {
-      "auto_generate": false,
-      "validate_yaml": false,
-      "security_policies": false
+      "auto_generate": true,
+      "validate_yaml": true,
+      "security_policies": true
     }
   },
   "github_actions": {
-    "kubernetes_tests": false,
+    "kubernetes_tests": true,
     "docker_integration": true,
     "matrix_testing": true,
     "cache_optimization": true
@@ -58,6 +67,8 @@
       "git",
       "docker",
       "docker compose",
+      "kubectl",
+      "helm",
       "make"
     ]
   }

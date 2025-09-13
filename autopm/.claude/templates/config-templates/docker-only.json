@@ -1,32 +1,39 @@
 {
   "features": {
-    "docker_first_development": false,
-    "enforce_docker_tests": false,
-    "block_local_execution": false,
-    "auto_create_dockerfile": false,
-    "sync_with_ci": false,
+    "docker_first_development": true,
+    "enforce_docker_tests": true,
+    "block_local_execution": true,
+    "auto_create_dockerfile": true,
+    "sync_with_ci": true,
     "kubernetes_devops_testing": false,
     "github_actions_k8s": false,
     "integration_tests": false,
-    "git_safety_hooks": false,
-    "ci_local_simulation": false
+    "git_safety_hooks": true,
+    "ci_local_simulation": true
+  },
+  "execution_strategy": {
+    "mode": "adaptive",
+    "parallel_by_default": false,
+    "max_parallel_agents": 3,
+    "context_optimization": true,
+    "fallback_to_sequential": true
   },
   "docker": {
-    "enabled": false,
+    "enabled": true,
     "default_base_images": {
       "python": "python:3.11-slim",
       "node": "node:20-alpine",
       "go": "golang:1.21-alpine"
     },
     "volume_mounts": {
-      "source_code": false,
+      "source_code": true,
       "node_modules": false,
       "python_venv": false
     },
     "development": {
-      "hot_reload": false,
-      "debug_ports": false,
-      "local_db": false
+      "hot_reload": true,
+      "debug_ports": true,
+      "local_db": true
     }
   },
   "kubernetes": {
@@ -49,18 +56,15 @@
   },
   "github_actions": {
     "kubernetes_tests": false,
-    "docker_integration": false,
-    "matrix_testing": false,
-    "cache_optimization": false
+    "docker_integration": true,
+    "matrix_testing": true,
+    "cache_optimization": true
   },
   "exceptions": {
     "allow_local_commands": [
       "git",
-      "npm",
-      "yarn",
-      "pip",
-      "python",
-      "node",
+      "docker",
+      "docker compose",
       "make"
     ]
   }

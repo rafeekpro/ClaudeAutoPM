@@ -29,14 +29,14 @@ TARGET_DIR="${1:-$(pwd)}"
 # Files and directories to install
 # Note: We're selective about .claude subdirectories - templates are NOT copied
 INSTALL_ITEMS=(
-    ".claude/agents"
-    ".claude/commands"
-    ".claude/rules"
-    ".claude/scripts"
-    ".claude/checklists"
-    ".claude/.env.example"
-    ".claude-code"
-    "scripts"
+    "autopm/.claude/agents"
+    "autopm/.claude/commands"
+    "autopm/.claude/rules"
+    "autopm/.claude/scripts"
+    "autopm/.claude/checklists"
+    "autopm/.claude/.env.example"
+    "autopm/.claude-code"
+    "autopm/scripts"
     "PLAYBOOK.md"
     "LICENSE"
 )
@@ -232,7 +232,9 @@ install_files() {
     
     for item in "${INSTALL_ITEMS[@]}"; do
         local source_path="$source_dir/$item"
-        local target_path="$TARGET_DIR/$item"
+        # Remove 'autopm/' prefix from target path
+        local target_item="${item#autopm/}"
+        local target_path="$TARGET_DIR/$target_item"
         
         if [ ! -e "$source_path" ]; then
             # Try to create missing files from templates or defaults
@@ -275,6 +277,46 @@ install_files() {
     done
 }
 
+# Install execution strategy based on mode
+install_strategy() {
+    local mode="$1"
+    local strategy_dir="$TARGET_DIR/.claude/strategies"
+    local source_dir="$PACKAGE_DIR/autopm/.claude/templates/strategies-templates"
+
+    # Create strategies directory if it doesn't exist
+    mkdir -p "$strategy_dir"
+
+    case "$mode" in
+        "sequential")
+            print_step "Installing Sequential (Safe) execution strategy..."
+            cp "$source_dir/sequential-safe.md" "$strategy_dir/ACTIVE_STRATEGY.md"
+            print_success "Sequential strategy installed - safe, predictable execution"
+            ;;
+        "hybrid")
+            print_step "Installing Hybrid (Parallel) execution strategy..."
+            cp "$source_dir/hybrid-parallel.md" "$strategy_dir/ACTIVE_STRATEGY.md"
+            print_success "Hybrid strategy installed - maximum performance with parallel execution"
+            print_msg "$CYAN" "  📋 This enables parallel agent spawning for complex tasks"
+            ;;
+        "adaptive")
+            print_step "Installing Adaptive (Smart) execution strategy..."
+            cp "$source_dir/adaptive-smart.md" "$strategy_dir/ACTIVE_STRATEGY.md"
+            print_success "Adaptive strategy installed - intelligent mode selection"
+            print_msg "$CYAN" "  📋 Claude will automatically choose the best execution mode"
+            ;;
+        *)
+            print_warning "Unknown strategy mode: $mode, defaulting to adaptive"
+            cp "$source_dir/adaptive-smart.md" "$strategy_dir/ACTIVE_STRATEGY.md"
+            ;;
+    esac
+
+    # Create symlink for backward compatibility
+    if [ ! -f "$TARGET_DIR/.claude/HYBRID_STRATEGY.md" ]; then
+        ln -sf "strategies/ACTIVE_STRATEGY.md" "$TARGET_DIR/.claude/HYBRID_STRATEGY.md"
+        print_msg "$CYAN" "  ✓ Created strategy symlink for compatibility"
+    fi
+}
+
 # Choose configuration template
 choose_configuration() {
     local config_file="$TARGET_DIR/.claude/config.json"
@@ -287,50 +329,61 @@ choose_configuration() {
     
     print_msg "$YELLOW" "\n🔧 Choose your development configuration:"
     echo ""
-    echo "  1) 🏃 Minimal     - Traditional development (no Docker/K8s)"
-    echo "  2) 🐳 Docker-only - Docker-first development without Kubernetes"  
-    echo "  3) 🚀 Full DevOps - All features (Docker + Kubernetes + CI/CD)"
-    echo "  4) ⚙️  Custom     - Use existing config.json template"
+    echo "  1) 🏃 Minimal      - Traditional development (Sequential execution)"
+    echo "  2) 🐳 Docker-only  - Docker-first with Adaptive execution"
+    echo "  3) 🚀 Full DevOps  - All features with Smart Adaptive execution (RECOMMENDED)"
+    echo "  4) ⚡ Performance  - Maximum parallelization for power users"
+    echo "  5) ⚙️  Custom      - Use existing config.json template"
     echo ""
-    
+
     while true; do
-        echo -n "Your choice [1-4]: "
+        echo -n "Your choice [1-5]: "
         read -r choice
-        
+
         case "$choice" in
             1)
                 print_step "Setting up minimal configuration..."
-                cp "$PACKAGE_DIR/.claude/config-templates/minimal.json" "$config_file"
+                cp "$PACKAGE_DIR/autopm/.claude/templates/config-templates/minimal.json" "$config_file"
                 print_success "Minimal configuration applied!"
+                print_msg "$CYAN" "  📋 Sequential execution - safe and predictable"
                 break
                 ;;
             2)
                 print_step "Setting up Docker-only configuration..."
-                cp "$PACKAGE_DIR/.claude/config-templates/docker-only.json" "$config_file"
+                cp "$PACKAGE_DIR/autopm/.claude/templates/config-templates/docker-only.json" "$config_file"
                 print_success "Docker-only configuration applied!"
+                print_msg "$CYAN" "  📋 Adaptive execution - learns and optimizes"
                 break
                 ;;
             3)
                 print_step "Setting up full DevOps configuration..."
-                cp "$PACKAGE_DIR/.claude/config-templates/full-devops.json" "$config_file"
+                cp "$PACKAGE_DIR/autopm/.claude/templates/config-templates/full-devops.json" "$config_file"
                 print_success "Full DevOps configuration applied!"
-                print_msg "$CYAN" "  📋 This enables Docker-first development and Kubernetes testing"
-                print_msg "$CYAN" "  📋 GitHub Actions will run comprehensive CI/CD pipelines"
+                print_msg "$CYAN" "  📋 Smart Adaptive execution - best balance of speed and safety"
+                print_msg "$CYAN" "  📋 Docker + Kubernetes + intelligent parallelization"
                 break
                 ;;
             4)
-                if [ -f "$PACKAGE_DIR/.claude/config.json" ]; then
+                print_step "Setting up performance configuration..."
+                cp "$PACKAGE_DIR/autopm/.claude/templates/config-templates/performance.json" "$config_file"
+                print_success "Performance configuration applied!"
+                print_msg "$YELLOW" "  ⚡ Maximum parallel execution - for experienced users"
+                print_msg "$YELLOW" "  ⚠️  Higher resource usage, requires good understanding"
+                break
+                ;;
+            5)
+                if [ -f "$PACKAGE_DIR/autopm/.claude/config.json" ]; then
                     print_step "Using default configuration template..."
-                    cp "$PACKAGE_DIR/.claude/config.json" "$config_file"
+                    cp "$PACKAGE_DIR/autopm/.claude/config.json" "$config_file"
                     print_success "Default configuration applied!"
                 else
                     print_warning "Default config not found, using Docker-only template..."
-                    cp "$PACKAGE_DIR/.claude/config-templates/docker-only.json" "$config_file"
+                    cp "$PACKAGE_DIR/autopm/.claude/templates/config-templates/docker-only.json" "$config_file"
                 fi
                 break
                 ;;
             *)
-                print_warning "Invalid choice. Please enter 1, 2, 3, or 4."
+                print_warning "Invalid choice. Please enter 1, 2, 3, 4, or 5."
                 ;;
         esac
     done
@@ -344,7 +397,7 @@ choose_configuration() {
 generate_claude_md() {
     local config_file="$TARGET_DIR/.claude/config.json"
     local target_claude="$TARGET_DIR/CLAUDE.md"
-    local base_template="$PACKAGE_DIR/.claude/claude-templates/base.md"
+    local base_template="$PACKAGE_DIR/autopm/.claude/templates/claude-templates/base.md"
     local workflow_addon=""
     local agents_addon=""
     
@@ -359,30 +412,34 @@ generate_claude_md() {
         local docker_enabled=$(jq -r '.features.docker_first_development // false' "$config_file")
         local k8s_enabled=$(jq -r '.features.kubernetes_devops_testing // false' "$config_file")
         local git_safety=$(jq -r '.features.git_safety_hooks // false' "$config_file")
-        
+        local strategy_mode=$(jq -r '.execution_strategy.mode // "adaptive"' "$config_file")
+
         if [ "$docker_enabled" = "true" ] && [ "$k8s_enabled" = "true" ]; then
-            workflow_addon="$PACKAGE_DIR/.claude/claude-templates/addons/devops-workflow.md"
-            agents_addon="$PACKAGE_DIR/.claude/claude-templates/addons/devops-agents.md"
+            workflow_addon="$PACKAGE_DIR/autopm/.claude/templates/claude-templates/addons/devops-workflow.md"
+            agents_addon="$PACKAGE_DIR/autopm/.claude/templates/claude-templates/addons/devops-agents.md"
             print_step "Generating CLAUDE.md for Full DevOps configuration..."
         elif [ "$docker_enabled" = "true" ]; then
-            workflow_addon="$PACKAGE_DIR/.claude/claude-templates/addons/docker-workflow.md"
-            agents_addon="$PACKAGE_DIR/.claude/claude-templates/addons/docker-agents.md"
+            workflow_addon="$PACKAGE_DIR/autopm/.claude/templates/claude-templates/addons/docker-workflow.md"
+            agents_addon="$PACKAGE_DIR/autopm/.claude/templates/claude-templates/addons/docker-agents.md"
             print_step "Generating CLAUDE.md for Docker-only configuration..."
         else
-            workflow_addon="$PACKAGE_DIR/.claude/claude-templates/addons/minimal-workflow.md"
-            agents_addon="$PACKAGE_DIR/.claude/claude-templates/addons/minimal-agents.md"
+            workflow_addon="$PACKAGE_DIR/autopm/.claude/templates/claude-templates/addons/minimal-workflow.md"
+            agents_addon="$PACKAGE_DIR/autopm/.claude/templates/claude-templates/addons/minimal-agents.md"
             print_step "Generating CLAUDE.md for Minimal configuration..."
         fi
+
+        # Install execution strategy based on config
+        install_strategy "$strategy_mode"
         
         # Set git safety addon if enabled
         if [ "$git_safety" = "true" ]; then
-            git_safety_addon="$PACKAGE_DIR/.claude/claude-templates/addons/git-safety.md"
+            git_safety_addon="$PACKAGE_DIR/autopm/.claude/templates/claude-templates/addons/git-safety.md"
             print_msg "$CYAN" "  ✓ Git safety hooks enabled"
         fi
     else
         # Fallback to minimal if no config or jq
-        workflow_addon="$PACKAGE_DIR/.claude/claude-templates/addons/minimal-workflow.md"
-        agents_addon="$PACKAGE_DIR/.claude/claude-templates/addons/minimal-agents.md"
+        workflow_addon="$PACKAGE_DIR/autopm/.claude/templates/claude-templates/addons/minimal-workflow.md"
+        agents_addon="$PACKAGE_DIR/autopm/.claude/templates/claude-templates/addons/minimal-agents.md"
         print_step "Generating CLAUDE.md from minimal configuration (no config found)..."
     fi
     

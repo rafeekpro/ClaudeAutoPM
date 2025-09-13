@@ -1,0 +1,92 @@
+{
+  "timestamp": "2025-09-13T14:28:57.528Z",
+  "files": {
+    "strategy": {
+      "exists": true,
+      "size": 4253,
+      "sizeValid": true,
+      "contentValid": true,
+      "missingPatterns": [],
+      "schemaValid": true
+    },
+    "claudeConfig": {
+      "exists": false,
+      "error": "ENOENT: no such file or directory, stat '/Users/rla/Projects/AUTOPM/.claude/base.md'",
+      "required": true
+    },
+    "packageJson": {
+      "exists": true,
+      "size": 3165,
+      "sizeValid": true,
+      "contentValid": true,
+      "missingPatterns": [],
+      "schemaValid": true
+    },
+    "orchestrator": {
+      "exists": false,
+      "error": "ENOENT: no such file or directory, stat '/Users/rla/Projects/AUTOPM/.claude/orchestrator.md'",
+      "required": false
+    }
+  },
+  "features": {
+    "parallelExecution": {
+      "feature": "Parallel agent execution",
+      "testsExist": true,
+      "patternsFound": true,
+      "details": [
+        {
+          "file": "test/security/integration.test.js",
+          "exists": true,
+          "patternsFound": 2,
+          "totalPatterns": 3
+        }
+      ]
+    },
+    "contextIsolation": {
+      "feature": "Context isolation between agents",
+      "testsExist": true,
+      "patternsFound": true,
+      "details": [
+        {
+          "file": "test/security/integration.test.js",
+          "exists": true,
+          "patternsFound": 2,
+          "totalPatterns": 3
+        }
+      ]
+    },
+    "resourceLimits": {
+      "feature": "Resource limit enforcement",
+      "testsExist": true,
+      "patternsFound": true,
+      "details": [
+        {
+          "file": "test/security/performance.test.js",
+          "exists": true,
+          "patternsFound": 1,
+          "totalPatterns": 3
+        }
+      ]
+    },
+    "errorRecovery": {
+      "feature": "Error recovery mechanisms",
+      "testsExist": true,
+      "patternsFound": false,
+      "details": [
+        {
+          "file": "test/security/integration.test.js",
+          "exists": true,
+          "patternsFound": 0,
+          "totalPatterns": 3
+        }
+      ]
+    }
+  },
+  "summary": {
+    "totalFiles": 4,
+    "validFiles": 2,
+    "totalFeatures": 4,
+    "validFeatures": 3,
+    "health": 62.5
+  }
+}

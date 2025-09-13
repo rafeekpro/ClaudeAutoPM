@@ -1,0 +1,74 @@
+{
+  "features": {
+    "docker_first_development": false,
+    "enforce_docker_tests": false,
+    "block_local_execution": false,
+    "auto_create_dockerfile": false,
+    "sync_with_ci": false,
+    "kubernetes_devops_testing": false,
+    "github_actions_k8s": false,
+    "integration_tests": false,
+    "git_safety_hooks": false,
+    "ci_local_simulation": false
+  },
+  "execution_strategy": {
+    "mode": "sequential",
+    "parallel_by_default": false,
+    "max_parallel_agents": 1,
+    "context_optimization": false,
+    "fallback_to_sequential": true
+  },
+  "docker": {
+    "enabled": false,
+    "default_base_images": {
+      "python": "python:3.11-slim",
+      "node": "node:20-alpine",
+      "go": "golang:1.21-alpine"
+    },
+    "volume_mounts": {
+      "source_code": false,
+      "node_modules": false,
+      "python_venv": false
+    },
+    "development": {
+      "hot_reload": false,
+      "debug_ports": false,
+      "local_db": false
+    }
+  },
+  "kubernetes": {
+    "enabled": false,
+    "testing": {
+      "integration_tests": false,
+      "helm_chart_tests": false,
+      "kubectl_smoke_tests": false
+    },
+    "environments": {
+      "minikube": false,
+      "kind": false,
+      "k3d": false
+    },
+    "manifests": {
+      "auto_generate": false,
+      "validate_yaml": false,
+      "security_policies": false
+    }
+  },
+  "github_actions": {
+    "kubernetes_tests": false,
+    "docker_integration": false,
+    "matrix_testing": false,
+    "cache_optimization": false
+  },
+  "exceptions": {
+    "allow_local_commands": [
+      "git",
+      "npm",
+      "yarn",
+      "pip",
+      "python",
+      "node",
+      "make"
+    ]
+  }
+}
