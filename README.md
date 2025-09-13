@@ -852,6 +852,49 @@ Watch as structured planning transforms into shipped code.
 - Worktrees provide clean git isolation for parallel work
 - GitHub Projects can be added separately for visualization
 
+## Contributing
+
+### Development Workflow
+
+ClaudeAutoPM uses a **hybrid development workflow** that supports both direct commits and pull requests:
+
+#### Quick Contributions (Direct Commits)
+For trusted contributors making small changes:
+```bash
+git checkout main
+git pull origin main
+# Make changes
+npm test
+git add .
+git commit -m "fix: resolve issue"
+git push origin main
+```
+
+#### Standard Contributions (Pull Requests)
+For external contributors or major changes:
+```bash
+git checkout -b feat/new-feature
+# Make changes
+npm test
+git add .
+git commit -m "feat: add new feature"
+git push origin feat/new-feature
+# Open PR on GitHub
+```
+
+#### When to Use Each Method
+
+| Change Type | Direct Commit | Pull Request |
+|------------|--------------|--------------|
+| Hotfix | ✅ Preferred | If complex |
+| Documentation | ✅ Preferred | Optional |
+| Minor feature | Allowed | ✅ Recommended |
+| Major feature | ❌ | ✅ Required |
+| Breaking change | ❌ | ✅ Required |
+| External contributor | ❌ | ✅ Required |
+
+See [.claude/rules/no-pr-workflow.md](autopm/.claude/rules/no-pr-workflow.md) for detailed guidelines.
+
 ---
 
 ## Support This Project

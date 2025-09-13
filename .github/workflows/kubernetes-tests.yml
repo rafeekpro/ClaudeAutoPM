@@ -2,9 +2,19 @@ name: Kubernetes & DevOps Tests
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
+    paths:
+      - 'k8s/**'
+      - 'charts/**'
+      - '.github/workflows/kubernetes-tests.yml'
+      - 'autopm/.claude/scripts/docker-*.sh'
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
+    paths:
+      - 'k8s/**'
+      - 'charts/**'
+      - '.github/workflows/kubernetes-tests.yml'
+      - 'autopm/.claude/scripts/docker-*.sh'
   workflow_dispatch:
     inputs:
       k8s_environment:
