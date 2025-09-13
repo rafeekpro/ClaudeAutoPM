@@ -2,9 +2,20 @@ name: Docker Tests
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
+    paths:
+      - 'autopm/.claude/scripts/docker-*.sh'
+      - '.github/workflows/docker-tests.yml'
+      - 'Dockerfile*'
+      - 'docker-compose*.yml'
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
+    paths:
+      - 'autopm/.claude/scripts/docker-*.sh'
+      - '.github/workflows/docker-tests.yml'
+      - 'Dockerfile*'
+      - 'docker-compose*.yml'
+  workflow_dispatch:
 
 # Cancel in-progress runs for PRs
 concurrency:
