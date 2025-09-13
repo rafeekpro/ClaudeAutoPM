@@ -1007,9 +1007,11 @@ main() {
     
     # Generate configuration-specific CLAUDE.md
     generate_claude_md
-    
-    # Handle CLAUDE.md migration (for existing files)
-    handle_claude_md "$source_dir"
+
+    # Handle CLAUDE.md migration (only for existing installations)
+    if [ "$is_update" = true ]; then
+        handle_claude_md "$source_dir"
+    fi
     
     # Setup git safety features if enabled
     setup_git_safety
