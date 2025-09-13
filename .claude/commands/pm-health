@@ -1,0 +1,52 @@
+#!/bin/bash
+# Generate health report for ClaudeAutoPM
+
+echo "🏥 Generating ClaudeAutoPM Health Report..."
+echo ""
+
+# Use file-analyzer for log analysis
+echo "📊 System Metrics:"
+echo "  ├── Agent Ecosystem"
+
+# Count agents
+total_agents=$(find autopm/.claude/agents -name "*.md" -not -path "*/templates/*" | wc -l)
+echo "  │   ├── Total agents: $total_agents"
+
+# Check deprecated agents
+deprecated=$(grep -r "DEPRECATED" autopm/.claude/agents 2>/dev/null | wc -l)
+echo "  │   └── Deprecated: $deprecated"
+
+# Test status
+echo "  ├── Test Status"
+if [ -f package.json ]; then
+    echo "  │   ├── Running tests..."
+    npm test --silent 2>/dev/null && echo "  │   └── ✅ Tests passing" || echo "  │   └── ❌ Tests failing"
+fi
+
+# Documentation status
+echo "  └── Documentation"
+if [ -f CHANGELOG.md ]; then
+    last_update=$(stat -f "%Sm" -t "%Y-%m-%d" CHANGELOG.md 2>/dev/null || stat -c "%y" CHANGELOG.md 2>/dev/null | cut -d' ' -f1)
+    echo "      └── Last updated: $last_update"
+fi
+
+echo ""
+echo "🎯 Recommendations:"
+
+# Generate recommendations based on metrics
+if [ "$total_agents" -gt 40 ]; then
+    echo "  - Consider further agent consolidation (current: $total_agents, target: <30)"
+fi
+
+if [ "$deprecated" -gt 10 ]; then
+    echo "  - Clean up deprecated agents (current: $deprecated)"
+fi
+
+# Check for recent commits
+last_commit=$(git log -1 --format="%ar" 2>/dev/null)
+echo ""
+echo "📝 Last commit: $last_commit"
+
+echo ""
+echo "Use 'pm optimize' to analyze optimization opportunities"
+echo "Use 'pm validate' to run full validation"

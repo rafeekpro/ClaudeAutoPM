@@ -11,11 +11,25 @@
     "continuous_improvement": true,
     "dogfooding": true
   },
+  "agents": {
+    "source": "autopm/.claude/agents/",
+    "auto_invoke": true,
+    "use_framework_agents": true,
+    "preferred": [
+      "agent-manager",
+      "code-analyzer",
+      "test-runner",
+      "file-analyzer",
+      "github-operations-specialist"
+    ],
+    "triggers": ".claude/agent-triggers.md"
+  },
   "maintenance": {
     "agents": {
       "registry_manager": true,
       "installer_tester": true,
-      "optimization_analyzer": true
+      "optimization_analyzer": true,
+      "use_framework_agents": true
     },
     "automation": {
       "daily_validation": true,

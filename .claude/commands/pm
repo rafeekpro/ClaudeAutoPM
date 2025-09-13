@@ -1,0 +1,41 @@
+#!/bin/bash
+# Main PM command for ClaudeAutoPM self-maintenance
+
+echo "🤖 ClaudeAutoPM Self-Maintenance System"
+echo ""
+
+if [ -z "$1" ]; then
+    echo "Available commands:"
+    echo "  pm validate      - Validate project integrity"
+    echo "  pm optimize      - Analyze optimization opportunities"
+    echo "  pm test-install  - Test installation scenarios"
+    echo "  pm health        - Generate health report"
+    echo "  pm release       - Prepare new release"
+    echo ""
+    echo "Usage: pm <command> [options]"
+    exit 0
+fi
+
+# Route to specific command
+case "$1" in
+    validate)
+        exec .claude/commands/pm-validate "${@:2}"
+        ;;
+    optimize)
+        exec .claude/commands/pm-optimize "${@:2}"
+        ;;
+    test-install)
+        exec .claude/commands/pm-test-install "${@:2}"
+        ;;
+    health)
+        exec .claude/commands/pm-health "${@:2}"
+        ;;
+    release)
+        exec .claude/commands/pm-release "${@:2}"
+        ;;
+    *)
+        echo "Unknown command: $1"
+        echo "Run 'pm' without arguments to see available commands"
+        exit 1
+        ;;
+esac

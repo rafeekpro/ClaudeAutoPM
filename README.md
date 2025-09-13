@@ -43,6 +43,23 @@ Every team struggles with the same problems:
 
 This system solves all of that.
 
+## 🤖 Self-Maintaining System
+
+ClaudeAutoPM uses its own framework capabilities for self-maintenance:
+
+```bash
+# Check system health
+pm health
+
+# Optimize agent ecosystem
+pm optimize
+
+# Validate integrity
+pm validate
+```
+
+See [Self-Maintenance Guide](docs/SELF-MAINTENANCE-GUIDE.md) for details.
+
 ## 🚀 Installation
 
 ### Global Installation (Recommended)

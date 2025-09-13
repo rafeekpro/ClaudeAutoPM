@@ -15,11 +15,38 @@ This project is configured to maintain itself using its own agents and tools. Wh
 3. **Follow self-maintenance rules** in `.claude/rules/self-maintenance.md`
 4. **Apply optimization strategies** from `.claude/strategies/`
 
-## Available Maintenance Agents
+## Framework Agents for Self-Maintenance
 
-- **registry-manager** - Manage agent registry
-- **installer-tester** - Test installation scenarios
-- **optimization-analyzer** - Find optimization opportunities
+**IMPORTANT**: Use these agents from `autopm/.claude/agents/` for maintenance tasks:
+
+### Core Maintenance Agents
+- **agent-manager** (`autopm/.claude/agents/core/agent-manager.md`) - Create and manage agents
+- **code-analyzer** (`autopm/.claude/agents/core/code-analyzer.md`) - Review code changes for bugs
+- **test-runner** (`autopm/.claude/agents/core/test-runner.md`) - Execute and analyze tests
+- **file-analyzer** (`autopm/.claude/agents/core/file-analyzer.md`) - Summarize large files
+
+### DevOps Agents
+- **github-operations-specialist** (`autopm/.claude/agents/devops/github-operations-specialist.md`) - GitHub Actions, releases
+- **docker-containerization-expert** (`autopm/.claude/agents/devops/docker-containerization-expert.md`) - Container management
+
+### Framework Testing
+- **e2e-test-engineer** (`autopm/.claude/agents/frameworks/e2e-test-engineer.md`) - End-to-end testing
+
+## Agent Usage Examples
+
+```markdown
+# When adding new agents
+@agent-manager create a new agent for Redis optimization
+
+# When reviewing changes
+@code-analyzer review the recent optimization changes for potential issues
+
+# When running tests
+@test-runner execute all installation tests and analyze failures
+
+# When preparing releases
+@github-operations-specialist prepare release v1.0.8
+```
 
 ## Quick Commands
 

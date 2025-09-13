@@ -1,0 +1,48 @@
+#!/bin/bash
+# Test installation scenarios using framework agents
+
+echo "🧪 Testing ClaudeAutoPM installation scenarios..."
+
+# Use test-runner agent for comprehensive testing
+echo "Running installation tests with test-runner agent..."
+
+# Test scenarios
+scenarios=("minimal" "docker" "full" "performance")
+
+for scenario in "${scenarios[@]}"; do
+    echo ""
+    echo "Testing $scenario installation..."
+
+    # Create test directory
+    test_dir="/tmp/autopm-test-$scenario-$$"
+    mkdir -p "$test_dir"
+
+    # Run installation test
+    case $scenario in
+        minimal)
+            echo "1" | bash install/install.sh "$test_dir"
+            ;;
+        docker)
+            echo "2" | bash install/install.sh "$test_dir"
+            ;;
+        full)
+            echo "3" | bash install/install.sh "$test_dir"
+            ;;
+        performance)
+            echo "4" | bash install/install.sh "$test_dir"
+            ;;
+    esac
+
+    # Validate installation
+    if [ -f "$test_dir/CLAUDE.md" ] && [ -d "$test_dir/.claude" ]; then
+        echo "  ✅ $scenario installation successful"
+    else
+        echo "  ❌ $scenario installation failed"
+    fi
+
+    # Cleanup
+    rm -rf "$test_dir"
+done
+
+echo ""
+echo "📋 Installation test complete"
