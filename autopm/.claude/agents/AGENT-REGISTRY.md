@@ -2,6 +2,24 @@
 
 This document provides the official registry of all agents for inclusion in the system prompt.
 
+## 🚀 Optimization Update (v1.1.0)
+
+### Summary of Changes
+- **Reduced agent count from 50+ to ~35** (Phase 1 complete)
+- **Consolidated similar agents** into parameterized versions
+- **Unified coordination rules** for better efficiency
+- **Maintained all functionality** through parameters
+
+### Key Consolidations
+1. **UI Frameworks**: 4 agents → 1 `react-ui-expert`
+2. **Python Backend**: 3 agents → 1 `python-backend-expert`
+3. **Docker**: 3 agents → 1 `docker-containerization-expert`
+4. **E2E Testing**: 2 agents → 1 `e2e-test-engineer`
+
+### Migration Guide
+Legacy agent names will continue to work with deprecation warnings.
+Parameters are automatically inferred from legacy agent names.
+
 ## Core Agents
 
 ### agent-manager
@@ -41,26 +59,26 @@ This document provides the official registry of all agents for inclusion in the 
 
 ## Framework Agents
 
-### mui-react-expert
+### react-ui-expert (NEW - Consolidated)
 
-**Location**: `.claude/agents/frameworks/mui-react-expert.md`
-**Description**: Use this agent for Material-UI (MUI) React component development including theming, custom components, and design system implementation. Expert in MUI v5/v6 features.
+**Location**: `.claude/agents/frameworks/react-ui-expert.md`
+**Description**: Unified React UI component development specialist supporting MUI, Chakra, Ant Design, Bootstrap, and headless UI libraries. Use parameters to specify framework.
+**Parameters**: `framework: [mui|chakra|antd|bootstrap|headless]`, `style_system: [css-in-js|tailwind|css-modules]`
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
 **Status**: Active
+**Replaces**: mui-react-expert, chakra-ui-expert, antd-react-expert, bootstrap-ui-expert
 
-### chakra-ui-expert
+### mui-react-expert (DEPRECATED)
 
-**Location**: `.claude/agents/frameworks/chakra-ui-expert.md`
-**Description**: Use this agent for Chakra UI React component development including theme customization, responsive design, and accessibility-first implementations.
-**Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
-**Status**: Active
+**Status**: Deprecated - Use `react-ui-expert` with `framework: mui`
 
-### antd-react-expert
+### chakra-ui-expert (DEPRECATED)
 
-**Location**: `.claude/agents/frameworks/antd-react-expert.md`
-**Description**: Use this agent for Ant Design (antd) React component development including enterprise-grade UI implementations, form handling, and data visualization.
-**Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
-**Status**: Active
+**Status**: Deprecated - Use `react-ui-expert` with `framework: chakra`
+
+### antd-react-expert (DEPRECATED)
+
+**Status**: Deprecated - Use `react-ui-expert` with `framework: antd`
 
 ### react-frontend-engineer
 
@@ -76,12 +94,9 @@ This document provides the official registry of all agents for inclusion in the 
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
 **Status**: Active
 
-### bootstrap-ui-expert
+### bootstrap-ui-expert (DEPRECATED)
 
-**Location**: `.claude/agents/frameworks/bootstrap-ui-expert.md`
-**Description**: Use this agent for Bootstrap CSS framework development including responsive layouts, component styling, and custom themes.
-**Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
-**Status**: Active
+**Status**: Deprecated - Use `react-ui-expert` with `framework: bootstrap`
 
 ### tailwindcss-expert
 
@@ -90,33 +105,30 @@ This document provides the official registry of all agents for inclusion in the 
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
 **Status**: Active
 
-### fastapi-backend-engineer
+### fastapi-backend-engineer (DEPRECATED)
 
-**Location**: `.claude/agents/frameworks/fastapi-backend-engineer.md`
-**Description**: Use this agent for FastAPI development including REST APIs, async operations, Pydantic models, and OpenAPI documentation.
-**Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
+**Status**: Deprecated - Use `python-backend-expert` with `framework: fastapi`
+
+### flask-backend-engineer (DEPRECATED)
+
+**Status**: Deprecated - Use `python-backend-expert` with `framework: flask`
+
+### e2e-test-engineer (NEW - Consolidated)
+
+**Location**: `.claude/agents/frameworks/e2e-test-engineer.md`
+**Description**: Unified E2E test engineering specialist covering Playwright automation, MCP browser control, visual testing, and comprehensive test strategies.
+**Parameters**: `test_framework: [playwright|cypress]`, `browser_control: [standard|mcp-enhanced]`, `test_types: [functional|visual|accessibility]`
+**Tools**: Bash, Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Task, Agent, MCP tools when available
 **Status**: Active
+**Replaces**: playwright-test-engineer, playwright-mcp-frontend-tester
 
-### flask-backend-engineer
+### playwright-test-engineer (DEPRECATED)
 
-**Location**: `.claude/agents/frameworks/flask-backend-engineer.md`
-**Description**: Use this agent for Flask development including web applications, REST APIs, blueprints, and Flask extensions.
-**Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
-**Status**: Active
+**Status**: Deprecated - Use `e2e-test-engineer` with `test_framework: playwright`
 
-### playwright-test-engineer
+### playwright-mcp-frontend-tester (DEPRECATED)
 
-**Location**: `.claude/agents/frameworks/playwright-test-engineer.md`
-**Description**: Use this agent when you need to create, debug, or optimize end-to-end tests using Playwright.
-**Tools**: Bash, Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Task, Agent
-**Status**: Active
-
-### playwright-mcp-frontend-tester
-
-**Location**: `.claude/agents/frameworks/playwright-mcp-frontend-tester.md`
-**Description**: Use this agent for advanced Playwright testing with MCP browser control integration for visual testing and UX feedback.
-**Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent, mcp__playwright__navigate, mcp__playwright__screenshot, mcp__playwright__click, mcp__playwright__fill
-**Status**: Active
+**Status**: Deprecated - Use `e2e-test-engineer` with `browser_control: mcp-enhanced`
 
 ### nats-messaging-expert
 
@@ -127,12 +139,14 @@ This document provides the official registry of all agents for inclusion in the 
 
 ## Language Agents
 
-### python-backend-engineer
+### python-backend-expert (ENHANCED)
 
-**Location**: `.claude/agents/languages/python-backend-engineer.md`
-**Description**: Use this agent when you need to develop, refactor, or optimize Python backend systems using modern tooling like uv.
+**Location**: `.claude/agents/languages/python-backend-expert.md`
+**Description**: Comprehensive Python backend specialist supporting FastAPI, Flask, Django, and pure Python. Handles all Python backend development needs.
+**Parameters**: `framework: [fastapi|flask|django|none]`, `async_support: boolean`, `database: [postgresql|mongodb|redis]`
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
 **Status**: Active
+**Replaces**: fastapi-backend-engineer, flask-backend-engineer
 
 ### javascript-frontend-engineer
 
@@ -222,26 +236,26 @@ This document provides the official registry of all agents for inclusion in the 
 **Tools**: Bash, Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Task, Agent
 **Status**: Active
 
-### docker-expert
+### docker-containerization-expert (NEW - Consolidated)
 
-**Location**: `.claude/agents/devops/docker-expert.md`
-**Description**: Use this agent for Docker containerization including Dockerfile optimization, multi-stage builds, image security, and registry management.
+**Location**: `.claude/agents/devops/docker-containerization-expert.md`
+**Description**: Comprehensive Docker specialist covering Dockerfile optimization, Compose orchestration, and development environments.
+**Parameters**: `use_case: [development|production]`, `orchestration: [compose|swarm|kubernetes]`
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
 **Status**: Active
+**Replaces**: docker-expert, docker-compose-expert, docker-development-orchestrator
 
-### docker compose-expert
+### docker-expert (DEPRECATED)
 
-**Location**: `.claude/agents/devops/docker compose-expert.md`
-**Description**: Use this agent for Docker Compose orchestration including multi-container applications, service dependencies, and networking.
-**Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
-**Status**: Active
+**Status**: Deprecated - Use `docker-containerization-expert`
 
-### docker-development-orchestrator
+### docker-compose-expert (DEPRECATED)
 
-**Location**: `.claude/agents/devops/docker-development-orchestrator.md`
-**Description**: Use this agent for Docker-first development workflows including creating development containers and managing compose files.
-**Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
-**Status**: Active
+**Status**: Deprecated - Use `docker-containerization-expert` with focus on compose
+
+### docker-development-orchestrator (DEPRECATED)
+
+**Status**: Deprecated - Use `docker-containerization-expert` with `use_case: development`
 
 ### traefik-proxy-expert
 
