@@ -1,8 +1,17 @@
-# PM to Azure DevOps Command Mapping
+# PM and Azure DevOps Command Mapping
 
-Complete mapping of all PM system commands to Azure DevOps equivalents.
+## 🤝 Complementary Systems
+
+**IMPORTANT**: The PM and Azure systems are designed to **coexist and complement** each other, not replace one another.
+
+- **PM System** (`/pm:*`): Local, file-based, works offline, universal git platform support
+- **Azure System** (`/azure:*`): Enterprise integration, team collaboration, metrics tracking
+
+See [PM-AZURE-COEXISTENCE.md](../../docs/PM-AZURE-COEXISTENCE.md) for detailed strategy.
 
 ## Command Translation Table
+
+Below is a mapping showing equivalent commands between systems. Use the system that best fits your current context.
 
 ### PRD Commands → User Story Commands
 
@@ -10,7 +19,7 @@ Complete mapping of all PM system commands to Azure DevOps equivalents.
 |------------|---------------------|---------|-------------|
 | `/pm:prd-new` | `/azure:us-new` | ✅ Created | Create new User Story |
 | `/pm:prd-list` | `/azure:us-list` | ✅ Created | List User Stories |
-| `/pm:prd-edit` | `/azure:us-edit` | 🔧 TODO | Edit User Story |
+| `/pm:prd-edit` | `/azure:us-edit` | ✅ Created | Edit User Story |
 | `/pm:prd-parse` | `/azure:us-parse` | ✅ Created | Parse User Story into Tasks |
 | `/pm:prd-status` | `/azure:us-status` | ✅ Created | User Story status dashboard |
 
@@ -20,11 +29,11 @@ Complete mapping of all PM system commands to Azure DevOps equivalents.
 |------------|---------------------|---------|-------------|
 | `/pm:issue-start` | `/azure:task-start` | ✅ Created | Start working on Task |
 | `/pm:issue-close` | `/azure:task-close` | ✅ Created | Complete Task |
-| `/pm:issue-edit` | `/azure:task-edit` | 🔧 TODO | Edit Task details |
-| `/pm:issue-show` | `/azure:task-show` | 🔧 TODO | Show Task details |
-| `/pm:issue-status` | `/azure:task-status` | 🔧 TODO | Task status |
-| `/pm:issue-sync` | `/azure:task-sync` | 🔧 TODO | Sync Tasks |
-| `/pm:issue-reopen` | `/azure:task-reopen` | 🔧 TODO | Reopen closed Task |
+| `/pm:issue-edit` | `/azure:task-edit` | ✅ Created | Edit Task details |
+| `/pm:issue-show` | `/azure:task-show` | ✅ Created | Show Task details |
+| `/pm:issue-status` | `/azure:task-status` | ✅ Created | Task status |
+| `/pm:issue-sync` | `/azure:task-sync` | ✅ Created | Sync Tasks |
+| `/pm:issue-reopen` | `/azure:task-reopen` | ✅ Created | Reopen closed Task |
 | `/pm:issue-analyze` | `/azure:task-analyze` | 🔧 TODO | Analyze Task patterns |
 
 ### Epic Commands → Feature Commands
@@ -32,11 +41,11 @@ Complete mapping of all PM system commands to Azure DevOps equivalents.
 | PM Command | Azure DevOps Command | Status | Description |
 |------------|---------------------|---------|-------------|
 | `/pm:epic-decompose` | `/azure:feature-decompose` | ✅ Created | Break down Feature into User Stories |
-| `/pm:epic-start` | `/azure:feature-start` | 🔧 TODO | Start Feature development |
+| `/pm:epic-start` | `/azure:feature-start` | ✅ Created | Start Feature development |
 | `/pm:epic-start-worktree` | `/azure:feature-start-worktree` | 🔧 TODO | Start Feature with git worktree |
 | `/pm:epic-close` | `/azure:feature-close` | 🔧 TODO | Complete Feature |
 | `/pm:epic-edit` | `/azure:feature-edit` | 🔧 TODO | Edit Feature details |
-| `/pm:epic-list` | `/azure:feature-list` | 🔧 TODO | List Features |
+| `/pm:epic-list` | `/azure:feature-list` | ✅ Created | List Features |
 | `/pm:epic-show` | `/azure:feature-show` | 🔧 TODO | Show Feature details |
 | `/pm:epic-status` | `/azure:feature-status` | 🔧 TODO | Feature progress dashboard |
 | `/pm:epic-sync` | `/azure:feature-sync` | 🔧 TODO | Sync Features |
@@ -48,11 +57,11 @@ Complete mapping of all PM system commands to Azure DevOps equivalents.
 
 | PM Command | Azure DevOps Command | Status | Description |
 |------------|---------------------|---------|-------------|
-| `/pm:status` | `/azure:sprint-status` | 🔧 TODO | Sprint overview dashboard |
-| `/pm:standup` | `/azure:standup` | 🔧 TODO | Daily standup report |
-| `/pm:next` | `/azure:next-task` | 🔧 TODO | Get next recommended task |
-| `/pm:in-progress` | `/azure:active-work` | 🔧 TODO | Show all active work items |
-| `/pm:blocked` | `/azure:blocked-items` | 🔧 TODO | List blocked work items |
+| `/pm:status` | `/azure:sprint-status` | ✅ Created | Sprint overview dashboard |
+| `/pm:standup` | `/azure:standup` | ✅ Created | Daily standup report |
+| `/pm:next` | `/azure:next-task` | ✅ Created | Get next recommended task |
+| `/pm:in-progress` | `/azure:active-work` | ✅ Created | Show all active work items |
+| `/pm:blocked` | `/azure:blocked-items` | ✅ Created | List blocked work items |
 | `/pm:search` | `/azure:search` | 🔧 TODO | Search work items |
 | `/pm:validate` | `/azure:validate` | 🔧 TODO | Validate work item structure |
 | `/pm:clean` | `/azure:clean` | 🔧 TODO | Clean up completed items |
