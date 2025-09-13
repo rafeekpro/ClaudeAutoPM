@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Safe Commit Script - Zapewnia że wszystko jest sprawdzone przed commitem
-# Użycie: ./scripts/safe-commit.sh "commit message"
+# Safe Commit Script - Ensures everything is checked before commit
+# Usage: ./scripts/safe-commit.sh "commit message"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -14,7 +14,7 @@ echo -e "${CYAN}╔════════════════════�
 echo -e "${CYAN}║         SAFE COMMIT VERIFICATION             ║${NC}"
 echo -e "${CYAN}╚══════════════════════════════════════════════╝${NC}"
 
-# Sprawdź czy podano wiadomość
+# Check if message was provided
 if [ -z "$1" ]; then
     echo -e "${RED}❌ Error: Commit message required${NC}"
     echo "Usage: $0 \"your commit message\""
@@ -36,7 +36,7 @@ check_status() {
     fi
 }
 
-# 1. Sprawdź git status
+# 1. Check git status
 echo -e "\n${BLUE}📊 Git Status:${NC}"
 git status --short
 if [ -z "$(git status --short)" ]; then
@@ -44,7 +44,7 @@ if [ -z "$(git status --short)" ]; then
     exit 0
 fi
 
-# 2. Sprawdź czy są unstaged changes
+# 2. Check for unstaged changes
 echo -e "\n${BLUE}🔍 Checking for unstaged changes...${NC}"
 if ! git diff --quiet; then
     echo -e "${YELLOW}⚠️  You have unstaged changes:${NC}"
@@ -129,10 +129,10 @@ if [ -f "tsconfig.json" ]; then
     check_status "TypeScript"
 fi
 
-# 8. Sprawdź security
+# 8. Check security
 echo -e "\n${BLUE}🔒 Security checks...${NC}"
 
-# Sprawdź czy nie ma sekretów
+# Check for secrets
 if grep -r "password\|secret\|api_key\|token" --exclude-dir=.git --exclude-dir=node_modules --exclude="*.md" . 2>/dev/null | grep -v "^Binary" | grep -i "=\|:" | head -1 >/dev/null; then
     echo -e "${YELLOW}⚠️  Potential secrets detected${NC}"
     echo "Review these lines:"

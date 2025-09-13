@@ -23,14 +23,14 @@ ClaudeAutoPM currently maintains **50+ agents** and **30+ rule files**, creating
 
 ### 1. UI Framework Consolidation
 
-**Zmiana:** Połącz agentów `mui-react-expert`, `chakra-ui-expert`, `antd-react-expert`, `bootstrap-ui-expert` w jednego `react-ui-expert`
+**Change:** Merge agents `mui-react-expert`, `chakra-ui-expert`, `antd-react-expert`, `bootstrap-ui-expert` w jednego `react-ui-expert`
 
-**Uzasadnienie:**
-- Wszystkie są ekspertami React UI z podobnymi narzędziami
-- 80% wiedzy się pokrywa (React, komponenty, stylowanie)
+**Justification:**
+- All are React UI experts with similar tools
+- 80% knowledge overlap (React, components, styling)
 - Framework można określić parametrem
 
-**Implementacja:**
+**Implementation:**
 ```yaml
 react-ui-expert:
   parameters:
@@ -40,20 +40,20 @@ react-ui-expert:
 
 **Potencjalne ryzyka:**
 - Utrata specjalistycznej wiedzy o konkretnym frameworku
-- Możliwe pomyłki między API różnych bibliotek
+- Possible confusion between APIs of different libraries
 
 ---
 
 ### 2. Python Backend Consolidation
 
-**Zmiana:** Połącz `python-backend-engineer`, `fastapi-backend-engineer`, `flask-backend-engineer` w jednego `python-backend-expert`
+**Change:** Merge `python-backend-engineer`, `fastapi-backend-engineer`, `flask-backend-engineer` w jednego `python-backend-expert`
 
-**Uzasadnienie:**
-- Wszyscy używają Pythona jako głównego języka
-- FastAPI i Flask to frameworki, nie oddzielne technologie
-- 90% praktyk backend jest wspólnych
+**Justification:**
+- All use Python as the main language
+- FastAPI and Flask are frameworks, not separate technologies
+- 90% of backend practices are shared
 
-**Implementacja:**
+**Implementation:**
 ```yaml
 python-backend-expert:
   parameters:
@@ -63,21 +63,21 @@ python-backend-expert:
 ```
 
 **Potencjalne ryzyka:**
-- FastAPI ma unikalne wzorce async/await
-- Flask i FastAPI mają różne filozofie projektowe
+- FastAPI has unique async/await patterns
+- Flask and FastAPI have different design philosophies
 
 ---
 
 ### 3. Docker Ecosystem Consolidation
 
-**Zmiana:** Połącz `docker-expert`, `docker-compose-expert`, `docker-development-orchestrator` w jednego `docker-containerization-expert`
+**Change:** Merge `docker-expert`, `docker-compose-expert`, `docker-development-orchestrator` w jednego `docker-containerization-expert`
 
-**Uzasadnienie:**
-- Docker Compose jest integralną częścią Docker
-- Development orchestration to zastosowanie, nie oddzielna ekspertyza
-- 95% wiedzy się pokrywa
+**Justification:**
+- Docker Compose is an integral part of Docker
+- Development orchestration is an application, not separate expertise
+- 95% knowledge overlap
 
-**Implementacja:**
+**Implementation:**
 ```yaml
 docker-containerization-expert:
   specializations:
@@ -88,8 +88,8 @@ docker-containerization-expert:
 ```
 
 **Potencjalne ryzyka:**
-- Możliwa utrata głębokiej specjalizacji w multi-stage builds
-- Docker Compose v2 vs v3 różnice mogą być pominięte
+- Possible loss of deep specialization in multi-stage builds
+- Docker Compose v2 vs v3 differences may be overlooked
 
 ---
 
@@ -97,12 +97,12 @@ docker-containerization-expert:
 
 **Zmiana:** Stwórz `multi-cloud-architect` z parametrami dla AWS, GCP, Azure
 
-**Uzasadnienie:**
-- Koncepty cloud są uniwersalne (IaC, networking, security)
-- Terraform jest wspólny dla wszystkich
-- 70% wzorców jest identycznych
+**Justification:**
+- Cloud concepts are universal (IaC, networking, security)
+- Terraform is common to all
+- 70% of patterns are identical
 
-**Implementacja:**
+**Implementation:**
 ```yaml
 multi-cloud-architect:
   parameters:
@@ -112,22 +112,22 @@ multi-cloud-architect:
 ```
 
 **Potencjalne ryzyka:**
-- Każdy cloud ma unikalne usługi (np. AWS Lambda vs Cloud Functions)
-- Różne modele cenowe i limity
-- Specyficzne certyfikacje i best practices
+- Each cloud has unique services (e.g., AWS Lambda vs Cloud Functions)
+- Different pricing models and limits
+- Specific certifications and best practices
 
 ---
 
 ### 5. Test Engineering Consolidation
 
-**Zmiana:** Połącz `playwright-test-engineer` i `playwright-mcp-frontend-tester` w jednego `e2e-test-engineer`
+**Change:** Merge `playwright-test-engineer` i `playwright-mcp-frontend-tester` w jednego `e2e-test-engineer`
 
-**Uzasadnienie:**
-- Oba używają Playwright
-- MCP to rozszerzenie, nie oddzielna ekspertyza
-- Test patterns są uniwersalne
+**Justification:**
+- Both use Playwright
+- MCP is an extension, not separate expertise
+- Test patterns are universal
 
-**Implementacja:**
+**Implementation:**
 ```yaml
 e2e-test-engineer:
   capabilities:
@@ -138,7 +138,7 @@ e2e-test-engineer:
 ```
 
 **Potencjalne ryzyka:**
-- MCP integration wymaga specyficznej wiedzy
+- MCP integration requires specific knowledge
 - Visual testing ma inne wymagania niż functional
 
 ---
@@ -147,12 +147,12 @@ e2e-test-engineer:
 
 **Zmiana:** Stwórz `database-architect` z parametrami dla różnych baz
 
-**Uzasadnienie:**
-- Koncepty baz danych są uniwersalne (normalizacja, indeksy, optymalizacja)
-- SQL jest wspólny dla większości
-- Wzorce modelowania są podobne
+**Justification:**
+- Database concepts are universal (normalization, indexes, optimization)
+- SQL is common to most
+- Modeling patterns are similar
 
-**Implementacja:**
+**Implementation:**
 ```yaml
 database-architect:
   parameters:
@@ -162,9 +162,9 @@ database-architect:
 ```
 
 **Potencjalne ryzyka:**
-- NoSQL vs SQL to fundamentalnie różne paradygmaty
-- Każda baza ma unikalne features (np. PostgreSQL JSONB)
-- Języki zapytań są różne
+- NoSQL vs SQL are fundamentally different paradigms
+- Each database has unique features (e.g., PostgreSQL JSONB)
+- Query languages are different
 
 ---
 
@@ -172,56 +172,56 @@ database-architect:
 
 ### 1. Agent Coordination Rules
 
-**Zmiana:** Połącz `agent-coordination.md` i `agent-coordination-extended.md`
+**Change:** Merge `agent-coordination.md` i `agent-coordination-extended.md`
 
-**Uzasadnienie:**
-- Duplikacja podstawowych zasad
-- Extended powinno być częścią głównego dokumentu
-- Łatwiejsze utrzymanie jednego źródła prawdy
+**Justification:**
+- Duplication of basic principles
+- Extended should be part of main document
+- Easier maintenance of single source of truth
 
 **Potencjalne ryzyka:**
-- Zbyt długi dokument może być trudny w nawigacji
+- Too long document may be difficult to navigate
 
 ---
 
 ### 2. UI Development Rules
 
-**Zmiana:** Połącz `ui-development-standards.md`, `ui-framework-rules.md`, `ux-design-rules.md`
+**Change:** Merge `ui-development-standards.md`, `ui-framework-rules.md`, `ux-design-rules.md`
 
-**Uzasadnienie:**
-- Wszystkie dotyczą frontend development
-- Wiele pokrywających się wytycznych
-- Spójność w jednym dokumencie
+**Justification:**
+- All concern frontend development
+- Many overlapping guidelines
+- Consistency in one document
 
 **Potencjalne ryzyka:**
-- UX design to inna domena niż implementacja
-- Różne role mogą potrzebować różnych sekcji
+- UX design is a different domain than implementation
+- Different roles may need different sections
 
 ---
 
 ### 3. Pipeline Rules
 
-**Zmiana:** Połącz `pipeline-mandatory.md`, `command-pipelines.md`, `database-pipeline.md`, `infrastructure-pipeline.md`
+**Change:** Merge `pipeline-mandatory.md`, `command-pipelines.md`, `database-pipeline.md`, `infrastructure-pipeline.md`
 
-**Uzasadnienie:**
-- Wszystkie opisują pipeline patterns
-- Wspólne zasady orchestration
-- Redukcja powtórzeń
+**Justification:**
+- All describe pipeline patterns
+- Common orchestration principles
+- Repetition reduction
 
-**Potencjalne ryzyka:**
-- Różne pipeline'y mają różne wymagania
-- Specyficzne narzędzia per pipeline
+**Potential risks:**
+- Different pipelines have different requirements
+- Specific tools per pipeline
 
 ---
 
 ### 4. DevOps Workflows
 
-**Zmiana:** Połącz `development-workflow.md`, `devops-troubleshooting-playbook.md`, `docker-first-development.md`
+**Change:** Merge `development-workflow.md`, `devops-troubleshooting-playbook.md`, `docker-first-development.md`
 
-**Uzasadnienie:**
-- Wszystkie dotyczą DevOps practices
-- Nakładające się procedury
-- Spójny playbook
+**Justification:**
+- All concern DevOps practices
+- Overlapping procedures
+- Consistent playbook
 
 **Potencjalne ryzyka:**
 - Docker-first to specyficzna strategia
