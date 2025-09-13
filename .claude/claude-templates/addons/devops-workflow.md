@@ -40,6 +40,19 @@ This project uses a hybrid strategy: Docker for local development, Kubernetes fo
    docker compose exec app npm test
    ```
 
+3. **Simulate CI locally before push**
+   ```bash
+   # Test exactly what CI will run
+   npm ci
+   npm run build
+   npm run test
+   npm run lint
+   npm run test:e2e
+   
+   # Or use shorthand
+   npm run ci:local
+   ```
+
 ### ☸️ Kubernetes Testing (CI/CD)
 
 Automated via GitHub Actions:

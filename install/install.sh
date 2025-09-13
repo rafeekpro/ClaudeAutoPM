@@ -358,6 +358,7 @@ generate_claude_md() {
     if [ -f "$config_file" ] && command -v jq >/dev/null 2>&1; then
         local docker_enabled=$(jq -r '.features.docker_first_development // false' "$config_file")
         local k8s_enabled=$(jq -r '.features.kubernetes_devops_testing // false' "$config_file")
+        local git_safety=$(jq -r '.features.git_safety_hooks // false' "$config_file")
         
         if [ "$docker_enabled" = "true" ] && [ "$k8s_enabled" = "true" ]; then
             workflow_addon="$PACKAGE_DIR/.claude/claude-templates/addons/devops-workflow.md"
@@ -371,6 +372,12 @@ generate_claude_md() {
             workflow_addon="$PACKAGE_DIR/.claude/claude-templates/addons/minimal-workflow.md"
             agents_addon="$PACKAGE_DIR/.claude/claude-templates/addons/minimal-agents.md"
             print_step "Generating CLAUDE.md for Minimal configuration..."
+        fi
+        
+        # Set git safety addon if enabled
+        if [ "$git_safety" = "true" ]; then
+            git_safety_addon="$PACKAGE_DIR/.claude/claude-templates/addons/git-safety.md"
+            print_msg "$CYAN" "  ✓ Git safety hooks enabled"
         fi
     else
         # Fallback to minimal if no config or jq
@@ -415,6 +422,13 @@ generate_claude_md() {
             { print }
         ' "$target_claude.tmp" > "$target_claude.tmp2"
         mv "$target_claude.tmp2" "$target_claude.tmp"
+    fi
+    
+    # Append git safety addon if enabled
+    if [ -n "$git_safety_addon" ] && [ -f "$git_safety_addon" ]; then
+        echo "" >> "$target_claude.tmp"
+        cat "$git_safety_addon" >> "$target_claude.tmp"
+        print_msg "$CYAN" "  ✓ Added git safety documentation"
     fi
     
     # Move the final file to target location
@@ -785,6 +799,60 @@ create_env_interactive() {
     echo ""
 }
 
+# Setup git safety features (hooks and scripts)
+setup_git_safety() {
+    local config_file="$TARGET_DIR/.claude/config.json"
+    
+    # Check if git safety is enabled in configuration
+    if [ ! -f "$config_file" ] || ! command -v jq >/dev/null 2>&1; then
+        return
+    fi
+    
+    local git_safety=$(jq -r '.features.git_safety_hooks // false' "$config_file")
+    
+    if [ "$git_safety" != "true" ]; then
+        return
+    fi
+    
+    print_step "Setting up git safety features..."
+    
+    # Create scripts directory if it doesn't exist
+    if [ ! -d "$TARGET_DIR/scripts" ]; then
+        mkdir -p "$TARGET_DIR/scripts"
+    fi
+    
+    # Copy safe-commit script
+    if [ -f "$PACKAGE_DIR/.claude/scripts-templates/safe-commit.sh" ]; then
+        cp "$PACKAGE_DIR/.claude/scripts-templates/safe-commit.sh" "$TARGET_DIR/scripts/safe-commit.sh"
+        chmod +x "$TARGET_DIR/scripts/safe-commit.sh"
+        print_msg "$CYAN" "  ✓ Installed safe-commit script"
+    fi
+    
+    # Offer to install git hooks
+    echo ""
+    if confirm "Would you like to install git hooks for automated commit/push validation?"; then
+        # Install pre-commit hook
+        if [ -f "$PACKAGE_DIR/.claude/hooks-templates/pre-commit" ]; then
+            cp "$PACKAGE_DIR/.claude/hooks-templates/pre-commit" "$TARGET_DIR/.git/hooks/pre-commit"
+            chmod +x "$TARGET_DIR/.git/hooks/pre-commit"
+            print_msg "$CYAN" "  ✓ Installed pre-commit hook"
+        fi
+        
+        # Install pre-push hook
+        if [ -f "$PACKAGE_DIR/.claude/hooks-templates/pre-push" ]; then
+            cp "$PACKAGE_DIR/.claude/hooks-templates/pre-push" "$TARGET_DIR/.git/hooks/pre-push"
+            chmod +x "$TARGET_DIR/.git/hooks/pre-push"
+            print_msg "$CYAN" "  ✓ Installed pre-push hook"
+        fi
+        
+        print_success "Git hooks installed successfully!"
+        print_msg "$YELLOW" "  Note: You can bypass hooks with --no-verify flag in emergencies"
+    else
+        print_msg "$YELLOW" "  Skipped git hooks installation"
+        print_msg "$CYAN" "  You can manually copy hooks from .claude/hooks-templates/ later"
+    fi
+}
+
 # Main installation function
 main() {
     print_banner
@@ -867,6 +935,9 @@ main() {
     
     # Handle CLAUDE.md migration (for existing files)
     handle_claude_md "$source_dir"
+    
+    # Setup git safety features if enabled
+    setup_git_safety
     
     # Interactive .env setup
     echo ""

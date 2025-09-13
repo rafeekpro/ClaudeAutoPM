@@ -7,7 +7,9 @@
     "sync_with_ci": true,
     "kubernetes_devops_testing": false,
     "github_actions_k8s": false,
-    "integration_tests": false
+    "integration_tests": false,
+    "git_safety_hooks": true,
+    "ci_local_simulation": true
   },
   "docker": {
     "enabled": true,
