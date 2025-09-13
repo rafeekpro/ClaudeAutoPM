@@ -188,3 +188,44 @@ Key principles:
 - IMPLEMENT TEST FOR EVERY FUNCTION (see `.claude/rules/tdd-enforcement.md`)
 - NO CHEATER TESTS (tests must be meaningful)
 - Follow all rules defined in `.claude/rules/` without exception
+
+## 📋 Quick Reference Checklists
+
+### Before Committing
+
+```bash
+# Minimum Definition of Done
+✓ Tests written and passing (TDD - see .claude/rules/tdd-enforcement.md)
+✓ Code formatted (black, prettier, eslint)
+✓ No partial implementations
+✓ No code duplication
+✓ Error handling implemented
+✓ Security considered
+
+# Run these checks
+npm test          # or pytest
+npm run lint      # or ruff check
+npm run build     # Ensure production build works
+```
+
+### Before Creating PR
+
+```bash
+✓ Branch up to date with main
+✓ All tests passing
+✓ CI/CD pipeline green
+✓ Documentation updated
+✓ Breaking changes noted
+```
+
+### Code Quality Checklist
+
+```bash
+✓ Functions are single-purpose
+✓ Variable names are descriptive
+✓ No hardcoded values
+✓ No debugging code left
+✓ Comments explain "why" not "what"
+```
+
+For detailed checklists, see `.claude/checklists/`
