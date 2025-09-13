@@ -32,7 +32,13 @@
     "lint:fix": "markdownlint --fix *.md .claude/**/*.md install/*.md",
     "format": "prettier --write *.md .claude/**/*.md install/*.md",
     "validate": "npm run lint && npm run test",
-    "prepublishOnly": "echo 'Skipping validation for first publish'"
+    "prepublishOnly": "echo 'Skipping validation for first publish'",
+    "pm:maintain": "node scripts/self-maintenance.js all",
+    "pm:validate": "node scripts/self-maintenance.js validate",
+    "pm:test": "node scripts/self-maintenance.js test",
+    "pm:metrics": "node scripts/self-maintenance.js metrics",
+    "pm:optimize": "node scripts/self-maintenance.js optimize",
+    "pm:health": "node scripts/self-maintenance.js health"
   },
   "keywords": [
     "ai",
