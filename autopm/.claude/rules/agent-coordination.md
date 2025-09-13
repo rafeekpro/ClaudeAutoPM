@@ -1,19 +1,45 @@
-# Agent Coordination
+# Agent Coordination Rules
 
-Rules for multiple agents working in parallel within the same epic worktree.
+Comprehensive coordination system for multi-agent collaboration in ClaudeAutoPM.
 
-## Parallel Execution Principles
+## Core Principles
 
 1. **File-level parallelism** - Agents working on different files never conflict
 2. **Explicit coordination** - When same file needed, coordinate explicitly
 3. **Fail fast** - Surface conflicts immediately, don't try to be clever
-4. **Human resolution** - Conflicts are resolved by humans, not agents
+4. **Human resolution** - Critical conflicts are resolved by humans, not agents
+5. **Context efficiency** - Share context pools to reduce duplication
+6. **Parameter-based specialization** - Use parameters to specify framework/tool choices
+
+## Agent Specialization Matrix
+
+### Consolidated Agents (Optimized Ecosystem)
+
+| Agent | Primary Domain | Can Modify | Coordinates With | Parameters |
+|-------|---------------|------------|------------------|------------|
+| python-backend-expert | Backend APIs | `*.py`, `requirements.txt`, `pyproject.toml` | react-ui-expert, kubernetes, cloud architects | framework: fastapi/flask/django |
+| react-ui-expert | Frontend UI | `*.tsx`, `*.jsx`, `*.css`, `package.json` | python-backend, e2e-test | framework: mui/chakra/antd/bootstrap |
+| e2e-test-engineer | E2E Tests | `tests/`, `*.spec.ts`, `playwright.config.ts` | react-ui, python-backend | tool: playwright/cypress |
+| multi-cloud-architect | Cloud Infrastructure | `terraform/`, `*.tf`, cloud configs | kubernetes, docker | provider: aws/azure/gcp |
+| kubernetes-orchestrator | K8s Manifests | `k8s/`, `charts/`, `*.yaml` | cloud architects, github-ops | tool: helm/kustomize |
+| docker-containerization-expert | Containers | `Dockerfile*`, `docker-compose*.yml` | All deployment agents | strategy: multi-stage/compose |
+| database-architect | Database | `migrations/`, `*.sql`, schema files | python-backend | engine: postgresql/mysql/mongodb |
+| github-operations-specialist | CI/CD | `.github/`, `*.yml`, `*.yaml` | All agents | platform: actions/azure-devops |
+| mcp-context-manager | Context | `.claude/mcp-servers.json`, context pools | All agents | pool: shared/isolated |
+
+### Specialized Agents (When Needed)
+
+| Agent | Use Case | Replaces |
+|-------|----------|----------|
+| azure-devops-specialist | Azure DevOps specific | Part of github-operations |
+| playwright-mcp-frontend-tester | MCP browser control | Enhanced e2e-test |
+| code-analyzer | Read-only analysis | Support role |
+| file-analyzer | Log/file summarization | Support role |
+| test-runner | Test execution only | Support role |
 
 ## Inter-Agent Communication Protocol
 
 ### Message Format
-
-Agents communicate through structured status updates:
 
 ```markdown
 📡 AGENT STATUS UPDATE
@@ -24,300 +50,498 @@ Status: [Starting/Working/Blocked/Complete]
 Files: [list of files being modified]
 Dependencies: [files/components needed from other agents]
 ETA: [estimated completion time]
+Context-Pool: [shared context pool name]
+Parameters: [framework/tool selections]
 ```
 
 ### Coordination Signals
 
 **CLAIM** - Agent claims ownership of files:
-
 ```markdown
 🔒 FILE CLAIM
-Agent: python-backend-engineer
+Agent: python-backend-expert
 Files: [src/api/users.py, src/models/user.py]
 Duration: ~15 minutes
+Parameters: framework=fastapi, database=postgresql
 ```
 
 **RELEASE** - Agent releases files after completion:
-
 ```markdown
-🔓 FILE RELEASE  
-Agent: python-backend-engineer
+🔓 FILE RELEASE
+Agent: python-backend-expert
 Files: [src/api/users.py, src/models/user.py]
 Status: Changes committed
+Next: react-ui-expert can consume API
+Contract: OpenAPI spec at /docs/api.yaml
 ```
 
 **BLOCK** - Agent is blocked and needs assistance:
-
 ```markdown
 ⛔ BLOCKED
-Agent: react-frontend-engineer
-Waiting For: API endpoints from python-backend-engineer
+Agent: react-ui-expert
+Waiting For: API endpoints from python-backend-expert
 Files Needed: [src/api/users.py - getUserProfile method]
+Parameters: framework=mui, typescript=strict
 ```
 
 ### Handoff Protocol
 
-When agents need to hand off work:
-
-1. **Completion Signal**:
-
 ```markdown
 ✅ HANDOFF READY
-From: python-backend-engineer
-To: test-runner
+From: python-backend-expert
+To: e2e-test-engineer
 Deliverable: User API implementation
 Files: [src/api/users.py, src/models/user.py]
 Tests Required: Unit and integration tests
-Notes: Added new authentication middleware
+Parameters Used: framework=fastapi, auth=jwt
+Notes: Added rate limiting middleware
 ```
 
-2. **Acknowledgment**:
+## MCP Context Pool Architecture
 
-```markdown
-👍 HANDOFF ACKNOWLEDGED
-Agent: test-runner
-Received: User API implementation
-Starting: Test suite development
-ETA: 20 minutes
+### Optimized Pool Definitions
+
+```yaml
+backend-context:
+  agents: [python-backend-expert, database-architect]
+  sources: [context7-docs, context7-codebase]
+  filters: [python, fastapi, flask, django, sqlalchemy, databases]
+  persistence: true
+
+frontend-context:
+  agents: [react-ui-expert, e2e-test-engineer]
+  sources: [context7-docs, context7-codebase]
+  filters: [react, typescript, ui-frameworks, testing]
+  persistence: true
+
+infrastructure-context:
+  agents: [multi-cloud-architect, kubernetes-orchestrator, docker-containerization-expert]
+  sources: [context7-docs, terraform-registry]
+  filters: [terraform, kubernetes, docker, cloud-providers]
+  persistence: true
+
+devops-context:
+  agents: [github-operations-specialist, mcp-context-manager]
+  sources: [context7-docs, github-mcp]
+  filters: [ci-cd, github-actions, azure-devops]
+  persistence: false
+
+project-context:
+  agents: [ALL]
+  sources: [context7-codebase]
+  persistence: true
+  shared: true
+  auto-refresh: true
 ```
 
-## Work Stream Assignment
+## Work Stream Management
 
-Each agent is assigned a work stream from the issue analysis:
+### Stream Assignment
 
 ```yaml
 # From {issue}-analysis.md
-Stream A: Database Layer
-  Files: src/db/*, migrations/*
-  Agent: backend-specialist
+Stream A: Backend Development
+  Agent: python-backend-expert
+  Parameters:
+    framework: fastapi
+    database: postgresql
+    auth: jwt
+  Files: src/api/*, src/models/*, src/db/*
+  Priority: P1
 
-Stream B: API Layer
-  Files: src/api/*
-  Agent: api-specialist
+Stream B: Frontend Development
+  Agent: react-ui-expert
+  Parameters:
+    framework: mui
+    state: redux
+    style: css-in-js
+  Files: src/components/*, src/pages/*, src/hooks/*
+  Priority: P1
+
+Stream C: Infrastructure
+  Agent: multi-cloud-architect
+  Parameters:
+    provider: aws
+    iac: terraform
+    region: us-east-1
+  Files: terraform/*, infrastructure/*
+  Priority: P2
+
+Stream D: Testing
+  Agent: e2e-test-engineer
+  Parameters:
+    tool: playwright
+    parallel: true
+  Files: tests/*, *.spec.ts
+  Priority: P2
 ```
 
-Agents should only modify files in their assigned patterns.
+### Progress Tracking
+
+```markdown
+# .claude/epics/{epic}/updates/{issue}/stream-{id}.md
+---
+stream: Backend Development
+agent: python-backend-expert
+started: 2024-01-15T10:00:00Z
+status: in_progress
+parameters:
+  framework: fastapi
+  database: postgresql
+---
+
+## Completed
+- ✅ User model created
+- ✅ Authentication endpoints
+- ✅ Database migrations
+
+## In Progress
+- 🔄 Authorization middleware
+- 🔄 Rate limiting
+
+## Blocked
+- ⛔ Waiting for API Gateway config from infrastructure
+
+## Next Steps
+- Unit tests for auth flow
+- Integration with frontend
+```
+
+## Technology Stack Coordination
+
+### Frontend ↔ Backend
+
+- **API Contract**: OpenAPI/Swagger specs in `/docs/api.yaml`
+- **Type Generation**: Backend generates TypeScript types via `openapi-typescript`
+- **Testing**: E2E tests validate full stack integration
+- **Error Handling**: Consistent error format across stack
+- **Data Validation**: Shared schemas via JSON Schema
+
+### Application ↔ Infrastructure
+
+- **Deployment**: Docker images → Kubernetes manifests → Cloud providers
+- **Secrets**: Cloud KMS → K8s Secrets → Application env vars
+- **Networking**: Infrastructure provides endpoints → Apps configure clients
+- **Scaling**: Apps define requirements → Infrastructure implements policies
+- **Monitoring**: Apps expose metrics → Infrastructure collects and alerts
+
+### Development ↔ Operations
+
+- **CI/CD**: GitHub Actions validates → Builds → Deploys
+- **GitOps**: ArgoCD syncs validated changes automatically
+- **Rollbacks**: Git reverts trigger automatic deployments
+- **Feature Flags**: LaunchDarkly/ConfigCat for progressive rollouts
+- **Observability**: OpenTelemetry spans across all services
+
+## Workflow Patterns
+
+### Full Stack Feature Development
+
+```mermaid
+graph LR
+  A[python-backend-expert] -->|API Contract| B[react-ui-expert]
+  B -->|UI Ready| C[e2e-test-engineer]
+  C -->|Tests Pass| D[github-operations-specialist]
+  D -->|CI/CD Ready| E[kubernetes-orchestrator]
+  E -->|Deployment Config| F[multi-cloud-architect]
+  F -->|Infrastructure| G[Production]
+```
+
+### Hotfix Deployment
+
+```mermaid
+graph LR
+  A[code-analyzer] -->|Bug Identified| B[python-backend-expert]
+  B -->|Fix Applied| C[test-runner]
+  C -->|Tests Pass| D[github-operations-specialist]
+  D -->|Fast Track| E[Production]
+```
+
+### Infrastructure Migration
+
+```mermaid
+graph LR
+  A[multi-cloud-architect] -->|New Infrastructure| B[docker-containerization-expert]
+  B -->|Updated Images| C[kubernetes-orchestrator]
+  C -->|Manifests Ready| D[github-operations-specialist]
+  D -->|Blue-Green Deploy| E[Production]
+```
 
 ## File Access Coordination
 
 ### Check Before Modify
 
-Before modifying a shared file:
-
 ```bash
-# Check if file is being modified
+# Before modifying a shared file
 git status {file}
 
-# If modified by another agent, wait
+# If modified by another agent, coordinate
 if [[ $(git status --porcelain {file}) ]]; then
-  echo "Waiting for {file} to be available..."
-  sleep 30
-  # Retry
+  echo "📋 File {file} is being modified by another agent"
+  echo "⏳ Waiting for release signal..."
+  # Check update files for release signal
 fi
 ```
 
 ### Atomic Commits
 
-Make commits atomic and focused:
-
 ```bash
-# Good - Single purpose commit
-git add src/api/users.ts src/api/users.test.ts
-git commit -m "Issue #1234: Add user CRUD endpoints"
+# Good - Single purpose, clear scope
+git add src/api/users.py src/api/users.test.py
+git commit -m "feat(api): Add user CRUD endpoints with JWT auth
 
-# Bad - Mixed concerns
+Agent: python-backend-expert
+Parameters: framework=fastapi, auth=jwt
+Next: react-ui-expert
+Tests: All passing"
+
+# Bad - Mixed concerns, unclear scope
 git add src/api/* src/db/* src/ui/*
-git commit -m "Issue #1234: Multiple changes"
+git commit -m "Multiple changes"
 ```
 
-## Communication Between Agents
+## Conflict Resolution Protocol
 
-### Through Commits
+### Level 1: Automatic Resolution
+- Different files modified by different agents
+- No semantic conflicts detected
+- All tests pass without modification
+- **Action**: Git auto-merge proceeds
 
-Agents see each other's work through commits:
+### Level 2: Agent Coordination
+- Same file, different sections modified
+- Agents negotiate changes via update files
+- Test validation required after merge
+- **Action**: Agents coordinate sequentially
 
-```bash
-# Agent checks what others have done
-git log --oneline -10
+### Level 3: Human Intervention Required
+- Conflicting business logic changes
+- Architecture decisions needed
+- Security implications detected
+- Database schema conflicts
+- **Action**: Stop work, escalate to human
 
-# Agent pulls latest changes
-git pull origin epic/{name}
-```
+## Priority Matrix
 
-### Through Progress Files
+| Scenario | Priority | Lead Agent | Support Agents | SLA |
+|----------|----------|------------|----------------|-----|
+| Production Down | P0 | kubernetes-orchestrator | multi-cloud, python-backend | 15 min |
+| Security Vulnerability | P0 | code-analyzer | python-backend, github-ops | 30 min |
+| Data Loss Risk | P0 | database-architect | multi-cloud, kubernetes | 15 min |
+| Failed Deployment | P1 | github-operations-specialist | kubernetes-orchestrator | 1 hour |
+| Performance Degradation | P1 | python-backend-expert | database-architect, multi-cloud | 2 hours |
+| Test Failures | P2 | e2e-test-engineer | react-ui, python-backend | 4 hours |
+| Feature Development | P3 | Varies by stream | Full stack team | 1-5 days |
+| Technical Debt | P4 | code-analyzer | All relevant agents | Best effort |
 
-Each stream maintains progress:
+## Coordination Boundaries
 
-```markdown
-# .claude/epics/{epic}/updates/{issue}/stream-A.md
----
-stream: Database Layer
-agent: backend-specialist
-started: {datetime}
-status: in_progress
----
+### Never Modify Without Coordination
 
-## Completed
-- Created user table schema
-- Added migration files
+- **Production configurations** - Requires multi-cloud-architect + kubernetes-orchestrator
+- **Security settings** - Requires security review + python-backend-expert
+- **API contracts** - Requires python-backend + react-ui agreement
+- **Database schemas** - Requires database-architect + python-backend
+- **Authentication flows** - Requires security review + full stack team
+- **Payment processing** - Requires security + compliance review
+- **User data handling** - Requires privacy review + database-architect
 
-## Working On
-- Adding indexes
+### Safe for Independent Work
 
-## Blocked
-- None
-```
-
-### Through Analysis Files
-
-The analysis file is the contract:
-
-```yaml
-# Agents read this to understand boundaries
-Stream A:
-  Files: src/db/*  # Agent A only touches these
-Stream B:
-  Files: src/api/* # Agent B only touches these
-```
-
-## Handling Conflicts
-
-### Conflict Detection
-
-```bash
-# If commit fails due to conflict
-git commit -m "Issue #1234: Update"
-# Error: conflicts exist
-
-# Agent should report and wait
-echo "❌ Conflict detected in {files}"
-echo "Human intervention needed"
-```
-
-### Conflict Resolution
-
-Always defer to humans:
-
-1. Agent detects conflict
-2. Agent reports issue
-3. Agent pauses work
-4. Human resolves
-5. Agent continues
-
-Never attempt automatic merge resolution.
+- Documentation updates (own domain)
+- Test additions (own test suite)
+- Logging improvements (non-breaking)
+- Code comments and docstrings
+- Development tool configurations
+- Local environment settings
+- README updates
 
 ## Synchronization Points
 
-### Natural Sync Points
+### Mandatory Sync Points
 
-- After each commit
-- Before starting new file
-- When switching work streams
-- Every 30 minutes of work
+1. **After each commit** - Pull latest changes
+2. **Before modifying shared files** - Check ownership
+3. **Every 30 minutes of work** - Status update
+4. **At natural breakpoints** - Feature complete, blocked, etc.
+5. **Before handoff** - Ensure clean state
 
-### Explicit Sync
+### Sync Commands
 
 ```bash
-# Pull latest changes
+# Standard sync
 git pull --rebase origin epic/{name}
 
-# If conflicts, stop and report
+# Check for conflicts
 if [[ $? -ne 0 ]]; then
-  echo "❌ Sync failed - human help needed"
+  echo "❌ Sync conflict detected"
+  echo "📝 Creating conflict report..."
+  git status > conflict-report.txt
+  echo "🚨 Escalating to human..."
   exit 1
 fi
-```
 
-## Agent Communication Protocol
-
-### Status Updates
-
-Agents should update their status regularly:
-
-```bash
-# Update progress file every significant step
-echo "✅ Completed: Database schema" >> stream-A.md
-git add stream-A.md
-git commit -m "Progress: Stream A - schema complete"
-```
-
-### Coordination Requests
-
-When agents need to coordinate:
-
-```markdown
-# In stream-A.md
-## Coordination Needed
-- Need to update src/types/index.ts
-- Will modify after Stream B commits
-- ETA: 10 minutes
-```
-
-## Parallel Commit Strategy
-
-### No Conflicts Possible
-
-When working on completely different files:
-
-```bash
-# These can happen simultaneously
-Agent-A: git commit -m "Issue #1234: Update database"
-Agent-B: git commit -m "Issue #1235: Update UI"
-Agent-C: git commit -m "Issue #1236: Add tests"
-```
-
-### Sequential When Needed
-
-When touching shared resources:
-
-```bash
-# Agent A commits first
-git add src/types/index.ts
-git commit -m "Issue #1234: Update type definitions"
-
-# Agent B waits, then proceeds
-# (After A's commit)
-git pull
-git add src/api/users.ts
-git commit -m "Issue #1235: Use new types"
+# Update progress
+echo "✅ Synced at $(date)" >> stream-{id}.md
+git add stream-{id}.md
+git commit -m "chore: Sync checkpoint"
 ```
 
 ## Best Practices
 
 1. **Commit early and often** - Smaller commits = fewer conflicts
 2. **Stay in your lane** - Only modify assigned files
-3. **Communicate changes** - Update progress files
-4. **Pull frequently** - Stay synchronized with other agents
-5. **Fail loudly** - Report issues immediately
-6. **Never force** - No `--force` flags ever
+3. **Use parameters explicitly** - Always specify framework/tool choices
+4. **Share context efficiently** - Use MCP pools to reduce duplication
+5. **Communicate proactively** - Update status before being blocked
+6. **Pull frequently** - Stay synchronized with other agents
+7. **Fail loudly** - Report issues immediately with full context
+8. **Document decisions** - Include reasoning in commits
+9. **Test continuously** - Never commit without running tests
+10. **Respect boundaries** - Stay within expertise domain
 
-## Common Patterns
+## Emergency Protocols
 
-### Starting Work
+### System Down
 
-```bash
-1. cd ../epic-{name}
-2. git pull
-3. Check {issue}-analysis.md for assignment
-4. Update stream-{X}.md with "started"
-5. Begin work on assigned files
+1. **kubernetes-orchestrator** takes incident command
+2. **multi-cloud-architect** checks infrastructure health
+3. **python-backend-expert** validates application state
+4. **database-architect** verifies data integrity
+5. **github-operations-specialist** prepares rollback if needed
+
+### Security Breach
+
+1. **code-analyzer** identifies scope and entry point
+2. **multi-cloud-architect** isolates affected resources
+3. **python-backend-expert** patches vulnerability
+4. **database-architect** audits data access
+5. **github-operations-specialist** deploys emergency fix
+
+### Performance Crisis
+
+1. **python-backend-expert** profiles application bottlenecks
+2. **database-architect** analyzes and optimizes queries
+3. **docker-containerization-expert** optimizes container resources
+4. **kubernetes-orchestrator** scales resources horizontally
+5. **multi-cloud-architect** provisions additional infrastructure
+
+### Data Corruption
+
+1. **database-architect** stops writes immediately
+2. **multi-cloud-architect** initiates backup restoration
+3. **kubernetes-orchestrator** redirects traffic to healthy replicas
+4. **python-backend-expert** validates data integrity checks
+5. **e2e-test-engineer** runs full regression suite
+
+## Migration Guide
+
+### From Legacy to Consolidated Agents
+
+| Legacy Agent | New Agent | Parameters |
+|--------------|-----------|------------|
+| fastapi-backend-engineer | python-backend-expert | framework: fastapi |
+| flask-backend-engineer | python-backend-expert | framework: flask |
+| mui-react-expert | react-ui-expert | framework: mui |
+| chakra-ui-expert | react-ui-expert | framework: chakra |
+| docker-expert | docker-containerization-expert | focus: dockerfile |
+| docker-compose-expert | docker-containerization-expert | focus: compose |
+| aws-cloud-architect | multi-cloud-architect | provider: aws |
+| gcp-cloud-architect | multi-cloud-architect | provider: gcp |
+| playwright-test-engineer | e2e-test-engineer | tool: playwright |
+
+### Backward Compatibility
+
+- Legacy agent names automatically map to new agents
+- Parameters inferred from legacy agent names
+- Deprecation warnings shown in logs
+- 30-day grace period for migration
+
+## Performance Optimizations
+
+### Context Reduction Strategies
+
+- **Unified agents** reduce context overhead by 40%
+- **Shared pools** eliminate duplication across agents
+- **Parameter-based specialization** vs separate agents
+- **Lazy loading** of documentation contexts
+- **Smart caching** of frequently accessed resources
+
+### Decision Optimization
+
+- **Fewer agents** = faster agent selection
+- **Clear parameter guidelines** reduce ambiguity
+- **Decision matrices** for common scenarios
+- **Pre-configured workflows** for standard tasks
+
+### Maintenance Benefits
+
+- **Single source of truth** per technical domain
+- **Unified best practices** across similar agents
+- **Simplified updates** to agent capabilities
+- **Consistent behavior** across frameworks
+- **Reduced training overhead** for new patterns
+
+## Monitoring and Metrics
+
+### Agent Performance Metrics
+
+```yaml
+metrics:
+  response_time: < 5 seconds
+  context_usage: < 70% of limit
+  success_rate: > 95%
+  conflict_rate: < 5%
+  handoff_success: > 98%
 ```
 
-### During Work
+### Coordination Health Checks
 
 ```bash
-1. Make changes to assigned files
-2. Commit with clear message
-3. Update progress file
-4. Check for new commits from others
-5. Continue or coordinate as needed
+# Check coordination health
+./scripts/check-coordination-health.sh
+
+# Output:
+# ✅ No file conflicts detected
+# ✅ All agents responsive
+# ✅ Context pools synchronized
+# ⚠️ 2 agents approaching context limit
+# ✅ No blocked agents
 ```
 
-### Completing Work
+## Appendix: Quick Reference
+
+### Common Commands
 
 ```bash
-1. Final commit for stream
-2. Update stream-{X}.md with "completed"
-3. Check if other streams need help
-4. Report completion
+# Claim files
+echo "🔒 Claiming files: $FILES" >> updates/stream-$ID.md
+
+# Release files
+echo "🔓 Releasing files: $FILES" >> updates/stream-$ID.md
+
+# Check ownership
+git blame -L1,1 $FILE | awk '{print $2}'
+
+# Sync safely
+git stash && git pull --rebase && git stash pop
+
+# Report blockage
+echo "⛔ BLOCKED: $REASON" >> updates/stream-$ID.md
 ```
+
+### Decision Trees
+
+```mermaid
+graph TD
+  A[Need to modify file] --> B{Is file claimed?}
+  B -->|Yes| C[Wait for release]
+  B -->|No| D[Claim file]
+  D --> E[Make changes]
+  E --> F[Run tests]
+  F --> G{Tests pass?}
+  G -->|Yes| H[Commit & Release]
+  G -->|No| I[Fix or escalate]
+```
+
+This unified coordination system provides clear boundaries, efficient communication protocols, and robust conflict resolution while maintaining the flexibility needed for complex multi-agent collaboration.
