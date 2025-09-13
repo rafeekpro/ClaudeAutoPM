@@ -33,11 +33,11 @@ INSTALL_ITEMS=(
     ".claude/commands"
     ".claude/rules"
     ".claude/scripts"
+    ".claude/checklists"
     ".claude/.env.example"
     ".claude-code"
     "scripts"
     "PLAYBOOK.md"
-    "COMMIT_CHECKLIST.md"
     "LICENSE"
 )
 
@@ -143,51 +143,9 @@ create_missing_file() {
     local item="$1"
     local target_path="$2"
     
-    case "$item" in
-        "COMMIT_CHECKLIST.md")
-            print_step "Creating: $item (from template)"
-            mkdir -p "$(dirname "$target_path")"
-            cat > "$target_path" << 'EOF'
-# Commit Checklist
-
-## Before Committing
-
-- [ ] Tests written and passing
-- [ ] Code follows style guide
-- [ ] Documentation updated
-- [ ] No hardcoded values
-- [ ] Error handling implemented
-- [ ] Security considerations addressed
-- [ ] Performance acceptable
-
-## Code Quality
-
-- [ ] No code duplication
-- [ ] Functions are single-purpose
-- [ ] Variable names are descriptive
-- [ ] Comments explain "why", not "what"
-- [ ] No debugging code left behind
-
-## Testing
-
-- [ ] Unit tests cover new functionality
-- [ ] Integration tests updated if needed
-- [ ] Manual testing completed
-- [ ] Edge cases considered
-
-## Documentation
-
-- [ ] README updated if needed
-- [ ] API documentation current
-- [ ] Changelog entry added
-- [ ] Breaking changes documented
-EOF
-            print_success "Created: $item (from template)"
-            ;;
-        *)
-            print_warning "Cannot create template for: $item - file missing from source"
-            ;;
-    esac
+    # Since we moved COMMIT_CHECKLIST to .claude/checklists/, 
+    # we don't need to create it from template anymore
+    print_warning "Cannot create template for: $item - file missing from source"
 }
 
 # List detailed changes for directories/files
