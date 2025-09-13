@@ -85,6 +85,9 @@ const executeBashScript = (scriptPath, args = [], options = {}) => {
   if (options.noBackup) {
     env.AUTOPM_NO_BACKUP = '1';
   }
+  if (options.cicd) {
+    env.AUTOPM_CICD_SYSTEM = options.cicd;
+  }
 
   try {
     const result = spawn(command, scriptArgs, {
@@ -156,6 +159,7 @@ const showHelp = () => {
   log('INSTALL OPTIONS:', 'yellow');
   log('  --yes, -y          Auto-accept all prompts (non-interactive mode)');
   log('  --config, -c       Preset configuration: minimal|docker|devops|performance');
+  log('  --cicd             CI/CD system: github-actions|azure-devops|gitlab-ci|jenkins|none');
   log('  --no-env           Skip .env setup');
   log('  --no-hooks         Skip git hooks installation');
   log('');
@@ -164,6 +168,8 @@ const showHelp = () => {
   log('  autopm install ~/my-project       # Install to specific directory');
   log('  autopm install --yes -c devops    # Non-interactive DevOps setup');
   log('  autopm install -y --config minimal --no-env  # Minimal, skip .env');
+  log('  autopm install --yes --cicd github-actions  # Use GitHub Actions for CI/CD');
+  log('  autopm install -y -c docker --cicd none  # Docker-only, no CI/CD');
   log('  autopm update                     # Update existing installation');
   log('  autopm merge                      # Generate CLAUDE.md merge prompt');
   log('  autopm setup-env                  # Configure .env in current directory');
@@ -288,6 +294,12 @@ const parseArgs = (args) => {
         case '--no-hooks':
           // Skip git hooks installation
           parsed.options.skipHooks = true;
+          break;
+        case '--cicd':
+          // CI/CD system choice
+          if (i + 1 < args.length) {
+            parsed.options.cicd = args[++i];
+          }
           break;
         default:
           warning(`Unknown option: ${arg}`);

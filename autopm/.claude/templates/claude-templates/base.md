@@ -86,22 +86,7 @@ Use for coordinating multiple work streams in parallel.
 
 <!-- AGENT_SELECTION_SECTION -->
 
-## Azure DevOps Integration
-
-### Complete Azure DevOps command suite for enterprise project management
-
-The system includes full Azure DevOps integration with 38+ commands mapped from PM system:
-
-#### Quick Start
-```bash
-# Initialize Azure DevOps
-/azure:init
-
-# Daily workflow
-/azure:standup              # Morning standup
-/azure:next-task            # Get AI-recommended task
-/azure:sprint-status        # Sprint dashboard
-```
+<!-- CICD_SECTION -->
 
 ## TDD PIPELINE FOR ALL IMPLEMENTATIONS
 
