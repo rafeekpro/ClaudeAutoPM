@@ -4,6 +4,17 @@ This project uses a hybrid strategy: Docker for local development, Kubernetes fo
 
 ### 🎯 HYBRID STRATEGY
 
+#### Why Hybrid?
+**The Problem**: 
+- ✅ Docker works perfectly for local development
+- ❌ CI/CD runners use containerd (no Docker daemon)
+- ❌ `docker build` and `docker run` fail in Kubernetes runners
+
+**The Solution**:
+- 🏠 **Local**: Pure Docker (unchanged for developers)
+- ☸️ **CI/CD**: Kubernetes-native using Kaniko for builds
+- 🐳 **Shared**: Dockerfiles remain source of truth
+
 #### Local Development: Docker-First
 - All local development happens in Docker containers
 - Use `docker compose` for service orchestration
@@ -11,6 +22,7 @@ This project uses a hybrid strategy: Docker for local development, Kubernetes fo
 
 #### CI/CD & Production: Kubernetes-Native
 - GitHub Actions automatically test in KIND clusters
+- Kaniko builds images without Docker daemon
 - Helm charts for production deployments
 - Multi-environment support (dev/staging/prod)
 
@@ -37,7 +49,30 @@ Automated via GitHub Actions:
    - Tests deployment manifests
    - Validates Helm charts
 
-2. **Integration Tests**
+2. **Building Images with Kaniko**
+   ```yaml
+   # In GitHub Actions (no Docker daemon)
+   - name: Build with Kaniko
+     run: |
+       kubectl apply -f - <<EOF
+       apiVersion: batch/v1
+       kind: Job
+       metadata:
+         name: kaniko-build
+       spec:
+         template:
+           spec:
+             containers:
+             - name: kaniko
+               image: gcr.io/kaniko-project/executor:latest
+               args:
+                 - "--dockerfile=Dockerfile"
+                 - "--context=git://github.com/user/repo"
+                 - "--destination=registry/image:tag"
+       EOF
+   ```
+
+3. **Integration Tests**
    ```yaml
    # Runs automatically on push
    - Tests in real K8s environment
@@ -45,7 +80,7 @@ Automated via GitHub Actions:
    - Security scanning with Trivy
    ```
 
-3. **Production Deployment**
+4. **Production Deployment**
    ```bash
    # Helm deployment (automated)
    helm upgrade --install app ./charts/app
