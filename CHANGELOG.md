@@ -5,6 +5,43 @@ All notable changes to the ClaudeAutoPM framework will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-09-13
+
+### Added
+
+- 📡 **MCP Server Management System** - Complete system for managing Model Context Protocol servers
+  - New `autopm mcp` CLI commands (list, add, enable, disable, sync, validate, info)
+  - Server definitions in Markdown with YAML frontmatter
+  - Automatic generation of `.claude/mcp-servers.json`
+  - 6 pre-configured servers (context7, playwright, github, filesystem, sqlite)
+  - New `@mcp-manager` agent for server lifecycle management
+  - Comprehensive MCP Management Guide documentation
+
+- 🤖 **Self-Maintenance System** - Framework now uses its own capabilities for maintenance
+  - PM commands for project maintenance (validate, optimize, health, release)
+  - Framework agents used for self-maintenance
+  - Agent configuration verification tools
+  - Self-maintenance documentation and guides
+
+- 🔧 **Agent Ecosystem Optimization (Phase 1)**
+  - Consolidated UI frameworks into `react-ui-expert`
+  - Consolidated Python backends into `python-backend-expert`
+  - Consolidated Docker agents into `docker-containerization-expert`
+  - Consolidated E2E testing into `e2e-test-engineer`
+  - Reduced agent count from 50+ to ~35 (30% reduction)
+
+### Changed
+
+- 📚 Updated README with MCP management section
+- 🔄 Enhanced installer to copy MCP directory
+- 📦 Added `js-yaml` dependency for YAML parsing
+- 🎯 Improved agent registry with new consolidated agents
+
+### Fixed
+
+- 🐛 DevOps workflow inconsistency (hybrid workflow support)
+- 📝 Agent registry validation issues
+
 ## [1.0.2] - 2024-01-13
 
 ### Added
