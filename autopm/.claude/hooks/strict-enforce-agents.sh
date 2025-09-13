@@ -1,16 +1,16 @@
 #!/bin/bash
 
-# STRICT MODE: Blokuje WSZYSTKIE bezpośrednie operacje oprócz Task tool
+# STRICT MODE: Blocks ALL direct operations except Task tool
 
 TOOL_NAME="$1"
 
-# Lista dozwolonych narzędzi gdy nie używamy agentów
+# List of allowed tools when not using agents
 ALLOWED_TOOLS="Task|TodoWrite|ExitPlanMode|WebFetch|WebSearch"
 
-# Jeśli narzędzie nie jest na liście dozwolonych
+# If tool is not on allowed list
 if ! echo "$TOOL_NAME" | grep -qE "^($ALLOWED_TOOLS)$"; then
     
-    # Mapowanie narzędzi na agenty
+    # Tool to agent mapping
     case "$TOOL_NAME" in
         "Bash")
             echo "❌ BLOCKED: Direct bash execution"
