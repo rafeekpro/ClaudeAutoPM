@@ -101,6 +101,59 @@ file_changed() {
 }
 
 # Generate merge prompt for CLAUDE.md
+generate_merge_prompt() {
+    local existing_claude="$1"
+    local new_basic="$2"
+    local output_file="${3:-}"
+    
+    local prompt="# Merge Instructions for CLAUDE.md
+
+You need to merge two CLAUDE.md files into one comprehensive configuration:
+
+## File 1: Existing CLAUDE.md (User's current configuration)
+\`\`\`markdown
+$(cat "$existing_claude")
+\`\`\`
+
+## File 2: New CLAUDE_BASIC.md (Updated framework defaults)
+\`\`\`markdown
+$(cat "$new_basic")
+\`\`\`
+
+## Merge Requirements:
+1. **Preserve all user customizations** from the existing CLAUDE.md
+2. **Add new sections** from CLAUDE_BASIC.md that don't exist in current CLAUDE.md
+3. **Update framework references** to the latest versions while keeping user rules
+4. **Maintain user's tone and behavior preferences**
+5. **Keep all custom rules and workflows** the user has added
+6. **Merge agent lists** - include both user's custom agents and new framework agents
+7. **Update documentation paths** if they've changed in the new version
+8. **Preserve any project-specific configurations**
+
+## Priority Order:
+1. User's custom rules and configurations (highest priority)
+2. New framework features and agents
+3. Updated documentation and paths
+4. Framework defaults (lowest priority)
+
+## Output Format:
+Please provide the merged CLAUDE.md that:
+- Combines both files intelligently
+- Preserves user intent and customizations
+- Includes new framework capabilities
+- Maintains consistency and readability
+- Documents any significant changes in comments
+
+Please output only the merged CLAUDE.md content without any additional explanation."
+
+    if [ -n "$output_file" ]; then
+        echo "$prompt" > "$output_file"
+        print_success "Merge prompt saved to: $output_file"
+    else
+        echo "$prompt"
+    fi
+}
+
 # Backup existing installation
 backup_existing() {
     local backup_dir="$TARGET_DIR/.autopm_backup_$(date +%Y%m%d_%H%M%S)"
