@@ -69,13 +69,10 @@
   "preferGlobal": true,
   "files": [
     "bin/",
-    ".claude/",
-    ".claude-code/",
+    "autopm/",
     ".github/",
     "scripts/",
     "install/",
-    "PLAYBOOK.md",
-    "COMMIT_CHECKLIST.md",
     "LICENSE",
     "README.md"
   ],

@@ -310,11 +310,7 @@ install_strategy() {
             ;;
     esac
 
-    # Create symlink for backward compatibility
-    if [ ! -f "$TARGET_DIR/.claude/HYBRID_STRATEGY.md" ]; then
-        ln -sf "strategies/ACTIVE_STRATEGY.md" "$TARGET_DIR/.claude/HYBRID_STRATEGY.md"
-        print_msg "$CYAN" "  ✓ Created strategy symlink for compatibility"
-    fi
+    # Strategy is now located directly in strategies/ folder
 }
 
 # Choose configuration template

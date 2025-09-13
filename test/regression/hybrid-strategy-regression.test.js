@@ -5,7 +5,7 @@ const path = require('path');
 const crypto = require('crypto');
 
 /**
- * Regression Test Suite for HYBRID_STRATEGY
+ * Regression Test Suite for ACTIVE_STRATEGY
  *
  * Purpose: Protect existing implementation from breaking changes
  * during future development. These tests ensure that core
@@ -16,7 +16,7 @@ class HybridStrategySnapshot {
   constructor() {
     this.snapshotDir = path.join(__dirname, '__snapshots__');
     this.criticalPaths = [
-      '.claude/HYBRID_STRATEGY.md',
+      '.claude/strategies/ACTIVE_STRATEGY.md',
       '.claude/orchestrator.md',
       '.claude/prompts/parallel-execution.md',
       '.claude/prompts/context-aggregation.md'
@@ -267,7 +267,7 @@ class BackwardCompatibilityChecker {
   }
 }
 
-describe('HYBRID_STRATEGY Regression Tests', () => {
+describe('ACTIVE_STRATEGY Regression Tests', () => {
   let snapshot;
   let validator;
   let compatChecker;
@@ -319,7 +319,7 @@ describe('HYBRID_STRATEGY Regression Tests', () => {
     it('should preserve context management patterns', async () => {
       const hybridStrategyPath = path.join(
         process.cwd(),
-        '.claude/HYBRID_STRATEGY.md'
+        '.claude/strategies/ACTIVE_STRATEGY.md'
       );
 
       const validation = await validator.validateContent(hybridStrategyPath);

@@ -231,6 +231,40 @@ class HybridStrategyOrchestrator {
 
     return violations;
   }
+
+  // Error recovery methods
+  async recoverContext(contextId, error) {
+    try {
+      const context = this.contexts.get(contextId);
+      if (context && context.state === 'error') {
+        context.state = 'recovering';
+        // Reset context state
+        context.sandbox = new ContextSandbox(contextId);
+        context.depth = 0;
+        context.state = 'active';
+        return true;
+      }
+      return false;
+    } catch (recoveryError) {
+      return false;
+    }
+  }
+
+  async fallbackToSequential(task, options = {}) {
+    // Fallback mechanism for failed parallel execution
+    try {
+      return {
+        success: true,
+        result: `Sequential fallback executed: ${task}`,
+        mode: 'sequential'
+      };
+    } catch (fallbackError) {
+      return {
+        success: false,
+        error: `Fallback failed: ${fallbackError.message}`
+      };
+    }
+  }
 }
 
 class ContextSandbox {

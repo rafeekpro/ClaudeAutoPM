@@ -1,4 +1,4 @@
-# SEQUENTIAL_STRATEGY - Safe Sequential Execution
+# ACTIVE_STRATEGY - Sequential Safe Execution
 
 ## Core Principles
 

@@ -1,10 +1,13 @@
 {
-  "timestamp": "2025-09-13T15:36:00.473Z",
+  "timestamp": "2025-09-13T16:00:29.436Z",
   "files": {
     "strategy": {
-      "exists": false,
-      "error": "ENOENT: no such file or directory, stat '/Users/rla/Projects/AUTOPM/autopm/.claude/strategies/ACTIVE_STRATEGY.md'",
-      "required": true
+      "exists": true,
+      "size": 4235,
+      "sizeValid": true,
+      "contentValid": true,
+      "missingPatterns": [],
+      "schemaValid": true
     },
     "claudeConfig": {
       "exists": true,
@@ -71,12 +74,12 @@
     "errorRecovery": {
       "feature": "Error recovery mechanisms",
       "testsExist": true,
-      "patternsFound": false,
+      "patternsFound": true,
       "details": [
         {
           "file": "test/security/integration.test.js",
           "exists": true,
-          "patternsFound": 0,
+          "patternsFound": 2,
           "totalPatterns": 3
         }
       ]
@@ -84,9 +87,9 @@
   },
   "summary": {
     "totalFiles": 4,
-    "validFiles": 2,
+    "validFiles": 3,
     "totalFeatures": 4,
-    "validFeatures": 3,
-    "health": 62.5
+    "validFeatures": 4,
+    "health": 87.5
   }
 }

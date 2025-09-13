@@ -1,4 +1,4 @@
-# ADAPTIVE_STRATEGY - Intelligent Context-Aware Execution
+# ACTIVE_STRATEGY - Adaptive Smart Execution
 
 ## Core Principles
 
