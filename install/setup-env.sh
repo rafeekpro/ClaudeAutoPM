@@ -44,13 +44,30 @@ print_error() {
     echo -e "${RED}✗${NC} $1"
 }
 
-# Ask for confirmation
+# Ask for confirmation with optional default
 confirm() {
     local prompt="$1"
+    local default="${2:-}"  # Default value (y or n)
     local response
-    
+    local prompt_suffix
+
+    # Set prompt suffix based on default
+    if [ "$default" = "y" ]; then
+        prompt_suffix="[Y/n]"
+    elif [ "$default" = "n" ]; then
+        prompt_suffix="[y/N]"
+    else
+        prompt_suffix="[y/n]"
+    fi
+
     while true; do
-        read -p "$(echo -e ${CYAN}❓ $prompt [y/n]: ${NC})" response
+        read -p "$(echo -e ${CYAN}❓ $prompt $prompt_suffix: ${NC})" response
+
+        # If empty response and default is set, use default
+        if [ -z "$response" ] && [ -n "$default" ]; then
+            response="$default"
+        fi
+
         case "$response" in
             [yY][eE][sS]|[yY]) return 0 ;;
             [nN][oO]|[nN]) return 1 ;;
@@ -228,7 +245,7 @@ setup_env() {
     if [ -f "$target_env" ]; then
         print_msg "$YELLOW" "📝 .env file already exists at: $target_env"
         
-        if ! confirm "Would you like to recreate it interactively?"; then
+        if ! confirm "Would you like to recreate it interactively?" "y"; then
             print_msg "$CYAN" "Setup cancelled. Existing .env file preserved."
             exit 0
         fi
@@ -241,6 +258,7 @@ setup_env() {
     print_msg "$BLUE$BOLD" "\n🔧 Interactive .env Configuration"
     print_msg "$CYAN" "Let's set up your environment configuration step by step."
     print_msg "$YELLOW" "⏭️  You can skip optional fields by pressing Enter."
+    print_msg "$YELLOW" "💡 For yes/no questions: [Y/n] means Yes is default, [y/N] means No is default"
     print_msg "$YELLOW" "🔒 All sensitive data will be stored securely in .env"
     echo ""
     
@@ -305,7 +323,7 @@ setup_env() {
     local playwright_browser
     playwright_browser=$(get_input "Browser for Playwright tests (chromium/firefox/webkit)" "chromium" "text" false)
     local playwright_headless
-    if confirm "Run Playwright in headless mode? (recommended for CI/CD)"; then
+    if confirm "Run Playwright in headless mode? (recommended for CI/CD)" "y"; then
         playwright_headless="true"
     else
         playwright_headless="false"
@@ -321,7 +339,7 @@ setup_env() {
     print_msg "$CYAN" "Enterprise project management with Azure DevOps integration."
     echo ""
     
-    if confirm "Would you like to configure Azure DevOps integration?"; then
+    if confirm "Would you like to configure Azure DevOps integration?" "n"; then
         print_msg "$CYAN" "Create PAT at: https://dev.azure.com/{organization}/_usersSettings/tokens"
         print_msg "$CYAN" "Required scopes: Work Items (read, write), Code (read), Build (read)"
         echo ""
@@ -353,10 +371,10 @@ setup_env() {
     print_msg "$CYAN" "Configure credentials for cloud infrastructure management."
     echo ""
     
-    if confirm "Would you like to configure cloud provider credentials?"; then
+    if confirm "Would you like to configure cloud provider credentials?" "n"; then
         
         # AWS
-        if confirm "Configure AWS credentials?"; then
+        if confirm "Configure AWS credentials?" "n"; then
             print_msg "$CYAN" "AWS credentials for infrastructure agents (aws-cloud-architect, etc.)"
             echo ""
             
@@ -375,7 +393,7 @@ setup_env() {
         fi
         
         # Azure Cloud
-        if confirm "Configure Azure Cloud credentials?"; then
+        if confirm "Configure Azure Cloud credentials?" "n"; then
             print_msg "$CYAN" "Azure credentials for infrastructure agents (azure-cloud-architect, etc.)"
             echo ""
             
@@ -397,7 +415,7 @@ setup_env() {
         fi
         
         # Google Cloud Platform
-        if confirm "Configure Google Cloud Platform credentials?"; then
+        if confirm "Configure Google Cloud Platform credentials?" "n"; then
             print_msg "$CYAN" "GCP credentials for infrastructure agents (gcp-cloud-architect, etc.)"
             echo ""
             
@@ -418,10 +436,10 @@ setup_env() {
     print_msg "$CYAN" "Configure API keys for AI agents and integrations."
     echo ""
     
-    if confirm "Would you like to configure AI provider API keys?"; then
+    if confirm "Would you like to configure AI provider API keys?" "n"; then
         
         # OpenAI
-        if confirm "Configure OpenAI API key?"; then
+        if confirm "Configure OpenAI API key?" "n"; then
             print_msg "$CYAN" "OpenAI API for openai-python-expert agent and integrations"
             print_msg "$CYAN" "Get your API key from: https://platform.openai.com/api-keys"
             echo ""
@@ -437,7 +455,7 @@ setup_env() {
         fi
         
         # Google Gemini
-        if confirm "Configure Google Gemini API key?"; then
+        if confirm "Configure Google Gemini API key?" "n"; then
             print_msg "$CYAN" "Google Gemini API for gemini-api-expert agent and integrations"
             print_msg "$CYAN" "Get your API key from: https://makersuite.google.com/app/apikey"
             echo ""
