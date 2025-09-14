@@ -219,4 +219,4 @@ class AzurePRCreate {
   }
 }
 
-module.exports = new AzurePRCreate();
+module.exports = AzurePRCreate;
