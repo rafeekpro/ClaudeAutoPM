@@ -1,0 +1,83 @@
+{
+  "timestamp": "2025-09-14T14:16:58.431Z",
+  "summary": {
+    "passed": true,
+    "totalTests": 0,
+    "passedTests": 0,
+    "failedTests": 0,
+    "skippedTests": 0,
+    "successRate": "0.0"
+  },
+  "results": [
+    {
+      "suite": "Unit Tests - Self Maintenance",
+      "passed": true,
+      "duration": "0.04s",
+      "tests": 0,
+      "passes": 0,
+      "failures": 0,
+      "skipped": 0,
+      "critical": true
+    },
+    {
+      "suite": "Integration Tests - Azure DevOps Issue Show",
+      "passed": true,
+      "duration": "0.04s",
+      "tests": 0,
+      "passes": 0,
+      "failures": 0,
+      "skipped": 0,
+      "critical": true
+    },
+    {
+      "suite": "Integration Tests - Azure DevOps PR Create",
+      "passed": true,
+      "duration": "0.04s",
+      "tests": 0,
+      "passes": 0,
+      "failures": 0,
+      "skipped": 0,
+      "critical": true
+    },
+    {
+      "suite": "E2E Tests - PM Commands",
+      "passed": true,
+      "duration": "0.04s",
+      "tests": 0,
+      "passes": 0,
+      "failures": 0,
+      "skipped": 0,
+      "critical": false
+    },
+    {
+      "suite": "Security Tests",
+      "passed": true,
+      "duration": "0.39s",
+      "tests": 0,
+      "passes": 0,
+      "failures": 0,
+      "skipped": 0,
+      "critical": true
+    },
+    {
+      "suite": "Regression Tests",
+      "passed": true,
+      "duration": "0.15s",
+      "tests": 0,
+      "passes": 0,
+      "failures": 0,
+      "skipped": 0,
+      "critical": true
+    },
+    {
+      "suite": "Installation Tests",
+      "passed": false,
+      "duration": "0.15s",
+      "tests": 0,
+      "passes": 0,
+      "failures": 0,
+      "skipped": 0,
+      "critical": false
+    }
+  ]
+}

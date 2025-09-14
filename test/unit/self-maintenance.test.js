@@ -26,28 +26,30 @@ const mockSpawnSync = {
   error: null
 };
 
+// Load the module once at the top level for better performance
+const SelfMaintenance = require('../../scripts/self-maintenance.js');
+
 describe('SelfMaintenance Class', () => {
-  let SelfMaintenance;
   let selfMaintenance;
   let originalConsoleLog;
   let consoleOutput;
 
   beforeEach(() => {
-    // Clear require cache
-    delete require.cache[require.resolve('../../scripts/self-maintenance.js')];
+    // Create fresh instance for each test instead of clearing require cache
+    // This provides better isolation without cache manipulation
+    selfMaintenance = null;
 
     // Capture console output
     consoleOutput = [];
     originalConsoleLog = console.log;
     console.log = (...args) => consoleOutput.push(args.join(' '));
-
-    // Load the module
-    SelfMaintenance = require('../../scripts/self-maintenance.js');
   });
 
   afterEach(() => {
     // Restore console.log
     console.log = originalConsoleLog;
+    // Clean up any created instances
+    selfMaintenance = null;
   });
 
   describe('Constructor and Initialization', () => {
