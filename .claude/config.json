@@ -78,5 +78,17 @@
       "github-mcp",
       "filesystem-mcp"
     ]
+  },
+  "projectManagement": {
+    "provider": "github",
+    "settings": {
+      "github": {
+        "repository": "<owner>/<repo>"
+      },
+      "azure": {
+        "organization": "<organization>",
+        "project": "<project>"
+      }
+    }
   }
 }
