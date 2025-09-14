@@ -35,14 +35,14 @@ jobs:
           elif [[ "${{ github.event.inputs.use_self_hosted }}" == "self-hosted" ]]; then
             echo "runner=self-hosted" >> $GITHUB_OUTPUT
           else
-            # Auto-detect: try self-hosted first
-            echo "runner=['self-hosted', 'linux'] || 'ubuntu-latest'" >> $GITHUB_OUTPUT
+            # Auto-detect: use GitHub runners for CI stability
+            echo "runner=ubuntu-latest" >> $GITHUB_OUTPUT
           fi
 
   unit-tests:
     name: Unit Tests
     needs: check-runners
-    runs-on: ${{ fromJson(format('[{0}]', needs.check-runners.outputs.runner-type || '"ubuntu-latest"'))[0] }}
+    runs-on: ${{ needs.check-runners.outputs.runner-type || 'ubuntu-latest' }}
     strategy:
       matrix:
         node-version: [16.x, 18.x, 20.x]
@@ -138,7 +138,7 @@ jobs:
   security-tests:
     name: Security Tests
     needs: check-runners
-    runs-on: ${{ fromJson(format('[{0}]', needs.check-runners.outputs.runner-type || '"ubuntu-latest"'))[0] }}
+    runs-on: ${{ needs.check-runners.outputs.runner-type || 'ubuntu-latest' }}
 
     steps:
       - uses: actions/checkout@v4
@@ -169,7 +169,7 @@ jobs:
   regression-tests:
     name: Regression Tests
     needs: check-runners
-    runs-on: ${{ fromJson(format('[{0}]', needs.check-runners.outputs.runner-type || '"ubuntu-latest"'))[0] }}
+    runs-on: ${{ needs.check-runners.outputs.runner-type || 'ubuntu-latest' }}
 
     steps:
       - uses: actions/checkout@v4
