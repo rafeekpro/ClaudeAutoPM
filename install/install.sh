@@ -424,10 +424,22 @@ choose_provider() {
                 print_success "GitHub selected"
 
                 # Get GitHub configuration
-                echo -n "Enter GitHub owner/org: "
-                read github_owner
-                echo -n "Enter GitHub repo name: "
-                read github_repo
+                if [ "$AUTOPM_TEST_MODE" = "1" ] || [ "$AUTOPM_AUTO_ACCEPT" = "1" ]; then
+                    github_owner="test-owner"
+                    github_repo="test-repo"
+                    if [ "$AUTOPM_TEST_MODE" = "1" ]; then
+                        print_msg "$CYAN" "GitHub owner/org: test-owner (auto-filled in test mode)"
+                        print_msg "$CYAN" "GitHub repo name: test-repo (auto-filled in test mode)"
+                    else
+                        print_msg "$CYAN" "GitHub owner/org: test-owner (auto-filled)"
+                        print_msg "$CYAN" "GitHub repo name: test-repo (auto-filled)"
+                    fi
+                else
+                    echo -n "Enter GitHub owner/org: "
+                    read github_owner
+                    echo -n "Enter GitHub repo name: "
+                    read github_repo
+                fi
 
                 export GITHUB_OWNER="$github_owner"
                 export GITHUB_REPO="$github_repo"
@@ -438,12 +450,27 @@ choose_provider() {
                 print_success "Azure DevOps selected"
 
                 # Get Azure DevOps configuration
-                echo -n "Enter Azure organization: "
-                read azure_org
-                echo -n "Enter Azure project: "
-                read azure_project
-                echo -n "Enter Azure team (or press Enter for default): "
-                read azure_team
+                if [ "$AUTOPM_TEST_MODE" = "1" ] || [ "$AUTOPM_AUTO_ACCEPT" = "1" ]; then
+                    azure_org="test-org"
+                    azure_project="test-project"
+                    azure_team=""
+                    if [ "$AUTOPM_TEST_MODE" = "1" ]; then
+                        print_msg "$CYAN" "Azure organization: test-org (auto-filled in test mode)"
+                        print_msg "$CYAN" "Azure project: test-project (auto-filled in test mode)"
+                        print_msg "$CYAN" "Azure team: (default, auto-filled in test mode)"
+                    else
+                        print_msg "$CYAN" "Azure organization: test-org (auto-filled)"
+                        print_msg "$CYAN" "Azure project: test-project (auto-filled)"
+                        print_msg "$CYAN" "Azure team: (default, auto-filled)"
+                    fi
+                else
+                    echo -n "Enter Azure organization: "
+                    read azure_org
+                    echo -n "Enter Azure project: "
+                    read azure_project
+                    echo -n "Enter Azure team (or press Enter for default): "
+                    read azure_team
+                fi
 
                 export AZURE_ORG="$azure_org"
                 export AZURE_PROJECT="$azure_project"
