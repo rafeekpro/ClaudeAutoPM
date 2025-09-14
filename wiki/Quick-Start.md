@@ -26,7 +26,7 @@ autopm install
 ### No-Install Option
 ```bash
 # Use without installing globally
-npx claude-autopm install
+npx autopm install
 ```
 
 ## 🎯 Choose Your Configuration

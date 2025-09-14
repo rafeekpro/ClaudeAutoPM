@@ -128,33 +128,33 @@ See [MCP Management Guide](docs/MCP-MANAGEMENT-GUIDE.md) for complete documentat
 
 ```bash
 npm install -g claude-autopm
-claude-autopm --help
+autopm --help
 ```
 
 ### Quick Start Commands
 
 ```bash
 # Install ClaudeAutoPM framework to current project
-claude-autopm install
+autopm install
 
 # Install to specific directory
-claude-autopm install ./my-project
+autopm install ./my-project
 
 # Non-interactive installation with preset configuration
-claude-autopm install --yes --config devops
-claude-autopm install -y -c minimal --no-env --no-hooks
+autopm install --yes --config devops
+autopm install -y -c minimal --no-env --no-hooks
 
 # Update existing ClaudeAutoPM installation
-claude-autopm update
+autopm update
 
 # Generate AI-powered CLAUDE.md merge prompts
-claude-autopm merge
+autopm merge
 
 # Interactive .env configuration
-claude-autopm setup-env
+autopm setup-env
 
 # Create new project with ClaudeAutoPM
-claude-autopm init my-new-project
+autopm init my-new-project
 ```
 
 ### Non-Interactive Installation
@@ -163,16 +163,16 @@ For CI/CD pipelines and automated setups, ClaudeAutoPM supports fully non-intera
 
 ```bash
 # Minimal setup (sequential execution, no Docker/K8s)
-claude-autopm install --yes --config minimal --no-env --no-hooks
+autopm install --yes --config minimal --no-env --no-hooks
 
 # DevOps setup (Docker + Kubernetes enabled)
-claude-autopm install -y -c devops
+autopm install -y -c devops
 
 # Performance setup (hybrid parallel execution)
-claude-autopm install --yes --config performance
+autopm install --yes --config performance
 
 # Docker-only setup
-claude-autopm install -y -c docker --no-env
+autopm install -y -c docker --no-env
 ```
 
 **Available Options:**
@@ -186,8 +186,8 @@ claude-autopm install -y -c docker --no-env
 #### Use without global installation
 
 ```bash
-npx claude-autopm install
-npx claude-autopm merge
+npx autopm install
+npx autopm merge
 ```
 
 #### Manual installation (legacy)
@@ -980,7 +980,7 @@ npm install -g claude-autopm
 cd path/to/your/project/
 
 # Install ClaudeAutoPM framework
-claude-autopm install
+autopm install
 ```
 
 #### Legacy Installation Methods
