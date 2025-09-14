@@ -219,4 +219,5 @@ class AzurePRCreate {
   }
 }
 
-module.exports = new AzurePRCreate();
+// Export the class directly - tests create their own instances
+module.exports = AzurePRCreate;
