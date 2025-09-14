@@ -34,7 +34,7 @@ providers/
 │   ├── api.js       # Azure DevOps API client
 │   ├── mapper.js    # Work item mapping
 │   └── handler.js   # Command handler
-└── interface.js     # Common provider interface
+└── interface.js     # Common provider interface (planned Phase 2)
 ```
 
 Each provider directory contains:
