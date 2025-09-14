@@ -469,7 +469,10 @@ class SelfMaintenance {
 
   // Validate agent registry consistency
   validateRegistry() {
-    if (!fs.existsSync(this.agentRegistry)) return false;
+    if (!fs.existsSync(this.agentRegistry)) {
+      console.log(`❌ Agent registry file not found at: ${this.agentRegistry}`);
+      return false;
+    }
 
     const registryContent = fs.readFileSync(this.agentRegistry, 'utf8');
     const agents = this.parseAgents(registryContent);
