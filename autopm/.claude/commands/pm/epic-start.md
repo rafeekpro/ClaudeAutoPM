@@ -4,42 +4,42 @@ allowed-tools: Bash, Read, Write, LS, Task
 
 # Epic Start
 
-Launch parallel agents to work on epic tasks in a shared branch.
+Launch parallel agents to work on epic tasks using the unified branch strategy.
 
 ## Usage
-` ``
+```
 /pm:epic-start <epic_name>
-` ``
+```
 
 ## Quick Check
 
 1. **Verify epic exists:**
-   ` ``bash
+   ```bash
    test -f .claude/epics/$ARGUMENTS/epic.md || echo "❌ Epic not found. Run: /pm:prd-parse $ARGUMENTS"
-   ` ``
+   ```
 
 2. **Check GitHub sync:**
    Look for `github:` field in epic frontmatter.
    If missing: "❌ Epic not synced. Run: /pm:epic-sync $ARGUMENTS first"
 
 3. **Check for branch:**
-   ` ``bash
+   ```bash
    git branch -a | grep "epic/$ARGUMENTS"
-   ` ``
+   ```
 
 4. **Check for uncommitted changes:**
-   ` ``bash
+   ```bash
    git status --porcelain
-   ` ``
+   ```
    If output is not empty: "❌ You have uncommitted changes. Please commit or stash them before starting an epic"
 
 ## Instructions
 
 ### 1. Create or Enter Branch
 
-Follow `/rules/branch-operations.md`:
+Follow the unified Git strategy in `/rules/git-strategy.md`:
 
-` ``bash
+```bash
 # Check for uncommitted changes
 if [ -n "$(git status --porcelain)" ]; then
   echo "❌ You have uncommitted changes. Please commit or stash them before starting an epic."
@@ -54,200 +54,106 @@ if ! git branch -a | grep -q "epic/$ARGUMENTS"; then
   git push -u origin epic/$ARGUMENTS
   echo "✅ Created branch: epic/$ARGUMENTS"
 else
+  # Branch exists, check it out
   git checkout epic/$ARGUMENTS
   git pull origin epic/$ARGUMENTS
   echo "✅ Using existing branch: epic/$ARGUMENTS"
 fi
-` ``
+```
 
 ### 2. Identify Ready Issues
 
 Read all task files in `.claude/epics/$ARGUMENTS/`:
-- Parse frontmatter for `status`, `depends_on`, `parallel` fields
-- Check GitHub issue status if needed
-- Build dependency graph
+- Look for tasks with `status: ready` or `status: in_progress`
+- Group by dependencies
 
-Categorize issues:
-- **Ready**: No unmet dependencies, not started
-- **Blocked**: Has unmet dependencies
-- **In Progress**: Already being worked on
-- **Complete**: Finished
+### 3. Launch Parallel Agents
 
-### 3. Analyze Ready Issues
+For each ready issue without dependencies:
 
-For each ready issue without analysis:
-` ``bash
-# Check for analysis
-if ! test -f .claude/epics/$ARGUMENTS/{issue}-analysis.md; then
-  echo "Analyzing issue #{issue}..."
-  # Run analysis (inline or via Task tool)
-fi
-` ``
+```bash
+# Example parallel launch
+/agent python-backend-engineer "Work on issue #1234 from epic $ARGUMENTS"
+/agent react-frontend-engineer "Work on issue #1235 from epic $ARGUMENTS"
+```
 
-### 4. Launch Parallel Agents
+### 4. Monitor Progress
 
-For each ready issue with analysis:
+```bash
+# Check branch status
+git log --oneline -10
 
-` ``markdown
-## Starting Issue #{issue}: {title}
+# Check CI status
+gh pr checks
 
-Reading analysis...
-Found {count} parallel streams:
-  - Stream A: {description} (Agent-{id})
-  - Stream B: {description} (Agent-{id})
+# View agent progress
+tail -f .claude/epics/$ARGUMENTS/progress.md
+```
 
-Launching agents in branch: epic/$ARGUMENTS
-` ``
+## Parallel Execution Rules
 
-Use Task tool to launch each stream:
-` ``yaml
-Task:
-  description: "Issue #{issue} Stream {X}"
-  subagent_type: "{agent_type}"
-  prompt: |
-    **CRITICAL RULE: This project uses 'Docker-first development'.**
-    - All commands (dependency installation, tests, running the application) MUST be executed inside a Docker container using `docker compose run --rm <service_name> <command>`.
-    - DO NOT run `npm`, `pip`, `pytest`, etc., directly on the host.
-    - The source code is mounted as a VOLUME, so file changes will be immediately visible in the container (hot-reloading).
-    - Full rules can be found in `.claude/rules/docker-first-development.md`.
+1. **File Coordination**: Agents working on different files can commit simultaneously
+2. **Pull Before Push**: Always `git pull` before pushing changes
+3. **Conflict Resolution**: Human intervention required for merge conflicts
+4. **Commit Frequently**: Small, focused commits reduce conflict risk
 
-    Working in branch: epic/$ARGUMENTS
-    Issue: #{issue} - {title}
-    Stream: {stream_name}
+## Example Workflow
 
-    Your scope:
-    - Files: {file_patterns}
-    - Work: {stream_description}
+```bash
+# 1. Start epic
+/pm:epic-start authentication
 
-    Read full requirements from:
-    - .claude/epics/$ARGUMENTS/{task_file}
-    - .claude/epics/$ARGUMENTS/{issue}-analysis.md
+# 2. Agents work in parallel
+# Agent A: Backend API
+# Agent B: Frontend UI
+# Agent C: Database schema
 
-    Follow coordination rules in /rules/agent-coordination.md
+# 3. Monitor progress
+/pm:epic-status authentication
 
-    Commit frequently with message format:
-    "Issue #{issue}: {specific change}"
+# 4. When complete
+/pm:epic-merge authentication
+```
 
-    Update progress in:
-    .claude/epics/$ARGUMENTS/updates/{issue}/stream-{X}.md
-` ``
+## Branch Management
 
-### 5. Track Active Agents
-
-Create/update `.claude/epics/$ARGUMENTS/execution-status.md`:
-
-` ``markdown
----
-started: {datetime}
-branch: epic/$ARGUMENTS
----
-
-# Execution Status
-
-## Active Agents
-- Agent-1: Issue #1234 Stream A (Database) - Started {time}
-- Agent-2: Issue #1234 Stream B (API) - Started {time}
-- Agent-3: Issue #1235 Stream A (UI) - Started {time}
-
-## Queued Issues
-- Issue #1236 - Waiting for #1234
-- Issue #1237 - Waiting for #1235
-
-## Completed
-- {None yet}
-` ``
-
-### 6. Monitor and Coordinate
-
-Set up monitoring:
-` ``bash
-echo "
-Agents launched successfully!
-
-Monitor progress:
-  /pm:epic-status $ARGUMENTS
-
-View branch changes:
-  git status
-
-Stop all agents:
-  /pm:epic-stop $ARGUMENTS
-
-Merge when complete:
-  /pm:epic-merge $ARGUMENTS
-"
-` ``
-
-### 7. Handle Dependencies
-
-As agents complete streams:
-- Check if any blocked issues are now ready
-- Launch new agents for newly-ready work
-- Update execution-status.md
-
-## Output Format
-
-` ``
-🚀 Epic Execution Started: $ARGUMENTS
-
-Branch: epic/$ARGUMENTS
-
-Launching {total} agents across {issue_count} issues:
-
-Issue #1234: Database Schema
-  ├─ Stream A: Schema creation (Agent-1) ✓ Started
-  └─ Stream B: Migrations (Agent-2) ✓ Started
-
-Issue #1235: API Endpoints
-  ├─ Stream A: User endpoints (Agent-3) ✓ Started
-  ├─ Stream B: Post endpoints (Agent-4) ✓ Started
-  └─ Stream C: Tests (Agent-5) ⏸ Waiting for A & B
-
-Blocked Issues (2):
-  - #1236: UI Components (depends on #1234)
-  - #1237: Integration (depends on #1235, #1236)
-
-Monitor with: /pm:epic-status $ARGUMENTS
-` ``
-
-## Error Handling
-
-If agent launch fails:
-` ``
-❌ Failed to start Agent-{id}
-  Issue: #{issue}
-  Stream: {stream}
-  Error: {reason}
-
-Continue with other agents? (yes/no)
-` ``
-
-If uncommitted changes are found:
-` ``
-❌ You have uncommitted changes. Please commit or stash them before starting an epic.
-
-To commit changes:
-  git add .
-  git commit -m "Your commit message"
-
-To stash changes:
-  git stash push -m "Work in progress"
-  # (Later restore with: git stash pop)
-` ``
-
-If branch creation fails:
-` ``
-❌ Cannot create branch
-  {git error message}
-
-Try: git branch -d epic/$ARGUMENTS
-Or: Check existing branches with: git branch -a
-` ``
+The epic branch (`epic/$ARGUMENTS`) will be:
+- Created if it doesn't exist
+- Checked out if it exists
+- Pulled to get latest changes
+- Ready for parallel agent work
 
 ## Important Notes
 
-- Follow `/rules/branch-operations.md` for git operations
-- Follow `/rules/agent-coordination.md` for parallel work
-- Agents work in the SAME branch (not separate branches)
-- Maximum parallel agents should be reasonable (e.g., 5-10)
-- Monitor system resources if launching many agents
+⚠️ **NO WORKTREES**: This command uses the standard branch strategy. Git worktrees are not supported.
+
+⚠️ **COMMIT BEFORE SWITCHING**: Always commit or stash changes before starting a new epic.
+
+⚠️ **PULL FREQUENTLY**: Agents should pull changes regularly to avoid conflicts.
+
+## Troubleshooting
+
+### "You have uncommitted changes"
+```bash
+# Option 1: Commit changes
+git add -A && git commit -m "WIP: Save work before epic start"
+
+# Option 2: Stash changes
+git stash save "WIP before starting epic"
+```
+
+### "Branch already exists"
+```bash
+# Use existing branch
+git checkout epic/$ARGUMENTS
+git pull origin epic/$ARGUMENTS
+```
+
+### "Merge conflicts"
+```bash
+# Resolve conflicts manually
+git status  # See conflicted files
+# Edit files to resolve
+git add {resolved-files}
+git commit -m "resolve: Merge conflicts"
+```

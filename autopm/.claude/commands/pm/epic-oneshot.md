@@ -58,7 +58,7 @@ This will:
 - Create epic issue on GitHub
 - Create sub-issues (using parallel agents if appropriate)
 - Rename task files to issue IDs
-- Create worktree
+- Create epic branch
 
 ### 4. Output
 
@@ -71,7 +71,7 @@ Step 1: Decomposition ✓
 Step 2: GitHub Sync ✓
   - Epic: #{number}
   - Sub-issues created: {count}
-  - Worktree: ../epic-$ARGUMENTS
+  - Branch: epic/$ARGUMENTS
 
 Ready for development!
   Start work: /pm:epic-start $ARGUMENTS

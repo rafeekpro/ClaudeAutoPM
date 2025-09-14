@@ -21,8 +21,7 @@ All rule files in `.claude/rules/` define mandatory behaviors and must be follow
 
 - **agent-coordination.md** - Multi-agent parallel work with file-level coordination
 - **agent-coordination-extended.md** - Extended coordination patterns for complex workflows
-- **branch-operations.md** - Git branch management, naming conventions, and merge strategies
-- **worktree-operations.md** - Git worktree management for parallel development
+- **git-strategy.md** - Unified Git branch strategy, naming conventions, and merge workflows
 - **datetime.md** - Real datetime requirements using ISO 8601 UTC format (no placeholders)
 - **frontmatter-operations.md** - YAML frontmatter standards for PRDs, epics, and tasks
 - **strip-frontmatter.md** - Metadata removal for GitHub sync and external communication

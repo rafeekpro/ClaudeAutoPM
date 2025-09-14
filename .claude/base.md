@@ -71,6 +71,18 @@ npm run pm:health
 3. **Before commit**: Run tests with `npm test`
 4. **Before release**: Run `pm release` workflow
 
+## Git Strategy
+
+**IMPORTANT**: ClaudeAutoPM uses a **unified branch-based Git strategy**.
+
+- **NO WORKTREES**: Git worktrees are not supported
+- **Use branches**: All work happens in feature/epic branches
+- **Follow the rules**: See `autopm/.claude/rules/git-strategy.md`
+- **One branch per epic**: Keep work isolated
+- **Pull frequently**: Avoid conflicts with regular pulls
+
+For detailed Git workflow, refer to the authoritative guide in `autopm/.claude/rules/git-strategy.md`
+
 ## Project Structure
 
 ```
