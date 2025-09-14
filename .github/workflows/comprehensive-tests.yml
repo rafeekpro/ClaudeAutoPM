@@ -81,9 +81,7 @@ jobs:
         #   - Flaky test failures on Windows CI
         #   - Path handling inconsistencies in E2E scripts
         #   - Ensure all dependencies are compatible with Windows runners
-        include:
-          - os: windows-latest
-            experimental: true
+        # Windows E2E tests are now run in a separate workflow to avoid CI instability.
 
     steps:
       - uses: actions/checkout@v4
