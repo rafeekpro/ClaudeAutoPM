@@ -78,8 +78,8 @@ jobs:
         os: [ubuntu-latest, macos-latest]
         # Windows tests are experimental.
         # TODO: Make Windows E2E tests non-experimental after resolving:
-        #   - Issue #123: Flaky test failures on Windows CI
-        #   - Issue #456: Path handling inconsistencies in E2E scripts
+        #   - Flaky test failures on Windows CI
+        #   - Path handling inconsistencies in E2E scripts
         #   - Ensure all dependencies are compatible with Windows runners
         include:
           - os: windows-latest
