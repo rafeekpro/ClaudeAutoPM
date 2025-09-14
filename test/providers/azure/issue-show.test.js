@@ -12,7 +12,7 @@ const fs = require('fs');
 process.env.AZURE_DEVOPS_ORG = 'test-org';
 process.env.AZURE_DEVOPS_PROJECT = 'test-project';
 process.env.AZURE_DEVOPS_TOKEN = 'test-token';
-process.env.AZURE_DEVOPS_PAT = 'test-token'; // Backwards compatibility
+process.env.AZURE_DEVOPS_PAT = 'test-token'; // For backward compatibility
 
 // Load module once - creates new instances for isolation
 const AzureIssueShow = require('../../../autopm/.claude/providers/azure/issue-show.js');
