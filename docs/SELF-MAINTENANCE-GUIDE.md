@@ -2,214 +2,383 @@
 
 ## Overview
 
-ClaudeAutoPM uses its own framework capabilities for self-maintenance, creating a self-improving ecosystem. This guide explains how the system maintains itself.
+ClaudeAutoPM uses its own framework capabilities for self-maintenance, creating a self-improving ecosystem. This guide explains the completely rewritten Node.js-based maintenance system.
 
 ## Architecture
 
 ```
 AUTOPM/                          # Development project
-├── .claude/                     # Project-specific config
+├── scripts/
+│   └── self-maintenance.js     # Main Node.js maintenance script
+├── .claude/
 │   ├── base.md                 # Project context
 │   ├── config.json             # Configuration
-│   ├── commands/               # PM maintenance commands
-│   │   ├── pm                  # Main command router
-│   │   ├── pm-validate         # Validation
-│   │   ├── pm-optimize         # Optimization
-│   │   ├── pm-test-install     # Installation testing
-│   │   ├── pm-health          # Health reporting
-│   │   └── pm-release         # Release preparation
-│   └── strategies/            # Execution strategies
-│       └── self-maintenance-strategy.md
+│   └── strategies/             # Execution strategies
+│       └── ACTIVE_STRATEGY.md  # Current strategy
 │
-└── autopm/.claude/            # Framework resources
-    └── agents/                # Framework agents used for maintenance
+└── autopm/.claude/             # Framework resources
+    └── agents/                 # Framework agents used for maintenance
         ├── core/
         │   ├── agent-manager.md
         │   ├── code-analyzer.md
         │   ├── test-runner.md
         │   └── file-analyzer.md
-        ├── devops/
-        │   └── github-operations-specialist.md
-        └── frameworks/
-            └── [various framework agents]
+        └── devops/
+            └── github-operations-specialist.md
 ```
 
-## How It Works
+## Self-Maintenance Commands
 
-### 1. Framework Agents for Maintenance
+All maintenance commands are now implemented in pure Node.js (`scripts/self-maintenance.js`):
 
-The project uses its own framework agents from `autopm/.claude/agents/`:
+### Core Commands
 
-- **agent-manager**: Creates and manages agents
-- **code-analyzer**: Reviews code changes
-- **test-runner**: Executes and analyzes tests
-- **file-analyzer**: Summarizes large files
-- **github-operations-specialist**: Manages releases
-
-### 2. PM Commands
-
-Located in `.claude/commands/`, these scripts orchestrate maintenance tasks:
+#### `pm health`
+Generate comprehensive health report for the ClaudeAutoPM system.
 
 ```bash
-# Check project health
-pm health
-
-# Validate integrity
-pm validate
-
-# Analyze optimization opportunities
-pm optimize
-
-# Test installation scenarios
-pm test-install
-
-# Prepare release
-pm release
+npm run pm:health
+# or
+node scripts/self-maintenance.js health
 ```
 
-### 3. Self-Maintenance Workflow
+Output includes:
+- Agent ecosystem metrics
+- Installation health
+- File integrity checks
+- Test coverage status
+- Performance metrics
 
-```mermaid
-graph LR
-    A[Monitor] --> B[pm health]
-    B --> C[Identify Issues]
-    C --> D[pm optimize]
-    D --> E[Apply Changes]
-    E --> F[pm validate]
-    F --> G[pm test-install]
-    G --> A
+#### `pm validate`
+Validate the entire framework installation and configuration.
+
+```bash
+npm run pm:validate
+# or
+node scripts/self-maintenance.js validate
 ```
 
-## Usage Examples
+Validates:
+- Agent registry consistency
+- Configuration files
+- Installation completeness
+- Template availability
+- Strategy configuration
+
+#### `pm optimize`
+Analyze and optimize the agent ecosystem for better performance.
+
+```bash
+npm run pm:optimize
+# or
+node scripts/self-maintenance.js optimize
+```
+
+Performs:
+- Agent consolidation analysis
+- Context efficiency calculation
+- Duplicate detection
+- Performance recommendations
+
+#### `pm metrics`
+Display detailed metrics about the framework.
+
+```bash
+npm run pm:metrics
+# or
+node scripts/self-maintenance.js metrics
+```
+
+Shows:
+- Total agents by category
+- Deprecated agent count
+- Context usage statistics
+- Installation statistics
+
+#### `pm test-install`
+Test the installation process in various scenarios.
+
+```bash
+npm run pm:test-install
+# or
+node scripts/self-maintenance.js test-install
+```
+
+Tests:
+- Minimal installation
+- Docker-only installation
+- Full DevOps installation
+- Performance installation
+- Upgrade scenarios
+
+#### `pm release`
+Prepare a new release of the framework.
+
+```bash
+npm run pm:release
+# or
+node scripts/self-maintenance.js release
+```
+
+Steps:
+1. Run validation checks
+2. Execute test suite
+3. Update version
+4. Generate changelog
+5. Create GitHub release
+6. Publish to npm
+
+## Implementation Details
+
+### Node.js Class Structure
+
+```javascript
+class SelfMaintenance {
+  constructor() {
+    this.projectRoot = path.join(__dirname, '..');
+    this.agentRegistry = path.join(this.projectRoot, 'autopm/.claude/agents/AGENT-REGISTRY.md');
+    this.metrics = {
+      totalAgents: 0,
+      deprecatedAgents: 0,
+      consolidatedAgents: 0,
+      activeAgents: 0,
+      contextEfficiency: 0
+    };
+  }
+
+  // Command implementations
+  async runHealthCheck() { }
+  async runValidation() { }
+  async runOptimization() { }
+  async runMetrics() { }
+  async testInstallation() { }
+  async prepareRelease() { }
+}
+```
+
+### Key Features
+
+#### 1. Cross-Platform Compatibility
+- Pure Node.js implementation
+- No bash dependencies
+- Works on Windows, macOS, Linux
+
+#### 2. Performance Optimizations
+- Parallel file operations
+- Efficient registry parsing
+- Cached metrics calculation
+- Optimized spawn operations
+
+#### 3. Enhanced Testing
+```javascript
+// Test installation scenarios
+const scenarios = {
+  'minimal': '1',
+  'docker': '2',
+  'full': '3',
+  'performance': '4'
+};
+
+for (const [name, option] of Object.entries(scenarios)) {
+  await this.testScenario(name, option);
+}
+```
+
+#### 4. Improved Error Handling
+```javascript
+try {
+  const result = await this.executeCommand(cmd, args);
+  return this.handleSuccess(result);
+} catch (error) {
+  return this.handleError(error, context);
+}
+```
+
+## Configuration
+
+### Self-Maintenance Configuration (`.claude/config.json`)
+
+```json
+{
+  "maintenance": {
+    "agents": {
+      "registry_manager": true,
+      "installer_tester": true,
+      "optimization_analyzer": true
+    },
+    "schedule": {
+      "health_check": "daily",
+      "validation": "on_change",
+      "optimization": "weekly"
+    },
+    "thresholds": {
+      "max_agents": 100,
+      "min_context_efficiency": 0.7,
+      "max_deprecation_ratio": 0.2
+    }
+  }
+}
+```
+
+## Maintenance Workflow
 
 ### Daily Maintenance
 
 ```bash
 # Morning health check
-pm health
+npm run pm:health
 
-# If issues found
-pm validate
+# Validate any changes
+npm run pm:validate
 
-# Analyze opportunities
-pm optimize
+# Check metrics
+npm run pm:metrics
 ```
 
-### Before Commits
-
-```bash
-# Validate changes
-pm validate
-
-# Quick test
-pm test-install
-```
-
-### Release Process
+### Before Release
 
 ```bash
 # Full validation
-pm validate
-pm test-install
+npm run pm:validate
+
+# Run all tests
+npm test
+
+# Test installations
+npm run pm:test-install
 
 # Prepare release
-pm release
+npm run pm:release
 ```
 
-## Agent Integration
-
-### Using Framework Agents
-
-When Claude Code works on the project, it can use framework agents:
-
-```markdown
-@agent-manager create a new specialized agent for GraphQL
-@code-analyzer review recent changes for bugs
-@test-runner execute installation tests
-@github-operations-specialist prepare release v1.0.4
-```
-
-### Agent Mapping
-
-| Task | Framework Agent | PM Command |
-|------|----------------|------------|
-| Create agents | agent-manager | - |
-| Review code | code-analyzer | pm validate |
-| Run tests | test-runner | pm test-install |
-| Analyze logs | file-analyzer | pm health |
-| Manage releases | github-operations-specialist | pm release |
-
-## Automation
-
-### GitHub Actions
-
-```yaml
-# .github/workflows/self-maintenance.yml
-name: Self-Maintenance
-on:
-  schedule:
-    - cron: '0 0 * * *'  # Daily
-  workflow_dispatch:
-
-jobs:
-  health-check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Health Check
-        run: |
-          .claude/commands/pm-health
-          .claude/commands/pm-validate
-```
-
-### Git Hooks
+### After Major Changes
 
 ```bash
-# .git/hooks/pre-commit
-#!/bin/bash
-.claude/commands/pm-validate
+# Analyze optimization opportunities
+npm run pm:optimize
+
+# Test all installation scenarios
+npm run pm:test-install
+
+# Generate health report
+npm run pm:health
 ```
 
-## Metrics
+## Integration with Framework Agents
 
-The system tracks:
+The self-maintenance system leverages framework agents for complex tasks:
 
-- **Agent count**: Target <30
-- **Test coverage**: Target >90%
-- **Context efficiency**: Target >70%
-- **Installation success**: Target >98%
+```javascript
+// Example: Using agents from Node.js
+async optimizeWithAgents() {
+  console.log('📋 Recommended agent invocations:');
+  console.log('   @optimization-analyzer find redundancies');
+  console.log('   @code-analyzer check for breaking changes');
+  console.log('   @test-runner validate optimizations');
+}
+```
 
-## Benefits
+## Monitoring and Alerts
 
-1. **Dogfooding**: Project uses its own capabilities
-2. **Continuous Improvement**: Self-optimizing system
-3. **Quality Assurance**: Automated validation
-4. **Efficiency**: Reduced maintenance overhead
+### Health Indicators
+
+| Metric | Healthy | Warning | Critical |
+|--------|---------|---------|----------|
+| Agent Count | < 80 | 80-100 | > 100 |
+| Deprecated Ratio | < 10% | 10-20% | > 20% |
+| Context Efficiency | > 80% | 60-80% | < 60% |
+| Test Coverage | > 80% | 60-80% | < 60% |
+
+### Alert Conditions
+
+```javascript
+// Check for critical conditions
+if (metrics.deprecatedRatio > 0.2) {
+  console.warn('⚠️ High deprecation ratio detected');
+}
+
+if (metrics.contextEfficiency < 0.6) {
+  console.warn('⚠️ Low context efficiency');
+}
+```
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **PM commands not found**
-   ```bash
-   chmod +x .claude/commands/pm*
-   ```
+#### 1. Command Not Found
+```bash
+Error: Cannot find module './self-maintenance.js'
+```
+**Solution**: Ensure you're in the project root directory
 
-2. **Agent not recognized**
-   - Ensure CLAUDE.md references framework agents
-   - Check agent exists in `autopm/.claude/agents/`
+#### 2. Permission Denied
+```bash
+Error: EACCES: permission denied
+```
+**Solution**: Check file permissions or run with appropriate privileges
 
-3. **Tests failing**
-   ```bash
-   pm validate
-   npm test
-   ```
+#### 3. Installation Test Failures
+```bash
+❌ Installation test failed for scenario: docker
+```
+**Solution**: Check Docker availability and configuration
 
-## Next Steps
+### Debug Mode
 
-1. Run `pm health` to check current status
-2. Use `pm optimize` to find improvements
-3. Apply framework agents for maintenance tasks
-4. Monitor metrics with `pm health`
+Enable verbose output:
+```bash
+DEBUG=true npm run pm:health
+```
 
-The self-maintenance system ensures ClaudeAutoPM continuously improves while maintaining stability and quality.
+## Best Practices
+
+1. **Regular Health Checks**: Run `pm health` daily
+2. **Validate Before Commit**: Always run `pm validate`
+3. **Test Installations**: Test after framework changes
+4. **Monitor Metrics**: Track trends over time
+5. **Optimize Periodically**: Run `pm optimize` weekly
+
+## Migration from Bash Scripts
+
+### Old vs New Commands
+
+| Old Bash Command | New Node.js Command |
+|------------------|-------------------|
+| `./scripts/pm-health.sh` | `npm run pm:health` |
+| `./scripts/pm-validate.sh` | `npm run pm:validate` |
+| `./scripts/pm-optimize.sh` | `npm run pm:optimize` |
+| `./scripts/pm-metrics.sh` | `npm run pm:metrics` |
+
+### Advantages of Node.js Implementation
+
+1. **Cross-Platform**: Works on all operating systems
+2. **Better Performance**: Parallel operations and optimizations
+3. **Improved Testing**: Comprehensive test scenarios
+4. **Enhanced Error Handling**: Detailed error messages
+5. **Easier Maintenance**: Single language (JavaScript)
+
+## Future Enhancements
+
+- **Automated Scheduling**: Cron-like task scheduling
+- **Web Dashboard**: Visual health monitoring
+- **AI-Powered Optimization**: Machine learning for optimization
+- **Distributed Testing**: Parallel test execution
+- **Real-time Monitoring**: WebSocket-based live updates
+
+## Contributing
+
+To improve self-maintenance:
+
+1. Edit `scripts/self-maintenance.js`
+2. Add new command methods
+3. Update this documentation
+4. Test thoroughly
+5. Submit pull request
+
+## Resources
+
+- [Self-Maintenance Script](../scripts/self-maintenance.js)
+- [Configuration Guide](./Configuration-Options.md)
+- [Agent Documentation](../autopm/.claude/agents/README.md)
+- [Testing Guide](../test/README.md)
