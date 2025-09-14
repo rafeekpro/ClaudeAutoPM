@@ -8,7 +8,7 @@ const assert = require('node:assert');
 const path = require('path');
 
 // Import the class directly
-const SelfMaintenance = require('../../scripts/self-maintenance.js');
+const SelfMaintenance = require('../../../scripts/self-maintenance.js');
 
 describe('SelfMaintenance - Simple Tests', () => {
   describe('Constructor', () => {
