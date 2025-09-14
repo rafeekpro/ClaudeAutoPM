@@ -163,7 +163,7 @@ jobs:
           path: |
             test/test-report.json
             test/regression/__snapshots__/**
-          if-no-files-found: warn  # Warn instead of fail if snapshots don't exist
+          if-no-files-found: error  # Fail if snapshots don't exist
 
   comprehensive-suite:
     name: Comprehensive Test Suite
