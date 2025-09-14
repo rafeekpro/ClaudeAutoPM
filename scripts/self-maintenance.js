@@ -433,7 +433,9 @@ class SelfMaintenance {
     const result = spawnSync('bash', [installScript, targetDir], {
       input: inputOption + '\n',
       encoding: 'utf8',
-      cwd: this.projectRoot
+      cwd: this.projectRoot,
+      stdio: 'pipe',
+      maxBuffer: 10 * 1024 * 1024 // 10MB buffer to prevent ENOBUFS
     });
 
     if (result.error) {

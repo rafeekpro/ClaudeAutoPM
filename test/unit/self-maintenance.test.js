@@ -16,7 +16,10 @@ const mockFs = {
   readdirSync: () => [],
   mkdirSync: () => {},
   rmSync: () => {},
-  statSync: () => ({ isDirectory: () => false })
+  statSync: () => ({
+    isDirectory: () => false,
+    isFile: () => true
+  })
 };
 
 const mockSpawnSync = {
@@ -116,7 +119,10 @@ describe('SelfMaintenance Class', () => {
       const maintenance = new SelfMaintenance();
 
       // Mock file system calls
-      mockManager.add(fs, 'existsSync', (path) => true);
+      mockManager.add(fs, 'existsSync', (path) => {
+        // Return true for expected paths, false for others
+        return true;
+      });
       mockManager.add(fs, 'readFileSync', (path) => {
         if (path.includes('AGENT-REGISTRY.md')) {
           return '# Agent Registry\n- agent1\n- agent2';
@@ -124,9 +130,16 @@ describe('SelfMaintenance Class', () => {
         if (path.includes('package.json')) {
           return JSON.stringify({ version: '1.0.0' });
         }
+        if (path.includes('CHANGELOG.md')) {
+          return '# Changelog\n## 1.0.0';
+        }
         return '';
       });
       mockManager.add(fs, 'readdirSync', (path) => ['agent1.md', 'agent2.md']);
+      mockManager.add(fs, 'statSync', (path) => ({
+        isDirectory: () => path.includes('agents'),
+        isFile: () => !path.includes('agents')
+      }));
 
       // Mock spawnSync for git commands
       const childProcess = require('child_process');
@@ -455,7 +468,10 @@ describe('SelfMaintenance Class', () => {
 
         fs.existsSync = () => true;
         fs.readdirSync = () => ['file1.js', 'file2.ts', 'file3.js', 'file4.md'];
-        fs.statSync = () => ({ isDirectory: () => false });
+        fs.statSync = () => ({
+          isDirectory: () => false,
+          isFile: () => true
+        });
 
         try {
           const count = maintenance.countFiles('/test', ['.js', '.ts']);
