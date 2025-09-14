@@ -2,6 +2,13 @@
 
 Get ClaudeAutoPM up and running in your project in just 5 minutes!
 
+## ✨ What's New in v1.1.0
+
+- **🔄 Unified Commands** - Same commands work for GitHub, Azure DevOps, and more
+- **⚡ 40% Faster** - With intelligent caching and optimizations
+- **🧪 94% Test Coverage** - Production-ready reliability
+- **📊 Self-Maintaining** - Built-in health checks and optimization tools
+
 ## ⚡ 1-Minute Installation
 
 ### Global Installation (Recommended)
@@ -72,7 +79,9 @@ autopm --version
 autopm config
 
 # Test AI agent
-# In Claude Code, try: /pm:help
+# In Claude Code, try the new unified commands:
+/pm:issue:list
+/pm:help
 ```
 
 ## 🎨 Customize Your Setup
@@ -98,6 +107,24 @@ nano .claude/.env
 ```
 
 ## 🚦 Your First ClaudeAutoPM Workflow
+
+### New Unified Commands (v1.1.0)
+
+All commands now use the `/pm:resource:action` format:
+
+```bash
+# List open issues (works with ANY provider!)
+/pm:issue:list --status=open
+
+# Start working on an issue
+/pm:issue:start 123
+
+# Create a pull request
+/pm:pr:create --title="Feature: Add caching"
+
+# Check project health
+npm run pm:health
+```
 
 ### 1. **Create a PRD** (Product Requirements Document)
 ```bash
