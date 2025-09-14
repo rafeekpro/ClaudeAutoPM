@@ -1,277 +1,307 @@
-# ClaudeAutoPM Provider Architecture Strategy
+# Provider Strategy Architecture
 
-## Executive Summary
+## Overview
 
-This document outlines the new provider-based architecture for ClaudeAutoPM, enabling seamless integration with multiple project management platforms while maintaining a unified command interface.
+ClaudeAutoPM implements a **provider-based architecture** that allows seamless integration with multiple project management platforms. This architecture enables users to work with their preferred tools (GitHub, Azure DevOps, etc.) through a unified command interface.
 
-## Architecture Overview
+## Core Architecture Components
 
-### Core Principle: Provider Abstraction
+### 1. Provider Router (`autopm/.claude/providers/router.js`)
 
-ClaudeAutoPM now implements a **Provider Pattern** that abstracts project management operations behind a unified interface. This allows the same commands to work transparently with different platforms (GitHub Issues, Azure DevOps, Jira, etc.).
+The central routing component that:
+- Loads project configuration from `.claude/config.json`
+- Determines the active provider (GitHub, Azure DevOps, etc.)
+- Routes commands to appropriate provider implementations
+- Handles provider-specific settings and authentication
 
-```
-User Command → Unified Interface → Provider Layer → Platform API
-                                         ↓
-                                   [GitHub/Azure/Jira]
-```
-
-## Directory Structure
-
-### `/autopm/.claude/providers/`
-
-The central directory for all provider implementations:
-
-```
-providers/
-├── github/           # GitHub Issues provider
-│   ├── README.md
-│   ├── api.js       # GitHub API client
-│   ├── mapper.js    # Data mapping layer
-│   └── handler.js   # Command handler
-├── azure/           # Azure DevOps provider
-│   ├── README.md
-│   ├── api.js       # Azure DevOps API client
-│   ├── mapper.js    # Work item mapping
-│   └── handler.js   # Command handler
-└── interface.js     # Common provider interface (planned Phase 2)
+```javascript
+// Example flow
+/pm:issue:show 123
+  ↓
+ProviderRouter.execute('issue-show', ['123'])
+  ↓
+Loads github/issue-show.js or azure/issue-show.js
+  ↓
+Returns unified response format
 ```
 
-Each provider directory contains:
-- **README.md**: Provider-specific documentation
-- **api.js**: Platform API integration
-- **mapper.js**: Data transformation between platform and ClaudeAutoPM formats
-- **handler.js**: Command implementation specific to the platform
+### 2. Provider Implementations
 
-## Configuration System
+Each provider has its own directory with command implementations:
 
-### Central Configuration: `config.json`
+```
+autopm/.claude/providers/
+├── router.js           # Central routing logic
+├── interface.js        # Unified interface definitions
+├── github/
+│   ├── issue-show.js
+│   ├── issue-start.js
+│   ├── issue-close.js
+│   ├── epic-list.js
+│   ├── epic-show.js
+│   └── ...
+└── azure/
+    ├── issue-show.js
+    ├── issue-start.js
+    ├── issue-close.js
+    ├── board-show.js
+    ├── test-plan-create.js
+    ├── lib/
+    │   ├── client.js    # Azure DevOps API client
+    │   └── formatter.js # Output formatting utilities
+    └── ...
+```
 
-The configuration file now includes a `projectManagement` section:
+### 3. Unified Command Interface
+
+All providers implement the same command interface, ensuring consistency:
+
+| Unified Command | GitHub Implementation | Azure DevOps Implementation |
+|----------------|----------------------|----------------------------|
+| `/pm:issue:show` | GitHub Issues API | Azure Work Items API |
+| `/pm:issue:start` | Create issue + assign | Create work item + assign |
+| `/pm:issue:close` | Close issue | Close work item |
+| `/pm:epic:list` | List milestones | List epics/features |
+| `/pm:pr:create` | GitHub Pull Request | Azure DevOps Pull Request |
+| `/pm:board:show` | GitHub Projects | Azure Boards |
+
+## Configuration
+
+### Project Configuration (`.claude/config.json`)
 
 ```json
 {
   "projectManagement": {
-    "provider": "github",  // Active provider
+    "provider": "github",  // or "azure"
     "settings": {
       "github": {
-        "repository": "owner/repo",
-        "token": "${GITHUB_TOKEN}",
-        "defaultLabels": ["autopm"],
-        "projectBoard": "Development"
+        "owner": "username",
+        "repo": "repository"
       },
       "azure": {
-        "organization": "my-org",
-        "project": "my-project",
-        "token": "${AZURE_DEVOPS_TOKEN}",
-        "defaultAreaPath": "MyProject\\Development",
-        "defaultIterationPath": "MyProject\\Sprint 1"
+        "organization": "org-name",
+        "project": "project-name",
+        "team": "team-name"
       }
     }
   }
 }
 ```
 
-### Provider Selection
+### Provider Selection Priority
 
-The active provider is determined by:
-1. **config.json**: `projectManagement.provider` field
-2. **Environment Variable**: `AUTOPM_PROVIDER` (overrides config)
-3. **Command Flag**: `--provider=azure` (highest priority)
+1. **Environment Variable**: `AUTOPM_PROVIDER=azure`
+2. **Configuration File**: `.claude/config.json`
+3. **Default**: GitHub (if not configured)
 
-## Unified Commands
+## Provider Development Guide
 
-All commands work identically regardless of the active provider:
+### Creating a New Provider
 
-### Issue/Work Item Management
+1. **Create Provider Directory**
+   ```
+   autopm/.claude/providers/jira/
+   ```
 
-```bash
-# These commands work with both GitHub Issues and Azure Work Items
-autopm decompose 123             # Decomposes issue/work item #123
-autopm start-stream 123          # Starts parallel work streams
-autopm status 123                 # Shows progress status
-autopm update 123 "In Progress"   # Updates status
-```
+2. **Implement Required Commands**
+   Each command module must export an `execute` function:
 
-### Pull Request Management
+   ```javascript
+   // jira/issue-show.js
+   module.exports = {
+     async execute(options, settings) {
+       // Connect to JIRA API
+       // Fetch issue data
+       // Return unified format
+       return {
+         id: issue.key,
+         title: issue.fields.summary,
+         status: mapStatus(issue.fields.status),
+         assignee: issue.fields.assignee?.displayName
+       };
+     }
+   };
+   ```
 
-```bash
-# Creates PR in GitHub or Azure DevOps based on provider
-autopm pr create "Feature implementation"
-autopm pr merge 456
-autopm pr review 456
-```
+3. **Map Provider-Specific Data**
+   Convert provider formats to unified structure:
 
-### Project Board Integration
+   ```javascript
+   // Unified status values
+   const STATUS_MAP = {
+     'open': ['New', 'To Do', 'Open'],
+     'in_progress': ['In Progress', 'Active', 'Doing'],
+     'in_review': ['Review', 'Testing', 'Resolved'],
+     'closed': ['Done', 'Closed', 'Complete']
+   };
+   ```
 
-```bash
-# Updates GitHub Projects or Azure Boards
-autopm board move 123 "In Review"
-autopm board list
-autopm sprint plan
-```
+### Provider Interface Standards
 
-## Provider Interface
-
-All providers implement a common interface:
+Each provider must implement these core methods:
 
 ```javascript
 class ProviderInterface {
-  // Issue/Work Item Operations
-  async getItem(id) {}
-  async createItem(data) {}
-  async updateItem(id, data) {}
-  async decomposeItem(id) {}
+  // Issue Management
+  async issueShow(id) { }
+  async issueList(filters) { }
+  async issueCreate(data) { }
+  async issueUpdate(id, changes) { }
+  async issueClose(id) { }
 
-  // Pull Request Operations
-  async createPR(data) {}
-  async mergePR(id) {}
-  async getPRStatus(id) {}
+  // Epic/Feature Management
+  async epicList() { }
+  async epicShow(id) { }
 
-  // Board Operations
-  async moveCard(itemId, column) {}
-  async getBoard() {}
-  async createSprint(data) {}
+  // Pull Request Management
+  async prCreate(data) { }
+  async prList(filters) { }
+  async prMerge(id) { }
+
+  // Board/Project Views
+  async boardShow() { }
+  async sprintStatus() { }
 }
 ```
 
-## Data Mapping
+## Authentication
 
-### Unified Data Model
+### GitHub Provider
+- Uses `GITHUB_TOKEN` environment variable
+- Supports GitHub Enterprise with custom URLs
+- OAuth token or Personal Access Token
 
-ClaudeAutoPM uses a unified data model that providers map to/from:
+### Azure DevOps Provider
+- Uses `AZURE_DEVOPS_TOKEN` environment variable
+- Personal Access Token (PAT) authentication
+- Supports on-premises Azure DevOps Server
+
+### Security Best Practices
+- Never commit tokens to repository
+- Use `.env` files for local development
+- Leverage CI/CD secret management
+- Rotate tokens regularly
+
+## Advanced Features
+
+### 1. Provider-Specific Extensions
+
+Providers can offer unique commands:
 
 ```javascript
+// Azure-specific test management
+/pm:test:plan:create
+/pm:test:run
+/pm:test:summary
+
+// GitHub-specific actions
+/pm:action:status
+/pm:workflow:trigger
+```
+
+### 2. Cross-Provider Migration
+
+Future capability to migrate between providers:
+
+```bash
+# Export from GitHub
+/pm:export --provider=github --format=universal
+
+# Import to Azure DevOps
+/pm:import --provider=azure --source=export.json
+```
+
+### 3. Multi-Provider Support
+
+Work with multiple providers simultaneously:
+
+```json
 {
-  id: "123",
-  title: "Add authentication",
-  description: "Implement user authentication...",
-  status: "in_progress",
-  assignee: "user@example.com",
-  labels: ["enhancement", "backend"],
-  milestone: "v2.0",
-  priority: "high",
-  streams: [...]  // Decomposed work streams
+  "projectManagement": {
+    "providers": {
+      "primary": "github",
+      "secondary": "azure"
+    }
+  }
 }
 ```
 
-### Platform Mapping
+## Provider Comparison
 
-Each provider handles mapping between the unified model and platform-specific formats:
+| Feature | GitHub | Azure DevOps | JIRA | GitLab |
+|---------|--------|--------------|------|--------|
+| Issues/Work Items | ✅ | ✅ | ✅ | ✅ |
+| Epics/Milestones | ✅ | ✅ | ✅ | ✅ |
+| Boards/Projects | ✅ | ✅ | ✅ | ✅ |
+| Pull/Merge Requests | ✅ | ✅ | ❌ | ✅ |
+| Test Management | ❌ | ✅ | ⚠️ | ⚠️ |
+| Wiki Integration | ✅ | ✅ | ✅ | ✅ |
+| CI/CD Integration | ✅ | ✅ | ⚠️ | ✅ |
 
-- **GitHub**: Issues, Labels, Milestones, Projects
-- **Azure DevOps**: Work Items, Tags, Iterations, Boards
-- **Jira**: Issues, Components, Sprints, Boards
+Legend: ✅ Full Support | ⚠️ Partial Support | ❌ Not Available
 
-## Migration Strategy
+## Troubleshooting
 
-### Phase 1: Foundation (Current)
-- ✅ Create provider directory structure
-- ✅ Update configuration system
-- ✅ Document architecture
+### Common Issues
 
-### Phase 2: Provider Implementation ✅ COMPLETE
-- ✅ Implement GitHub provider
-- ✅ Implement Azure DevOps provider
-  - ✅ Work item show/list/edit operations
-  - ✅ Rich field support (story points, acceptance criteria)
-  - ✅ WIQL query support
-  - ✅ State mapping and transitions
-- ✅ Create provider interface and router
+1. **Provider Not Found**
+   ```
+   ❌ Provider implementation not found for jira/issue-show
+   ```
+   Solution: Ensure provider directory and command file exist
 
-### Phase 3: Command Unification ✅ COMPLETE
-- ✅ Update CLI to use providers
-- ✅ Implement provider selection in installer
-- ✅ Add provider-specific configuration
-- ✅ Support both GitHub and Azure DevOps seamlessly
+2. **Authentication Failed**
+   ```
+   ❌ Error: Unauthorized (401)
+   ```
+   Solution: Check environment variable and token validity
 
-### Phase 4: Testing & Documentation (90% Complete)
-- [ ] Provider integration tests
-- ✅ Update user documentation
-- ✅ Add Azure DevOps setup guide
-- ✅ Document unified commands
+3. **Configuration Missing**
+   ```
+   ⚠️ No provider configured, defaulting to GitHub
+   ```
+   Solution: Add provider configuration to `.claude/config.json`
 
-## Benefits
+### Debug Mode
 
-### 1. **Platform Agnostic**
-Teams can use their preferred project management platform without changing workflows.
+Enable detailed logging:
 
-### 2. **Seamless Migration**
-Switch between platforms without rewriting automation scripts.
+```bash
+export AUTOPM_DEBUG=true
+/pm:issue:show 123
+```
 
-### 3. **Unified Experience**
-Consistent commands and behavior across all platforms.
+## Future Roadmap
 
-### 4. **Extensibility**
-Easy to add new providers (Jira, Linear, Asana, etc.).
-
-### 5. **Configuration Flexibility**
-Per-project provider selection with environment-specific overrides.
-
-## Implementation Guidelines
-
-### Adding a New Provider
-
-1. Create directory: `/providers/<provider-name>/`
-2. Implement the provider interface
-3. Add configuration schema to `config.json`
-4. Create data mappers
-5. Write provider documentation
-6. Add integration tests
-
-### Provider Best Practices
-
-- **Error Handling**: Graceful degradation with clear error messages
-- **Rate Limiting**: Respect platform API limits
-- **Caching**: Cache frequently accessed data
-- **Authentication**: Support multiple auth methods (token, OAuth, etc.)
-- **Logging**: Detailed logging for debugging
-- **Testing**: Comprehensive unit and integration tests
-
-## Security Considerations
-
-### Token Management
-- Tokens stored in environment variables
-- Never committed to repository
-- Support for credential managers
-
-### API Security
-- HTTPS only for API calls
-- Token validation before operations
-- Audit logging for sensitive operations
-
-### Data Privacy
-- No sensitive data in logs
-- Configurable data retention
-- GDPR compliance for European users
-
-## Future Enhancements
-
-### Planned Features
-
-1. **Multi-Provider Support**: Work with multiple platforms simultaneously
-2. **Provider Sync**: Synchronize data between platforms
-3. **Custom Providers**: Plugin system for custom implementations
-4. **Provider Templates**: Quick-start templates for common platforms
-5. **Migration Tools**: Automated data migration between platforms
-
-### Potential Integrations
-
-- **Jira**: Atlassian's issue tracking
+### Planned Providers
+- **GitLab**: Full GitLab integration
+- **Bitbucket**: Atlassian ecosystem support
 - **Linear**: Modern issue tracking
-- **Asana**: Task management
-- **Monday.com**: Work OS platform
-- **ClickUp**: All-in-one productivity
-- **Notion**: Workspace collaboration
+- **Notion**: Documentation and project management
 
-## Conclusion
+### Enhanced Features
+- Automated provider detection
+- Provider plugin system
+- GraphQL support for better performance
+- Offline mode with sync capabilities
+- AI-powered command suggestions per provider
 
-The provider architecture transforms ClaudeAutoPM into a truly platform-agnostic project management automation framework. By abstracting platform-specific details behind a unified interface, teams can leverage the power of AI-driven project management regardless of their chosen platform.
+## Contributing
 
-This architecture ensures:
-- **Flexibility**: Choose the right platform for your team
-- **Consistency**: Same commands, same results
-- **Scalability**: Easy to add new platforms
-- **Maintainability**: Clean separation of concerns
+To add a new provider:
 
-The provider strategy positions ClaudeAutoPM as the universal adapter for AI-powered project management across all major platforms.
+1. Fork the repository
+2. Create provider directory structure
+3. Implement required commands
+4. Add provider tests
+5. Update this documentation
+6. Submit pull request
+
+See [CONTRIBUTING.md](../CONTRIBUTING.md) for detailed guidelines.
+
+## Resources
+
+- [Provider Interface Specification](./PROVIDER_INTERFACE.md)
+- [Command Mapping Guide](./COMMAND_MAPPING.md)
+- [API Documentation](./API.md)
+- [Testing Providers](../test/providers/README.md)

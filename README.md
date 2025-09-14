@@ -7,21 +7,31 @@
 &nbsp;
 [![Follow on 𝕏](https://img.shields.io/badge/𝕏-@rafeekpro-1c9bf0)](http://x.com/intent/follow?screen_name=rafeekpro)
 
-## Automated project management system to ship ~~faster~~ _better_ using spec-driven development, GitHub/Azure DevOps, Git branches, and multiple AI agents running in parallel
+## Automated project management system to ship ~~faster~~ _better_ using spec-driven development, unified provider architecture, Git branches, and multiple AI agents running in parallel
 
-### 🔷 Azure DevOps Integration - Full Feature Set
+### 🎯 Unified Provider Architecture
 
-**✅ Complete Implementation:**
-- **Work Item Management** - Create, View, Edit, Close, List with WIQL queries
-- **Rich Field Support** - Story Points, Acceptance Criteria, Sprint Planning, Custom Fields
-- **Epic/Feature Hierarchy** - Full parent-child relationship tracking
-- **Pull Request Management** - Create, List, Review PRs with work item linking
-- **Board Visualization** - Kanban board display with customizable columns
-- **Test Plan Integration** - Create test plans, execute test runs, track results
-- **State Transitions** - Full workflow state management
-- **Team Collaboration** - Assignments, reviewers, tags, and comments
+ClaudeAutoPM implements a **provider-agnostic command interface** that seamlessly works across different project management platforms:
 
-Choose your platform during installation - both GitHub and Azure DevOps have feature parity!
+**✅ Supported Providers:**
+- **GitHub** - Issues, Projects, Pull Requests, Actions
+- **Azure DevOps** - Work Items, Boards, Repos, Pipelines
+- **GitLab** *(coming soon)* - Issues, Epics, Merge Requests
+- **Jira** *(planned)* - Issues, Epics, Boards
+
+**✨ Key Features:**
+- **Unified Commands** - Same `/pm:` commands work across all providers
+- **Automatic Routing** - Commands are automatically routed to your configured provider
+- **Provider Switching** - Easy switching between platforms without changing workflow
+- **Feature Parity** - Core functionality works consistently across providers
+- **Provider Extensions** - Access provider-specific features when needed
+
+All commands use the same syntax regardless of provider:
+```bash
+/pm:issue:show 123      # Works with GitHub Issues or Azure Work Items
+/pm:epic:list           # Works with GitHub Milestones or Azure Epics
+/pm:pr:create           # Works with GitHub PRs or Azure DevOps PRs
+```
 
 > **Inspired by [CCPM (Claude Code Project Manager)](https://github.com/automazeio/ccpm)** - This project builds upon the foundational concepts of AI-powered project management to create a comprehensive development framework.
 
@@ -61,20 +71,38 @@ This system solves all of that.
 
 ## 🤖 Self-Maintaining System
 
-ClaudeAutoPM uses its own framework capabilities for self-maintenance:
+ClaudeAutoPM uses its own framework capabilities for self-maintenance, now fully implemented in Node.js for cross-platform compatibility:
 
 ```bash
 # Check system health
-pm health
+npm run pm:health
+# or: node scripts/self-maintenance.js health
 
 # Optimize agent ecosystem
-pm optimize
+npm run pm:optimize
+# or: node scripts/self-maintenance.js optimize
 
 # Validate integrity
-pm validate
+npm run pm:validate
+# or: node scripts/self-maintenance.js validate
+
+# Display metrics
+npm run pm:metrics
+
+# Test installation scenarios
+npm run pm:test-install
+
+# Prepare release
+npm run pm:release
 ```
 
-See [Self-Maintenance Guide](docs/SELF-MAINTENANCE-GUIDE.md) for details.
+**Key improvements:**
+- **Cross-platform** - Works on Windows, macOS, and Linux
+- **Performance optimized** - Parallel operations and efficient parsing
+- **Enhanced testing** - Comprehensive scenario testing
+- **Better error handling** - Detailed error messages and recovery
+
+See [Self-Maintenance Guide](docs/SELF-MAINTENANCE-GUIDE.md) for complete documentation.
 
 ## 📡 MCP Server Management
 
@@ -632,15 +660,16 @@ Specialized agents implement tasks while maintaining progress updates and an aud
 - `/pm:epic-edit` - Edit epic details
 - `/pm:epic-refresh` - Update epic progress from tasks
 
-### Issue Commands
+### Issue/Work Item Commands
 
-- `/pm:issue-show` - Display issue and sub-issues
-- `/pm:issue-status` - Check issue status
-- `/pm:issue-start` - Begin work with specialized agent
-- `/pm:issue-sync` - Push updates to GitHub
-- `/pm:issue-close` - Mark issue as complete
-- `/pm:issue-reopen` - Reopen closed issue
-- `/pm:issue-edit` - Edit issue details
+- `/pm:issue:show <id>` - Display issue details (GitHub Issues/Azure Work Items)
+- `/pm:issue:list` - List all issues with filters
+- `/pm:issue:create` - Create new issue
+- `/pm:issue:start <id>` - Begin work with branch and assignment
+- `/pm:issue:close <id>` - Mark issue as complete
+- `/pm:issue:edit <id>` - Edit issue details
+- `/pm:issue:assign <id> <user>` - Assign to user
+- `/pm:issue:comment <id>` - Add comment
 
 ### Workflow Commands
 
