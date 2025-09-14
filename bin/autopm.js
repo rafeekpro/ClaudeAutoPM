@@ -147,6 +147,9 @@ const showHelp = () => {
   log('  setup-env [path]   Interactive .env configuration setup (current dir or specified path)');
   log('  init               Initialize new project with ClaudeAutoPM');
   log('  mcp <command>      Manage MCP (Model Context Protocol) servers');
+  log('  decompose <issue>  Decompose issue into parallel work streams');
+  log('  start-streams <id> Start parallel execution of decomposed streams');
+  log('  status <issue>     Check status of issue decomposition');
   log('  version            Show version information');
   log('  help               Show this help message');
   log('  config             Configure development features (Docker/K8s toggles)');
@@ -180,6 +183,9 @@ const showHelp = () => {
   log('  autopm mcp list                   # List available MCP servers');
   log('  autopm mcp enable github-mcp      # Enable GitHub MCP server');
   log('  autopm mcp sync                   # Sync MCP configuration');
+  log('  autopm decompose 123 "Add auth"   # Decompose issue #123');
+  log('  autopm start-streams 123          # Start parallel work on issue');
+  log('  autopm status 123                 # Check issue progress');
   log('');
   log('INSTALLATION MODES:', 'yellow');
   log('  🆕 Fresh Install   - Sets up complete ClaudeAutoPM framework');
@@ -429,6 +435,117 @@ const main = () => {
     case 'mcp':
       // Handle MCP subcommands
       handleMCPCommand(args.slice(1));
+      break;
+
+    case 'decompose':
+      // Decompose issue into parallel work streams
+      checkPrerequisites();
+      printBanner();
+      if (!parsed.path && args.length < 2) {
+        error('Usage: autopm decompose <issue-number> [title] [description]');
+      }
+      const issueNumber = parsed.path || args[1];
+      const issueTitle = args[2] || 'Untitled Issue';
+      const issueDescription = args[3] || '';
+
+      info(`Decomposing issue #${issueNumber}...`);
+      const decomposer = path.join(PACKAGE_DIR, 'autopm', '.claude', 'scripts', 'decompose-issue.js');
+      if (!fs.existsSync(decomposer)) {
+        error('Decomposer script not found. Please reinstall ClaudeAutoPM.');
+      }
+
+      try {
+        const { spawnSync } = require('child_process');
+        const result = spawnSync('node', [decomposer, issueNumber, issueTitle, issueDescription], {
+          stdio: 'inherit',
+          cwd: process.cwd()
+        });
+        process.exit(result.status || 0);
+      } catch (err) {
+        error(`Failed to decompose issue: ${err.message}`);
+      }
+      break;
+
+    case 'start-streams':
+      // Start parallel execution of decomposed streams
+      printBanner();
+      if (!parsed.path && args.length < 2) {
+        error('Usage: autopm start-streams <issue-number>');
+      }
+      const streamIssueNumber = parsed.path || args[1];
+
+      info(`Starting parallel streams for issue #${streamIssueNumber}...`);
+      const starter = path.join(PACKAGE_DIR, 'autopm', '.claude', 'scripts', 'start-parallel-streams.js');
+      if (!fs.existsSync(starter)) {
+        error('Stream starter script not found. Please reinstall ClaudeAutoPM.');
+      }
+
+      try {
+        const { spawnSync } = require('child_process');
+        const result = spawnSync('node', [starter, streamIssueNumber], {
+          stdio: 'inherit',
+          cwd: process.cwd()
+        });
+        process.exit(result.status || 0);
+      } catch (err) {
+        error(`Failed to start streams: ${err.message}`);
+      }
+      break;
+
+    case 'status':
+      // Check status of issue decomposition
+      printBanner();
+      if (!parsed.path && args.length < 2) {
+        error('Usage: autopm status <issue-number>');
+      }
+      const statusIssueNumber = parsed.path || args[1];
+
+      info(`Checking status for issue #${statusIssueNumber}...`);
+      const statusChecker = path.join(PACKAGE_DIR, 'autopm', '.claude', 'scripts', 'check-issue-status.js');
+      if (!fs.existsSync(statusChecker)) {
+        // If status checker doesn't exist yet, create a simple inline version
+        const issuePath = path.join(process.cwd(), '.claude', 'epics', 'current', `issue-${statusIssueNumber}`);
+        if (!fs.existsSync(issuePath)) {
+          error(`Issue #${statusIssueNumber} not found. Have you decomposed it yet?`);
+        }
+
+        const updatesPath = path.join(issuePath, 'updates');
+        if (fs.existsSync(updatesPath)) {
+          const streamFiles = fs.readdirSync(updatesPath).filter(f => f.startsWith('stream-'));
+          log(`\n📊 Issue #${statusIssueNumber} Status:\n`, 'bright');
+
+          streamFiles.forEach((file, index) => {
+            const content = fs.readFileSync(path.join(updatesPath, file), 'utf8');
+            const statusMatch = content.match(/status: (\w+)/);
+            const nameMatch = content.match(/name: (.+)/);
+            const status = statusMatch ? statusMatch[1] : 'unknown';
+            const name = nameMatch ? nameMatch[1] : 'Unknown Stream';
+            const letter = String.fromCharCode(65 + index);
+
+            let statusIcon = '⏸️';
+            if (status === 'completed') statusIcon = '✅';
+            else if (status === 'in_progress') statusIcon = '🔄';
+            else if (status === 'failed') statusIcon = '❌';
+            else if (status === 'blocked') statusIcon = '🚫';
+
+            log(`  ${statusIcon} Stream ${letter}: ${name} (${status})`);
+          });
+
+          log('\nFor detailed info, check:', 'cyan');
+          log(`  ${issuePath}`);
+        }
+      } else {
+        try {
+          const { spawnSync } = require('child_process');
+          const result = spawnSync('node', [statusChecker, statusIssueNumber], {
+            stdio: 'inherit',
+            cwd: process.cwd()
+          });
+          process.exit(result.status || 0);
+        } catch (err) {
+          error(`Failed to check status: ${err.message}`);
+        }
+      }
       break;
 
     default:

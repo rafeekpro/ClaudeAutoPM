@@ -1,0 +1,69 @@
+name: "Default Template"
+description: "Generic template for issues that don't match specific patterns"
+patterns: []
+
+streams:
+  analysis:
+    name: "Requirements Analysis"
+    agent: "code-analyzer"
+    priority: 1
+    tasks:
+      - "Analyze requirements and constraints"
+      - "Identify affected components"
+      - "Document technical approach"
+      - "Define success criteria"
+      - "Identify potential risks"
+    files:
+      - "docs/analysis/*.md"
+
+  backend:
+    name: "Backend Implementation"
+    agent: "python-backend-expert"
+    priority: 2
+    dependencies: ["analysis"]
+    tasks:
+      - "Implement core business logic"
+      - "Add data persistence layer"
+      - "Create service interfaces"
+      - "Add validation and error handling"
+      - "Implement logging and monitoring"
+    files:
+      - "src/**/*.py"
+
+  frontend:
+    name: "Frontend Implementation"
+    agent: "react-frontend-engineer"
+    priority: 3
+    dependencies: ["backend"]
+    tasks:
+      - "Create user interface components"
+      - "Implement user interactions"
+      - "Add client-side validation"
+      - "Handle API communication"
+      - "Implement error handling"
+    files:
+      - "src/**/*.tsx"
+      - "src/**/*.ts"
+
+  tests:
+    name: "Testing"
+    agent: "test-runner"
+    priority: 4
+    dependencies: ["backend", "frontend"]
+    tasks:
+      - "Write unit tests"
+      - "Create integration tests"
+      - "Add end-to-end tests"
+      - "Perform manual testing"
+      - "Document test results"
+    files:
+      - "tests/**/*.test.*"
+
+coordination:
+  sync_points:
+    - after: "analysis"
+      message: "Technical approach defined"
+    - after: "backend"
+      message: "Backend ready for frontend integration"
+
+  shared_files: []
