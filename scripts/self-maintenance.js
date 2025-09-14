@@ -8,7 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { execSync } = require('child_process');
+const { spawnSync } = require('child_process');
 const readline = require('readline');
 
 class SelfMaintenance {
@@ -55,7 +55,8 @@ class SelfMaintenance {
     if (fs.existsSync(path.join(this.projectRoot, 'package.json'))) {
       console.log('  │   ├── Running tests...');
       try {
-        execSync('npm test --silent', { cwd: this.projectRoot, stdio: 'pipe' });
+        const result = spawnSync('npm', ['test', '--silent'], { cwd: this.projectRoot, stdio: 'pipe' });
+        if (result.status !== 0) throw new Error('Tests failed');
         console.log('  │   └── ✅ Tests passing');
       } catch (e) {
         console.log('  │   └── ❌ Tests failing');
@@ -85,10 +86,11 @@ class SelfMaintenance {
 
     // Check for recent commits
     try {
-      const lastCommit = execSync('git log -1 --format="%ar"', {
+      const gitResult = spawnSync('git', ['log', '-1', '--format=%ar'], {
         cwd: this.projectRoot,
         encoding: 'utf8'
-      }).trim();
+      });
+      const lastCommit = gitResult.stdout ? gitResult.stdout.trim() : 'unknown';
       console.log('');
       console.log(`📝 Last commit: ${lastCommit}`);
     } catch (e) {
@@ -148,7 +150,8 @@ class SelfMaintenance {
     try {
       const verifyScript = path.join(this.projectRoot, 'scripts/verify-agents.js');
       if (fs.existsSync(verifyScript)) {
-        execSync(`node ${verifyScript}`, { cwd: this.projectRoot, stdio: 'pipe' });
+        const result = spawnSync('node', [verifyScript], { cwd: this.projectRoot, stdio: 'pipe' });
+        if (result.status !== 0) throw new Error('Verification failed');
         console.log('✅');
       } else {
         console.log('⚠️ (verify script not found)');
@@ -164,7 +167,8 @@ class SelfMaintenance {
     // Run npm test if available
     if (fs.existsSync(path.join(this.projectRoot, 'package.json'))) {
       try {
-        execSync('npm test --silent', { cwd: this.projectRoot, stdio: 'pipe' });
+        const result = spawnSync('npm', ['test', '--silent'], { cwd: this.projectRoot, stdio: 'pipe' });
+        if (result.status !== 0) throw new Error('Tests failed');
         console.log('  ✅ Tests passing');
       } catch (e) {
         console.log('  ❌ Some tests failing');
@@ -249,7 +253,8 @@ class SelfMaintenance {
     // 2. Run tests
     process.stdout.write('  ├── Test suite... ');
     try {
-      execSync('npm test --silent', { cwd: this.projectRoot, stdio: 'pipe' });
+      const testResult = spawnSync('npm', ['test', '--silent'], { cwd: this.projectRoot, stdio: 'pipe' });
+      if (testResult.status !== 0) throw new Error('Tests failed');
       console.log('✅');
     } catch (e) {
       console.log('❌');
@@ -267,11 +272,12 @@ class SelfMaintenance {
     const testDir = path.join(os.tmpdir(), `autopm-release-test-${Date.now()}`);
     try {
       fs.mkdirSync(testDir, { recursive: true });
-      execSync(`echo "${this.DEFAULT_INSTALL_OPTION}" | bash ${path.join(this.projectRoot, 'install/install.sh')} ${testDir}`,
-        { stdio: 'pipe' });
+      // Use safe installation method
+      this.runInstallScript(this.DEFAULT_INSTALL_OPTION, testDir);
       const success = fs.existsSync(path.join(testDir, 'CLAUDE.md'));
       console.log(success ? '✅' : '❌');
-      execSync(`rm -rf ${testDir}`);
+      // Clean up using fs methods instead of shell commands
+      fs.rmSync(testDir, { recursive: true, force: true });
     } catch (e) {
       console.log('❌');
     }
@@ -326,7 +332,8 @@ class SelfMaintenance {
           if (confirm.toLowerCase() === 'y') {
             console.log('🎉 Creating release...');
             try {
-              execSync(`npm version ${npmVersion}`, { cwd: this.projectRoot, stdio: 'inherit' });
+              const versionResult = spawnSync('npm', ['version', npmVersion], { cwd: this.projectRoot, stdio: 'inherit' });
+              if (versionResult.status !== 0) throw new Error('Version update failed');
               console.log('✅ Version updated');
               console.log('');
               console.log('Next steps:');
@@ -375,12 +382,8 @@ class SelfMaintenance {
           throw new Error(`Unknown scenario: ${scenario}`);
         }
 
-        // Use execFileSync for safer execution (avoids shell injection)
-        const installScript = path.join(this.projectRoot, 'install/install.sh');
-        execSync(
-          `echo "${input}" | bash "${installScript}" "${testDir}"`,
-          { stdio: 'pipe' }
-        );
+        // Use safe installation method (no shell injection risk)
+        this.runInstallScript(input, testDir);
 
         // Validate installation
         const success = fs.existsSync(path.join(testDir, 'CLAUDE.md')) &&
@@ -395,14 +398,14 @@ class SelfMaintenance {
         }
 
         // Cleanup
-        execSync(`rm -rf ${testDir}`);
+        fs.rmSync(testDir, { recursive: true, force: true });
       } catch (e) {
         console.log(`  ❌ ${scenario} installation error: ${e.message}`);
         results.push({ scenario, success: false, error: e.message });
 
         // Cleanup on error
         try {
-          execSync(`rm -rf ${testDir}`);
+          fs.rmSync(testDir, { recursive: true, force: true });
         } catch {}
       }
     }
@@ -419,6 +422,30 @@ class SelfMaintenance {
   /**
    * HELPER METHODS
    */
+
+  /**
+   * Safely run installation script without shell injection risk
+   */
+  runInstallScript(inputOption, targetDir) {
+    const installScript = path.join(this.projectRoot, 'install/install.sh');
+
+    // Use spawnSync with proper argument array (no shell interpolation)
+    const result = spawnSync('bash', [installScript, targetDir], {
+      input: inputOption + '\n',
+      encoding: 'utf8',
+      cwd: this.projectRoot
+    });
+
+    if (result.error) {
+      throw result.error;
+    }
+
+    if (result.status !== 0) {
+      throw new Error(`Installation failed with exit code ${result.status}: ${result.stderr}`);
+    }
+
+    return result;
+  }
 
   // Count files with specific extensions
   countFiles(dir, extensions, excludeDirs = []) {
