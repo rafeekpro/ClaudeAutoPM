@@ -9,6 +9,22 @@
 
 ## Automated project management system to ship ~~faster~~ _better_ using spec-driven development, GitHub/Azure DevOps, Git branches, and multiple AI agents running in parallel
 
+### 🔷 Azure DevOps Integration Status
+
+**Production Ready Features:**
+- ✅ Work Item Management (Create, View, Edit, Close)
+- ✅ WIQL Query Support for Advanced Filtering
+- ✅ Rich Field Support (Story Points, Acceptance Criteria, Sprint Planning)
+- ✅ Epic/Feature Hierarchy Management
+- ✅ State Transitions and Assignments
+
+**Coming Soon:**
+- 🚧 Pull Request Management (Different API)
+- 🚧 Board Visualization
+- 🚧 Test Plan Integration
+
+Choose your platform during installation - both GitHub and Azure DevOps are fully supported for core workflows!
+
 > **Inspired by [CCPM (Claude Code Project Manager)](https://github.com/automazeio/ccpm)** - This project builds upon the foundational concepts of AI-powered project management to create a comprehensive development framework.
 
 Stop losing context. Stop blocking on tasks. Stop shipping bugs. This battle-tested system turns PRDs into epics, epics into GitHub issues, and issues into production code – with full traceability at every step.
@@ -207,6 +223,33 @@ graph LR
 | Manual task coordination | **Intelligent prioritization** with `/pm:next` |
 
 ## ⚙️ Configuration Options
+
+### Platform Selection
+
+ClaudeAutoPM supports multiple project management platforms:
+
+```bash
+# During installation, you'll be asked:
+Choose your project management platform:
+  1) 📙 GitHub (Issues, Projects, Pull Requests)
+  2) 🔷 Azure DevOps (Work Items, Boards, Repos)
+```
+
+You can also switch providers after installation:
+```bash
+# In your .claude/config.json
+"projectManagement": {
+  "provider": "azure",  // or "github"
+  "settings": {
+    "azure": {
+      "organization": "your-org",
+      "project": "your-project"
+    }
+  }
+}
+```
+
+### Execution Strategies
 
 ClaudeAutoPM adapts to your development style with **3 distinct configurations**:
 

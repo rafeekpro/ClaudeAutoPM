@@ -4,26 +4,34 @@
 
 This document tracks the migration from provider-specific commands to unified commands.
 
-### ✅ Completed Migrations
+### ✅ Completed Implementations
 
-| Old PM Command | Old Azure Command | New Unified Command | Status |
+| Command | GitHub Support | Azure DevOps Support | Status |
 |---|---|---|---|
-| `/pm:epic-list` | `/azure:feature-list` | `/epic:list` | ✅ Migrated |
-| `/pm:issue-start` | `/azure:task-start` | `/issue:start` | ✅ Migrated |
+| `issue-start` | ✅ Full | ✅ Full | Production Ready |
+| `issue-close` | ✅ Full | ✅ Full | Production Ready |
+| `issue-show` | ✅ Full | ✅ Full | Production Ready |
+| `issue-list` | ✅ Full | ✅ Full | Production Ready |
+| `issue-edit` | ✅ Full | ✅ Full (with rich fields) | Production Ready |
+| `epic-list` | ✅ Full | ✅ Full | Production Ready |
 
-### 🔄 Commands to Migrate
+### 🚧 Partially Implemented
 
-Based on analysis of the command directories, here are the primary command pairs that need unification:
-
-#### Issue/Task Management
-| PM Command | Azure Command | Unified Command | Priority |
+| Command | GitHub | Azure DevOps | Notes |
 |---|---|---|---|
-| `/pm:issue-close` | `/azure:task-close` | `/issue:close` | High |
-| `/pm:issue-show` | `/azure:task-show` | `/issue:show` | High |
-| `/pm:issue-edit` | `/azure:task-edit` | `/issue:edit` | High |
-| `/pm:issue-status` | `/azure:task-status` | `/issue:status` | High |
-| `/pm:issue-sync` | `/azure:task-sync` | `/issue:sync` | Medium |
-| `/pm:issue-reopen` | `/azure:task-reopen` | `/issue:reopen` | Medium |
+| Project boards | Via Projects API | Via Boards API | Different paradigms |
+| Sprint planning | Via Milestones | ✅ Native support | Azure has richer model |
+| User Stories | Via labeled issues | ✅ Native Work Items | Azure has dedicated type |
+
+### 🔄 Commands to Implement
+
+#### High Priority (Core Workflow)
+| Command | Purpose | Priority | Complexity |
+|---|---|---|---|
+| `epic-show` | Display epic details | High | Low |
+| `epic-edit` | Update epic fields | High | Low |
+| `project-status` | Show project overview | High | Medium |
+| `search` | Cross-platform search | High | Medium |
 
 #### Epic/Feature Management
 | PM Command | Azure Command | Unified Command | Priority |
@@ -73,24 +81,28 @@ Where:
 - `<action>` is the operation (list, show, start, close, etc.)
 - `[options]` are provider-agnostic parameters
 
-### 📁 Directory Structure
+### 📁 Current Implementation Status
 
 ```
 autopm/.claude/providers/
-├── router.js                 # Main routing logic
-├── interface.js              # Common contracts
+├── router.js                 # ✅ Main routing logic (working)
+├── interface.js              # ⚠️ Planned for Phase 4
 ├── github/                   # GitHub implementations
-│   ├── epic-list.js         ✅
-│   ├── issue-start.js       ✅
-│   ├── issue-close.js       🔄
-│   ├── issue-show.js        🔄
-│   └── ...
+│   ├── epic-list.js         # ✅ Complete
+│   ├── issue-start.js       # ✅ Complete
+│   ├── issue-close.js       # ✅ Complete
+│   ├── issue-show.js        # ✅ Complete
+│   └── (4 files total)
 └── azure/                    # Azure DevOps implementations
-    ├── epic-list.js         ✅
-    ├── issue-start.js       ✅
-    ├── issue-close.js       🔄
-    ├── issue-show.js        🔄
-    └── ...
+    ├── epic-list.js         # ✅ Complete
+    ├── issue-start.js       # ✅ Complete
+    ├── issue-close.js       # ✅ Complete
+    ├── issue-show.js        # ✅ Complete
+    ├── issue-list.js        # ✅ Complete with WIQL
+    ├── issue-edit.js        # ✅ Complete with rich fields
+    └── lib/
+        ├── client.js        # ✅ Azure DevOps API client
+        └── formatter.js     # ✅ Display formatting
 ```
 
 ### 🗑️ Directories to Remove
@@ -131,6 +143,63 @@ Legend:
 - ✅ Full support
 - ⚠️ Partial support / workaround needed
 - ❌ Not supported
+
+## Implementation Roadmap
+
+### ✅ Phase 1: Core Foundation (COMPLETE)
+- Basic provider architecture
+- Router implementation
+- GitHub and Azure DevOps clients
+- Issue management (start, close, show, list, edit)
+- Epic listing
+
+### 🚧 Phase 2: Extended Commands (IN PROGRESS)
+**Next Sprint (Priority Order):**
+1. `epic-show` and `epic-edit` - Complete epic management
+2. `project-status` - Unified project overview
+3. `search` - Cross-platform search capability
+
+### 📅 Phase 3: Advanced Features (PLANNED)
+- Sprint/Iteration management
+- User Story workflows
+- Board visualization
+- Bulk operations
+
+### 🎯 Phase 4: Polish & Optimization
+- Common interface abstraction
+- Performance optimizations
+- Enhanced error handling
+- Provider plugin system
+
+## Current Capabilities
+
+### What Works Today
+
+**✅ Azure DevOps:**
+- Create, view, edit, close work items
+- List and filter work items with WIQL
+- Rich field support (Story Points, Acceptance Criteria)
+- State transitions and assignments
+- Tag management
+
+**✅ GitHub:**
+- Create, view, edit, close issues
+- List and filter issues
+- Label management
+- Milestone assignment
+- Project board integration
+
+### Known Limitations
+
+**⚠️ Azure DevOps:**
+- No PR management yet (different API)
+- Board operations not implemented
+- Test Plan integration pending
+
+**⚠️ GitHub:**
+- Sprint concept uses milestones (less rich)
+- No native User Story type (uses labels)
+- Limited hierarchy support
 
 ## Reference
 
