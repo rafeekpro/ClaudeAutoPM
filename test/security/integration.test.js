@@ -533,10 +533,7 @@ describe('Hybrid Strategy Integration Tests', () => {
       const recursiveExecute = async (depth) => {
         if (depth > 5) return;
 
-        // Need to simulate nested calls by increasing context depth manually
-        const context = orchestrator.contexts.get('depth-test');
-        context.depth = depth;
-
+        // Simulate nested calls by recursively invoking executeInContext
         await orchestrator.executeInContext('depth-test', 'task');
         await recursiveExecute(depth + 1);
       };
