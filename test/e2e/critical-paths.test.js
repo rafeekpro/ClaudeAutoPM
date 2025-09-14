@@ -38,11 +38,15 @@ describe('E2E Critical Path Tests', () => {
       // Run non-interactive installation
       const result = execSync(
         `node ${autopmpBin} install --yes --config minimal --no-env --no-hooks`,
-        { cwd: testProjectPath, encoding: 'utf8' }
+        {
+          cwd: testProjectPath,
+          encoding: 'utf8',
+          env: { ...process.env, AUTOPM_TEST_MODE: '1' }
+        }
       );
 
       // Verify installation
-      assert(result.includes('Installation complete'), 'Installation should complete');
+      assert(result.includes('installation completed successfully') || result.includes('Installation complete'), 'Installation should complete');
       assert(fs.existsSync(path.join(testProjectPath, '.claude')), '.claude directory should exist');
       assert(fs.existsSync(path.join(testProjectPath, 'CLAUDE.md')), 'CLAUDE.md should exist');
     });
@@ -52,8 +56,8 @@ describe('E2E Critical Path Tests', () => {
       assert(fs.existsSync(configPath), 'Config file should exist');
 
       const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-      assert(config.projectManagement, 'Should have project management config');
-      assert(config.executionStrategy, 'Should have execution strategy');
+      assert(config.provider, 'Should have provider config');
+      assert(config.execution_strategy, 'Should have execution strategy');
     });
   });
 
