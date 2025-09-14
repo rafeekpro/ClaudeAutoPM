@@ -3,7 +3,7 @@
  * Tests the PM command logic that was migrated from bash to Node.js
  */
 
-const { describe, it, beforeEach, afterEach, mock } = require('node:test');
+const { describe, it, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
