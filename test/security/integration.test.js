@@ -69,7 +69,7 @@ class HybridStrategyOrchestrator {
     }
 
     // Check depth limit BEFORE incrementing to prevent exceeding the limit
-    if (context.depth >= context.config.maxDepth) {
+    if (context.depth > context.config.maxDepth) {
       throw new Error('Max recursion depth exceeded');
     }
 
