@@ -98,36 +98,48 @@ class ProviderRouter {
    * Parse command line arguments
    */
   parseArgs(args) {
-    const options = {
-      status: 'open',
-      limit: 50
-    };
+    const options = {};
+
+    // First non-option argument is often the primary parameter (like issue ID)
+    let primaryParam = null;
 
     for (let i = 0; i < args.length; i++) {
       const arg = args[i];
 
-      switch (arg) {
-        case '--status':
-          if (i + 1 < args.length) {
-            options.status = args[++i];
-          }
-          break;
-        case '--assignee':
-          if (i + 1 < args.length) {
-            options.assignee = args[++i];
-          }
-          break;
-        case '--label':
-          if (i + 1 < args.length) {
-            options.label = args[++i];
-          }
-          break;
-        case '--limit':
-          if (i + 1 < args.length) {
-            options.limit = parseInt(args[++i], 10);
-          }
-          break;
+      if (arg.startsWith('--')) {
+        // Handle option flags
+        const optionName = arg.substring(2);
+
+        // Boolean flags
+        if (optionName === 'assign' || optionName === 'no-branch') {
+          options[optionName.replace('-', '_')] = true;
+        }
+        // Options with values
+        else if (i + 1 < args.length && !args[i + 1].startsWith('--')) {
+          const value = args[++i];
+          options[optionName.replace('-', '_')] = value;
+        }
+        // Flags without values default to true
+        else {
+          options[optionName.replace('-', '_')] = true;
+        }
+      } else if (!primaryParam) {
+        // First non-option argument
+        primaryParam = arg;
       }
+    }
+
+    // Add primary parameter if exists
+    if (primaryParam) {
+      options.id = primaryParam;
+    }
+
+    // Set defaults for list command
+    if (!options.status) {
+      options.status = 'open';
+    }
+    if (!options.limit) {
+      options.limit = 50;
     }
 
     return options;
@@ -137,28 +149,93 @@ class ProviderRouter {
    * Output results in consistent format
    */
   outputResults(results) {
-    if (!results || results.length === 0) {
-      console.log('📋 No epics found matching criteria');
+    // Handle different response types
+    if (!results) {
+      console.log('📋 No results returned');
       return;
     }
 
-    console.log(`\n📋 Found ${results.length} epic(s):\n`);
+    // Handle action results (like issue:start)
+    if (results.success !== undefined && results.actions) {
+      this.outputActionResult(results);
+      return;
+    }
 
-    results.forEach((epic, index) => {
-      console.log(`${index + 1}. [${epic.id}] ${epic.title}`);
-      console.log(`   Status: ${epic.status}`);
-      if (epic.assignee) {
-        console.log(`   Assignee: ${epic.assignee}`);
+    // Handle list results (like epic:list)
+    if (Array.isArray(results)) {
+      this.outputListResults(results);
+      return;
+    }
+
+    // Default: output as JSON
+    console.log(JSON.stringify(results, null, 2));
+  }
+
+  /**
+   * Output list results
+   */
+  outputListResults(results) {
+    if (results.length === 0) {
+      console.log('📋 No items found matching criteria');
+      return;
+    }
+
+    console.log(`\n📋 Found ${results.length} item(s):\n`);
+
+    results.forEach((item, index) => {
+      console.log(`${index + 1}. [${item.id}] ${item.title}`);
+      console.log(`   Status: ${item.status}`);
+      if (item.assignee) {
+        console.log(`   Assignee: ${item.assignee}`);
       }
-      if (epic.childCount > 0) {
-        console.log(`   Progress: ${epic.completedCount}/${epic.childCount} items completed`);
+      if (item.childCount > 0) {
+        console.log(`   Progress: ${item.completedCount}/${item.childCount} items completed`);
       }
-      if (epic.labels && epic.labels.length > 0) {
-        console.log(`   Labels: ${epic.labels.join(', ')}`);
+      if (item.labels && item.labels.length > 0) {
+        console.log(`   Labels: ${item.labels.join(', ')}`);
       }
-      console.log(`   URL: ${epic.url}`);
+      console.log(`   URL: ${item.url}`);
       console.log('');
     });
+  }
+
+  /**
+   * Output action result
+   */
+  outputActionResult(result) {
+    if (result.success) {
+      console.log(`\n✅ Successfully executed action\n`);
+
+      if (result.issue) {
+        console.log(`📋 Issue Details:`);
+        console.log(`   ID: ${result.issue.id}`);
+        console.log(`   Title: ${result.issue.title}`);
+        console.log(`   Status: ${result.issue.status}`);
+        if (result.issue.assignee) {
+          console.log(`   Assignee: ${result.issue.assignee}`);
+        }
+        if (result.issue.branch) {
+          console.log(`   Branch: ${result.issue.branch}`);
+        }
+        console.log(`   URL: ${result.issue.url}`);
+      }
+
+      if (result.actions && result.actions.length > 0) {
+        console.log(`\n🎯 Actions performed:`);
+        result.actions.forEach(action => {
+          console.log(`   ✓ ${action}`);
+        });
+      }
+
+      if (result.timestamp) {
+        console.log(`\n⏰ Timestamp: ${result.timestamp}`);
+      }
+    } else {
+      console.log(`\n❌ Action failed\n`);
+      if (result.error) {
+        console.log(`Error: ${result.error}`);
+      }
+    }
   }
 }
 

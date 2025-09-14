@@ -81,6 +81,36 @@ class ProviderInterface {
   async createPullRequest(data, settings) {
     throw new Error('createPullRequest must be implemented by provider');
   }
+
+  /**
+   * Start work on an issue/task
+   * @param {Object} options - Start options
+   * @param {string} options.id - Issue/task ID
+   * @param {string} options.branch - Custom branch name
+   * @param {boolean} options.assign - Auto-assign to current user
+   * @param {string} options.comment - Comment to add
+   * @param {boolean} options.no_branch - Skip branch creation
+   * @param {Object} settings - Provider-specific settings
+   * @returns {Promise<StartResult>} Result of start operation
+   * @abstract
+   */
+  async startIssue(options, settings) {
+    throw new Error('startIssue must be implemented by provider');
+  }
+
+  /**
+   * Complete work on an issue/task
+   * @param {Object} options - Complete options
+   * @param {string} options.id - Issue/task ID
+   * @param {string} options.comment - Completion comment
+   * @param {boolean} options.close - Close the issue
+   * @param {Object} settings - Provider-specific settings
+   * @returns {Promise<CompleteResult>} Result of complete operation
+   * @abstract
+   */
+  async completeIssue(options, settings) {
+    throw new Error('completeIssue must be implemented by provider');
+  }
 }
 
 /**
@@ -134,6 +164,36 @@ class ProviderInterface {
  * @property {string} url - Web URL to PR
  * @property {Date} createdAt - Creation date
  * @property {Date|null} mergedAt - Merge date
+ * @property {Object} metadata - Provider-specific metadata
+ */
+
+/**
+ * Unified Start Result data structure
+ * @typedef {Object} StartResult
+ * @property {boolean} success - Whether the operation succeeded
+ * @property {Object} issue - Issue details after starting
+ * @property {string} issue.id - Issue identifier
+ * @property {string} issue.title - Issue title
+ * @property {string} issue.status - New status
+ * @property {string} issue.assignee - Assignee
+ * @property {string|null} issue.branch - Created branch name
+ * @property {string} issue.url - Web URL
+ * @property {Array<string>} actions - List of actions performed
+ * @property {string} timestamp - Operation timestamp
+ * @property {Object} metadata - Provider-specific metadata
+ */
+
+/**
+ * Unified Complete Result data structure
+ * @typedef {Object} CompleteResult
+ * @property {boolean} success - Whether the operation succeeded
+ * @property {Object} issue - Issue details after completion
+ * @property {string} issue.id - Issue identifier
+ * @property {string} issue.title - Issue title
+ * @property {string} issue.status - New status (completed/closed)
+ * @property {string} issue.resolution - Resolution type
+ * @property {Array<string>} actions - List of actions performed
+ * @property {string} timestamp - Operation timestamp
  * @property {Object} metadata - Provider-specific metadata
  */
 
