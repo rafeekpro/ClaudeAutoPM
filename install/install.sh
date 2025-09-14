@@ -325,16 +325,141 @@ install_strategy() {
     # Strategy is now located directly in strategies/ folder
 }
 
+# Add provider configuration to config.json
+add_provider_to_config() {
+    local config_file="$1"
+
+    if [ ! -f "$config_file" ]; then
+        print_error "Config file not found: $config_file"
+        return 1
+    fi
+
+    # Create provider configuration based on selection
+    local provider_config=""
+
+    if [ "$PROVIDER_TYPE" = "azure" ]; then
+        provider_config=$(cat <<EOF
+  "provider": {
+    "type": "azure",
+    "config": {
+      "organization": "$AZURE_ORG",
+      "project": "$AZURE_PROJECT",
+      "team": "$AZURE_TEAM"
+    }
+  },
+EOF
+)
+    else
+        # Default to GitHub
+        provider_config=$(cat <<EOF
+  "provider": {
+    "type": "github",
+    "config": {
+      "owner": "${GITHUB_OWNER:-owner}",
+      "repo": "${GITHUB_REPO:-repo}"
+    }
+  },
+EOF
+)
+    fi
+
+    # Insert provider config into the JSON file
+    # This is a bit tricky with just bash, so we'll use a temporary file
+    local temp_file="${config_file}.tmp"
+
+    # Read the original file and insert provider config after opening brace
+    awk -v provider="$provider_config" '
+        NR==1 && /{/ {
+            print $0
+            print provider
+            next
+        }
+        {print}
+    ' "$config_file" > "$temp_file"
+
+    # Move temp file back
+    mv "$temp_file" "$config_file"
+
+    print_msg "$CYAN" "  Added $PROVIDER_TYPE provider configuration"
+}
+
+# Choose provider (GitHub or Azure DevOps)
+choose_provider() {
+    local config_file="$TARGET_DIR/.claude/config.json"
+
+    # Skip if provider already configured and this is an update
+    if [ "$is_update" = true ] && [ -f "$config_file" ]; then
+        if grep -q '"provider"' "$config_file" 2>/dev/null; then
+            local current_provider=$(grep -A2 '"provider"' "$config_file" | grep '"type"' | cut -d'"' -f4)
+            print_msg "$CYAN" "🔧 Keeping existing provider: $current_provider"
+            return
+        fi
+    fi
+
+    print_msg "$YELLOW" "\n🎯 Choose your project management platform:"
+    echo ""
+    echo "  1) 📙 GitHub (Recommended) - Best for open source, startups"
+    echo "  2) 🔷 Azure DevOps - Best for enterprise, Agile teams"
+    echo ""
+
+    while true; do
+        if [ "$AUTOPM_TEST_MODE" = "1" ]; then
+            choice="1"
+            print_msg "$CYAN" "❓ Your choice [1-2]: 1 (auto-selected GitHub in test mode)"
+        else
+            echo -n "Your choice [1-2]: "
+            read choice
+        fi
+
+        case "$choice" in
+            1)
+                export PROVIDER_TYPE="github"
+                print_success "GitHub selected"
+
+                # Get GitHub configuration
+                echo -n "Enter GitHub owner/org: "
+                read github_owner
+                echo -n "Enter GitHub repo name: "
+                read github_repo
+
+                export GITHUB_OWNER="$github_owner"
+                export GITHUB_REPO="$github_repo"
+                break
+                ;;
+            2)
+                export PROVIDER_TYPE="azure"
+                print_success "Azure DevOps selected"
+
+                # Get Azure DevOps configuration
+                echo -n "Enter Azure organization: "
+                read azure_org
+                echo -n "Enter Azure project: "
+                read azure_project
+                echo -n "Enter Azure team (or press Enter for default): "
+                read azure_team
+
+                export AZURE_ORG="$azure_org"
+                export AZURE_PROJECT="$azure_project"
+                export AZURE_TEAM="${azure_team:-$azure_project Team}"
+                break
+                ;;
+            *)
+                print_error "Invalid choice. Please select 1 or 2."
+                ;;
+        esac
+    done
+}
+
 # Choose configuration template
 choose_configuration() {
     local config_file="$TARGET_DIR/.claude/config.json"
-    
+
     # Skip if config already exists and this is an update
     if [ "$is_update" = true ] && [ -f "$config_file" ]; then
         print_msg "$CYAN" "🔧 Keeping existing configuration"
         return
     fi
-    
+
     # Only show menu if not using preset
     if [ -z "$AUTOPM_CONFIG_PRESET" ] && [ "$AUTOPM_TEST_MODE" != "1" ]; then
         print_msg "$YELLOW" "\n🔧 Choose your development configuration:"
@@ -376,6 +501,7 @@ choose_configuration() {
             1)
                 print_step "Setting up minimal configuration..."
                 cp "$BASE_DIR/autopm/.claude/templates/config-templates/minimal.json" "$config_file"
+                add_provider_to_config "$config_file"
                 print_success "Minimal configuration applied!"
                 print_msg "$CYAN" "  📋 Sequential execution - safe and predictable"
                 break
@@ -383,6 +509,7 @@ choose_configuration() {
             2)
                 print_step "Setting up Docker-only configuration..."
                 cp "$BASE_DIR/autopm/.claude/templates/config-templates/docker-only.json" "$config_file"
+                add_provider_to_config "$config_file"
                 print_success "Docker-only configuration applied!"
                 print_msg "$CYAN" "  📋 Adaptive execution - learns and optimizes"
                 break
@@ -390,6 +517,7 @@ choose_configuration() {
             3)
                 print_step "Setting up full DevOps configuration..."
                 cp "$BASE_DIR/autopm/.claude/templates/config-templates/full-devops.json" "$config_file"
+                add_provider_to_config "$config_file"
                 print_success "Full DevOps configuration applied!"
                 print_msg "$CYAN" "  📋 Smart Adaptive execution - best balance of speed and safety"
                 print_msg "$CYAN" "  📋 Docker + Kubernetes + intelligent parallelization"
@@ -398,6 +526,7 @@ choose_configuration() {
             4)
                 print_step "Setting up performance configuration..."
                 cp "$BASE_DIR/autopm/.claude/templates/config-templates/performance.json" "$config_file"
+                add_provider_to_config "$config_file"
                 print_success "Performance configuration applied!"
                 print_msg "$YELLOW" "  ⚡ Maximum parallel execution - for experienced users"
                 print_msg "$YELLOW" "  ⚠️  Higher resource usage, requires good understanding"
@@ -407,10 +536,12 @@ choose_configuration() {
                 if [ -f "$BASE_DIR/autopm/.claude/config.json" ]; then
                     print_step "Using default configuration template..."
                     cp "$BASE_DIR/autopm/.claude/config.json" "$config_file"
+                    add_provider_to_config "$config_file"
                     print_success "Default configuration applied!"
                 else
                     print_warning "Default config not found, using Docker-only template..."
                     cp "$BASE_DIR/autopm/.claude/templates/config-templates/docker-only.json" "$config_file"
+                    add_provider_to_config "$config_file"
                 fi
                 break
                 ;;
@@ -1132,8 +1263,9 @@ main() {
     
     install_files "$source_dir" "$is_update"
     
-    # Choose configuration template (only for fresh installs)
+    # Choose provider and configuration (only for fresh installs)
     if [ "$is_update" = false ]; then
+        choose_provider
         choose_configuration
         # Choose CI/CD system for fresh installs
         choose_cicd_system
@@ -1141,6 +1273,7 @@ main() {
         # For updates, ensure config.json exists
         if [ ! -f "$TARGET_DIR/.claude/config.json" ]; then
             print_warning "config.json not found, selecting configuration..."
+            choose_provider
             choose_configuration
             choose_cicd_system
         fi
