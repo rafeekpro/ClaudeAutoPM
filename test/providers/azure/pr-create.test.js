@@ -16,7 +16,7 @@ process.env.AZURE_DEVOPS_TOKEN = 'test-token';
 process.env.AZURE_DEVOPS_PAT = 'test-token'; // For backward compatibility
 
 // Load module once - creates new instances for isolation
-const AzurePRCreate = require('../../../../autopm/.claude/providers/azure/pr-create.js');
+const AzurePRCreate = require('../../../autopm/.claude/providers/azure/pr-create.js');
 
 describe('Azure DevOps pr-create Command', () => {
   let prCreate;
