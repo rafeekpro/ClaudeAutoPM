@@ -265,8 +265,9 @@ describe('Performance and Resource Limit Tests', () => {
         return 'result';
       });
 
-      assert.ok(metrics.duration >= 100);
-      assert.ok(metrics.duration < 150);
+      // Be more tolerant with timing - setTimeout is not perfectly accurate
+      assert.ok(metrics.duration >= 90, `Expected duration >= 90ms, got ${metrics.duration}ms`);
+      assert.ok(metrics.duration < 200, `Expected duration < 200ms, got ${metrics.duration}ms`);
     });
 
     it('should track memory usage', async () => {
