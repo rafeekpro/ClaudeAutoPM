@@ -75,7 +75,7 @@ jobs:
             npm install -g claude-autopm
             
             # Or use with npx
-            npx claude-autopm install
+            npx autopm install
             ```
           draft: false
           prerelease: false

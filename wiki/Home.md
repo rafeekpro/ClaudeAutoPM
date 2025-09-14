@@ -111,7 +111,7 @@ npm install -g claude-autopm
 
 # Initialize in your project
 cd your-project
-claude-autopm install --yes --config devops
+autopm install --yes --config devops
 
 # Start using unified commands
 /pm:issue:list --status=open
