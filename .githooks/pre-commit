@@ -52,7 +52,7 @@ done
 if [ -f "test/regression/critical-paths.test.js" ]; then
     echo ""
     echo "🧪 Running regression tests..."
-    run_test "Critical paths" "node --test test/regression/critical-paths.test.js"
+    run_test "Critical paths" "node --test --test-concurrency=1 test/regression/critical-paths.test.js"
 fi
 
 # 3. Check for test file modifications
@@ -69,7 +69,7 @@ if [ -n "$MODIFIED_TESTS" ]; then
 
     for test_file in $MODIFIED_TESTS; do
         if [ -f "$test_file" ]; then
-            run_test "$(basename $test_file)" "node --test $test_file"
+            run_test "$(basename $test_file)" "node --test --test-concurrency=1 $test_file"
         fi
     done
 fi

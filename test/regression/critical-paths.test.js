@@ -249,12 +249,22 @@ describe('Critical Path Protection', () => {
   let report;
 
   before(async () => {
-    validator = new CriticalPathValidator();
-    report = await validator.generateReport();
+    try {
+      validator = new CriticalPathValidator();
+      report = await validator.generateReport();
+    } catch (error) {
+      console.error('Error generating report:', error.message);
+      validator = new CriticalPathValidator();
+      report = null; // Tests will handle null gracefully
+    }
   });
 
   describe('Essential Files', () => {
-    it('should have all required files present', () => {
+    it('should have all required files present', async () => {
+      if (!report) {
+        report = await validator.generateReport();
+      }
+
       const requiredFiles = Object.entries(validator.criticalPaths)
         .filter(([_, config]) => config.required);
 
@@ -267,7 +277,11 @@ describe('Critical Path Protection', () => {
       }
     });
 
-    it('should maintain HYBRID_STRATEGY.md integrity', () => {
+    it('should maintain HYBRID_STRATEGY.md integrity', async () => {
+      if (!report) {
+        report = await validator.generateReport();
+      }
+
       const strategy = report.files.strategy;
 
       assert.ok(strategy.exists, 'HYBRID_STRATEGY.md must exist');
@@ -278,7 +292,11 @@ describe('Critical Path Protection', () => {
       );
     });
 
-    it('should have valid package.json', () => {
+    it('should have valid package.json', async () => {
+      if (!report) {
+        report = await validator.generateReport();
+      }
+
       const pkg = report.files.packageJson;
 
       assert.ok(pkg.exists, 'package.json must exist');
