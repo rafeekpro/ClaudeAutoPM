@@ -152,14 +152,14 @@ describe('SelfMaintenance Class', () => {
 
     it('should handle missing agent registry', async () => {
       const maintenance = new SelfMaintenance();
+      const mockManager = new MockManager();
 
-      const originalExistsSync = fs.existsSync;
-      fs.existsSync = (path) => {
+      mockManager.add(fs, 'existsSync', (path) => {
         if (path.includes('AGENT-REGISTRY.md')) {
           return false;
         }
         return true;
-      };
+      });
 
       try {
         await maintenance.runHealthCheck();
@@ -167,18 +167,18 @@ describe('SelfMaintenance Class', () => {
         const output = consoleOutput.join('\n');
         assert.ok(output.includes('Health Report'), 'Should still generate report');
       } finally {
-        fs.existsSync = originalExistsSync;
+        mockManager.restoreAll();
       }
     });
 
     it('should show recommendations based on agent count', async () => {
       const maintenance = new SelfMaintenance();
+      const mockManager = new MockManager();
 
       // Mock high agent count
       maintenance.metrics.totalAgents = 65;
 
-      const originalExistsSync = fs.existsSync;
-      fs.existsSync = () => true;
+      mockManager.add(fs, 'existsSync', () => true);
 
       try {
         await maintenance.runHealthCheck();
@@ -187,7 +187,7 @@ describe('SelfMaintenance Class', () => {
         assert.ok(output.includes('Consider further agent consolidation'),
           'Should recommend consolidation for high agent count');
       } finally {
-        fs.existsSync = originalExistsSync;
+        mockManager.restoreAll();
       }
     });
   });
@@ -195,12 +195,11 @@ describe('SelfMaintenance Class', () => {
   describe('runValidation()', () => {
     it('should validate all required components', async () => {
       const maintenance = new SelfMaintenance();
+      const mockManager = new MockManager();
+      const child_process = require('child_process');
 
-      const originalExistsSync = fs.existsSync;
-      const originalSpawnSync = require('child_process').spawnSync;
-
-      fs.existsSync = () => true;
-      require('child_process').spawnSync = () => ({ status: 0, stdout: '' });
+      mockManager.add(fs, 'existsSync', () => true);
+      mockManager.add(child_process, 'spawnSync', () => ({ status: 0, stdout: '' }));
 
       try {
         await maintenance.runValidation();
@@ -213,24 +212,22 @@ describe('SelfMaintenance Class', () => {
         assert.ok(output.includes('Documentation'), 'Should validate documentation');
         assert.ok(output.includes('Test suite'), 'Should run test suite');
       } finally {
-        fs.existsSync = originalExistsSync;
-        require('child_process').spawnSync = originalSpawnSync;
+        mockManager.restoreAll();
       }
     });
 
     it('should report validation failures', async () => {
       const maintenance = new SelfMaintenance();
+      const mockManager = new MockManager();
+      const child_process = require('child_process');
 
-      const originalExistsSync = fs.existsSync;
-      const originalSpawnSync = require('child_process').spawnSync;
-
-      fs.existsSync = (path) => {
+      mockManager.add(fs, 'existsSync', (path) => {
         if (path.includes('README.md')) {
           return false; // Simulate missing README
         }
         return true;
-      };
-      require('child_process').spawnSync = () => ({ status: 1 }); // Simulate test failure
+      });
+      mockManager.add(child_process, 'spawnSync', () => ({ status: 1 })); // Simulate test failure
 
       try {
         await maintenance.runValidation();
@@ -240,8 +237,7 @@ describe('SelfMaintenance Class', () => {
         assert.ok(output.includes('issues') || output.includes('failed'),
           'Should indicate validation issues');
       } finally {
-        fs.existsSync = originalExistsSync;
-        require('child_process').spawnSync = originalSpawnSync;
+        mockManager.restoreAll();
       }
     });
   });

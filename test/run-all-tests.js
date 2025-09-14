@@ -91,6 +91,7 @@ function runTestSuite(suite) {
   return new Promise((resolve) => {
     console.log(`${colors.cyan}▶ Running: ${suite.name}${colors.reset}`);
     const startTime = Date.now();
+    const SUITE_TIMEOUT = getSuiteTimeout();
 
     const child = spawn(suite.command, suite.args, {
       stdio: 'pipe',
@@ -264,6 +265,8 @@ async function main() {
   console.log(`${colors.cyan}Running ${testSuites.length} test suites...${colors.reset}`);
 
   // Display configuration
+  const IS_CI = process.env.CI === 'true';
+  const SUITE_TIMEOUT = getSuiteTimeout();
   console.log(`${colors.cyan}Configuration:${colors.reset}`);
   console.log(`  Environment: ${IS_CI ? 'CI' : 'Local'}`);
   console.log(`  Test Timeout: ${SUITE_TIMEOUT/1000}s per suite`);
