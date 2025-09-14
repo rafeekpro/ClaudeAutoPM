@@ -25,7 +25,7 @@ const testSuites = [
   {
     name: 'Unit Tests - Self Maintenance',
     command: 'node',
-    args: ['--test', 'test/unit/self-maintenance.test.js'],
+    args: ['--test', 'test/unit/self-maintenance-simple.test.js'],
     critical: true
   },
   {
