@@ -86,7 +86,8 @@
     "README.md"
   ],
   "dependencies": {
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.0",
+    "azure-devops-node-api": "^14.0.2"
   },
   "devDependencies": {
     "markdownlint-cli": "^0.37.0",
