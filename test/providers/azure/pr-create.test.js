@@ -30,16 +30,6 @@ child_process.execSync = (cmd, options) => {
 };
 
 // Mock AzureDevOpsClient before loading modules
-const mockAzureDevOpsClient = {
-  connection: null,
-  constructor: function(config) {
-    this.organization = config.organization;
-    this.project = config.project;
-    this.team = config.team || `${config.project} Team`;
-    return this;
-  }
-};
-
 // Mock the require for AzureDevOpsClient
 const Module = require('module');
 const originalRequire = Module.prototype.require;
