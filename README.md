@@ -7,7 +7,7 @@
 &nbsp;
 [![Follow on 𝕏](https://img.shields.io/badge/𝕏-@rafeekpro-1c9bf0)](http://x.com/intent/follow?screen_name=rafeekpro)
 
-## Automated project management system to ship ~~faster~~ _better_ using spec-driven development, GitHub issues, Git worktrees, and multiple AI agents running in parallel
+## Automated project management system to ship ~~faster~~ _better_ using spec-driven development, GitHub issues, Git branches, and multiple AI agents running in parallel
 
 > **Inspired by [CCPM (Claude Code Project Manager)](https://github.com/automazeio/ccpm)** - This project builds upon the foundational concepts of AI-powered project management to create a comprehensive development framework.
 
@@ -687,7 +687,7 @@ A single "Implement user authentication" issue isn't one task. It's...
 - **Agent 4**: UI components and forms
 - **Agent 5**: Test suites and documentation
 
-All running **simultaneously** in the same worktree.
+All running **simultaneously** in the same branch with proper coordination.
 
 ### The Math of Velocity
 
@@ -753,6 +753,20 @@ GitHub doesn't need to know HOW the work got done – just that it IS done.
 # One clean merge when done
 /pm:epic-merge memory-system
 ```
+
+## Git Strategy
+
+### 🌿 **Unified Branch-Based Workflow**
+
+ClaudeAutoPM uses a **single, consistent Git strategy** based on branches:
+
+- **NO WORKTREES**: Simple branch-based development only
+- **One branch per epic**: Clean isolation of work
+- **Parallel agent coordination**: Multiple agents work in the same branch
+- **Automatic conflict prevention**: Agents coordinate file access
+- **Pull before push**: Always sync before committing
+
+See the full Git strategy guide: `autopm/.claude/rules/git-strategy.md`
 
 ## Key Features & Benefits
 
@@ -821,15 +835,18 @@ Teams using this system report:
 ## 📚 Documentation
 
 ### 📖 **Complete Wiki Available**
+
 For comprehensive documentation, tutorials, and guides:
 
 **👉 [Visit the ClaudeAutoPM Wiki](https://github.com/rafeekpro/ClaudeAutoPM/wiki)**
 
 ### 🎯 **Popular Wiki Pages**
+
 - **[Quick Start Guide](https://github.com/rafeekpro/ClaudeAutoPM/wiki/Quick-Start)** - Get running in 5 minutes
 - **[Configuration Options](https://github.com/rafeekpro/ClaudeAutoPM/wiki/Configuration-Options)** - Minimal, Docker-only, Full DevOps
 - **[CLI Reference](https://github.com/rafeekpro/ClaudeAutoPM/wiki/CLI-Reference)** - Complete command documentation
 - **[Agent Registry](https://github.com/rafeekpro/ClaudeAutoPM/wiki/Agent-Registry)** - 50+ specialized AI agents
+- **[Git Strategy Guide](https://github.com/rafeekpro/ClaudeAutoPM/wiki/Git-Strategy)** - Unified branch-based workflow
 - **[Docker-First Development](https://github.com/rafeekpro/ClaudeAutoPM/wiki/Docker-First-Development)** - Container workflows
 - **[Kubernetes Integration](https://github.com/rafeekpro/ClaudeAutoPM/wiki/Kubernetes-Integration)** - K8s testing & deployment
 
@@ -937,7 +954,7 @@ Watch as structured planning transforms into shipped code.
 - Intentionally avoids GitHub Projects API complexity
 - All commands operate on local files first for speed
 - Synchronization with GitHub is explicit and controlled
-- Worktrees provide clean git isolation for parallel work
+- Branches provide clean git isolation for parallel work
 - GitHub Projects can be added separately for visualization
 
 ## Contributing

@@ -42,7 +42,6 @@ Below is a mapping showing equivalent commands between systems. Use the system t
 |------------|---------------------|---------|-------------|
 | `/pm:epic-decompose` | `/azure:feature-decompose` | ✅ Created | Break down Feature into User Stories |
 | `/pm:epic-start` | `/azure:feature-start` | ✅ Created | Start Feature development |
-| `/pm:epic-start-worktree` | `/azure:feature-start-worktree` | 🔧 TODO | Start Feature with git worktree |
 | `/pm:epic-close` | `/azure:feature-close` | 🔧 TODO | Complete Feature |
 | `/pm:epic-edit` | `/azure:feature-edit` | 🔧 TODO | Edit Feature details |
 | `/pm:epic-list` | `/azure:feature-list` | ✅ Created | List Features |
@@ -95,8 +94,7 @@ Below is a mapping showing equivalent commands between systems. Use the system t
 
 ### 🔧 Low Priority (Advanced)
 1. `/azure:feature-merge` - Merge Feature branches
-2. `/azure:feature-start-worktree` - Worktree management
-3. `/azure:task-analyze` - Task analytics
+2. `/azure:task-analyze` - Task analytics
 4. `/azure:search` - Advanced search
 5. `/azure:validate` - Validation tools
 6. `/azure:clean` - Cleanup utilities
