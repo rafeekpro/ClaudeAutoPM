@@ -135,8 +135,11 @@ class HybridStrategyOrchestrator {
 
     const agentId = `${parentContextId}-agent-${Date.now()}-${Math.random().toString(36).substring(7)}`;
 
-    // Small delay to allow for proper concurrent execution tracking
-    await new Promise(resolve => setTimeout(resolve, 1));
+    // Small delay to allow for proper concurrent execution tracking (enabled only if environment variable is set)
+    if (process.env.ENABLE_AGENT_SPAWN_DELAY === 'true') {
+      const delay = Number(process.env.AGENT_SPAWN_DELAY_MS) || 1;
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
 
     const agentContext = await this.createContext(agentId, {
       ...parentContext.config,
