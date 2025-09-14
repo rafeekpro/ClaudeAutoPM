@@ -83,11 +83,11 @@
     "provider": "github",
     "settings": {
       "github": {
-        "repository": "owner/repo"
+        "repository": "<owner>/<repo>"
       },
       "azure": {
-        "organization": "my-org",
-        "project": "my-project"
+        "organization": "<organization>",
+        "project": "<project>"
       }
     }
   }
