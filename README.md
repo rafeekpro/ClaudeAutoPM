@@ -7,7 +7,7 @@
 &nbsp;
 [![Follow on 𝕏](https://img.shields.io/badge/𝕏-@rafeekpro-1c9bf0)](http://x.com/intent/follow?screen_name=rafeekpro)
 
-## Automated project management system to ship ~~faster~~ _better_ using spec-driven development, GitHub issues, Git branches, and multiple AI agents running in parallel
+## Automated project management system to ship ~~faster~~ _better_ using spec-driven development, GitHub/Azure DevOps, Git branches, and multiple AI agents running in parallel
 
 > **Inspired by [CCPM (Claude Code Project Manager)](https://github.com/automazeio/ccpm)** - This project builds upon the foundational concepts of AI-powered project management to create a comprehensive development framework.
 
@@ -778,9 +778,11 @@ Never lose project state again. Each epic maintains its own context, agents read
 
 Ship faster with multiple agents working simultaneously. Tasks marked `parallel: true` enable conflict-free concurrent development.
 
-### 🔗 **GitHub Native**
+### 🔗 **Multi-Platform Support**
 
-Works with tools your team already uses. Issues are the source of truth, comments provide history, and there is no dependency on the Projects API.
+Choose your preferred platform:
+- **GitHub**: Perfect for open source, startups, and modern development teams
+- **Azure DevOps**: Enterprise-ready with rich Agile features, User Stories, and Sprint planning
 
 ### 🤖 **Agent Specialization**
 
@@ -830,6 +832,48 @@ Teams using this system report:
 
 # Check overall status
 /pm:epic-show memory-system
+```
+
+## 🔷 Azure DevOps Integration
+
+ClaudeAutoPM fully supports Azure DevOps with its rich work item hierarchy:
+
+- **Work Item Types**: Epic → Feature → User Story → Task → Bug
+- **Agile Metrics**: Story points, velocity tracking, sprint burndown
+- **Rich Fields**: Acceptance criteria, test plans, effort estimation
+- **Sprint Planning**: Iteration paths, capacity planning, velocity charts
+
+### Azure DevOps Setup
+
+```bash
+# During installation, choose Azure DevOps:
+autopm install
+
+# Set your Personal Access Token:
+export AZURE_DEVOPS_TOKEN="your-personal-access-token"
+
+# Your config will include:
+{
+  "provider": {
+    "type": "azure",
+    "config": {
+      "organization": "your-org",
+      "project": "your-project",
+      "team": "your-team"
+    }
+  }
+}
+```
+
+### Unified Commands Work Everywhere
+
+The same commands work regardless of your chosen platform:
+
+```bash
+/issue:show 123        # Shows GitHub Issue OR Azure Work Item
+/issue:list --open     # Lists from GitHub OR Azure DevOps
+/epic:start auth       # Creates branch and starts work
+/project:status        # Dashboard from either platform
 ```
 
 ## 📚 Documentation
