@@ -9,16 +9,17 @@ const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-// Configuration constants
-const TIMEOUT_LOCAL_MS = 120000; // 2 minutes
-const TIMEOUT_CI_MS = 300000;    // 5 minutes
-const TEST_TIMEOUT = parseInt(process.env.TEST_TIMEOUT || `${TIMEOUT_LOCAL_MS}`, 10); // Default 2 minutes
-const CI_TEST_TIMEOUT = parseInt(process.env.CI_TEST_TIMEOUT || `${TIMEOUT_CI_MS}`, 10); // Default 5 minutes for CI
-const IS_CI = process.env.CI === 'true';
-
-// Use appropriate timeout based on environment
-const SUITE_TIMEOUT = IS_CI ? CI_TEST_TIMEOUT : TEST_TIMEOUT;
-
+// Timeout configuration
+function getSuiteTimeout() {
+  const isCI = process.env.CI === 'true';
+  const defaultLocal = 120000; // 2 minutes
+  const defaultCI = 300000;    // 5 minutes
+  if (isCI) {
+    return parseInt(process.env.CI_TEST_TIMEOUT || `${defaultCI}`, 10);
+  } else {
+    return parseInt(process.env.TEST_TIMEOUT || `${defaultLocal}`, 10);
+  }
+}
 // Test suites configuration
 const testSuites = [
   {
