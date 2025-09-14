@@ -333,7 +333,7 @@ class ContextSandbox {
   }
 
   async runInSandbox(operation) {
-    // Removed unnecessary delay that was causing test timeouts
+    // Executes operation synchronously without delay
     return `Result of ${operation.type}`;
   }
 
