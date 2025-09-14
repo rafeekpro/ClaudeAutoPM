@@ -9,6 +9,14 @@ const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
+// Configuration constants
+const TEST_TIMEOUT = parseInt(process.env.TEST_TIMEOUT || '120000', 10); // Default 2 minutes
+const CI_TEST_TIMEOUT = parseInt(process.env.CI_TEST_TIMEOUT || '300000', 10); // Default 5 minutes for CI
+const IS_CI = process.env.CI === 'true';
+
+// Use appropriate timeout based on environment
+const SUITE_TIMEOUT = IS_CI ? CI_TEST_TIMEOUT : TEST_TIMEOUT;
+
 // Test suites configuration
 const testSuites = [
   {
@@ -99,17 +107,17 @@ function runTestSuite(suite) {
       process.stderr.write(data);
     });
 
-    // Set timeout for test suite
+    // Set timeout for test suite (configurable via environment)
     const timeoutId = setTimeout(() => {
       child.kill('SIGTERM');
-      console.log(`${colors.yellow}⚠ ${suite.name} timed out${colors.reset}\n`);
+      console.log(`${colors.yellow}⚠ ${suite.name} timed out after ${SUITE_TIMEOUT/1000}s${colors.reset}\n`);
       resolve({
         suite: suite.name,
         passed: false,
         duration: 'timeout',
-        error: 'Test suite timed out'
+        error: `Test suite timed out after ${SUITE_TIMEOUT/1000} seconds`
       });
-    }, 120000); // 2 minute timeout per suite
+    }, SUITE_TIMEOUT);
 
     child.on('close', (code) => {
       // Clear timeout when test completes normally
@@ -250,7 +258,13 @@ function generateReport() {
  */
 async function main() {
   console.log(`${colors.bold}${colors.blue}🧪 ClaudeAutoPM Comprehensive Test Suite${colors.reset}`);
-  console.log(`${colors.cyan}Running ${testSuites.length} test suites...${colors.reset}\n`);
+  console.log(`${colors.cyan}Running ${testSuites.length} test suites...${colors.reset}`);
+
+  // Display configuration
+  console.log(`${colors.cyan}Configuration:${colors.reset}`);
+  console.log(`  Environment: ${IS_CI ? 'CI' : 'Local'}`);
+  console.log(`  Test Timeout: ${SUITE_TIMEOUT/1000}s per suite`);
+  console.log(`  To customize: Set TEST_TIMEOUT or CI_TEST_TIMEOUT env variables (in ms)\n`);
 
   const startTime = Date.now();
 

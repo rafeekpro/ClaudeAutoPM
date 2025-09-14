@@ -28,6 +28,8 @@
     "test:cli:basic": "node test/cli/autopm-commands.test.js",
     "test:all": "npm run test:security && npm run test:regression && npm run test:install && npm run test:cli",
     "test:comprehensive": "node test/run-all-tests.js",
+    "test:comprehensive:quick": "TEST_TIMEOUT=30000 node test/run-all-tests.js",
+    "test:comprehensive:ci": "CI=true CI_TEST_TIMEOUT=600000 node test/run-all-tests.js",
     "test:azure": "node --test test/providers/azure/",
     "test:unit": "node --test test/unit/",
     "test:e2e": "node --test test/e2e/",
