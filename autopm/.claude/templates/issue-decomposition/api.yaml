@@ -1,0 +1,110 @@
+name: "API Integration"
+description: "External API integration or new API endpoint development"
+patterns:
+  - "api"
+  - "endpoint"
+  - "integration"
+  - "webhook"
+  - "rest"
+  - "graphql"
+  - "external"
+  - "service"
+  - "microservice"
+
+streams:
+  design:
+    name: "API Design & Documentation"
+    agent: "code-analyzer"
+    priority: 1
+    tasks:
+      - "Define API contract and data models"
+      - "Create OpenAPI/Swagger specification"
+      - "Document request/response schemas"
+      - "Define error codes and messages"
+      - "Specify rate limiting and authentication"
+    files:
+      - "docs/api/*.yaml"
+      - "docs/api/*.md"
+
+  backend:
+    name: "API Implementation"
+    agent: "python-backend-expert"
+    priority: 2
+    parameters:
+      framework: "fastapi"
+    dependencies: ["design"]
+    tasks:
+      - "Implement API client/SDK if external"
+      - "Create request/response models"
+      - "Add authentication handling"
+      - "Implement retry logic and circuit breaker"
+      - "Add request/response logging"
+      - "Handle rate limiting"
+    files:
+      - "src/clients/*.py"
+      - "src/api/*.py"
+      - "src/models/*.py"
+
+  middleware:
+    name: "Middleware & Security"
+    agent: "nodejs-backend-engineer"
+    priority: 3
+    dependencies: ["backend"]
+    tasks:
+      - "Create authentication middleware"
+      - "Add CORS configuration"
+      - "Implement rate limiting middleware"
+      - "Add request validation middleware"
+      - "Create error handling middleware"
+      - "Add API key management"
+    files:
+      - "src/middleware/*.ts"
+      - "src/utils/security.ts"
+
+  integration:
+    name: "Integration Layer"
+    agent: "python-backend-expert"
+    priority: 4
+    dependencies: ["middleware"]
+    tasks:
+      - "Create data transformation layer"
+      - "Implement webhook handlers if needed"
+      - "Add event publishing for async processing"
+      - "Create batch processing if applicable"
+      - "Add monitoring and metrics"
+    files:
+      - "src/integrations/*.py"
+      - "src/transformers/*.py"
+      - "src/events/*.py"
+
+  tests:
+    name: "API Testing"
+    agent: "test-runner"
+    priority: 5
+    dependencies: ["integration"]
+    tasks:
+      - "Unit tests for API client"
+      - "Integration tests with mock server"
+      - "Contract testing"
+      - "Load testing for performance"
+      - "Security testing (OWASP API Top 10)"
+      - "Test error scenarios and edge cases"
+    files:
+      - "tests/api/*.test.ts"
+      - "tests/integration/*.test.py"
+      - "tests/contract/*.test.js"
+
+coordination:
+  sync_points:
+    - after: "design"
+      message: "API specification ready for implementation"
+    - after: "backend"
+      message: "Core API logic ready for middleware"
+    - after: "middleware"
+      message: "Security layer ready for integration"
+
+  shared_files:
+    - path: "docs/api/spec.yaml"
+      description: "API specification"
+      owner: "design"
+      consumers: ["backend", "integration", "tests"]

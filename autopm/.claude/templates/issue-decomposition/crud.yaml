@@ -1,0 +1,114 @@
+name: "CRUD Operations"
+description: "Create, Read, Update, Delete operations for a resource"
+patterns:
+  - "crud"
+  - "create"
+  - "list"
+  - "update"
+  - "delete"
+  - "manage"
+  - "resource"
+  - "entity"
+  - "model"
+
+streams:
+  database:
+    name: "Database Schema"
+    agent: "database-architect"
+    priority: 1
+    tasks:
+      - "Design table schema for the resource"
+      - "Add appropriate indexes for query optimization"
+      - "Create foreign key relationships"
+      - "Add soft delete capability if needed"
+      - "Create database migrations"
+    files:
+      - "migrations/*.sql"
+      - "src/db/schema/*.ts"
+      - "src/models/*.py"
+
+  backend:
+    name: "Service Layer"
+    agent: "python-backend-expert"
+    priority: 2
+    parameters:
+      framework: "fastapi"
+    dependencies: ["database"]
+    tasks:
+      - "Create data model/entity class"
+      - "Implement repository pattern for data access"
+      - "Add validation logic for business rules"
+      - "Implement filtering and pagination"
+      - "Add caching layer if needed"
+      - "Handle cascading operations"
+    files:
+      - "src/services/*.py"
+      - "src/repositories/*.py"
+      - "src/models/*.py"
+
+  api:
+    name: "REST API Endpoints"
+    agent: "fastapi-backend-engineer"
+    priority: 3
+    dependencies: ["backend"]
+    tasks:
+      - "GET /resource - List all with pagination"
+      - "GET /resource/{id} - Get single resource"
+      - "POST /resource - Create new resource"
+      - "PUT /resource/{id} - Update entire resource"
+      - "PATCH /resource/{id} - Partial update"
+      - "DELETE /resource/{id} - Delete resource"
+      - "Add query parameters for filtering and sorting"
+    files:
+      - "src/api/routes/*.py"
+      - "src/api/schemas/*.py"
+
+  frontend:
+    name: "UI Components"
+    agent: "react-ui-expert"
+    priority: 4
+    parameters:
+      framework: "mui"
+    dependencies: ["api"]
+    tasks:
+      - "Create list view with DataGrid/Table"
+      - "Build create/edit form with validation"
+      - "Add delete confirmation dialog"
+      - "Implement search and filter components"
+      - "Add pagination controls"
+      - "Create detail view component"
+      - "Add loading and error states"
+    files:
+      - "src/components/*.tsx"
+      - "src/pages/*.tsx"
+      - "src/hooks/use*.ts"
+
+  tests:
+    name: "Test Coverage"
+    agent: "test-runner"
+    priority: 5
+    dependencies: ["api", "frontend"]
+    tasks:
+      - "Unit tests for service layer"
+      - "Integration tests for API endpoints"
+      - "Test pagination and filtering"
+      - "Test validation rules"
+      - "E2E tests for CRUD workflow"
+      - "Performance tests for list operations"
+    files:
+      - "tests/unit/*.test.ts"
+      - "tests/integration/*.test.py"
+      - "tests/e2e/*.spec.ts"
+
+coordination:
+  sync_points:
+    - after: "database"
+      message: "Schema ready for service implementation"
+    - after: "api"
+      message: "API endpoints ready for frontend"
+
+  shared_files:
+    - path: "docs/api/resource.yaml"
+      description: "OpenAPI specification"
+      owner: "api"
+      consumers: ["frontend", "tests"]

@@ -1,0 +1,114 @@
+name: "UI Feature"
+description: "Frontend feature or component development"
+patterns:
+  - "ui"
+  - "frontend"
+  - "component"
+  - "page"
+  - "form"
+  - "dashboard"
+  - "modal"
+  - "dialog"
+  - "view"
+  - "screen"
+
+streams:
+  design:
+    name: "UI/UX Design"
+    agent: "ux-design-expert"
+    priority: 1
+    tasks:
+      - "Create wireframes and mockups"
+      - "Define user flow and interactions"
+      - "Design responsive layouts"
+      - "Create design system tokens"
+      - "Define accessibility requirements"
+      - "Document component specifications"
+    files:
+      - "docs/design/*.md"
+      - "src/styles/tokens.ts"
+
+  components:
+    name: "Component Development"
+    agent: "react-ui-expert"
+    priority: 2
+    parameters:
+      framework: "mui"
+    dependencies: ["design"]
+    tasks:
+      - "Create base component structure"
+      - "Implement component logic and state"
+      - "Add prop validation with TypeScript"
+      - "Create reusable sub-components"
+      - "Implement responsive design"
+      - "Add accessibility features (ARIA)"
+    files:
+      - "src/components/*.tsx"
+      - "src/components/*.module.css"
+      - "src/types/*.ts"
+
+  state:
+    name: "State Management"
+    agent: "react-frontend-engineer"
+    priority: 3
+    dependencies: ["components"]
+    tasks:
+      - "Set up state management (Context/Redux)"
+      - "Create actions and reducers"
+      - "Implement data fetching logic"
+      - "Add optimistic updates"
+      - "Handle loading and error states"
+      - "Implement caching strategy"
+    files:
+      - "src/store/*.ts"
+      - "src/hooks/*.ts"
+      - "src/contexts/*.tsx"
+
+  integration:
+    name: "API Integration"
+    agent: "javascript-frontend-engineer"
+    priority: 4
+    dependencies: ["state"]
+    tasks:
+      - "Create API service functions"
+      - "Implement data fetching hooks"
+      - "Add error handling and retry logic"
+      - "Set up real-time updates if needed"
+      - "Add data validation"
+      - "Implement pagination/infinite scroll"
+    files:
+      - "src/services/*.ts"
+      - "src/api/*.ts"
+      - "src/utils/*.ts"
+
+  tests:
+    name: "Testing & QA"
+    agent: "playwright-test-engineer"
+    priority: 5
+    dependencies: ["integration"]
+    tasks:
+      - "Unit tests for components"
+      - "Integration tests for user flows"
+      - "Visual regression tests"
+      - "Accessibility testing"
+      - "Performance testing"
+      - "Cross-browser testing"
+    files:
+      - "tests/unit/*.test.tsx"
+      - "tests/e2e/*.spec.ts"
+      - "tests/visual/*.test.ts"
+
+coordination:
+  sync_points:
+    - after: "design"
+      message: "Design specs ready for development"
+    - after: "components"
+      message: "Components ready for state integration"
+    - after: "state"
+      message: "State management ready for API connection"
+
+  shared_files:
+    - path: "src/types/index.ts"
+      description: "Shared TypeScript definitions"
+      owner: "components"
+      consumers: ["state", "integration", "tests"]
