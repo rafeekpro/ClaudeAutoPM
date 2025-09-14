@@ -80,7 +80,11 @@ validate_input() {
             fi
             ;;
         "token")
-            if [ ${#value} -ge 20 ] && [[ "$value" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+            # More lenient token validation
+            # Allow various token formats including Base64, hex, JWT, etc.
+            # Minimum 10 characters (some short tokens exist)
+            # Allow alphanumeric, =, ., _, -, +, /, and other common token chars
+            if [ ${#value} -ge 10 ]; then
                 return 0
             else
                 return 1
@@ -139,17 +143,32 @@ get_input() {
             return 0
         else
             case "$type" in
-                "email") print_warning "Please enter a valid email address" ;;
-                "url") print_warning "Please enter a valid URL starting with http:// or https://" ;;
-                "token") print_warning "Please enter a valid token (at least 20 characters, alphanumeric and -_)" ;;
-                "path") print_warning "Please enter a valid file path" ;;
-                *) print_warning "Invalid input" ;;
+                "email")
+                    print_warning "❌ Invalid email format. Please enter a valid email address (e.g., user@example.com)"
+                    ;;
+                "url")
+                    print_warning "❌ Invalid URL. Please enter a valid URL starting with http:// or https://"
+                    ;;
+                "token")
+                    print_warning "❌ Invalid token format. Token must be at least 10 characters long."
+                    print_warning "   Common issues:"
+                    print_warning "   • Token too short (minimum 10 characters)"
+                    print_warning "   • Copy entire token including all special characters"
+                    print_warning "   • Check for extra spaces or line breaks"
+                    ;;
+                "path")
+                    print_warning "❌ Invalid file path. Please enter a valid path (absolute or relative)"
+                    ;;
+                *)
+                    print_warning "❌ Invalid input. Please try again."
+                    ;;
             esac
             ((attempts++))
         fi
     done
     
-    print_error "Too many invalid attempts. Skipping this field."
+    print_error "Too many invalid attempts (3). Skipping this field."
+    print_msg "$YELLOW" "💡 Tip: You can re-run this script later or edit .claude/.env manually"
     echo "$default"
 }
 
@@ -232,6 +251,7 @@ setup_env() {
     echo ""
     
     local context7_key
+    print_msg "$YELLOW" "   Format: Alphanumeric string, min 10 characters"
     context7_key=$(get_input "Context7 API Key" "" "token" false)
     local context7_workspace
     if [ -n "$context7_key" ]; then
@@ -257,6 +277,7 @@ setup_env() {
     echo ""
     
     local github_token
+    print_msg "$YELLOW" "   Format: ghp_xxxxxxxxxxxx or classic token format"
     github_token=$(get_input "GitHub Personal Access Token" "" "token" false)
     
     env_content+="# GitHub MCP Server Configuration\n"
@@ -294,6 +315,7 @@ setup_env() {
         echo ""
         
         local azdo_pat
+        print_msg "$YELLOW" "   Format: Base64 encoded string or alphanumeric token"
         azdo_pat=$(get_input "Azure DevOps Personal Access Token" "" "token" false)
         local azdo_org
         azdo_org=$(get_input "Azure DevOps Organization" "" "text" false)
@@ -392,6 +414,7 @@ setup_env() {
             echo ""
             
             local openai_key
+            print_msg "$YELLOW" "   Format: sk-xxxxxxxxxxxx"
             openai_key=$(get_input "OpenAI API Key" "" "token" false)
             
             env_content+="# OpenAI Configuration\n"
