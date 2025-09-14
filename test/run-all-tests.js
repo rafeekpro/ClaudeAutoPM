@@ -99,7 +99,22 @@ function runTestSuite(suite) {
       process.stderr.write(data);
     });
 
+    // Set timeout for test suite
+    const timeoutId = setTimeout(() => {
+      child.kill('SIGTERM');
+      console.log(`${colors.yellow}⚠ ${suite.name} timed out${colors.reset}\n`);
+      resolve({
+        suite: suite.name,
+        passed: false,
+        duration: 'timeout',
+        error: 'Test suite timed out'
+      });
+    }, 120000); // 2 minute timeout per suite
+
     child.on('close', (code) => {
+      // Clear timeout when test completes normally
+      clearTimeout(timeoutId);
+
       const duration = Date.now() - startTime;
       const passed = code === 0;
 
@@ -143,18 +158,6 @@ function runTestSuite(suite) {
 
       resolve(result);
     });
-
-    // Set timeout for test suite
-    setTimeout(() => {
-      child.kill('SIGTERM');
-      console.log(`${colors.yellow}⚠ ${suite.name} timed out${colors.reset}\n`);
-      resolve({
-        suite: suite.name,
-        passed: false,
-        duration: 'timeout',
-        error: 'Test suite timed out'
-      });
-    }, 120000); // 2 minute timeout per suite
   });
 }
 
