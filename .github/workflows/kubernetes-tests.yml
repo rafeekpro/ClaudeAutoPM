@@ -39,9 +39,28 @@ env:
   HELM_VERSION: v3.12.0
 
 jobs:
+  # Select runner type
+  select-runner:
+    name: Select Runner
+    runs-on: ubuntu-latest
+    outputs:
+      runner: ${{ steps.select.outputs.runner }}
+    steps:
+      - id: select
+        run: |
+          if [[ "${{ github.event.inputs.runner_type }}" == "github" ]]; then
+            echo "runner=ubuntu-latest" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event.inputs.runner_type }}" == "self-hosted" ]]; then
+            echo "runner=['self-hosted', 'linux', 'kubernetes']" >> $GITHUB_OUTPUT
+          else
+            # Auto: prefer self-hosted for K8s tests (needs kubectl, helm)
+            echo "runner=['self-hosted', 'linux', 'kubernetes'] || 'ubuntu-latest'" >> $GITHUB_OUTPUT
+          fi
+
   detect-k8s-config:
     name: Detect Kubernetes Configuration
-    runs-on: ubuntu-latest
+    needs: select-runner
+    runs-on: ${{ fromJson(format('[{0}]', needs.select-runner.outputs.runner || '"ubuntu-latest"'))[0] }}
     outputs:
       kubernetes-enabled: ${{ steps.config.outputs.k8s_enabled }}
       docker-first-enabled: ${{ steps.config.outputs.docker_enabled }}
@@ -95,7 +114,8 @@ jobs:
 
   kubernetes-validation:
     name: Validate Kubernetes Manifests
-    runs-on: ubuntu-latest
+    needs: select-runner
+    runs-on: ${{ fromJson(format('[{0}]', needs.select-runner.outputs.runner || '"ubuntu-latest"'))[0] }}
     needs: detect-k8s-config
     if: needs.detect-k8s-config.outputs.kubernetes-enabled == 'true' || needs.detect-k8s-config.outputs.k8s-manifests-changed == 'true'
     
@@ -146,7 +166,8 @@ jobs:
 
   kind-integration-tests:
     name: KIND Integration Tests
-    runs-on: ubuntu-latest
+    needs: select-runner
+    runs-on: ${{ fromJson(format('[{0}]', needs.select-runner.outputs.runner || '"ubuntu-latest"'))[0] }}
     needs: [detect-k8s-config, kubernetes-validation]
     if: needs.detect-k8s-config.outputs.kubernetes-enabled == 'true' && needs.detect-k8s-config.outputs.integration-tests == 'true'
     
@@ -237,7 +258,8 @@ jobs:
 
   docker-k8s-integration:
     name: Docker + Kubernetes Integration
-    runs-on: ubuntu-latest
+    needs: select-runner
+    runs-on: ${{ fromJson(format('[{0}]', needs.select-runner.outputs.runner || '"ubuntu-latest"'))[0] }}
     needs: [detect-k8s-config, kind-integration-tests]
     if: needs.detect-k8s-config.outputs.kubernetes-enabled == 'true' && needs.detect-k8s-config.outputs.docker-first-enabled == 'true'
     
@@ -274,7 +296,8 @@ jobs:
 
   security-scanning:
     name: Security Scanning
-    runs-on: ubuntu-latest
+    needs: select-runner
+    runs-on: ${{ fromJson(format('[{0}]', needs.select-runner.outputs.runner || '"ubuntu-latest"'))[0] }}
     needs: detect-k8s-config
     if: needs.detect-k8s-config.outputs.kubernetes-enabled == 'true'
     
