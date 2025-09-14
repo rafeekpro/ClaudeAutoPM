@@ -27,6 +27,10 @@
     "test:cli": "node --test test/cli/",
     "test:cli:basic": "node test/cli/autopm-commands.test.js",
     "test:all": "npm run test:security && npm run test:regression && npm run test:install && npm run test:cli",
+    "test:comprehensive": "node test/run-all-tests.js",
+    "test:azure": "node --test test/providers/azure/",
+    "test:unit": "node --test test/unit/",
+    "test:e2e": "node --test test/e2e/",
     "setup:hooks": "bash scripts/setup-hooks.sh",
     "lint": "markdownlint *.md .claude/**/*.md install/*.md",
     "lint:fix": "markdownlint --fix *.md .claude/**/*.md install/*.md",
@@ -86,17 +90,18 @@
     "README.md"
   ],
   "dependencies": {
-    "js-yaml": "^4.1.0",
-    "azure-devops-node-api": "^14.0.2"
+    "azure-devops-node-api": "^14.0.2",
+    "js-yaml": "^4.1.0"
   },
   "devDependencies": {
     "markdownlint-cli": "^0.37.0",
+    "nock": "^14.0.10",
     "prettier": "^3.0.0"
   },
   "optionalDependencies": {
     "@context7/mcp-server": "^1.0.0",
-    "@playwright/mcp-server": "^1.0.0",
-    "@modelcontextprotocol/server-github": "^1.0.0"
+    "@modelcontextprotocol/server-github": "^1.0.0",
+    "@playwright/mcp-server": "^1.0.0"
   },
   "peerDependencies": {
     "git": "*"
