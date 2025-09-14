@@ -1,363 +1,452 @@
 /**
- * Integration tests for Azure DevOps issue-show command
- * Tests the work item display functionality with mocked API responses
+ * Azure DevOps Provider - Issue Show Command Integration Tests
+ * Tests for the /issue:show command implementation
  */
 
 const { describe, it, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
-const path = require('path');
-const fs = require('fs');
+const AzureIssueShow = require('../../../autopm/.claude/providers/azure/issue-show');
 
-// Mock environment variables
-process.env.AZURE_DEVOPS_ORG = 'test-org';
-process.env.AZURE_DEVOPS_PROJECT = 'test-project';
-process.env.AZURE_DEVOPS_TOKEN = 'test-token';
-process.env.AZURE_DEVOPS_PAT = 'test-token'; // For backward compatibility
+describe('Azure DevOps Issue Show Command', () => {
+  const testConfig = {
+    organization: 'testorg',
+    project: 'testproject'
+  };
 
-// Load module once - creates new instances for isolation
-const AzureIssueShow = require('../../../autopm/.claude/providers/azure/issue-show.js');
+  const testToken = 'test-personal-access-token';
 
-describe('Azure DevOps issue-show Command', () => {
   let issueShow;
   let mockWitApi;
-  let apiCalled;
 
   beforeEach(() => {
-    apiCalled = false;
+    // Set the environment variable for the token
+    process.env.AZURE_DEVOPS_TOKEN = testToken;
+
+    // Create a fresh instance
+    issueShow = new AzureIssueShow(testConfig);
 
     // Create mock Work Item Tracking API
     mockWitApi = {
       getWorkItem: async (id, fields, asOf, expand) => {
-        apiCalled = true;
-        // Will be overridden in each test
         throw new Error(`Mock not configured for work item ${id}`);
       }
     };
 
-    // Create fresh instance for each test - provides proper isolation
-    issueShow = new AzureIssueShow({
-      organization: 'test-org',
-      project: 'test-project'
-    });
-
-    // Mock the connection to return our mock API
+    // Override the connection to return our mock API
     issueShow.connection = {
       getWorkItemTrackingApi: async () => mockWitApi
     };
   });
 
   afterEach(() => {
-    // Clean up any mocks
+    // Clean up environment
+    delete process.env.AZURE_DEVOPS_TOKEN;
   });
 
-  describe('Happy Path', () => {
-    it('should fetch and display a work item correctly', async () => {
+  describe('Success Scenarios', () => {
+    it('should successfully retrieve and format a User Story work item', async () => {
       const workItemId = 123;
       const mockWorkItem = {
         id: workItemId,
         fields: {
-          'System.Title': 'Test Work Item',
-          'System.Description': 'This is a test description',
           'System.WorkItemType': 'User Story',
-          'System.State': 'Active',
+          'System.Title': 'Implement user authentication',
+          'System.State': 'In Progress',
           'System.AssignedTo': {
             displayName: 'John Doe',
-            uniqueName: 'john.doe@example.com'
+            uniqueName: 'john.doe@testorg.com'
           },
-          'System.Tags': 'frontend; bug-fix',
-          'System.IterationPath': 'Sprint 1',
-          'System.AreaPath': 'Frontend',
+          'System.CreatedDate': '2024-01-15T10:00:00.000Z',
+          'System.ChangedDate': '2024-01-16T14:30:00.000Z',
+          'System.IterationPath': 'TestProject\\Sprint 3',
+          'System.AreaPath': 'TestProject\\Backend',
           'Microsoft.VSTS.Common.Priority': 2,
           'Microsoft.VSTS.Scheduling.StoryPoints': 5,
-          'System.CreatedDate': '2025-01-01T10:00:00Z',
-          'System.ChangedDate': '2025-01-02T15:30:00Z'
-        },
-        _links: {
-          html: { href: 'https://dev.azure.com/test-org/test-project/_workitems/edit/123' }
-        }
-      };
-
-      // Mock the API call
-      mockWitApi.getWorkItem = async (id) => {
-        apiCalled = true;
-        if (id === workItemId) {
-          return mockWorkItem;
-        }
-        throw new Error(`Work item ${id} not found`);
-      };
-
-      // Mock console.log to capture output
-      const outputs = [];
-      const originalLog = console.log;
-      console.log = (...args) => outputs.push(args.join(' '));
-
-      try {
-        // Execute the command
-        const result = await issueShow.execute({ id: workItemId });
-
-        // issueShow.execute returns object with data and formatted properties
-        const output = result.formatted || result.output || outputs.join('\n');
-
-        // Verify the output contains expected information
-        assert.ok(output.includes('Test Work Item'), 'Title should be in output');
-        assert.ok(output.includes('User Story'), 'Work item type should be in output');
-        assert.ok(output.includes('in_progress'), 'State should be in output (Active maps to in_progress)');
-        assert.ok(output.includes('John Doe'), 'Assignee should be in output');
-        assert.ok(output.includes('frontend'), 'Tags should be in output');
-        assert.ok(output.includes('Sprint 1'), 'Iteration should be in output');
-        assert.ok(output.includes('5'), 'Story points should be in output');
-
-        // Verify API was called
-        assert.ok(apiCalled, 'API should have been called');
-      } finally {
-        console.log = originalLog;
-      }
-    });
-
-    it('should handle work items with minimal fields', async () => {
-      const workItemId = 456;
-      const mockWorkItem = {
-        id: workItemId,
-        fields: {
-          'System.Title': 'Minimal Work Item',
-          'System.WorkItemType': 'Bug',
-          'System.State': 'New'
-        },
-        _links: {
-          html: { href: 'https://dev.azure.com/test-org/test-project/_workitems/edit/456' }
-        }
-      };
-
-      // Mock the API call
-      mockWitApi.getWorkItem = async (id) => {
-        apiCalled = true;
-        if (id === workItemId) {
-          return mockWorkItem;
-        }
-        throw new Error(`Work item ${id} not found`);
-      };
-
-      // Mock console.log to capture output
-      const outputs = [];
-      const originalLog = console.log;
-      console.log = (...args) => outputs.push(args.join(' '));
-
-      try {
-        // Execute the command
-        const result = await issueShow.execute({ id: workItemId });
-        const output = result.formatted || result.output || outputs.join('\n');
-
-        // Verify the output contains expected information
-        assert.ok(output.includes('Minimal Work Item'), 'Title should be in output');
-        assert.ok(output.includes('Bug'), 'Work item type should be in output');
-        assert.ok(output.includes('open'), 'State should be in output (New maps to open)');
-
-        // Verify API was called correctly
-        assert.ok(apiCalled, 'API call should have been made');
-      } finally {
-        console.log = originalLog;
-      }
-    });
-
-    it('should display parent work item information', async () => {
-      const workItemId = 789;
-      const mockWorkItem = {
-        id: workItemId,
-        fields: {
-          'System.Title': 'Child Task',
-          'System.WorkItemType': 'Task',
-          'System.State': 'Active',
-          'System.Parent': 100
+          'System.Description': '<div>As a user, I want to be able to log in securely.</div>',
+          'Microsoft.VSTS.Common.AcceptanceCriteria': '<ul><li>User can login with email</li><li>Password is encrypted</li></ul>',
+          'System.Tags': 'security; authentication; backend',
+          'Microsoft.VSTS.Scheduling.RemainingWork': 8,
+          'Microsoft.VSTS.Scheduling.CompletedWork': 4,
+          'Microsoft.VSTS.Scheduling.Effort': 12
         },
         relations: [
           {
             rel: 'System.LinkTypes.Hierarchy-Reverse',
-            url: 'https://dev.azure.com/test-org/_apis/wit/workItems/100',
-            attributes: { name: 'Parent' }
+            url: `https://dev.azure.com/testorg/_apis/wit/workItems/100`
+          },
+          {
+            rel: 'System.LinkTypes.Hierarchy-Forward',
+            url: `https://dev.azure.com/testorg/_apis/wit/workItems/124`
+          },
+          {
+            rel: 'System.LinkTypes.Hierarchy-Forward',
+            url: `https://dev.azure.com/testorg/_apis/wit/workItems/125`
+          },
+          {
+            rel: 'AttachedFile',
+            url: `https://dev.azure.com/testorg/_apis/wit/attachments/abc123`
           }
-        ],
-        _links: {
-          html: { href: 'https://dev.azure.com/test-org/test-project/_workitems/edit/789' }
-        }
+        ]
       };
 
       // Mock the API call
       mockWitApi.getWorkItem = async (id) => {
-        apiCalled = true;
         if (id === workItemId) {
           return mockWorkItem;
         }
         throw new Error(`Work item ${id} not found`);
       };
 
-      // Mock console.log to capture output
-      const outputs = [];
-      const originalLog = console.log;
-      console.log = (...args) => outputs.push(args.join(' '));
+      // Execute
+      const result = await issueShow.execute({ id: workItemId });
 
-      try {
-        // Execute the command
-        const result = await issueShow.execute({ id: workItemId });
-        const output = result.formatted || result.output || outputs.join('\n');
+      // Verify success
+      assert.strictEqual(result.success, true);
+      assert.ok(result.data);
+      assert.ok(result.formatted);
 
-        // Verify the output contains expected information
-        assert.ok(output.includes('Child Task'), 'Title should be in output');
-        assert.ok(output.includes('Task'), 'Work item type should be in output');
+      // Verify data mapping
+      const data = result.data;
+      assert.strictEqual(data.id, workItemId);
+      assert.strictEqual(data.type, 'issue'); // User Story maps to 'issue'
+      assert.strictEqual(data.title, 'Implement user authentication');
+      assert.strictEqual(data.state, 'in_progress'); // 'In Progress' maps to 'in_progress'
+      assert.strictEqual(data.assignee, 'John Doe');
+      assert.strictEqual(data.workItemType, 'User Story');
+      assert.strictEqual(data.iterationPath, 'TestProject\\Sprint 3');
+      assert.strictEqual(data.areaPath, 'TestProject\\Backend');
+      assert.strictEqual(data.priority, 2);
+      assert.strictEqual(data.storyPoints, 5);
 
-        // Note: Parent relationship formatting depends on implementation
-        // Check if relations are mentioned at all
-        if (mockWorkItem.relations && mockWorkItem.relations.length > 0) {
-          // Parent info might be displayed
+      // Verify parent/children extraction
+      assert.strictEqual(data.parent, 100);
+      assert.deepStrictEqual(data.children, [124, 125]);
+      assert.strictEqual(data.attachmentCount, 1);
+
+      // Verify tags parsing
+      assert.deepStrictEqual(data.tags, ['security', 'authentication', 'backend']);
+
+      // Verify metrics
+      assert.strictEqual(data.metrics.storyPoints, 5);
+      assert.strictEqual(data.metrics.effort, 12);
+      assert.strictEqual(data.metrics.remainingWork, 8);
+      assert.strictEqual(data.metrics.completedWork, 4);
+
+      // Verify formatted output contains key information
+      assert.ok(result.formatted.includes('User Story #123'));
+      assert.ok(result.formatted.includes('Implement user authentication'));
+      assert.ok(result.formatted.includes('Status:** in_progress'));
+      assert.ok(result.formatted.includes('Assignee:** John Doe'));
+      assert.ok(result.formatted.includes('Story Points:** 5'));
+      assert.ok(result.formatted.includes('Parent:** #100'));
+      assert.ok(result.formatted.includes('Children:** #124, #125'));
+      assert.ok(result.formatted.includes('Tags:** security, authentication, backend'));
+      assert.ok(result.formatted.includes('Remaining: 8h'));
+      assert.ok(result.formatted.includes('Completed: 4h'));
+    });
+
+    it('should handle Epic work item type correctly', async () => {
+      const workItemId = 200;
+      const mockEpic = {
+        id: workItemId,
+        fields: {
+          'System.WorkItemType': 'Epic',
+          'System.Title': 'Q1 Authentication System',
+          'System.State': 'Active',
+          'System.AssignedTo': null, // Test unassigned case
+          'System.CreatedDate': '2024-01-01T10:00:00.000Z',
+          'System.ChangedDate': '2024-01-20T14:30:00.000Z',
+          'System.IterationPath': 'TestProject',
+          'System.AreaPath': 'TestProject',
+          'Microsoft.VSTS.Common.Priority': 1,
+          'System.Description': 'Complete authentication system implementation',
+          'System.Tags': '' // Test empty tags
+        },
+        relations: [] // Test no relations
+      };
+
+      // Mock the API call
+      mockWitApi.getWorkItem = async (id) => {
+        if (id === workItemId) {
+          return mockEpic;
         }
+        throw new Error(`Work item ${id} not found`);
+      };
 
-        // Verify API was called correctly
-        assert.ok(apiCalled, 'API call should have been made');
-      } finally {
-        console.log = originalLog;
+      const result = await issueShow.execute({ id: workItemId });
+
+      assert.strictEqual(result.success, true);
+      assert.strictEqual(result.data.type, 'epic'); // Epic maps to 'epic'
+      assert.strictEqual(result.data.state, 'in_progress'); // 'Active' maps to 'in_progress'
+      assert.strictEqual(result.data.assignee, null);
+      assert.strictEqual(result.data.parent, null);
+      assert.deepStrictEqual(result.data.children, []);
+      assert.deepStrictEqual(result.data.tags, []);
+      assert.ok(result.formatted.includes('Unassigned'));
+    });
+
+    it('should handle Bug work item with all states correctly', async () => {
+      const testStates = [
+        { azure: 'New', unified: 'open' },
+        { azure: 'Active', unified: 'in_progress' },
+        { azure: 'Resolved', unified: 'in_review' },
+        { azure: 'Closed', unified: 'closed' },
+        { azure: 'Removed', unified: 'cancelled' }
+      ];
+
+      for (const stateTest of testStates) {
+        const workItemId = 300 + testStates.indexOf(stateTest);
+        const mockBug = {
+          id: workItemId,
+          fields: {
+            'System.WorkItemType': 'Bug',
+            'System.Title': `Test bug in ${stateTest.azure} state`,
+            'System.State': stateTest.azure,
+            'System.CreatedDate': '2024-01-01T10:00:00.000Z',
+            'System.ChangedDate': '2024-01-20T14:30:00.000Z'
+          },
+          relations: []
+        };
+
+        // Create a new instance for each iteration
+        const localIssueShow = new AzureIssueShow(testConfig);
+        const localMockWitApi = {
+          getWorkItem: async (id) => {
+            if (id === workItemId) {
+              return mockBug;
+            }
+            throw new Error(`Work item ${id} not found`);
+          }
+        };
+
+        localIssueShow.connection = {
+          getWorkItemTrackingApi: async () => localMockWitApi
+        };
+
+        const result = await localIssueShow.execute({ id: workItemId });
+
+        assert.strictEqual(result.success, true);
+        assert.strictEqual(result.data.state, stateTest.unified,
+          `State ${stateTest.azure} should map to ${stateTest.unified}`);
       }
     });
   });
 
-  describe('Error Handling', () => {
-    it('should handle missing work item ID', async () => {
-      try {
-        await issueShow.execute({});
-        assert.fail('Should have thrown an error');
-      } catch (error) {
-        assert.ok(error.message.includes('required'), 'Error should mention ID is required');
-      }
-    });
-
-    it('should handle non-existent work item', async () => {
+  describe('Error Scenarios', () => {
+    it('should handle 404 Not Found error gracefully', async () => {
       const workItemId = 999;
 
-      // Mock the API to return 404
+      // Mock 404 response
       mockWitApi.getWorkItem = async (id) => {
-        apiCalled = true;
         const error = new Error('Work Item not found');
         error.statusCode = 404;
         throw error;
       };
 
-      try {
-        await issueShow.execute({ id: workItemId });
-        assert.fail('Should have thrown an error');
-      } catch (error) {
-        assert.ok(error.message.includes('not found'), 'Error should mention work item not found');
-        assert.ok(apiCalled, 'API call should have been made');
-      }
-    });
-
-    it('should handle API errors gracefully', async () => {
-      const workItemId = 321;
-
-      // Mock the API to return an error
-      mockWitApi.getWorkItem = async (id) => {
-        apiCalled = true;
-        throw new Error('API Error: Internal Server Error');
-      };
-
-      try {
-        await issueShow.execute({ id: workItemId });
-        assert.fail('Should have thrown an error');
-      } catch (error) {
-        assert.ok(error.message.includes('Error') || error.message.includes('error'),
-                  'Error should be propagated');
-        assert.ok(apiCalled, 'API call should have been made');
-      }
-    });
-  });
-
-  describe('Field Formatting', () => {
-    it('should format dates correctly', async () => {
-      const workItemId = 555;
-      const mockWorkItem = {
-        id: workItemId,
-        fields: {
-          'System.Title': 'Date Test Item',
-          'System.WorkItemType': 'Task',
-          'System.State': 'Done',
-          'System.CreatedDate': '2025-01-15T10:30:00.000Z',
-          'System.ChangedDate': '2025-01-16T14:45:30.000Z'
-        },
-        _links: {
-          html: { href: 'https://dev.azure.com/test-org/test-project/_workitems/edit/555' }
+      await assert.rejects(
+        async () => await issueShow.execute({ id: workItemId }),
+        (error) => {
+          assert.ok(error.message.includes(`Work Item #${workItemId} not found`));
+          assert.ok(error.message.includes(testConfig.project));
+          return true;
         }
+      );
+    });
+
+    it('should handle 403 Forbidden error for insufficient permissions', async () => {
+      const workItemId = 456;
+
+      // Mock 403 response
+      mockWitApi.getWorkItem = async (id) => {
+        const error = new Error('Access denied');
+        error.statusCode = 403;
+        throw error;
       };
 
-      // Mock the API call
+      await assert.rejects(
+        async () => await issueShow.execute({ id: workItemId }),
+        (error) => {
+          // The error should be propagated as an Azure DevOps API error
+          assert.ok(error.message.includes('Azure DevOps API error') || error.message.includes('Access denied'));
+          return true;
+        }
+      );
+    });
+
+    it('should handle missing AZURE_DEVOPS_TOKEN environment variable', async () => {
+      delete process.env.AZURE_DEVOPS_TOKEN;
+
+      assert.throws(
+        () => new AzureIssueShow(testConfig),
+        (error) => {
+          assert.ok(error.message.includes('AZURE_DEVOPS_TOKEN environment variable is required'));
+          return true;
+        }
+      );
+    });
+
+    it('should handle missing work item ID parameter', async () => {
+      await assert.rejects(
+        async () => await issueShow.execute({}),
+        (error) => {
+          assert.ok(error.message.includes('Work Item ID is required'));
+          return true;
+        }
+      );
+    });
+
+    it('should handle API timeout errors', async () => {
+      const workItemId = 789;
+
+      // Mock timeout error
       mockWitApi.getWorkItem = async (id) => {
-        apiCalled = true;
+        const error = new Error('Request timeout');
+        error.code = 'ETIMEDOUT';
+        throw error;
+      };
+
+      await assert.rejects(
+        async () => await issueShow.execute({ id: workItemId }),
+        (error) => {
+          assert.ok(error.message.includes('Azure DevOps API error') || error.message.includes('timeout'));
+          return true;
+        }
+      );
+    });
+
+    it('should handle malformed API responses', async () => {
+      const workItemId = 555;
+
+      // Mock malformed response (missing required fields)
+      mockWitApi.getWorkItem = async (id) => {
         if (id === workItemId) {
-          return mockWorkItem;
+          return {
+            id: workItemId
+            // Missing 'fields' property
+          };
         }
         throw new Error(`Work item ${id} not found`);
       };
 
-      // Mock console.log to capture output
-      const outputs = [];
-      const originalLog = console.log;
-      console.log = (...args) => outputs.push(args.join(' '));
-
-      try {
-        // Execute the command
-        const result = await issueShow.execute({ id: workItemId });
-        const output = result.formatted || result.output || outputs.join('\n');
-
-        // Verify dates are processed (even if not displayed in formatted output)
-        assert.ok(result.data && result.data.created, 'Created date should be in data object');
-        assert.ok(result.data.created.includes('2025'), 'Created date should contain year 2025');
-
-        // Verify API was called correctly
-        assert.ok(apiCalled, 'API call should have been made');
-      } finally {
-        console.log = originalLog;
-      }
+      // This should throw an error as the implementation expects fields
+      await assert.rejects(
+        async () => await issueShow.execute({ id: workItemId }),
+        (error) => {
+          assert.ok(error.message.includes('Azure DevOps API error') || error.message.includes('Cannot read'));
+          return true;
+        }
+      );
     });
+  });
 
-    it('should handle special characters in fields', async () => {
+  describe('URL Extraction', () => {
+    it('should correctly extract work item IDs from relation URLs', async () => {
       const workItemId = 666;
       const mockWorkItem = {
         id: workItemId,
         fields: {
-          'System.Title': 'Title with "quotes" and \'apostrophes\'',
-          'System.Description': 'Description with <html> tags & special chars',
-          'System.WorkItemType': 'User Story',
-          'System.State': 'Active'
+          'System.WorkItemType': 'Task',
+          'System.Title': 'Test URL extraction',
+          'System.State': 'New'
         },
-        _links: {
-          html: { href: 'https://dev.azure.com/test-org/test-project/_workitems/edit/666' }
-        }
+        relations: [
+          {
+            rel: 'System.LinkTypes.Hierarchy-Reverse',
+            url: 'https://dev.azure.com/testorg/_apis/wit/workItems/1234'
+          },
+          {
+            rel: 'System.LinkTypes.Hierarchy-Forward',
+            url: 'https://dev.azure.com/testorg/testproject/_apis/wit/workItems/5678'
+          },
+          {
+            rel: 'System.LinkTypes.Hierarchy-Forward',
+            url: 'https://dev.azure.com/testorg/_apis/wit/workItems/90'
+          },
+          {
+            rel: 'System.LinkTypes.Related',
+            url: 'https://dev.azure.com/testorg/_apis/wit/workItems/invalid-url' // Test invalid ID
+          }
+        ]
       };
 
-      // Mock the API call
       mockWitApi.getWorkItem = async (id) => {
-        apiCalled = true;
         if (id === workItemId) {
           return mockWorkItem;
         }
         throw new Error(`Work item ${id} not found`);
       };
 
-      // Mock console.log to capture output
-      const outputs = [];
-      const originalLog = console.log;
-      console.log = (...args) => outputs.push(args.join(' '));
+      const result = await issueShow.execute({ id: workItemId });
 
-      try {
-        // Execute the command
-        const result = await issueShow.execute({ id: workItemId });
-        const output = result.formatted || result.output || outputs.join('\n');
+      assert.strictEqual(result.data.parent, 1234);
+      assert.deepStrictEqual(result.data.children, [5678, 90]);
+    });
+  });
 
-        // Verify special characters are handled
-        assert.ok(output.includes('quotes'), 'Title with quotes should be in output');
-        assert.ok(output.includes('special chars'), 'Description should be in output');
+  describe('Formatting', () => {
+    it('should properly format work item with minimal fields', async () => {
+      const workItemId = 777;
+      const mockWorkItem = {
+        id: workItemId,
+        fields: {
+          'System.WorkItemType': 'Task',
+          'System.Title': 'Minimal task',
+          'System.State': 'New',
+          'System.CreatedDate': '2024-01-01T10:00:00.000Z',
+          'System.ChangedDate': '2024-01-01T10:00:00.000Z'
+        },
+        relations: []
+      };
 
-        // Verify API was called correctly
-        assert.ok(apiCalled, 'API call should have been made');
-      } finally {
-        console.log = originalLog;
-      }
+      mockWitApi.getWorkItem = async (id) => {
+        if (id === workItemId) {
+          return mockWorkItem;
+        }
+        throw new Error(`Work item ${id} not found`);
+      };
+
+      const result = await issueShow.execute({ id: workItemId });
+
+      // Verify formatted output structure
+      assert.ok(result.formatted.includes('Task #777'));
+      assert.ok(result.formatted.includes('Minimal task'));
+      assert.ok(result.formatted.includes('_No description provided_'));
+      assert.ok(result.formatted.includes('View in Azure DevOps'));
+      assert.ok(result.formatted.includes(`https://dev.azure.com/${testConfig.organization}/${testConfig.project}/_workitems/edit/${workItemId}`));
+    });
+
+    it('should handle special characters in tags correctly', async () => {
+      const workItemId = 888;
+      const mockWorkItem = {
+        id: workItemId,
+        fields: {
+          'System.WorkItemType': 'User Story',
+          'System.Title': 'Test special characters',
+          'System.State': 'New',
+          'System.Tags': 'C#; ASP.NET Core; Entity Framework; SQL Server; Azure DevOps',
+          'System.CreatedDate': '2024-01-01T10:00:00.000Z',
+          'System.ChangedDate': '2024-01-01T10:00:00.000Z'
+        },
+        relations: []
+      };
+
+      mockWitApi.getWorkItem = async (id) => {
+        if (id === workItemId) {
+          return mockWorkItem;
+        }
+        throw new Error(`Work item ${id} not found`);
+      };
+
+      const result = await issueShow.execute({ id: workItemId });
+
+      assert.deepStrictEqual(result.data.tags, [
+        'C#',
+        'ASP.NET Core',
+        'Entity Framework',
+        'SQL Server',
+        'Azure DevOps'
+      ]);
+      assert.ok(result.formatted.includes('Tags:** C#, ASP.NET Core, Entity Framework, SQL Server, Azure DevOps'));
     });
   });
 });
