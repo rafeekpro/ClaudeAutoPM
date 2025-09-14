@@ -66,9 +66,9 @@ autopm install
 
 ```bash
 # Direct usage without installation
-npx autopminstall
-npx autopmmerge
-npx autopmsetup-env
+npx autopm install
+npx autopm merge
+npx autopm setup-env
 ```
 
 ### Legacy Shell Installation
