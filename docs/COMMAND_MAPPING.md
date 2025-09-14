@@ -14,6 +14,13 @@ This document tracks the migration from provider-specific commands to unified co
 | `issue-list` | ✅ Full | ✅ Full | Production Ready |
 | `issue-edit` | ✅ Full | ✅ Full (with rich fields) | Production Ready |
 | `epic-list` | ✅ Full | ✅ Full | Production Ready |
+| `epic-show` | ✅ Full | ✅ Full | Production Ready |
+| `pr-create` | ✅ Full | ✅ Full | Production Ready |
+| `pr-list` | ✅ Full | ✅ Full | Production Ready |
+| `board-show` | ✅ Projects | ✅ Boards | Production Ready |
+| `test-plan-create` | ❌ N/A | ✅ Full | Azure Exclusive |
+| `test-run` | ❌ N/A | ✅ Full | Azure Exclusive |
+| `test-summary` | ❌ N/A | ✅ Full | Azure Exclusive |
 
 ### 🚧 Partially Implemented
 
@@ -153,23 +160,26 @@ Legend:
 - Issue management (start, close, show, list, edit)
 - Epic listing
 
-### 🚧 Phase 2: Extended Commands (IN PROGRESS)
+### ✅ Phase 2: Extended Commands (COMPLETE)
+- Epic show command for detailed views
+- Pull Request management (create, list)
+- Board visualization with Kanban view
+- Test Plan integration (Azure DevOps exclusive)
+
+### 🚧 Phase 3: Advanced Features (IN PROGRESS)
 **Next Sprint (Priority Order):**
-1. `epic-show` and `epic-edit` - Complete epic management
+1. `epic-edit` - Complete epic management
 2. `project-status` - Unified project overview
 3. `search` - Cross-platform search capability
+4. Sprint/Iteration management
+5. User Story workflows
 
-### 📅 Phase 3: Advanced Features (PLANNED)
-- Sprint/Iteration management
-- User Story workflows
-- Board visualization
-- Bulk operations
-
-### 🎯 Phase 4: Polish & Optimization
+### 🎯 Phase 4: Polish & Optimization (PLANNED)
 - Common interface abstraction
 - Performance optimizations
 - Enhanced error handling
 - Provider plugin system
+- Bulk operations
 
 ## Current Capabilities
 
