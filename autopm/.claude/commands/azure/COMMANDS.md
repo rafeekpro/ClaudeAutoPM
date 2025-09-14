@@ -23,7 +23,6 @@
 # Epic → Feature
 /pm:epic-decompose  →  /azure:feature-decompose
 /pm:epic-start      →  /azure:feature-start
-/pm:epic-start-worktree → /azure:feature-start-worktree
 /pm:epic-close      →  /azure:feature-close
 /pm:epic-edit       →  /azure:feature-edit
 /pm:epic-list       →  /azure:feature-list
@@ -98,7 +97,6 @@
 /azure:feature-merge
 /azure:feature-refresh
 /azure:feature-oneshot
-/azure:feature-start-worktree
 /azure:search
 /azure:validate
 /azure:clean

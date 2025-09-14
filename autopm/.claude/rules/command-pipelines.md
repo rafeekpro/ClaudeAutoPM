@@ -36,7 +36,6 @@
 
 - `/pm:epic-decompose` - Break epic into tasks
 - `/pm:epic-start` - Launch parallel agents for epic
-- `/pm:epic-start-worktree` - Start epic with Git worktree
 - `/pm:epic-status` - Show execution status
 - `/pm:epic-merge` - Merge epic branch
 - `/pm:epic-close` - Close completed epic

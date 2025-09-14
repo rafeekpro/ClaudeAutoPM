@@ -35,18 +35,22 @@ Begin work on a GitHub issue with parallel agents based on work stream analysis.
 
 ## Instructions
 
-### 1. Ensure Worktree Exists
+### 1. Ensure Branch Exists
 
-Check if epic worktree exists:
+Check if epic branch exists:
 ` ``bash
 # Find epic name from task file
 epic_name={extracted_from_path}
 
-# Check worktree
-if ! git worktree list | grep -q "epic-$epic_name"; then
-  echo "❌ No worktree for epic. Run: /pm:epic-start $epic_name"
+# Check branch
+if ! git branch -a | grep -q "epic/$epic_name"; then
+  echo "❌ No branch for epic. Run: /pm:epic-start $epic_name"
   exit 1
 fi
+
+# Check out the branch
+git checkout epic/$epic_name
+git pull origin epic/$epic_name
 ` ``
 
 ### 2. Read Analysis
@@ -105,9 +109,9 @@ Task:
     - The source code is mounted as a VOLUME, so file changes will be immediately visible in the container (hot-reloading).
     - Full rules can be found in `.claude/rules/docker-first-development.md`.
 
-    You are working on Issue #$ARGUMENTS in the epic worktree.
-    
-    Worktree location: ../epic-{epic_name}/
+    You are working on Issue #$ARGUMENTS in the epic branch.
+
+    Branch: epic/{epic_name}
     Your stream: {stream_name}
     
     Your scope:

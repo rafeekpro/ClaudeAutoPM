@@ -406,19 +406,20 @@ echo "" >> .claude/epics/$ARGUMENTS/github-mapping.md
 echo "Synced: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> .claude/epics/$ARGUMENTS/github-mapping.md
 ```
 
-### 7. Create Worktree
+### 7. Create Branch
 
-Follow `/rules/worktree-operations.md` to create development worktree:
+Follow `/rules/git-strategy.md` to create development branch:
 
 ```bash
 # Ensure main is current
 git checkout main
 git pull origin main
 
-# Create worktree for epic
-git worktree add ../epic-$ARGUMENTS -b epic/$ARGUMENTS
+# Create branch for epic
+git checkout -b epic/$ARGUMENTS
+git push -u origin epic/$ARGUMENTS
 
-echo "✅ Created worktree: ../epic-$ARGUMENTS"
+echo "✅ Created branch: epic/$ARGUMENTS"
 ```
 
 ### 8. Output
@@ -430,7 +431,7 @@ echo "✅ Created worktree: ../epic-$ARGUMENTS"
   - Labels applied: epic, task, epic:{name}
   - Files renamed: 001.md → {issue_id}.md
   - References updated: depends_on/conflicts_with now use issue IDs
-  - Worktree: ../epic-$ARGUMENTS
+  - Branch: epic/$ARGUMENTS
 
 Next steps:
   - Start parallel execution: /pm:epic-start $ARGUMENTS

@@ -53,7 +53,7 @@ Parameters are automatically inferred from legacy agent names.
 ### parallel-worker
 
 **Location**: `.claude/agents/core/parallel-worker.md`
-**Description**: Executes parallel work streams in a git worktree for coordinated multi-agent execution.
+**Description**: Executes parallel work streams in a git branch for coordinated multi-agent execution.
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, BashOutput, KillBash, Search, Task, Agent
 **Status**: Active
 

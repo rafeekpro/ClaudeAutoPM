@@ -4,7 +4,7 @@ allowed-tools: Bash, Read, Write
 
 # Epic Merge
 
-Merge completed epic from worktree back to main branch.
+Merge completed epic branch back to main branch.
 
 ## Usage
 ```
@@ -13,9 +13,9 @@ Merge completed epic from worktree back to main branch.
 
 ## Quick Check
 
-1. **Verify worktree exists:**
+1. **Verify branch exists:**
    ```bash
-   git worktree list | grep "epic-$ARGUMENTS" || echo "❌ No worktree for epic: $ARGUMENTS"
+   git branch -a | grep "epic/$ARGUMENTS" || echo "❌ No branch for epic: $ARGUMENTS"
    ```
 
 2. **Check for active agents:**
@@ -26,13 +26,14 @@ Merge completed epic from worktree back to main branch.
 
 ### 1. Pre-Merge Validation
 
-Navigate to worktree and check status:
+Check out branch and check status:
 ```bash
-cd ../epic-$ARGUMENTS
+git checkout epic/$ARGUMENTS
+git pull origin epic/$ARGUMENTS
 
 # Check for uncommitted changes
 if [[ $(git status --porcelain) ]]; then
-  echo "⚠️ Uncommitted changes in worktree:"
+  echo "⚠️ Uncommitted changes in branch:"
   git status --short
   echo "Commit or stash changes before merging"
   exit 1
@@ -66,9 +67,6 @@ Update `.claude/epics/$ARGUMENTS/epic.md`:
 ### 4. Attempt Merge
 
 ```bash
-# Return to main repository
-cd {main-repo-path}
-
 # Ensure main is up to date
 git checkout main
 git pull origin main
@@ -110,7 +108,7 @@ Options:
 3. Get help:
    /pm:epic-resolve $ARGUMENTS
 
-Worktree preserved at: ../epic-$ARGUMENTS
+Branch preserved at: epic/$ARGUMENTS
 "
 exit 1
 ```
@@ -121,10 +119,6 @@ If merge succeeds:
 ```bash
 # Push to remote
 git push origin main
-
-# Clean up worktree
-git worktree remove ../epic-$ARGUMENTS
-echo "✅ Worktree removed: ../epic-$ARGUMENTS"
 
 # Delete branch
 git branch -d epic/$ARGUMENTS
