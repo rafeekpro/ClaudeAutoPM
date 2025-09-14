@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { describe, it, beforeEach } = require('node:test');
+const { describe, it, beforeEach, afterEach } = require('node:test');
 const { performance } = require('perf_hooks');
 
 class PerformanceMonitor {
@@ -130,13 +130,24 @@ class ResourceLimiter {
       tokensProcessed: 0
     };
     this.resetInterval = 1000;
+    this.resetTimer = null;
     this.startResetTimer();
   }
 
   startResetTimer() {
-    setInterval(() => {
+    if (this.resetTimer) {
+      clearInterval(this.resetTimer);
+    }
+    this.resetTimer = setInterval(() => {
       this.usage.tokensProcessed = 0;
     }, this.resetInterval);
+  }
+
+  cleanup() {
+    if (this.resetTimer) {
+      clearInterval(this.resetTimer);
+      this.resetTimer = null;
+    }
   }
 
   checkLimit(resource, amount = 1) {
@@ -238,6 +249,13 @@ describe('Performance and Resource Limit Tests', () => {
     monitor = new PerformanceMonitor();
     loadTester = new LoadTester();
     limiter = new ResourceLimiter();
+  });
+
+  afterEach(() => {
+    // Clean up any timers to prevent hanging tests
+    if (limiter && limiter.cleanup) {
+      limiter.cleanup();
+    }
   });
 
   describe('Performance Monitoring', () => {
