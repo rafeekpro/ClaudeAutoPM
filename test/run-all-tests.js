@@ -15,9 +15,9 @@ function getSuiteTimeout() {
   const defaultLocal = 120000; // 2 minutes
   const defaultCI = 300000;    // 5 minutes
   if (isCI) {
-    return parseInt(process.env.CI_TEST_TIMEOUT || `${defaultCI}`, 10);
+    return parseInt(process.env.CI_TEST_TIMEOUT || defaultCI, 10);
   } else {
-    return parseInt(process.env.TEST_TIMEOUT || `${defaultLocal}`, 10);
+    return parseInt(process.env.TEST_TIMEOUT || defaultLocal, 10);
   }
 }
 // Test suites configuration
