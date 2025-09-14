@@ -15,7 +15,21 @@ process.env.AZURE_DEVOPS_PROJECT = 'test-project';
 process.env.AZURE_DEVOPS_TOKEN = 'test-token';
 process.env.AZURE_DEVOPS_PAT = 'test-token'; // For backward compatibility
 
-// Load module once - creates new instances for isolation
+// Store original execSync before any modules are loaded
+const originalExecSync = child_process.execSync;
+
+// Global mock for git commands - must be set before module loading
+child_process.execSync = (cmd, options) => {
+  if (cmd.includes('git rev-parse --abbrev-ref HEAD')) {
+    return 'feature/test-branch\n';
+  }
+  if (cmd.includes('git')) {
+    return 'mocked-git-response\n';
+  }
+  return originalExecSync(cmd, options);
+};
+
+// Load module after mocking
 const AzurePRCreate = require('../../../autopm/.claude/providers/azure/pr-create.js');
 
 describe('Azure DevOps pr-create Command', () => {
@@ -26,15 +40,6 @@ describe('Azure DevOps pr-create Command', () => {
 
   beforeEach(() => {
     apiCalls = [];
-
-    // Mock execSync to return feature branch
-    originalExecSync = child_process.execSync;
-    child_process.execSync = (cmd) => {
-      if (cmd.includes('git rev-parse --abbrev-ref HEAD')) {
-        return 'feature/test-branch\n';
-      }
-      return originalExecSync(cmd);
-    };
 
     // Create mock Git API
     mockGitApi = {
@@ -83,8 +88,8 @@ describe('Azure DevOps pr-create Command', () => {
   });
 
   afterEach(() => {
-    // Restore original execSync
-    child_process.execSync = originalExecSync;
+    // Reset any test-specific state
+    apiCalls = [];
   });
 
   describe('Happy Path', () => {
@@ -535,4 +540,9 @@ describe('Azure DevOps pr-create Command', () => {
       }
     });
   });
+});
+
+// Restore original execSync after all tests
+process.on('exit', () => {
+  child_process.execSync = originalExecSync;
 });
