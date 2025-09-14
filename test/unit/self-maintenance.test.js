@@ -467,7 +467,13 @@ describe('SelfMaintenance Class', () => {
         const originalStatSync = fs.statSync;
 
         fs.existsSync = () => true;
-        fs.readdirSync = () => ['file1.js', 'file2.ts', 'file3.js', 'file4.md'];
+        fs.readdirSync = (dir) => {
+          // Avoid infinite recursion in tests
+          if (dir && dir.includes('subdir')) {
+            return [];
+          }
+          return ['file1.js', 'file2.ts', 'file3.js', 'file4.md'];
+        };
         fs.statSync = () => ({
           isDirectory: () => false,
           isFile: () => true
