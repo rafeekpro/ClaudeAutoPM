@@ -169,26 +169,13 @@ class HybridStrategyOrchestrator {
       context.sandbox.cleanup();
     }
 
-    // Reduced cleanup timeout for faster test execution
-    setTimeout(() => {
-      this.contexts.delete(contextId);
-    }, 1000);
+    // Keep terminated context in memory for tests to validate state
+    // It will be cleaned up in afterEach()
   }
 
   scheduleTimeout(contextId) {
-    setTimeout(() => {
-      const context = this.contexts.get(contextId);
-      if (context && context.state === 'active') {
-        const idleTime = Date.now() - Math.max(
-          context.created,
-          ...context.history.map(h => h.timestamp)
-        );
-
-        if (idleTime > this.contextTimeout) {
-          this.terminateContext(contextId, 'timeout');
-        }
-      }
-    }, this.contextTimeout);
+    // Disabled timeout scheduling in tests to prevent hanging
+    return;
   }
 
   estimateTokens(input, output) {
@@ -448,8 +435,14 @@ describe('Hybrid Strategy Integration Tests', () => {
   });
 
   afterEach(() => {
-    for (const contextId of orchestrator.contexts.keys()) {
-      orchestrator.terminateContext(contextId);
+    // Force cleanup of all contexts and their timers
+    if (orchestrator) {
+      for (const contextId of orchestrator.contexts.keys()) {
+        orchestrator.terminateContext(contextId);
+      }
+      // Clear all contexts immediately to prevent timers
+      orchestrator.contexts.clear();
+      orchestrator.activeAgents.clear();
     }
   });
 
