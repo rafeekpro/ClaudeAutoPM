@@ -88,7 +88,7 @@ All commands work identically regardless of the active provider:
 ```bash
 # These commands work with both GitHub Issues and Azure Work Items
 autopm decompose 123             # Decomposes issue/work item #123
-autopm start-streams 123          # Starts parallel work streams
+autopm start-stream 123          # Starts parallel work streams
 autopm status 123                 # Shows progress status
 autopm update 123 "In Progress"   # Updates status
 ```
