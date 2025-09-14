@@ -282,7 +282,7 @@ class SelfMaintenance {
     });
 
     return new Promise((resolve) => {
-      rl.question('Select release type (1-4): ', async (releaseType) => {
+      rl.question('Select release type (1-4): ', (releaseType) => {
         let npmVersion;
         switch (releaseType) {
           case '1': npmVersion = 'patch'; break;
