@@ -364,20 +364,27 @@ EOF
     fi
 
     # Insert provider config into the JSON file
-    # This is a bit tricky with just bash, so we'll use a temporary file
+    # Write provider config to temporary file to avoid AWK newline issues
     local temp_file="${config_file}.tmp"
+    local provider_file="${config_file}.provider"
+
+    echo "$provider_config" > "$provider_file"
 
     # Read the original file and insert provider config after opening brace
-    awk -v provider="$provider_config" '
+    awk -v provider_file="$provider_file" '
         NR==1 && /{/ {
             print $0
-            print provider
+            while ((getline line < provider_file) > 0) {
+                print line
+            }
+            close(provider_file)
             next
         }
         {print}
     ' "$config_file" > "$temp_file"
 
-    # Move temp file back
+    # Clean up and move temp file back
+    rm -f "$provider_file"
     mv "$temp_file" "$config_file"
 
     print_msg "$CYAN" "  Added $PROVIDER_TYPE provider configuration"
