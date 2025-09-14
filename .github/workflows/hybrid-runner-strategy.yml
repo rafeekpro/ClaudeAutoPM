@@ -147,14 +147,14 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const runnerType = ${{ needs.check-runners.outputs.use-self-hosted }} ? 'self-hosted' : 'GitHub-hosted';
+            const runnerType = '${{ needs.check-runners.outputs.use-self-hosted }}' === 'true' ? 'self-hosted' : 'GitHub-hosted';
             const summary = [];
 
             summary.push(`# Test Execution Summary`);
             summary.push(`**Runner Type:** ${runnerType}`);
             summary.push(`**Status:** ${{ needs.adaptive-tests.result }}`);
 
-            if (${{ needs.check-runners.outputs.use-self-hosted }}) {
+            if ('${{ needs.check-runners.outputs.use-self-hosted }}' === 'true') {
               summary.push(`\n## ✅ Self-Hosted Runner Benefits`);
               summary.push(`- Faster execution times`);
               summary.push(`- Cached dependencies`);
