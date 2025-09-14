@@ -1,8 +1,74 @@
 # 🔧 CLI Reference
 
-Complete reference for all ClaudeAutoPM command-line tools.
+Complete reference for all ClaudeAutoPM command-line tools with unified provider-agnostic commands.
 
-## 📋 Main Commands
+## 🎯 Unified Project Management Commands
+
+ClaudeAutoPM provides a unified command interface that works across different providers (GitHub, Azure DevOps, etc.). All commands use the `/pm:` prefix and are automatically routed to the configured provider.
+
+### Command Structure
+```
+/pm:<resource>:<action> [parameters] [--options]
+```
+
+## 📋 Core PM Commands
+
+### Issue/Work Item Management
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `/pm:issue:show <id>` | Display issue details | `/pm:issue:show 123` |
+| `/pm:issue:list [--filter]` | List all issues | `/pm:issue:list --status=open` |
+| `/pm:issue:create` | Create new issue | `/pm:issue:create --title="Bug fix"` |
+| `/pm:issue:start <id>` | Start working on issue | `/pm:issue:start 456 --assign` |
+| `/pm:issue:close <id>` | Close issue | `/pm:issue:close 789` |
+| `/pm:issue:edit <id>` | Edit issue fields | `/pm:issue:edit 101 --status=in_progress` |
+| `/pm:issue:assign <id> <user>` | Assign to user | `/pm:issue:assign 202 @johndoe` |
+| `/pm:issue:comment <id>` | Add comment | `/pm:issue:comment 303 "Fixed in PR #45"` |
+
+### Epic/Feature Management
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `/pm:epic:list` | List all epics | `/pm:epic:list` |
+| `/pm:epic:show <id>` | Display epic details | `/pm:epic:show 5` |
+| `/pm:epic:create` | Create new epic | `/pm:epic:create --title="Q1 Features"` |
+| `/pm:epic:update <id>` | Update epic | `/pm:epic:update 5 --status=active` |
+| `/pm:epic:close <id>` | Close epic | `/pm:epic:close 5` |
+| `/pm:epic:progress <id>` | Show epic progress | `/pm:epic:progress 5` |
+
+### Pull/Merge Request Management
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `/pm:pr:create` | Create pull request | `/pm:pr:create --title="Feature X"` |
+| `/pm:pr:list` | List pull requests | `/pm:pr:list --status=open` |
+| `/pm:pr:show <id>` | Display PR details | `/pm:pr:show 99` |
+| `/pm:pr:review <id>` | Start PR review | `/pm:pr:review 99` |
+| `/pm:pr:approve <id>` | Approve PR | `/pm:pr:approve 99` |
+| `/pm:pr:merge <id>` | Merge PR | `/pm:pr:merge 99` |
+| `/pm:pr:close <id>` | Close without merging | `/pm:pr:close 99` |
+
+### Board/Sprint Management
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `/pm:board:show` | Display project board | `/pm:board:show` |
+| `/pm:board:update` | Update board items | `/pm:board:update` |
+| `/pm:sprint:current` | Show current sprint | `/pm:sprint:current` |
+| `/pm:sprint:plan` | Plan next sprint | `/pm:sprint:plan` |
+| `/pm:sprint:close` | Close sprint | `/pm:sprint:close` |
+
+### Search and Reporting
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `/pm:search <query>` | Search all items | `/pm:search "authentication bug"` |
+| `/pm:report:velocity` | Team velocity | `/pm:report:velocity` |
+| `/pm:report:burndown` | Sprint burndown | `/pm:report:burndown` |
+| `/pm:report:summary` | Project summary | `/pm:report:summary` |
+
+## 🔧 Framework Installation Commands
 
 ### `autopm install [path]`
 Install ClaudeAutoPM framework to a project directory.
@@ -277,11 +343,113 @@ autopm config  # Validate and apply
 - **Scripts**: `.claude/scripts/`
 - **Generated**: `CLAUDE.md`
 
+## 🛠️ Self-Maintenance Commands
+
+ClaudeAutoPM includes powerful self-maintenance capabilities implemented in Node.js:
+
+### `pm health`
+Generate comprehensive health report for the ClaudeAutoPM system.
+
+```bash
+npm run pm:health
+# or
+node scripts/self-maintenance.js health
+```
+
+**Output includes:**
+- Agent ecosystem metrics
+- Installation health
+- File integrity checks
+- Test coverage status
+- Performance metrics
+
+### `pm validate`
+Validate the entire framework installation and configuration.
+
+```bash
+npm run pm:validate
+# or
+node scripts/self-maintenance.js validate
+```
+
+**Validates:**
+- Agent registry consistency
+- Configuration files
+- Installation completeness
+- Template availability
+- Strategy configuration
+
+### `pm optimize`
+Analyze and optimize the agent ecosystem for better performance.
+
+```bash
+npm run pm:optimize
+# or
+node scripts/self-maintenance.js optimize
+```
+
+**Performs:**
+- Agent consolidation analysis
+- Context efficiency calculation
+- Duplicate detection
+- Performance recommendations
+
+### `pm metrics`
+Display detailed metrics about the framework.
+
+```bash
+npm run pm:metrics
+# or
+node scripts/self-maintenance.js metrics
+```
+
+**Shows:**
+- Total agents by category
+- Deprecated agent count
+- Context usage statistics
+- Installation statistics
+
+### `pm test-install`
+Test the installation process in various scenarios.
+
+```bash
+npm run pm:test-install
+# or
+node scripts/self-maintenance.js test-install
+```
+
+**Tests:**
+- Minimal installation
+- Docker-only installation
+- Full DevOps installation
+- Performance installation
+- Upgrade scenarios
+
+### `pm release`
+Prepare a new release of the framework.
+
+```bash
+npm run pm:release
+# or
+node scripts/self-maintenance.js release
+```
+
+**Steps:**
+1. Run validation checks
+2. Execute test suite
+3. Update version
+4. Generate changelog
+5. Create GitHub release
+6. Publish to npm
+
 ## 🔧 Direct Script Access
 
 For advanced users, you can run scripts directly:
 
 ```bash
+# Self-maintenance script (Node.js)
+node scripts/self-maintenance.js <command>
+
 # Configuration toggle script
 .claude/scripts/config/toggle-features.sh
 
@@ -290,6 +458,83 @@ For advanced users, you can run scripts directly:
 
 # PM initialization script
 .claude/scripts/pm/init.sh
+```
+
+## ⚙️ Provider Configuration
+
+### Setting Provider
+Configure your provider in `.claude/config.json`:
+
+```json
+{
+  "projectManagement": {
+    "provider": "github",  // or "azure"
+    "settings": {
+      "github": {
+        "owner": "username",
+        "repo": "repository"
+      },
+      "azure": {
+        "organization": "org-name",
+        "project": "project-name",
+        "team": "team-name"
+      }
+    }
+  }
+}
+```
+
+### Provider Selection Priority
+1. **Environment Variable**: `export AUTOPM_PROVIDER=azure`
+2. **Configuration File**: `.claude/config.json`
+3. **Default**: GitHub (if not configured)
+
+### Authentication
+```bash
+# GitHub
+export GITHUB_TOKEN=ghp_xxxxxxxxxxxx
+
+# Azure DevOps
+export AZURE_DEVOPS_TOKEN=xxxxxxxxxxxx
+```
+
+## 🔍 Filter Syntax
+
+All list commands support advanced filtering:
+
+### Status Filters
+```bash
+/pm:issue:list --status=open
+/pm:issue:list --status=in_progress
+/pm:issue:list --status=closed
+/pm:pr:list --status=open
+```
+
+### Assignee Filters
+```bash
+/pm:issue:list --assignee=@me
+/pm:issue:list --assignee=johndoe
+/pm:issue:list --assignee=none
+```
+
+### Label/Tag Filters
+```bash
+/pm:issue:list --label=bug
+/pm:issue:list --label=enhancement
+/pm:issue:list --tag=frontend
+```
+
+### Combined Filters
+```bash
+/pm:issue:list --status=open --assignee=@me --label=bug
+/pm:pr:list --status=open --author=@me
+```
+
+### Date Filters
+```bash
+/pm:issue:list --created-after=2024-01-01
+/pm:issue:list --updated-since=7d
+/pm:pr:list --created-today
 ```
 
 ## 🎨 Output Formats
