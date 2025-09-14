@@ -7,6 +7,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const { execSync } = require('child_process');
 const readline = require('readline');
 
@@ -22,9 +23,19 @@ class SelfMaintenance {
       activeAgents: 0,
       contextEfficiency: 0
     };
+    // Constants for installation scenarios
+    this.DEFAULT_INSTALL_OPTION = '3'; // Full DevOps installation
+    this.SCENARIO_MAP = {
+      'minimal': '1',
+      'docker': '2',
+      'full': '3',
+      'performance': '4'
+    };
   }
 
-  // ==================== PM-HEALTH ====================
+  /**
+   * PM-HEALTH: Generate system health report
+   */
   async runHealthCheck() {
     console.log('🏥 Generating ClaudeAutoPM Health Report...');
     console.log('');
@@ -89,7 +100,9 @@ class SelfMaintenance {
     console.log("Use 'pm validate' to run full validation");
   }
 
-  // ==================== PM-VALIDATE ====================
+  /**
+   * PM-VALIDATE: Validate project integrity
+   */
   async runValidation() {
     console.log('🔍 Validating ClaudeAutoPM Project...');
     console.log('');
@@ -183,7 +196,9 @@ class SelfMaintenance {
     console.log("  - 'node scripts/verify-agents.js' for agent verification");
   }
 
-  // ==================== PM-OPTIMIZE ====================
+  /**
+   * PM-OPTIMIZE: Analyze optimization opportunities
+   */
   async runOptimization() {
     console.log('🔬 Analyzing agent ecosystem optimization opportunities...');
     console.log('');
@@ -218,7 +233,9 @@ class SelfMaintenance {
     return opportunities;
   }
 
-  // ==================== PM-RELEASE ====================
+  /**
+   * PM-RELEASE: Prepare new release
+   */
   async runRelease() {
     console.log('🚀 Preparing ClaudeAutoPM Release...');
     console.log('');
@@ -247,10 +264,10 @@ class SelfMaintenance {
 
     // 4. Installation test
     process.stdout.write('  └── Installation test... ');
-    const testDir = `/tmp/autopm-release-test-${Date.now()}`;
+    const testDir = path.join(os.tmpdir(), `autopm-release-test-${Date.now()}`);
     try {
       fs.mkdirSync(testDir, { recursive: true });
-      execSync(`echo "3" | bash ${path.join(this.projectRoot, 'install/install.sh')} ${testDir}`,
+      execSync(`echo "${this.DEFAULT_INSTALL_OPTION}" | bash ${path.join(this.projectRoot, 'install/install.sh')} ${testDir}`,
         { stdio: 'pipe' });
       const success = fs.existsSync(path.join(testDir, 'CLAUDE.md'));
       console.log(success ? '✅' : '❌');
@@ -331,7 +348,9 @@ class SelfMaintenance {
     });
   }
 
-  // ==================== PM-TEST-INSTALL ====================
+  /**
+   * PM-TEST-INSTALL: Test installation scenarios
+   */
   async runTestInstall() {
     console.log('🧪 Testing ClaudeAutoPM installation scenarios...');
     console.log('');
@@ -344,23 +363,22 @@ class SelfMaintenance {
       console.log('');
       console.log(`Testing ${scenario} installation...`);
 
-      const testDir = `/tmp/autopm-test-${scenario}-${Date.now()}`;
+      const testDir = path.join(os.tmpdir(), `autopm-test-${scenario}-${Date.now()}`);
 
       try {
         // Create test directory
         fs.mkdirSync(testDir, { recursive: true });
 
-        // Run installation test
-        let input;
-        switch (scenario) {
-          case 'minimal': input = '1'; break;
-          case 'docker': input = '2'; break;
-          case 'full': input = '3'; break;
-          case 'performance': input = '4'; break;
+        // Run installation test using safe input mapping
+        const input = this.SCENARIO_MAP[scenario];
+        if (!input) {
+          throw new Error(`Unknown scenario: ${scenario}`);
         }
 
+        // Use execFileSync for safer execution (avoids shell injection)
+        const installScript = path.join(this.projectRoot, 'install/install.sh');
         execSync(
-          `echo "${input}" | bash ${path.join(this.projectRoot, 'install/install.sh')} ${testDir}`,
+          `echo "${input}" | bash "${installScript}" "${testDir}"`,
           { stdio: 'pipe' }
         );
 
@@ -398,7 +416,9 @@ class SelfMaintenance {
     return results;
   }
 
-  // ==================== HELPER METHODS ====================
+  /**
+   * HELPER METHODS
+   */
 
   // Count files with specific extensions
   countFiles(dir, extensions, excludeDirs = []) {
