@@ -17,7 +17,7 @@
     "test:security:injection": "node --test test/security/prompt-injection.test.js",
     "test:security:integration": "node --test test/security/integration.test.js",
     "test:security:performance": "node --test test/security/performance.test.js",
-    "test:regression": "node --test test/regression/*.test.js",
+    "test:regression": "node --test --test-concurrency=1 test/regression/*.test.js",
     "test:regression:hybrid": "node --test test/regression/hybrid-strategy-regression.test.js",
     "test:regression:paths": "node --test test/regression/critical-paths.test.js",
     "test:install": "bash test/installation/integration.test.sh",
