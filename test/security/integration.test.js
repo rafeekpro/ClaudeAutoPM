@@ -122,7 +122,7 @@ class HybridStrategyOrchestrator {
     const tempId = `temp-${Date.now()}-${Math.random()}`;
     this.activeAgents.add(tempId);
 
-    if (this.activeAgents.size > this.maxParallelAgents) {
+    if (this.activeAgents.size >= this.maxParallelAgents) {
       this.activeAgents.delete(tempId);
       throw new Error('Max parallel agents limit reached');
     }
