@@ -77,10 +77,10 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
         # Windows tests are experimental.
-        # TODO: Make Windows E2E tests non-experimental after resolving:
-        #   - Flaky test failures on Windows CI
-        #   - Path handling inconsistencies in E2E scripts
-        #   - Ensure all dependencies are compatible with Windows runners
+        # See GitHub issues #123, #124, and #125 for tracking Windows E2E test compatibility:
+        #   - Flaky test failures on Windows CI (#123)
+        #   - Path handling inconsistencies in E2E scripts (#124)
+        #   - Ensure all dependencies are compatible with Windows runners (#125)
         # Windows E2E tests are now run in a separate workflow to avoid CI instability.
 
     steps:
