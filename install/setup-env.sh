@@ -80,14 +80,14 @@ validate_input() {
             fi
             ;;
         "token")
-            # More lenient token validation
-            # Allow various token formats including Base64, hex, JWT, etc.
-            # Minimum 10 characters (some short tokens exist)
-            # Allow alphanumeric, =, ., _, -, +, /, and other common token chars
-            if [ ${#value} -ge 10 ]; then
-                return 0
+            # Strict token validation for security
+            # Returns different error codes for different validation failures
+            if [ ${#value} -lt 20 ]; then
+                return 2  # Too short
+            elif ! [[ "$value" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+                return 3  # Invalid characters
             else
-                return 1
+                return 0  # Valid
             fi
             ;;
         "path")
@@ -138,7 +138,10 @@ get_input() {
         fi
         
         # Validate input
-        if validate_input "$value" "$type"; then
+        validate_input "$value" "$type"
+        local validation_result=$?
+
+        if [ $validation_result -eq 0 ]; then
             echo "$value"
             return 0
         else
@@ -150,11 +153,18 @@ get_input() {
                     print_warning "❌ Invalid URL. Please enter a valid URL starting with http:// or https://"
                     ;;
                 "token")
-                    print_warning "❌ Invalid token format. Token must be at least 10 characters long."
-                    print_warning "   Common issues:"
-                    print_warning "   • Token too short (minimum 10 characters)"
-                    print_warning "   • Copy entire token including all special characters"
-                    print_warning "   • Check for extra spaces or line breaks"
+                    if [ $validation_result -eq 2 ]; then
+                        print_warning "❌ Token too short! Your token has ${#value} characters."
+                        print_warning "   Required: Minimum 20 characters"
+                        print_warning "   💡 Make sure you copied the ENTIRE token"
+                    elif [ $validation_result -eq 3 ]; then
+                        print_warning "❌ Token contains invalid characters!"
+                        print_warning "   Allowed: Letters (a-z, A-Z), numbers (0-9), underscore (_), hyphen (-)"
+                        print_warning "   Your token contains special characters that are not allowed"
+                        print_warning "   💡 Some tokens (like Base64) may need to be converted or you may have the wrong token type"
+                    else
+                        print_warning "❌ Invalid token format"
+                    fi
                     ;;
                 "path")
                     print_warning "❌ Invalid file path. Please enter a valid path (absolute or relative)"
@@ -251,7 +261,8 @@ setup_env() {
     echo ""
     
     local context7_key
-    print_msg "$YELLOW" "   Format: Alphanumeric string, min 10 characters"
+    print_msg "$YELLOW" "   Format: Alphanumeric string (letters, numbers, _, -), minimum 20 characters"
+    print_msg "$YELLOW" "   Example: abc123def456ghi789jkl012mno345"
     context7_key=$(get_input "Context7 API Key" "" "token" false)
     local context7_workspace
     if [ -n "$context7_key" ]; then
@@ -277,7 +288,8 @@ setup_env() {
     echo ""
     
     local github_token
-    print_msg "$YELLOW" "   Format: ghp_xxxxxxxxxxxx or classic token format"
+    print_msg "$YELLOW" "   Format: Alphanumeric with underscore/hyphen, minimum 20 characters"
+    print_msg "$YELLOW" "   Note: New GitHub tokens start with 'ghp_' but contain only allowed characters"
     github_token=$(get_input "GitHub Personal Access Token" "" "token" false)
     
     env_content+="# GitHub MCP Server Configuration\n"
@@ -315,7 +327,8 @@ setup_env() {
         echo ""
         
         local azdo_pat
-        print_msg "$YELLOW" "   Format: Base64 encoded string or alphanumeric token"
+        print_msg "$YELLOW" "   Format: Alphanumeric string, minimum 20 characters"
+        print_msg "$YELLOW" "   ⚠️  If your token is Base64 encoded (contains =, /, +), you may need to decode it first"
         azdo_pat=$(get_input "Azure DevOps Personal Access Token" "" "token" false)
         local azdo_org
         azdo_org=$(get_input "Azure DevOps Organization" "" "text" false)
@@ -414,7 +427,8 @@ setup_env() {
             echo ""
             
             local openai_key
-            print_msg "$YELLOW" "   Format: sk-xxxxxxxxxxxx"
+            print_msg "$YELLOW" "   Format: Starts with 'sk-' followed by alphanumeric characters"
+            print_msg "$YELLOW" "   Example: sk-abc123def456ghi789jkl012mno345pqr"
             openai_key=$(get_input "OpenAI API Key" "" "token" false)
             
             env_content+="# OpenAI Configuration\n"
