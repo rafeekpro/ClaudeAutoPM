@@ -19,9 +19,11 @@ Stop losing context. Stop blocking on tasks. Stop shipping bugs. This battle-tes
 - [Background](#background)
 - [The Workflow](#the-workflow)
 - [What Makes This Different?](#what-makes-this-different)
+- [⚙️ Configuration Options](#️-configuration-options)
+- [🔧 Post-Installation Configuration Management](#-post-installation-configuration-management)
 - [Why GitHub Issues?](#why-github-issues)
 - [Core Principle: No Vibe Coding](#core-principle-no-vibe-coding)
-- [🎆 Key Features](#-key-features)
+- [🌟 Key Features](#-key-features)
 - [System Architecture](#system-architecture)
 - [Workflow Phases](#workflow-phases)
 - [Command Reference](#command-reference)
@@ -270,6 +272,57 @@ autopm update   # Keeps your current configuration
 ```
 
 **🎯 Smart CLAUDE.md Generation**: Your `CLAUDE.md` file automatically adapts to match your chosen configuration, giving Claude the right development rules for your environment.
+
+## 🔧 Post-Installation Configuration Management
+
+ClaudeAutoPM provides comprehensive tools to manage your configuration after installation. **You can add, modify, or remove any configuration without reinstalling.**
+
+### Quick Configuration Commands
+
+| Task | Command | Description |
+|------|---------|-------------|
+| **Update .env** | `autopm setup-env` | Reconfigure API keys and tokens interactively |
+| **Manage MCP** | `autopm mcp <cmd>` | Enable/disable MCP servers |
+| **Toggle features** | `autopm config` | Switch Docker/K8s features |
+| **Update framework** | `autopm update` | Update to latest version |
+| **Merge configs** | `autopm merge` | AI-assisted config merging |
+
+### Managing API Keys and Tokens
+
+```bash
+# Reconfigure .env at any time
+autopm setup-env           # Current directory
+autopm setup-env ~/project # Specific project
+
+# Add services manually
+echo "OPENAI_API_KEY=sk-xxxxx" >> .claude/.env
+```
+
+### MCP Server Management
+
+```bash
+# List available servers
+autopm mcp list
+
+# Enable/disable servers
+autopm mcp enable github-mcp
+autopm mcp disable context7-docs
+
+# Sync configuration
+autopm mcp sync
+```
+
+### Feature Configuration
+
+```bash
+# Interactive feature toggle
+autopm config
+
+# Switch configurations
+# Options: minimal, docker-only, full-devops
+```
+
+📚 **Full documentation**: [Post-Installation Management Guide](https://github.com/rafeekpro/ClaudeAutoPM/wiki/Post_Installation_Management)
 
 ---
 
