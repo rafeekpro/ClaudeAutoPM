@@ -1,20 +1,20 @@
 {
-  "timestamp": "2025-09-14T15:08:58.479Z",
+  "timestamp": "2025-09-14T20:44:06.242Z",
   "summary": {
-    "passed": true,
-    "totalTests": 0,
-    "passedTests": 0,
-    "failedTests": 0,
-    "skippedTests": 0,
-    "successRate": "0.0"
+    "passed": false,
+    "totalTests": 53,
+    "passedTests": 50,
+    "failedTests": 2,
+    "skippedTests": 1,
+    "successRate": "94.3"
   },
   "results": [
     {
       "suite": "Unit Tests - Self Maintenance",
       "passed": true,
-      "duration": "0.04s",
-      "tests": 0,
-      "passes": 0,
+      "duration": "0.08s",
+      "tests": 7,
+      "passes": 7,
       "failures": 0,
       "skipped": 0,
       "critical": true
@@ -22,9 +22,9 @@
     {
       "suite": "Integration Tests - Azure DevOps Issue Show",
       "passed": true,
-      "duration": "0.04s",
-      "tests": 0,
-      "passes": 0,
+      "duration": "0.13s",
+      "tests": 12,
+      "passes": 12,
       "failures": 0,
       "skipped": 0,
       "critical": true
@@ -32,17 +32,17 @@
     {
       "suite": "Integration Tests - Azure DevOps PR Create",
       "passed": true,
-      "duration": "0.04s",
-      "tests": 0,
-      "passes": 0,
+      "duration": "0.24s",
+      "tests": 11,
+      "passes": 10,
       "failures": 0,
-      "skipped": 0,
+      "skipped": 1,
       "critical": true
     },
     {
       "suite": "E2E Tests - PM Commands",
-      "passed": true,
-      "duration": "0.04s",
+      "passed": false,
+      "duration": "0.07s",
       "tests": 0,
       "passes": 0,
       "failures": 0,
@@ -52,27 +52,27 @@
     {
       "suite": "Security Tests",
       "passed": true,
-      "duration": "0.42s",
-      "tests": 0,
-      "passes": 0,
+      "duration": "4.62s",
+      "tests": 9,
+      "passes": 9,
       "failures": 0,
       "skipped": 0,
       "critical": true
     },
     {
       "suite": "Regression Tests",
-      "passed": true,
-      "duration": "0.16s",
-      "tests": 0,
-      "passes": 0,
-      "failures": 0,
+      "passed": false,
+      "duration": "0.27s",
+      "tests": 14,
+      "passes": 12,
+      "failures": 2,
       "skipped": 0,
       "critical": true
     },
     {
       "suite": "Installation Tests",
       "passed": false,
-      "duration": "0.16s",
+      "duration": "0.20s",
       "tests": 0,
       "passes": 0,
       "failures": 0,

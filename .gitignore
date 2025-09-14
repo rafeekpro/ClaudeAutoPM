@@ -11,3 +11,5 @@ repomix-output.xml
 autopm-framework-*.tgz
 node_modules/
 # package-lock.json should be committed to ensure consistent dependencies
+test/regression/__snapshots__/health-report.json
+test/regression/__snapshots__/hybrid-strategy-latest.json
