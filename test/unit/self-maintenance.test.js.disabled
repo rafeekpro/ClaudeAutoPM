@@ -30,7 +30,7 @@ const mockSpawnSync = {
 };
 
 // Load the module once at the top level for better performance
-const SelfMaintenance = require('../../scripts/self-maintenance.js');
+const SelfMaintenance = require('../../../scripts/self-maintenance.js');
 
 // Mock management helper
 class MockManager {
