@@ -1,0 +1,130 @@
+name: "Authentication Flow"
+description: "User authentication and authorization implementation"
+patterns:
+  - "auth"
+  - "login"
+  - "authentication"
+  - "authorization"
+  - "jwt"
+  - "oauth"
+  - "sign in"
+  - "sign up"
+  - "register"
+  - "password"
+
+streams:
+  database:
+    name: "Database Schema"
+    agent: "database-architect"
+    priority: 1
+    tasks:
+      - "Create users table with secure password storage"
+      - "Add sessions/tokens table for JWT management"
+      - "Create roles and permissions tables"
+      - "Add indexes for email and username lookups"
+      - "Create audit log table for security events"
+    files:
+      - "migrations/*.sql"
+      - "src/db/schema/*.ts"
+      - "prisma/schema.prisma"
+
+  backend:
+    name: "Service Layer"
+    agent: "python-backend-expert"
+    priority: 2
+    parameters:
+      framework: "fastapi"
+    dependencies: ["database"]
+    tasks:
+      - "Implement password hashing with bcrypt/argon2"
+      - "Create JWT token generation and validation"
+      - "Build authentication middleware"
+      - "Add rate limiting for login attempts"
+      - "Implement refresh token rotation"
+      - "Add email verification service"
+    files:
+      - "src/services/auth/*.py"
+      - "src/middleware/auth.py"
+      - "src/utils/security.py"
+
+  api:
+    name: "API Endpoints"
+    agent: "fastapi-backend-engineer"
+    priority: 3
+    dependencies: ["backend"]
+    tasks:
+      - "POST /auth/register - User registration"
+      - "POST /auth/login - User login with credentials"
+      - "POST /auth/refresh - Token refresh endpoint"
+      - "POST /auth/logout - Logout and token invalidation"
+      - "GET /auth/me - Current user profile"
+      - "POST /auth/forgot-password - Password reset request"
+      - "POST /auth/reset-password - Password reset confirmation"
+      - "POST /auth/verify-email - Email verification"
+    files:
+      - "src/api/auth/*.py"
+      - "src/api/routes.py"
+      - "src/api/dependencies.py"
+
+  frontend:
+    name: "UI Components"
+    agent: "react-ui-expert"
+    priority: 4
+    parameters:
+      framework: "mui"
+      state: "context"
+    dependencies: ["api"]
+    tasks:
+      - "Create login form with validation"
+      - "Build registration form with password strength indicator"
+      - "Implement AuthContext provider for state management"
+      - "Create ProtectedRoute wrapper component"
+      - "Build user profile dropdown"
+      - "Add forgot password flow"
+      - "Implement auto-refresh token logic"
+      - "Add loading states and error handling"
+    files:
+      - "src/components/auth/*.tsx"
+      - "src/contexts/AuthContext.tsx"
+      - "src/hooks/useAuth.ts"
+      - "src/utils/auth.ts"
+
+  tests:
+    name: "Test Suite"
+    agent: "playwright-test-engineer"
+    priority: 5
+    dependencies: ["frontend", "api"]
+    tasks:
+      - "Unit tests for password hashing and JWT"
+      - "API endpoint integration tests"
+      - "E2E login and logout flow"
+      - "E2E registration with email verification"
+      - "Security tests for SQL injection and XSS"
+      - "Rate limiting tests"
+      - "Token expiry and refresh tests"
+      - "Performance tests for concurrent logins"
+    files:
+      - "tests/unit/auth/*.test.ts"
+      - "tests/integration/auth/*.test.py"
+      - "tests/e2e/auth/*.spec.ts"
+
+coordination:
+  sync_points:
+    - after: "database"
+      message: "Database schema ready for backend implementation"
+    - after: "backend"
+      message: "Auth services ready for API endpoints"
+    - after: "api"
+      message: "API contracts available for frontend integration"
+    - after: "frontend"
+      message: "UI ready for E2E testing"
+
+  shared_files:
+    - path: "docs/api/auth.yaml"
+      description: "OpenAPI specification for auth endpoints"
+      owner: "api"
+      consumers: ["frontend", "tests"]
+    - path: "src/types/auth.ts"
+      description: "Shared TypeScript interfaces"
+      owner: "backend"
+      consumers: ["api", "frontend", "tests"]
