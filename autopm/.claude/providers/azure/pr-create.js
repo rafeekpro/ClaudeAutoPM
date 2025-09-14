@@ -219,4 +219,15 @@ class AzurePRCreate {
   }
 }
 
-module.exports = AzurePRCreate;
+// Backward compatibility: export a default instance and the class
+// Provide placeholder settings for the default instance; consumers should provide real settings
+const defaultSettings = {
+  organization: '',
+  project: '',
+  repository: ''
+};
+
+const defaultInstance = new AzurePRCreate(defaultSettings);
+
+module.exports = defaultInstance;
+module.exports.AzurePRCreate = AzurePRCreate;
