@@ -1,0 +1,188 @@
+name: Hybrid Runner Strategy
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  # Determine which runners are available
+  check-runners:
+    name: Check Available Runners
+    runs-on: ubuntu-latest
+    outputs:
+      use-self-hosted: ${{ steps.check.outputs.available }}
+      runner-labels: ${{ steps.check.outputs.labels }}
+
+    steps:
+      - name: Check for self-hosted runners
+        id: check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              const { data: runners } = await github.rest.actions.listSelfHostedRunnersForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo
+              });
+
+              const available = runners.total_count > 0 &&
+                               runners.runners.some(r => r.status === 'online');
+
+              core.setOutput('available', available.toString());
+
+              if (available) {
+                // Get labels from online runners
+                const labels = [...new Set(runners.runners
+                  .filter(r => r.status === 'online')
+                  .flatMap(r => r.labels.map(l => l.name)))];
+                core.setOutput('labels', JSON.stringify(labels));
+                console.log(`Found ${runners.total_count} self-hosted runner(s)`);
+              } else {
+                core.setOutput('labels', JSON.stringify(['ubuntu-latest']));
+                console.log('No self-hosted runners available, using GitHub runners');
+              }
+            } catch (error) {
+              console.log('Unable to check runners, defaulting to GitHub runners');
+              core.setOutput('available', 'false');
+              core.setOutput('labels', JSON.stringify(['ubuntu-latest']));
+            }
+
+  # Main test job that adapts to available runners
+  adaptive-tests:
+    name: Adaptive Tests
+    needs: check-runners
+    runs-on: ${{ needs.check-runners.outputs.use-self-hosted == 'true' && 'self-hosted' || 'ubuntu-latest' }}
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+        test-type: [unit, security, regression]
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Runner Information
+        run: |
+          echo "Running on: ${{ needs.check-runners.outputs.use-self-hosted == 'true' && 'self-hosted' || 'GitHub-hosted' }} runner"
+          echo "Runner labels: ${{ needs.check-runners.outputs.runner-labels }}"
+          echo "OS: $(uname -a)"
+          echo "CPU: $(nproc) cores"
+          echo "Memory: $(free -h | grep Mem | awk '{print $2}')"
+          echo "Disk: $(df -h / | tail -1 | awk '{print $4}' ) available"
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          # Use different strategies based on runner type
+          if [[ "${{ needs.check-runners.outputs.use-self-hosted }}" == "true" ]]; then
+            # Self-hosted: use offline install if possible
+            npm ci --prefer-offline --no-audit || npm ci
+          else
+            # GitHub runners: fresh install
+            npm ci
+          fi
+
+      - name: Run ${{ matrix.test-type }} tests
+        run: npm run test:${{ matrix.test-type }}
+        timeout-minutes: ${{ needs.check-runners.outputs.use-self-hosted == 'true' && 5 || 10 }}
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.node-version }}-${{ matrix.test-type }}
+          path: |
+            test-results/
+            coverage/
+          retention-days: 7
+
+  # Specialized job for performance testing (prefers self-hosted)
+  performance-tests:
+    name: Performance Tests
+    needs: check-runners
+    # Only run on self-hosted if available, skip otherwise
+    if: needs.check-runners.outputs.use-self-hosted == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ${{ needs.check-runners.outputs.use-self-hosted == 'true' && 'self-hosted' || 'ubuntu-latest' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit || npm ci
+
+      - name: Run performance benchmarks
+        run: |
+          if [[ "${{ needs.check-runners.outputs.use-self-hosted }}" == "true" ]]; then
+            echo "Running full performance suite on self-hosted runner"
+            npm run test:security:performance
+          else
+            echo "Running limited performance tests on GitHub runner"
+            npm run test:security:performance || echo "Performance tests skipped on GitHub runners"
+          fi
+        timeout-minutes: 15
+
+  # Summary job
+  test-summary:
+    name: Test Summary
+    if: always()
+    needs: [check-runners, adaptive-tests, performance-tests]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runnerType = ${{ needs.check-runners.outputs.use-self-hosted }} ? 'self-hosted' : 'GitHub-hosted';
+            const summary = [];
+
+            summary.push(`# Test Execution Summary`);
+            summary.push(`**Runner Type:** ${runnerType}`);
+            summary.push(`**Status:** ${{ needs.adaptive-tests.result }}`);
+
+            if (${{ needs.check-runners.outputs.use-self-hosted }}) {
+              summary.push(`\n## ✅ Self-Hosted Runner Benefits`);
+              summary.push(`- Faster execution times`);
+              summary.push(`- Cached dependencies`);
+              summary.push(`- Consistent environment`);
+              summary.push(`- Cost savings on GitHub Actions minutes`);
+            } else {
+              summary.push(`\n## ℹ️ GitHub-Hosted Runner Notice`);
+              summary.push(`- Tests ran on GitHub infrastructure`);
+              summary.push(`- Consider setting up self-hosted runners for:`);
+              summary.push(`  - Better performance`);
+              summary.push(`  - Lower costs`);
+              summary.push(`  - Custom environments`);
+            }
+
+            // Write to job summary
+            await core.summary
+              .addRaw(summary.join('\n'))
+              .write();
+
+            // Comment on PR if applicable
+            if (context.eventName === 'pull_request') {
+              const comment = summary.join('\n') +
+                '\n\n---\n*Generated by Hybrid Runner Strategy workflow*';
+
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }

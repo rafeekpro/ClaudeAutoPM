@@ -1,0 +1,247 @@
+name: Self-Hosted Runner Tests
+
+on:
+  push:
+    branches: [main, develop, 'test/**', 'feature/**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      runner_type:
+        description: 'Runner type to use'
+        required: false
+        default: 'self-hosted'
+        type: choice
+        options:
+          - self-hosted
+          - ubuntu-latest
+
+# Use workflow input or default to self-hosted
+env:
+  RUNNER_TYPE: ${{ github.event.inputs.runner_type || 'self-hosted' }}
+
+jobs:
+  unit-tests:
+    name: Unit Tests (Self-Hosted)
+    runs-on: [self-hosted, linux]
+    # Fallback to GitHub runners if self-hosted not available
+    continue-on-error: false
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          clean: true
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Clean npm cache
+        run: npm cache clean --force || true
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Run unit tests
+        run: npm run test:unit
+        timeout-minutes: 5
+
+      - name: Run security tests
+        run: npm run test:security
+        timeout-minutes: 10
+
+  integration-tests:
+    name: Integration Tests (Self-Hosted)
+    runs-on: [self-hosted, linux]
+    needs: unit-tests
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          clean: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Run integration tests
+        run: |
+          npm run test:regression
+          npm run test:install
+        timeout-minutes: 15
+
+  performance-tests:
+    name: Performance Tests (Self-Hosted)
+    runs-on: [self-hosted, linux, performance]
+    needs: unit-tests
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          clean: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Run performance tests
+        run: npm run test:security:performance
+        timeout-minutes: 10
+
+      - name: Upload performance results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-results
+          path: test/reports/performance-*.json
+          retention-days: 30
+
+  docker-tests:
+    name: Docker Tests (Self-Hosted)
+    runs-on: [self-hosted, linux, docker]
+    needs: unit-tests
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          clean: true
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build test container
+        run: |
+          docker build -t autopm-test:latest -f test/docker/Dockerfile.test .
+
+      - name: Run tests in container
+        run: |
+          docker run --rm \
+            -v $(pwd):/workspace \
+            -w /workspace \
+            autopm-test:latest \
+            npm run test:all
+        timeout-minutes: 20
+
+      - name: Cleanup Docker
+        if: always()
+        run: |
+          docker system prune -af --volumes || true
+
+  parallel-matrix-tests:
+    name: Parallel Tests - ${{ matrix.test-suite }}
+    runs-on: [self-hosted, linux]
+    strategy:
+      matrix:
+        test-suite:
+          - security
+          - regression
+          - installation
+          - cli
+          - unit
+      max-parallel: 5
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          clean: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Run ${{ matrix.test-suite }} tests
+        run: npm run test:${{ matrix.test-suite }}
+        timeout-minutes: 10
+
+  github-runner-fallback:
+    name: Fallback Tests (GitHub Runners)
+    # This job runs on GitHub runners as fallback
+    if: failure() && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    needs: [unit-tests]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run minimal test suite
+        run: |
+          npm run test:unit
+          npm run test:security:hybrid
+        timeout-minutes: 10
+
+      - name: Comment PR about fallback
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ Self-hosted runners unavailable. Tests ran on GitHub-hosted runners with limited scope.'
+            })
+
+  cleanup:
+    name: Cleanup Self-Hosted Runner
+    if: always()
+    runs-on: [self-hosted, linux]
+    needs: [unit-tests, integration-tests, performance-tests, docker-tests]
+
+    steps:
+      - name: Clean workspace
+        run: |
+          # Clean workspace but preserve runner tools
+          if [ -d "${{ github.workspace }}" ]; then
+            cd ${{ github.workspace }}
+            git clean -ffdx || true
+            git reset --hard HEAD || true
+          fi
+
+      - name: Clean Docker if available
+        run: |
+          if command -v docker &> /dev/null; then
+            docker system prune -af --volumes || true
+          fi
+
+      - name: Clean npm cache
+        run: |
+          npm cache clean --force || true
+
+      - name: Report runner status
+        run: |
+          echo "Runner cleanup completed"
+          echo "Available disk space:"
+          df -h
+          echo "Memory usage:"
+          free -h || true
