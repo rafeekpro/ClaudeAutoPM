@@ -3,6 +3,89 @@
  * Tests the most important workflows from end to end
  */
 
+// Mock AzureDevOpsClient before any other imports
+const Module = require('module');
+const originalRequire = Module.prototype.require;
+Module.prototype.require = function(id) {
+  // Mock all Azure DevOps related modules
+  if (id.includes('azure/lib/client') ||
+      id === './lib/client' ||
+      id.endsWith('/lib/client.js') ||
+      id === 'azure-devops-node-api') {
+    return class MockAzureDevOpsClient {
+      constructor(config) {
+        this.organization = config?.organization || 'test-org';
+        this.project = config?.project || 'test-project';
+        this.team = config?.team || `${this.project} Team`;
+        this.connection = {
+          getGitApi: async () => ({
+            createPullRequest: async () => ({ pullRequestId: 123, title: 'Test PR' }),
+            getRepository: async () => ({ id: 'test-repo' })
+          }),
+          getCoreApi: async () => ({
+            getIdentities: async () => [{ id: 'test-id', displayName: 'Test User' }]
+          }),
+          getWorkItemTrackingApi: async () => ({
+            queryByWiql: async () => ({ workItems: [] }),
+            getWorkItems: async () => []
+          })
+        };
+      }
+
+      async executeWiql() { return { workItems: [] }; }
+      async getWorkItems() { return []; }
+    };
+  }
+
+  // Mock Azure cache
+  if (id.includes('azure/lib/cache') || id === './lib/cache') {
+    return class MockAzureCache {
+      constructor(options = {}) {
+        this.maxSize = options.maxSize || 100;
+        this.cache = new Map();
+        this.stats = { hits: 0, misses: 0 };
+      }
+
+      get(key) {
+        if (this.cache.has(key)) {
+          this.stats.hits++;
+          return this.cache.get(key);
+        }
+        this.stats.misses++;
+        return null;
+      }
+
+      set(key, value) {
+        // Simple LRU - remove oldest if at capacity
+        if (this.cache.size >= this.maxSize && !this.cache.has(key)) {
+          const firstKey = this.cache.keys().next().value;
+          this.cache.delete(firstKey);
+        }
+        this.cache.set(key, value);
+      }
+
+      clear() {
+        this.cache.clear();
+        this.stats = { hits: 0, misses: 0 };
+      }
+
+      getStats() {
+        return { ...this.stats };
+      }
+    };
+  }
+
+  // Mock Azure formatter
+  if (id.includes('azure/lib/formatter') || id === './lib/formatter') {
+    return class MockAzureFormatter {
+      static formatWorkItems() { return []; }
+      static formatSummary() { return 'Test summary'; }
+    };
+  }
+
+  return originalRequire.apply(this, arguments);
+};
+
 const { describe, it, before, after } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
@@ -109,21 +192,25 @@ describe('E2E Critical Path Tests', () => {
       assert(outputStr.includes('System Metrics'), 'Should show system metrics');
     });
 
-    it('should validate project structure', () => {
+    it('should validate project structure', async () => {
       const SelfMaintenance = require('../../scripts/self-maintenance.js');
       const maintenance = new SelfMaintenance();
 
-      // Mock console.log
+      // Mock console.log and process.stdout.write
       const output = [];
       const originalLog = console.log;
-      console.log = (...args) => output.push(args.join(' '));
+      const originalWrite = process.stdout.write;
 
-      maintenance.runValidation();
+      console.log = (...args) => output.push(args.join(' '));
+      process.stdout.write = (str) => output.push(str);
+
+      await maintenance.runValidation();
 
       console.log = originalLog;
+      process.stdout.write = originalWrite;
 
       // Verify validation output
-      const outputStr = output.join('\n');
+      const outputStr = output.join('');
       assert(outputStr.includes('Validation Checklist'), 'Should show validation checklist');
       assert(outputStr.includes('Agent registry'), 'Should check agent registry');
     });

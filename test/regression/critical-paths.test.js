@@ -1,10 +1,11 @@
 const assert = require('assert');
 const { describe, it, before } = require('node:test');
-const fs = require('fs').promises;
+const fs = require('fs');
 const path = require('path');
 
 /**
- * Critical Path Protection Tests
+ * Critical Path Protection Tests - Fully Synchronous
+ * Fixed Node.js v22.19.0 test runner concurrency issues
  *
  * These tests ensure that key implementation details
  * are not accidentally broken during development.
@@ -90,12 +91,12 @@ class CriticalPathValidator {
     };
   }
 
-  async validateFile(config) {
+  validateFile(config) {
     const fullPath = path.join(process.cwd(), config.path);
 
     try {
-      const stats = await fs.stat(fullPath);
-      const content = await fs.readFile(fullPath, 'utf8');
+      const stats = fs.statSync(fullPath);
+      const content = fs.readFileSync(fullPath, 'utf8');
 
       const validation = {
         exists: true,
@@ -157,7 +158,7 @@ class CriticalPathValidator {
     }
   }
 
-  async validateFeature(feature) {
+  validateFeature(feature) {
     const results = {
       feature: feature.description,
       testsExist: true,
@@ -169,7 +170,7 @@ class CriticalPathValidator {
       const fullPath = path.join(process.cwd(), testFile);
 
       try {
-        const content = await fs.readFile(fullPath, 'utf8');
+        const content = fs.readFileSync(fullPath, 'utf8');
         let patternsFound = 0;
 
         for (const pattern of feature.requiredPatterns) {
@@ -201,7 +202,7 @@ class CriticalPathValidator {
     return results;
   }
 
-  async generateReport() {
+  generateReport() {
     const report = {
       timestamp: new Date().toISOString(),
       files: {},
@@ -216,7 +217,7 @@ class CriticalPathValidator {
 
     // Validate files
     for (const [name, config] of Object.entries(this.criticalPaths)) {
-      const validation = await this.validateFile(config);
+      const validation = this.validateFile(config);
       report.files[name] = validation;
       report.summary.totalFiles++;
 
@@ -227,7 +228,7 @@ class CriticalPathValidator {
 
     // Validate features
     for (const [name, feature] of Object.entries(this.criticalFeatures)) {
-      const validation = await this.validateFeature(feature);
+      const validation = this.validateFeature(feature);
       report.features[name] = validation;
       report.summary.totalFeatures++;
 
@@ -248,13 +249,22 @@ describe('Critical Path Protection', () => {
   let validator;
   let report;
 
-  before(async () => {
-    validator = new CriticalPathValidator();
-    report = await validator.generateReport();
+  before(() => {
+    try {
+      validator = new CriticalPathValidator();
+      report = validator.generateReport();
+    } catch (error) {
+      console.error('Error generating report:', error.message);
+      report = null; // Tests will handle null gracefully
+    }
   });
 
   describe('Essential Files', () => {
     it('should have all required files present', () => {
+      if (!report) {
+        report = validator.generateReport();
+      }
+
       const requiredFiles = Object.entries(validator.criticalPaths)
         .filter(([_, config]) => config.required);
 
@@ -268,6 +278,10 @@ describe('Critical Path Protection', () => {
     });
 
     it('should maintain HYBRID_STRATEGY.md integrity', () => {
+      if (!report) {
+        report = validator.generateReport();
+      }
+
       const strategy = report.files.strategy;
 
       assert.ok(strategy.exists, 'HYBRID_STRATEGY.md must exist');
@@ -279,6 +293,10 @@ describe('Critical Path Protection', () => {
     });
 
     it('should have valid package.json', () => {
+      if (!report) {
+        report = validator.generateReport();
+      }
+
       const pkg = report.files.packageJson;
 
       assert.ok(pkg.exists, 'package.json must exist');
@@ -365,7 +383,7 @@ describe('Critical Path Protection', () => {
       console.log(`   Valid Features: ${report.summary.validFeatures}/${report.summary.totalFeatures}`);
     });
 
-    it('should generate actionable report', async () => {
+    it('should generate actionable report', () => {
       const reportPath = path.join(
         process.cwd(),
         'test/regression/__snapshots__',
@@ -373,8 +391,8 @@ describe('Critical Path Protection', () => {
       );
 
       try {
-        await fs.mkdir(path.dirname(reportPath), { recursive: true });
-        await fs.writeFile(reportPath, JSON.stringify(report, null, 2));
+        fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+        fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
         console.log(`\n📄 Health report saved to: ${reportPath}`);
       } catch (err) {
         console.log('⚠️  Could not save health report:', err.message);
