@@ -10,4 +10,4 @@
 repomix-output.xml
 autopm-framework-*.tgz
 node_modules/
-package-lock.json
+# package-lock.json should be committed to ensure consistent dependencies
