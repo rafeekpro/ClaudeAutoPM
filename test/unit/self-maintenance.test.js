@@ -67,10 +67,12 @@ describe('SelfMaintenance Class', () => {
       const maintenance = new SelfMaintenance();
 
       assert.ok(maintenance.metrics, 'Metrics object should exist');
-      assert.equal(typeof maintenance.metrics.totalFiles, 'number',
-        'Total files metric should be initialized');
       assert.equal(typeof maintenance.metrics.totalAgents, 'number',
         'Total agents metric should be initialized');
+      assert.equal(typeof maintenance.metrics.deprecatedAgents, 'number',
+        'Deprecated agents metric should be initialized');
+      assert.equal(typeof maintenance.metrics.contextEfficiency, 'number',
+        'Context efficiency metric should be initialized');
     });
 
     it('should set default constants', () => {
