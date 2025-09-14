@@ -29,6 +29,35 @@ child_process.execSync = (cmd, options) => {
   return originalExecSync(cmd, options);
 };
 
+// Mock AzureDevOpsClient before loading modules
+const mockAzureDevOpsClient = {
+  connection: null,
+  constructor: function(config) {
+    this.organization = config.organization;
+    this.project = config.project;
+    this.team = config.team || `${config.project} Team`;
+    return this;
+  }
+};
+
+// Mock the require for AzureDevOpsClient
+const Module = require('module');
+const originalRequire = Module.prototype.require;
+Module.prototype.require = function(id) {
+  if (id === '../../../autopm/.claude/providers/azure/lib/client.js' ||
+      id.includes('azure/lib/client.js')) {
+    return class MockAzureDevOpsClient {
+      constructor(config) {
+        this.organization = config.organization;
+        this.project = config.project;
+        this.team = config.team || `${config.project} Team`;
+        this.connection = { getGitApi: async () => null };
+      }
+    };
+  }
+  return originalRequire.apply(this, arguments);
+};
+
 // Load module after mocking
 const AzurePRCreate = require('../../../autopm/.claude/providers/azure/pr-create.js');
 
@@ -40,6 +69,12 @@ describe('Azure DevOps pr-create Command', () => {
 
   beforeEach(() => {
     apiCalls = [];
+
+    // Ensure environment variables are set before creating instances
+    process.env.AZURE_DEVOPS_ORG = 'test-org';
+    process.env.AZURE_DEVOPS_PROJECT = 'test-project';
+    process.env.AZURE_DEVOPS_TOKEN = 'test-token';
+    process.env.AZURE_DEVOPS_PAT = 'test-token';
 
     // Create mock Git API
     mockGitApi = {
@@ -542,7 +577,8 @@ describe('Azure DevOps pr-create Command', () => {
   });
 });
 
-// Restore original execSync after all tests
+// Restore original execSync and require after all tests
 process.on('exit', () => {
   child_process.execSync = originalExecSync;
+  Module.prototype.require = originalRequire;
 });
