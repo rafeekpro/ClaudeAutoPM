@@ -23,6 +23,10 @@ class SelfMaintenance {
       activeAgents: 0,
       contextEfficiency: 0
     };
+
+    // Constants
+    this.MAX_SPAWN_BUFFER = 10 * 1024 * 1024; // 10MB buffer for spawn operations
+
     // Constants for installation scenarios
     this.DEFAULT_INSTALL_OPTION = '3'; // Full DevOps installation
     this.SCENARIO_MAP = {
@@ -435,7 +439,7 @@ class SelfMaintenance {
       encoding: 'utf8',
       cwd: this.projectRoot,
       stdio: 'pipe',
-      maxBuffer: 10 * 1024 * 1024 // 10MB buffer to prevent ENOBUFS
+      maxBuffer: this.MAX_SPAWN_BUFFER // Prevent ENOBUFS errors
     });
 
     if (result.error) {
