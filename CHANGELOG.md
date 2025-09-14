@@ -283,8 +283,8 @@ autopm --help
 ### Use with npx (No Installation)
 
 ```bash
-npx claude-autopm install
-npx claude-autopm merge
+npx autopm install
+npx autopm merge
 ```
 
 ### Local Development

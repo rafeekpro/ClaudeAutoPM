@@ -118,7 +118,7 @@ npm update claude-autopm
 
 ```bash
 # Run the update command
-claude-autopm update
+autopm update
 
 # This will:
 # - Preserve your configuration
