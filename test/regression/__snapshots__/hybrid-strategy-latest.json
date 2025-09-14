@@ -1,0 +1,25 @@
+{
+  "timestamp": 1757879075007,
+  "files": {
+    ".claude/strategies/ACTIVE_STRATEGY.md": {
+      "exists": true,
+      "size": 963,
+      "modified": "2025-09-13T21:59:44.061Z"
+    },
+    ".claude/base.md": {
+      "exists": true,
+      "size": 4409,
+      "modified": "2025-09-14T10:58:42.542Z"
+    },
+    ".claude/config.json": {
+      "exists": true,
+      "size": 2106,
+      "modified": "2025-09-14T10:58:42.543Z"
+    }
+  },
+  "checksums": {
+    ".claude/strategies/ACTIVE_STRATEGY.md": "a4a1d186e640c62778507dcd69a1d136e5763fb9aa9768e43a4e05c7ff05b5e3",
+    ".claude/base.md": "1c5fe79cfec6f3b1603325fef877567cb04f5ccbfd6127e2d657107e7ddc419e",
+    ".claude/config.json": "f5f1e51ba214a8006cda1a68e18e458feec5eaeb13c7c073d24ebbc4e001c058"
+  }
+}

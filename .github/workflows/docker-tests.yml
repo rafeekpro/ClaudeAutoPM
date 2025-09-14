@@ -16,6 +16,16 @@ on:
       - 'Dockerfile*'
       - 'docker-compose*.yml'
   workflow_dispatch:
+    inputs:
+      runner_type:
+        description: 'Runner type to use'
+        required: false
+        default: 'auto'
+        type: choice
+        options:
+          - auto
+          - self-hosted
+          - github
 
 # Cancel in-progress runs for PRs
 concurrency:
@@ -28,9 +38,28 @@ env:
   COMPOSE_DOCKER_CLI_BUILD: 1
 
 jobs:
+  # Determine runner type
+  select-runner:
+    name: Select Runner
+    runs-on: ubuntu-latest
+    outputs:
+      runner: ${{ steps.select.outputs.runner }}
+    steps:
+      - id: select
+        run: |
+          if [[ "${{ github.event.inputs.runner_type }}" == "github" ]]; then
+            echo "runner=ubuntu-latest" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event.inputs.runner_type }}" == "self-hosted" ]]; then
+            echo "runner=['self-hosted', 'linux', 'docker']" >> $GITHUB_OUTPUT
+          else
+            # Auto: prefer self-hosted for Docker tests
+            echo "runner=['self-hosted', 'linux', 'docker'] || 'ubuntu-latest'" >> $GITHUB_OUTPUT
+          fi
+
   detect-changes:
     name: Detect Changes
-    runs-on: ubuntu-latest
+    needs: select-runner
+    runs-on: ${{ fromJson(format('[{0}]', needs.select-runner.outputs.runner || '"ubuntu-latest"'))[0] }}
     outputs:
       docker-changed: ${{ steps.changes.outputs.docker }}
       code-changed: ${{ steps.changes.outputs.code }}
@@ -74,7 +103,8 @@ jobs:
 
   docker-tests:
     name: Docker Tests
-    runs-on: ubuntu-latest
+    needs: [select-runner, detect-changes]
+    runs-on: ${{ fromJson(format('[{0}]', needs.select-runner.outputs.runner || '"ubuntu-latest"'))[0] }}
     needs: detect-changes
     # Run if Docker-first is enabled OR if Docker files changed
     if: needs.detect-changes.outputs.docker-first-enabled == 'true' || needs.detect-changes.outputs.docker-changed == 'true'
@@ -207,7 +237,8 @@ jobs:
 
   docker-build-matrix:
     name: Multi-platform Build
-    runs-on: ubuntu-latest
+    needs: select-runner
+    runs-on: ${{ fromJson(format('[{0}]', needs.select-runner.outputs.runner || '"ubuntu-latest"'))[0] }}
     needs: detect-changes
     if: needs.detect-changes.outputs.docker-first-enabled == 'true'
     
@@ -235,7 +266,8 @@ jobs:
 
   validate-docker-first-compliance:
     name: Validate Docker-First Compliance
-    runs-on: ubuntu-latest
+    needs: select-runner
+    runs-on: ${{ fromJson(format('[{0}]', needs.select-runner.outputs.runner || '"ubuntu-latest"'))[0] }}
     needs: detect-changes
     if: needs.detect-changes.outputs.docker-first-enabled == 'true'
     

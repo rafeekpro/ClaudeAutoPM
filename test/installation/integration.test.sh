@@ -65,8 +65,10 @@ run_installation() {
 
     cd "$test_dir"
 
-    # Run install script with automated choice
-    echo "$choice" | bash "$INSTALL_SCRIPT" > install.log 2>&1
+    # Run install script with automated inputs:
+    # 1) Platform choice (GitHub=1), 2) GitHub owner, 3) GitHub repo, 4) Development config choice, 5) CI/CD choice (GitHub Actions=1)
+    export AUTOPM_TEST_MODE=1
+    printf "1\ntest-org\ntest-repo\n%s\n1\n" "$choice" | bash "$INSTALL_SCRIPT" > install.log 2>&1
 
     return $?
 }
