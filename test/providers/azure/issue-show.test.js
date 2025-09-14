@@ -15,17 +15,15 @@ process.env.AZURE_DEVOPS_PROJECT = 'test-project';
 process.env.AZURE_DEVOPS_TOKEN = 'test-token';
 process.env.AZURE_DEVOPS_PAT = 'test-token'; // Backwards compatibility
 
+// Load module once - creates new instances for isolation
+const AzureIssueShow = require('../../../autopm/.claude/providers/azure/issue-show.js');
+
 describe('Azure DevOps issue-show Command', () => {
-  let AzureIssueShow;
   let issueShow;
   const baseUrl = 'https://dev.azure.com';
 
   beforeEach(() => {
-    // Clean require cache to ensure fresh module load
-    delete require.cache[require.resolve('../../../autopm/.claude/providers/azure/issue-show.js')];
-    AzureIssueShow = require('../../../autopm/.claude/providers/azure/issue-show.js');
-
-    // Create instance with test config
+    // Create fresh instance for each test - provides proper isolation
     issueShow = new AzureIssueShow({
       organization: 'test-org',
       project: 'test-project'
@@ -289,24 +287,15 @@ describe('Azure DevOps issue-show Command', () => {
   describe('Environment Configuration', () => {
     it('should fail gracefully when environment variables are missing', async () => {
       // Temporarily remove environment variables
-      const originalOrg = process.env.AZURE_DEVOPS_ORG;
-      const originalProject = process.env.AZURE_DEVOPS_PROJECT;
       const originalToken = process.env.AZURE_DEVOPS_TOKEN;
-      const originalPat = process.env.AZURE_DEVOPS_PAT;
 
-      delete process.env.AZURE_DEVOPS_ORG;
-      delete process.env.AZURE_DEVOPS_PROJECT;
       delete process.env.AZURE_DEVOPS_TOKEN;
-      delete process.env.AZURE_DEVOPS_PAT;
-
-      // Reload module to pick up missing env vars
-      delete require.cache[require.resolve('../../../autopm/.claude/providers/azure/issue-show.js')];
-      const AzureIssueShowNoEnv = require('../../../autopm/.claude/providers/azure/issue-show.js');
 
       try {
         assert.throws(
           () => {
-            new AzureIssueShowNoEnv({
+            // Creating new instance without required token should fail
+            new AzureIssueShow({
               organization: 'test-org',
               project: 'test-project'
             });
@@ -322,11 +311,8 @@ describe('Azure DevOps issue-show Command', () => {
           }
         );
       } finally {
-        // Restore environment variables
-        process.env.AZURE_DEVOPS_ORG = originalOrg;
-        process.env.AZURE_DEVOPS_PROJECT = originalProject;
+        // Restore environment variable
         process.env.AZURE_DEVOPS_TOKEN = originalToken;
-        process.env.AZURE_DEVOPS_PAT = originalPat;
       }
     });
   });

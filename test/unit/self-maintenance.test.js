@@ -29,15 +29,35 @@ const mockSpawnSync = {
 // Load the module once at the top level for better performance
 const SelfMaintenance = require('../../scripts/self-maintenance.js');
 
+// Mock management helper
+class MockManager {
+  constructor() {
+    this.mocks = [];
+  }
+
+  add(object, property, mockValue) {
+    const original = object[property];
+    this.mocks.push({ object, property, original });
+    object[property] = mockValue;
+    return mockValue;
+  }
+
+  restoreAll() {
+    this.mocks.forEach(({ object, property, original }) => {
+      object[property] = original;
+    });
+    this.mocks = [];
+  }
+}
+
 describe('SelfMaintenance Class', () => {
-  let selfMaintenance;
   let originalConsoleLog;
   let consoleOutput;
+  let mockManager;
 
   beforeEach(() => {
-    // Create fresh instance for each test instead of clearing require cache
-    // This provides better isolation without cache manipulation
-    selfMaintenance = null;
+    // Initialize mock manager
+    mockManager = new MockManager();
 
     // Capture console output
     consoleOutput = [];
@@ -48,8 +68,11 @@ describe('SelfMaintenance Class', () => {
   afterEach(() => {
     // Restore console.log
     console.log = originalConsoleLog;
-    // Clean up any created instances
-    selfMaintenance = null;
+
+    // Restore all mocks systematically
+    if (mockManager) {
+      mockManager.restoreAll();
+    }
   });
 
   describe('Constructor and Initialization', () => {
@@ -93,12 +116,8 @@ describe('SelfMaintenance Class', () => {
       const maintenance = new SelfMaintenance();
 
       // Mock file system calls
-      const originalExistsSync = fs.existsSync;
-      const originalReadFileSync = fs.readFileSync;
-      const originalReaddirSync = fs.readdirSync;
-
-      fs.existsSync = (path) => true;
-      fs.readFileSync = (path) => {
+      mockManager.add(fs, 'existsSync', (path) => true);
+      mockManager.add(fs, 'readFileSync', (path) => {
         if (path.includes('AGENT-REGISTRY.md')) {
           return '# Agent Registry\n- agent1\n- agent2';
         }
@@ -106,12 +125,12 @@ describe('SelfMaintenance Class', () => {
           return JSON.stringify({ version: '1.0.0' });
         }
         return '';
-      };
-      fs.readdirSync = (path) => ['agent1.md', 'agent2.md'];
+      });
+      mockManager.add(fs, 'readdirSync', (path) => ['agent1.md', 'agent2.md']);
 
       // Mock spawnSync for git commands
-      const originalSpawnSync = require('child_process').spawnSync;
-      require('child_process').spawnSync = (cmd, args) => {
+      const childProcess = require('child_process');
+      mockManager.add(childProcess, 'spawnSync', (cmd, args) => {
         if (cmd === 'git' && args[0] === 'log') {
           return { stdout: '1 hour ago', status: 0 };
         }
@@ -119,23 +138,16 @@ describe('SelfMaintenance Class', () => {
           return { status: 0 };
         }
         return { status: 0, stdout: '' };
-      };
+      });
 
-      try {
-        await maintenance.runHealthCheck();
+      await maintenance.runHealthCheck();
 
-        const output = consoleOutput.join('\n');
-        assert.ok(output.includes('Health Report'), 'Should show health report title');
-        assert.ok(output.includes('Agent Ecosystem'), 'Should show agent ecosystem');
-        assert.ok(output.includes('Test Status'), 'Should show test status');
-        assert.ok(output.includes('Documentation'), 'Should show documentation status');
-        assert.ok(output.includes('Last commit'), 'Should show last commit info');
-      } finally {
-        fs.existsSync = originalExistsSync;
-        fs.readFileSync = originalReadFileSync;
-        fs.readdirSync = originalReaddirSync;
-        require('child_process').spawnSync = originalSpawnSync;
-      }
+      const output = consoleOutput.join('\n');
+      assert.ok(output.includes('Health Report'), 'Should show health report title');
+      assert.ok(output.includes('Agent Ecosystem'), 'Should show agent ecosystem');
+      assert.ok(output.includes('Test Status'), 'Should show test status');
+      assert.ok(output.includes('Documentation'), 'Should show documentation status');
+      assert.ok(output.includes('Last commit'), 'Should show last commit info');
     });
 
     it('should handle missing agent registry', async () => {

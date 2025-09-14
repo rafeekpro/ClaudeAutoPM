@@ -13,17 +13,15 @@ process.env.AZURE_DEVOPS_PROJECT = 'test-project';
 process.env.AZURE_DEVOPS_TOKEN = 'test-token';
 process.env.AZURE_DEVOPS_PAT = 'test-token'; // Backwards compatibility
 
+// Load module once - creates new instances for isolation
+const AzurePRCreate = require('../../../autopm/.claude/providers/azure/pr-create.js');
+
 describe('Azure DevOps pr-create Command', () => {
-  let AzurePRCreate;
   let prCreate;
   const baseUrl = 'https://dev.azure.com';
 
   beforeEach(() => {
-    // Clean require cache to ensure fresh module load
-    delete require.cache[require.resolve('../../../autopm/.claude/providers/azure/pr-create.js')];
-    AzurePRCreate = require('../../../autopm/.claude/providers/azure/pr-create.js');
-
-    // Create instance with test config
+    // Create fresh instance for each test - provides proper isolation
     prCreate = new AzurePRCreate({
       organization: 'test-org',
       project: 'test-project'
