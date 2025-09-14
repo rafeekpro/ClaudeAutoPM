@@ -10,8 +10,10 @@ const path = require('path');
 const fs = require('fs');
 
 // Configuration constants
-const TEST_TIMEOUT = parseInt(process.env.TEST_TIMEOUT || '120000', 10); // Default 2 minutes
-const CI_TEST_TIMEOUT = parseInt(process.env.CI_TEST_TIMEOUT || '300000', 10); // Default 5 minutes for CI
+const TIMEOUT_LOCAL_MS = 120000; // 2 minutes
+const TIMEOUT_CI_MS = 300000;    // 5 minutes
+const TEST_TIMEOUT = parseInt(process.env.TEST_TIMEOUT || `${TIMEOUT_LOCAL_MS}`, 10); // Default 2 minutes
+const CI_TEST_TIMEOUT = parseInt(process.env.CI_TEST_TIMEOUT || `${TIMEOUT_CI_MS}`, 10); // Default 5 minutes for CI
 const IS_CI = process.env.CI === 'true';
 
 // Use appropriate timeout based on environment
