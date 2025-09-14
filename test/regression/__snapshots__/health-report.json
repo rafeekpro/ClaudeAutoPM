@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-09-14T17:35:02.076Z",
+  "timestamp": "2025-09-14T18:21:02.274Z",
   "files": {
     "strategy": {
       "exists": true,
@@ -19,7 +19,7 @@
     },
     "packageJson": {
       "exists": true,
-      "size": 4444,
+      "size": 4441,
       "sizeValid": true,
       "contentValid": true,
       "missingPatterns": [],
@@ -40,7 +40,7 @@
         {
           "file": "test/security/integration.test.js",
           "exists": true,
-          "patternsFound": 2,
+          "patternsFound": 3,
           "totalPatterns": 3
         }
       ]
