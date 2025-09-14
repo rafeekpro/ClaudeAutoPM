@@ -15,7 +15,7 @@ process.env.AZURE_DEVOPS_TOKEN = 'test-token';
 process.env.AZURE_DEVOPS_PAT = 'test-token'; // For backward compatibility
 
 // Load module once - creates new instances for isolation
-const AzureIssueShow = require('../../../autopm/.claude/providers/azure/issue-show.js');
+const AzureIssueShow = require('../../../../autopm/.claude/providers/azure/issue-show.js');
 
 describe('Azure DevOps issue-show Command', () => {
   let issueShow;
