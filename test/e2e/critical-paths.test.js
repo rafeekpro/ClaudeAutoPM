@@ -11,7 +11,7 @@ Module.prototype.require = function(id) {
   if (id.includes('azure/lib/client') ||
       id === './lib/client' ||
       id.endsWith('/lib/client.js') ||
-      id.includes('azure-devops-node-api')) {
+      id === 'azure-devops-node-api') {
     return class MockAzureDevOpsClient {
       constructor(config) {
         this.organization = config?.organization || 'test-org';
