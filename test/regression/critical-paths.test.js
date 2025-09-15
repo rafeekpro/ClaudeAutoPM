@@ -255,7 +255,6 @@ describe('Critical Path Protection', () => {
       report = validator.generateReport();
     } catch (error) {
       console.error('Error generating report:', error.message);
-      validator = new CriticalPathValidator();
       report = null; // Tests will handle null gracefully
     }
   });
