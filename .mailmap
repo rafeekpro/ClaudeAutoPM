@@ -1,0 +1,11 @@
+# Mailmap to correct contributor attribution
+# This ensures AI assistants are never shown as contributors
+
+# Map any AI mentions to the actual human developer
+Rafal Lagowski <rafal@lagowski.es> Claude <noreply@anthropic.com>
+Rafal Lagowski <rafal@lagowski.es> Copilot <175728472+Copilot@users.noreply.github.com>
+Rafal Lagowski <rafal@lagowski.es> github-actions[bot] <github-actions[bot]@users.noreply.github.com>
+
+# Consolidate different email addresses for the same person
+Rafal Lagowski <rafal@lagowski.es> <rla@example.com>
+Rafal Lagowski <rafal@lagowski.es> <rla@Rafals-MacBook-Pro.local>
