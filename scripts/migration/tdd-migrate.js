@@ -22,27 +22,34 @@ class TDDMigrationAssistant {
   /**
    * Main entry point
    */
-  async run() {
+  async run(cliAction = null) {
     console.log(colors.boldCyan('\n🚀 TDD Migration Assistant\n'));
 
-    const { action } = await inquirer.prompt([
-      {
-        type: 'list',
-        name: 'action',
-        message: 'What would you like to do?',
-        choices: [
-          { name: 'Start new migration (TDD)', value: 'new' },
-          { name: 'Generate tests for bash script', value: 'generate-tests' },
-          { name: 'Check migration status', value: 'status' },
-          { name: 'Run migration tests', value: 'run-tests' },
-          { name: 'Compare bash vs node output', value: 'compare' },
-          { name: 'Generate migration report', value: 'report' }
-        ]
-      }
-    ]);
+    // Use CLI action if provided, otherwise prompt
+    let action = cliAction;
+
+    if (!action) {
+      const answer = await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'action',
+          message: 'What would you like to do?',
+          choices: [
+            { name: 'Start new migration (TDD)', value: 'new' },
+            { name: 'Generate tests for bash script', value: 'generate-tests' },
+            { name: 'Check migration status', value: 'status' },
+            { name: 'Run migration tests', value: 'run-tests' },
+            { name: 'Compare bash vs node output', value: 'compare' },
+            { name: 'Generate migration report', value: 'report' }
+          ]
+        }
+      ]);
+      action = answer.action;
+    }
 
     switch (action) {
       case 'new':
+      case 'next':
         await this.startNewMigration();
         break;
       case 'generate-tests':
@@ -509,6 +516,65 @@ module.exports = ${this.toPascalCase(scriptName)};
   }
 
   /**
+   * Generate migration report
+   */
+  async generateReport() {
+    console.log(colors.bold('\n📝 Migration Report\n'));
+
+    const bashScripts = this.findBashScripts();
+    const migrated = fs.readdirSync(this.nodeScriptsDir)
+      .filter(file => file.endsWith('.js'));
+
+    console.log(colors.cyan('='.repeat(50)));
+    console.log(colors.bold('Overall Progress'));
+    console.log(colors.cyan('='.repeat(50)));
+    console.log(`Total Bash scripts: ${bashScripts.length}`);
+    console.log(`Migrated to Node.js: ${migrated.length}`);
+    console.log(`Remaining: ${bashScripts.length - migrated.length}`);
+    console.log(`Progress: ${colors.green(`${Math.round((migrated.length / bashScripts.length) * 100)}%`)}`);
+
+    console.log('\n' + colors.cyan('='.repeat(50)));
+    console.log(colors.bold('Scripts by Priority'));
+    console.log(colors.cyan('='.repeat(50)));
+
+    const byPriority = {};
+    bashScripts.forEach(script => {
+      if (!byPriority[script.priority]) {
+        byPriority[script.priority] = { total: 0, migrated: 0, scripts: [] };
+      }
+      byPriority[script.priority].total++;
+      byPriority[script.priority].scripts.push(script);
+
+      const nodeName = script.name.replace(/\.(sh|bash)$/, '.js');
+      if (migrated.includes(nodeName)) {
+        byPriority[script.priority].migrated++;
+      }
+    });
+
+    for (const [priority, data] of Object.entries(byPriority)) {
+      const pct = Math.round((data.migrated / data.total) * 100);
+      const statusText = `${data.migrated}/${data.total}`;
+      const coloredStatus = pct === 100 ? colors.green(statusText) :
+                           pct > 0 ? colors.yellow(statusText) :
+                           colors.red(statusText);
+      console.log(`\n${colors.bold(priority)}: ${coloredStatus} (${pct}%)`);
+      data.scripts.forEach(script => {
+        const nodeName = script.name.replace(/\.(sh|bash)$/, '.js');
+        const status = migrated.includes(nodeName) ? colors.green('✓') : colors.red('✗');
+        console.log(`  ${status} ${script.name}`);
+      });
+    }
+
+    console.log('\n' + colors.cyan('='.repeat(50)));
+    console.log(colors.bold('Next Steps'));
+    console.log(colors.cyan('='.repeat(50)));
+    console.log('1. Run: npm run migration:next');
+    console.log('2. Follow TDD process (RED → GREEN → REFACTOR)');
+    console.log('3. Run: npm run migration:test');
+    console.log('4. Commit when tests pass');
+  }
+
+  /**
    * Helper functions
    */
   toPascalCase(str) {
@@ -527,7 +593,25 @@ module.exports = ${this.toPascalCase(scriptName)};
 // Run if called directly
 if (require.main === module) {
   const assistant = new TDDMigrationAssistant();
-  assistant.run().catch(error => {
+
+  // Get command from CLI arguments
+  const args = process.argv.slice(2);
+  const command = args[0];
+
+  // Map common commands to actions
+  const commandMap = {
+    'status': 'status',
+    'next': 'next',
+    'new': 'new',
+    'test': 'run-tests',
+    'tests': 'run-tests',
+    'report': 'report',
+    'compare': 'compare'
+  };
+
+  const action = commandMap[command] || command;
+
+  assistant.run(action).catch(error => {
     console.error(colors.red('Fatal error:'), error);
     process.exit(1);
   });
