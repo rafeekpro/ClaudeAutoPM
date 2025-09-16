@@ -5,9 +5,9 @@
   "main": "bin/autopm.js",
   "bin": {
     "autopm": "./bin/autopm.js",
-    "autopm-install": "./bin/autopm.js",
-    "autopm-merge": "./bin/merge-claude.js",
-    "autopm-setup-env": "./bin/setup-env.js"
+    "autopm-install": "./bin/node/install.js",
+    "autopm-merge": "./bin/node/merge-claude.js",
+    "autopm-setup-env": "./bin/node/setup-env.js"
   },
   "scripts": {
     "postinstall": "echo '🎉 ClaudeAutoPM installed! Run: autopm --help'",
@@ -87,6 +87,7 @@
   "preferGlobal": true,
   "files": [
     "bin/",
+    "lib/",
     "autopm/",
     ".github/",
     "scripts/",

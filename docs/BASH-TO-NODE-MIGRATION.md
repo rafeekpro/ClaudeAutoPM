@@ -193,23 +193,23 @@ test/node-scripts/
 
 ### Completed
 - [x] Phase 0: Preparation
+- [x] Phase 1: Analysis (Inventory)
+- [x] Phase 2: Implementation (P0 Critical Scripts)
 
 ### In Progress
-- [ ] Phase 1: Analysis
+- [ ] Phase 3: Validation
 
 ### Upcoming
-- [ ] Phase 2: Implementation
-- [ ] Phase 3: Validation
 - [ ] Phase 4: Rollout
 
 ## Migration Tracking Dashboard
 
 ### P0 - Critical Scripts
-| Script | Status | Node.js Version | Tests | Target Date | Notes |
-|--------|--------|----------------|-------|-------------|-------|
-| install/install.sh | ⏳ Pending | - | - | Week 1-2 | Most complex, 1373 lines |
-| install/setup-env.sh | ⏳ Pending | - | - | Week 2 | Already partially Node.js |
-| install/merge-claude.sh | ⏳ Pending | - | - | Week 2 | Already partially Node.js |
+| Script | Status | Node.js Version | Tests | Completion Date | Notes |
+|--------|--------|----------------|-------|-----------------|-------|
+| install/install.sh | ✅ Completed | bin/node/install.js | 14/17 | 2025-01-16 | 600+ lines, full feature parity |
+| install/setup-env.sh | ✅ Completed | bin/node/setup-env.js | 15/15 | 2025-01-16 | Secure credential handling |
+| install/merge-claude.sh | ✅ Completed | bin/node/merge-claude.js | 15/15 | 2025-01-16 | AI-assisted merge prompts |
 
 ### P1 - Developer Workflow
 | Script | Status | Node.js Version | Tests | Target Date | Notes |
@@ -226,8 +226,8 @@ test/node-scripts/
 | PM Utilities | 6 scripts | ⏳ Pending | Week 5 | Mostly file operations |
 
 ### Migration Progress
-- **Total**: 0/58 scripts migrated (0%)
-- **P0 Critical**: 0/3 (0%)
+- **Total**: 3/58 scripts migrated (5.2%)
+- **P0 Critical**: 3/3 (100%) ✅
 - **P1 Workflow**: 0/4 (0%)
 - **P2 PM System**: 0/13 (0%)
 - **P3 Azure**: 0/10 (0%)
