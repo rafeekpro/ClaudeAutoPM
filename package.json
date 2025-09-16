@@ -5,13 +5,16 @@
   "main": "bin/autopm.js",
   "bin": {
     "autopm": "./bin/autopm.js",
-    "autopm-install": "./bin/autopm.js",
-    "autopm-merge": "./bin/merge-claude.js",
-    "autopm-setup-env": "./bin/setup-env.js"
+    "autopm-install": "./bin/node/install.js",
+    "autopm-merge": "./bin/node/merge-claude.js",
+    "autopm-setup-env": "./bin/node/setup-env.js"
   },
   "scripts": {
     "postinstall": "echo '🎉 ClaudeAutoPM installed! Run: autopm --help'",
     "test": "bash scripts/test.sh",
+    "test:node": "node --test test/node-scripts/*.test.js",
+    "test:node:watch": "node --test --watch test/node-scripts/*.test.js",
+    "test:node:coverage": "node --test --experimental-test-coverage test/node-scripts/*.test.js",
     "test:security": "node test/run-security-tests.js",
     "test:security:hybrid": "node --test test/security/hybrid-strategy.test.js",
     "test:security:injection": "node --test test/security/prompt-injection.test.js",
@@ -84,6 +87,7 @@
   "preferGlobal": true,
   "files": [
     "bin/",
+    "lib/",
     "autopm/",
     ".github/",
     "scripts/",
@@ -93,7 +97,20 @@
   ],
   "dependencies": {
     "azure-devops-node-api": "^14.0.2",
-    "js-yaml": "^4.1.0"
+    "chalk": "^5.3.0",
+    "dotenv": "^16.3.1",
+    "execa": "^8.0.1",
+    "fast-glob": "^3.3.2",
+    "fs-extra": "^11.2.0",
+    "glob": "^10.3.10",
+    "inquirer": "^9.2.12",
+    "js-yaml": "^4.1.0",
+    "moment": "^2.29.4",
+    "ora": "^5.4.1",
+    "simple-git": "^3.20.0",
+    "table": "^6.8.1",
+    "which": "^4.0.0",
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
     "markdownlint-cli": "^0.37.0",
