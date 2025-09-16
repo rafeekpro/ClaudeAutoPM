@@ -125,7 +125,7 @@ All migrated scripts follow this pattern:
 
 ### 🚀 Next Steps
 
-1. Complete remaining P2 PM System scripts (4 scripts)
+1. Complete remaining P2 PM System scripts (5 scripts)
 2. Complete remaining P3 Azure DevOps scripts (7 scripts)
 3. Evaluate P5 Hook scripts for deprecation vs migration
 4. Update documentation with migration guide
