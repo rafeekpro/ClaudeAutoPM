@@ -1,50 +1,50 @@
-# ClaudeAutoPM - Kompletna migracja CLI do Yargs
+# ClaudeAutoPM - Complete CLI Migration to Yargs
 
-## ✅ Status migracji
+## ✅ Migration Status
 
-**ZAKOŃCZONO POMYŚLNIE** - Wszystkie 96 poleceń zostały zmigrowane z formatu `.md` do modułów yargs.
+**COMPLETED SUCCESSFULLY** - All 96 commands have been migrated from `.md` format to yargs modules.
 
-## 📊 Statystyki migracji
+## 📊 Migration Statistics
 
-- **Polecenia przed migracją**: 104 plików `.md`
-- **Polecenia po migracji**: 96 modułów JavaScript
-- **Pominiętych plików**: 8 (pliki README, COMMANDS, itp.)
-- **Struktura katalogów**:
-  - 91 poleceń z namespace (np. `azure:task-new`, `pm:status`)
-  - 5 poleceń głównych (np. `codeRabbit`, `reInit`)
+- **Commands before migration**: 104 `.md` files
+- **Commands after migration**: 96 JavaScript modules
+- **Skipped files**: 8 (README, COMMANDS, etc.)
+- **Directory structure**:
+  - 91 namespaced commands (e.g., `azure:task-new`, `pm:status`)
+  - 5 main commands (e.g., `codeRabbit`, `reInit`)
 
-## 🎯 Osiągnięte cele
+## 🎯 Achieved Goals
 
-### 1. **Pełna migracja do yargs**
-- ✅ Wszystkie polecenia używają teraz biblioteki yargs
-- ✅ Automatyczna generacja pomocy dla każdego polecenia
-- ✅ Spójna obsługa opcji i argumentów
-- ✅ Profesjonalna walidacja parametrów
+### 1. **Full migration to yargs**
+- ✅ All commands now use the yargs library
+- ✅ Automatic help generation for each command
+- ✅ Consistent handling of options and arguments
+- ✅ Professional parameter validation
 
-### 2. **Zachowanie funkcjonalności**
-- ✅ Wszystkie polecenia działają jak wcześniej
-- ✅ Prompty dla agentów AI zostały zachowane
-- ✅ Integracja z Azure DevOps działa poprawnie
-- ✅ Kompatybilność wsteczna zachowana
+### 2. **Preserved functionality**
+- ✅ All commands work as before
+- ✅ AI agent prompts have been preserved
+- ✅ Azure DevOps integration works correctly
+- ✅ Backward compatibility maintained
 
-### 3. **Ulepszenia strukturalne**
-- ✅ Separacja logiki CLI od promptów AI
-- ✅ Wspólne moduły pomocnicze (`agentExecutor`, `commandHelpers`)
-- ✅ Jednolita obsługa błędów
-- ✅ Spójne formatowanie wyjścia
+### 3. **Structural improvements**
+- ✅ Separation of CLI logic from AI prompts
+- ✅ Shared helper modules (`agentExecutor`, `commandHelpers`)
+- ✅ Unified error handling
+- ✅ Consistent output formatting
 
-## 📋 Lista wszystkich dostępnych poleceń
+## 📋 List of all available commands
 
-### 🤖 AI & Automation (2 polecenia)
+### 🤖 AI & Automation (2 commands)
 - `ai:langgraph-workflow` - LangGraph Workflow Command
 - `ai:openai-chat` - OpenAI Chat Integration
 
-### ☁️ Azure DevOps (39 poleceń)
-- `azure:active-work` - Pokaż aktywne zadania
-- `azure:blocked-items` - Lista zablokowanych elementów
-- `azure:clean` - Wyczyść lokalne dane
-- `azure:docs-query` - Zapytania do dokumentacji
-- `azure:feature-*` - Zarządzanie feature'ami (6 poleceń)
+### ☁️ Azure DevOps (39 commands)
+- `azure:active-work` - Show active tasks
+- `azure:blocked-items` - List blocked items
+- `azure:clean` - Clean local data
+- `azure:docs-query` - Documentation queries
+- `azure:feature-*` - Feature management (6 commands)
 - `azure:import-us` - Import User Stories
 - `azure:init` - Inicjalizacja Azure DevOps
 - `azure:next-task` - Następne zadanie do pracy
