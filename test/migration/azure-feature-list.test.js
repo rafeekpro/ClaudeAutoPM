@@ -221,7 +221,11 @@ describe('Azure Feature List Migration Tests', function() {
             if (azureFeatureList && azureFeatureList.getWorkItemDetails) {
                 azureFeatureList._setHttpClient({
                     get: (url, options) => {
-                        const id = url.match(/workitems\/(\d+)/)[1];
+                        const match = url.match(/workitems\/(\d+)/);
+                        const id = match?.[1];
+                        if (!id) {
+                            throw new Error(`Could not extract work item ID from URL: ${url}`);
+                        }
                         mockApiCalls.push({ method: 'GET', url, options });
                         return Promise.resolve({
                             status: 200,
