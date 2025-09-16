@@ -110,7 +110,7 @@ All migrated scripts follow this pattern:
 
 #### High Priority (P2 - PM System)
 - epic-list.sh, epic-show.sh, epic-status.sh
-- prd-list.sh, prd-status.sh
+- prd-list.sh
 
 #### Medium Priority (P3 - Azure DevOps)
 - active-work.sh, blocked.sh, daily.sh
