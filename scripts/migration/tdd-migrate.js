@@ -355,7 +355,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const { execSync } = require('child_process');
 const yargs = require('yargs');
-// Use colors module already imported
+const colors = require('../../lib/utils/colors');
 
 class ${this.toPascalCase(scriptName)} {
   constructor(options = {}) {
