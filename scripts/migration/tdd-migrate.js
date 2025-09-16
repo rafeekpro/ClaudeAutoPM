@@ -369,7 +369,7 @@ ${analysis.functions.map(func => `
    */
   async ${this.toCamelCase(func)}() {
     // TODO: Implement ${func}
-    throw new Error('Not implemented: ${func}');
+    throw new Error(`Not implemented: ${func}`);
   }
 `).join('')}
 
