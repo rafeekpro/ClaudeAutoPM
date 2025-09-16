@@ -40,7 +40,7 @@ function parseMetadata(content) {
         const value = valueParts.join(':').trim();
         const cleanKey = key.trim().toLowerCase();
 
-        if (metadata.hasOwnProperty(cleanKey)) {
+        if (Object.prototype.hasOwnProperty.call(metadata, cleanKey)) {
           metadata[cleanKey] = value;
         }
       }
@@ -55,7 +55,7 @@ function parseMetadata(content) {
         const value = valueParts.join(':').trim();
         const cleanKey = key.trim().toLowerCase();
 
-        if (metadata.hasOwnProperty(cleanKey)) {
+        if (Object.prototype.hasOwnProperty.call(metadata, cleanKey)) {
           metadata[cleanKey] = value;
         }
       } else if (trimmedLine.startsWith('#') || trimmedLine === '') {
