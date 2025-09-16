@@ -1,10 +1,30 @@
 #!/bin/bash
-# Azure DevOps Next Task Script
+# Azure DevOps Next Task Script (Backward Compatible Wrapper)
 # AI-powered task recommendation based on priority and context
 # Usage: ./next-task.sh [--user=me]
+#
+# This script now delegates to the Node.js implementation for better performance
+# and maintainability while preserving the original interface.
 
 set -e
 
+# Detect script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
+
+# Check if Node.js implementation exists
+NODE_SCRIPT="$PROJECT_ROOT/bin/node/azure-next-task.js"
+
+if [ -f "$NODE_SCRIPT" ]; then
+    # Use Node.js implementation with all arguments passed through
+    exec node "$NODE_SCRIPT" "$@"
+else
+    # Fallback to original bash implementation
+    echo "⚠️  Node.js implementation not found, using fallback bash version"
+    echo ""
+fi
+
+# Original bash implementation follows as fallback
 USER_FILTER=${1:-"--user=me"}
 
 echo "🤖 Azure DevOps Next Task Recommendation"
