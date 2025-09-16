@@ -97,10 +97,16 @@
   "dependencies": {
     "azure-devops-node-api": "^14.0.2",
     "chalk": "^5.3.0",
+    "dotenv": "^16.3.1",
     "execa": "^8.0.1",
+    "fast-glob": "^3.3.2",
     "fs-extra": "^11.2.0",
+    "glob": "^10.3.10",
     "inquirer": "^9.2.12",
     "js-yaml": "^4.1.0",
+    "moment": "^2.29.4",
+    "simple-git": "^3.20.0",
+    "table": "^6.8.1",
     "yargs": "^17.7.2"
   },
   "devDependencies": {
