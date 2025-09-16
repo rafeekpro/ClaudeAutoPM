@@ -339,9 +339,9 @@ describe('Azure DevOps Setup Migration Tests', () => {
       });
 
       // Create a directory with some content
-      const testDir = path.join(testDir, '.claude', 'azure', 'features');
-      await fs.ensureDir(testDir);
-      const testFile = path.join(testDir, 'existing-feature.md');
+      const featuresDir = path.join(testDir, '.claude', 'azure', 'features');
+      await fs.ensureDir(featuresDir);
+      const testFile = path.join(featuresDir, 'existing-feature.md');
       await fs.writeFile(testFile, 'existing content');
 
       await setup.createDirectoryStructure();
