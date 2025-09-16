@@ -677,4 +677,10 @@ if (require.main === module) {
   });
 }
 
+// Export run function for yargs integration
+EnvSetup.run = async function() {
+  const setup = new EnvSetup({});
+  await setup.setup();
+};
+
 module.exports = EnvSetup;
