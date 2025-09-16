@@ -68,8 +68,7 @@ describe('Test Runner Migration Tests', () => {
 
       // Should run: unit, azure, security, regression, installation, e2e
       try {
-        const output = execSync(`node ${runnerPath}`, {
-          cwd: tempDir,
+        const output = execSync(`node ${runnerPath} --cwd ${tempDir}`, {
           encoding: 'utf8'
         });
 
@@ -99,8 +98,7 @@ describe('Test Runner Migration Tests', () => {
       );
 
       try {
-        execSync(`node ${runnerPath}`, {
-          cwd: tempDir,
+        execSync(`node ${runnerPath} --cwd ${tempDir}`, {
           encoding: 'utf8'
         });
         assert.ok(true, 'Should exit with 0 when tests pass');
@@ -128,13 +126,14 @@ describe('Test Runner Migration Tests', () => {
       );
 
       try {
-        execSync(`node ${runnerPath}`, {
-          cwd: tempDir,
+        execSync(`node ${runnerPath} --cwd ${tempDir}`, {
           encoding: 'utf8'
         });
         assert.fail('Should throw when tests fail');
       } catch (error) {
-        assert.strictEqual(error.status, 1, 'Should exit with code 1');
+        // Check if error has status or code
+        const exitCode = error.status || error.code;
+        assert.ok(exitCode === 1 || exitCode === '1', `Should exit with code 1 (got ${exitCode})`);
       }
     });
   });
@@ -156,8 +155,8 @@ describe('Test Runner Migration Tests', () => {
         return;
       }
 
-      const output = execSync(`node ${runnerPath}`, {
-        cwd: tempDir,
+      const output = execSync(`node ${runnerPath} --cwd ${tempDir}`, {
+        
         encoding: 'utf8'
       }).toString();
 
@@ -180,8 +179,8 @@ describe('Test Runner Migration Tests', () => {
         return;
       }
 
-      const output = execSync(`node ${runnerPath}`, {
-        cwd: tempDir,
+      const output = execSync(`node ${runnerPath} --cwd ${tempDir}`, {
+        
         encoding: 'utf8'
       }).toString();
 
@@ -199,8 +198,8 @@ describe('Test Runner Migration Tests', () => {
         return;
       }
 
-      const output = execSync(`node ${runnerPath}`, {
-        cwd: tempDir,
+      const output = execSync(`node ${runnerPath} --cwd ${tempDir}`, {
+        
         encoding: 'utf8',
         env: { ...process.env, CI: 'true' }
       }).toString();
@@ -222,8 +221,8 @@ describe('Test Runner Migration Tests', () => {
         return;
       }
 
-      const output = execSync(`node ${runnerPath}`, {
-        cwd: tempDir,
+      const output = execSync(`node ${runnerPath} --cwd ${tempDir}`, {
+        
         encoding: 'utf8'
       }).toString();
 
@@ -239,8 +238,8 @@ describe('Test Runner Migration Tests', () => {
         return;
       }
 
-      const output = execSync(`node ${runnerPath}`, {
-        cwd: tempDir,
+      const output = execSync(`node ${runnerPath} --cwd ${tempDir}`, {
+        
         encoding: 'utf8'
       }).toString();
 
@@ -265,8 +264,8 @@ describe('Test Runner Migration Tests', () => {
       );
 
       try {
-        execSync(`node ${runnerPath}`, {
-          cwd: tempDir,
+        execSync(`node ${runnerPath} --cwd ${tempDir}`, {
+          
           encoding: 'utf8'
         });
       } catch (error) {
@@ -288,8 +287,8 @@ describe('Test Runner Migration Tests', () => {
         return;
       }
 
-      const output = execSync(`node ${runnerPath}`, {
-        cwd: tempDir,
+      const output = execSync(`node ${runnerPath} --cwd ${tempDir}`, {
+        
         encoding: 'utf8'
       }).toString();
 
@@ -313,8 +312,8 @@ describe('Test Runner Migration Tests', () => {
       );
 
       try {
-        execSync(`node ${runnerPath}`, {
-          cwd: tempDir,
+        execSync(`node ${runnerPath} --cwd ${tempDir}`, {
+          
           encoding: 'utf8'
         });
         assert.fail('Should handle syntax errors');
@@ -335,8 +334,8 @@ describe('Test Runner Migration Tests', () => {
 
       const start = Date.now();
 
-      execSync(`node ${runnerPath}`, {
-        cwd: tempDir,
+      execSync(`node ${runnerPath} --cwd ${tempDir}`, {
+        
         encoding: 'utf8'
       });
 
@@ -354,8 +353,8 @@ describe('Test Runner Migration Tests', () => {
         return;
       }
 
-      const output = execSync(`node ${runnerPath}`, {
-        cwd: tempDir,
+      const output = execSync(`node ${runnerPath} --cwd ${tempDir}`, {
+        
         encoding: 'utf8'
       }).toString();
 

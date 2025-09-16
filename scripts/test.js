@@ -12,11 +12,16 @@ const { spawn } = require('child_process');
 const colors = require('../lib/utils/colors');
 
 class TestRunner {
-  constructor() {
+  constructor(options = {}) {
     this.totalPass = 0;
     this.totalFail = 0;
     this.failedSuites = [];
-    this.projectRoot = path.resolve(__dirname, '..');
+    // Allow custom project root for testing
+    this.projectRoot = options.projectRoot || process.cwd();
+    // If no projectRoot specified and running from scripts/, go up one level
+    if (!options.projectRoot && __dirname.includes('scripts')) {
+      this.projectRoot = path.resolve(__dirname, '..');
+    }
   }
 
   /**
@@ -59,22 +64,27 @@ class TestRunner {
    * Check if test files exist in directory
    */
   hasTestFiles(dir, pattern = '*.test.js') {
-    const fullPath = path.join(this.projectRoot, dir);
+    const fullPath = path.isAbsolute(dir) ? dir : path.join(this.projectRoot, dir);
 
     if (!fs.existsSync(fullPath)) {
       return false;
     }
 
-    const files = fs.readdirSync(fullPath);
-    const testFiles = files.filter(file => {
-      if (pattern.includes('*')) {
-        const regex = new RegExp(pattern.replace('*', '.*'));
-        return regex.test(file);
-      }
-      return file === pattern;
-    });
+    try {
+      const files = fs.readdirSync(fullPath);
+      const testFiles = files.filter(file => {
+        if (pattern.includes('*')) {
+          // Simple glob pattern matching
+          const regex = new RegExp('^' + pattern.replace('*', '.*') + '$');
+          return regex.test(file);
+        }
+        return file === pattern;
+      });
 
-    return testFiles.length > 0;
+      return testFiles.length > 0;
+    } catch (error) {
+      return false;
+    }
   }
 
   /**
@@ -156,7 +166,18 @@ class TestRunner {
 
 // Run if called directly
 if (require.main === module) {
-  const runner = new TestRunner();
+  const args = process.argv.slice(2);
+  const options = {};
+
+  // Parse command line arguments
+  if (args.includes('--cwd')) {
+    const cwdIndex = args.indexOf('--cwd');
+    if (args[cwdIndex + 1]) {
+      options.projectRoot = path.resolve(args[cwdIndex + 1]);
+    }
+  }
+
+  const runner = new TestRunner(options);
   runner.run().catch(error => {
     console.error(colors.red('Fatal error:'), error);
     process.exit(1);
