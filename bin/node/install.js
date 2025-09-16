@@ -601,4 +601,22 @@ if (require.main === module) {
   });
 }
 
+// Export run function for yargs integration
+Installer.run = async function(preset) {
+  const options = {};
+  if (preset) {
+    const presetMap = {
+      1: 'minimal',
+      2: 'docker',
+      3: 'devops',
+      4: 'performance',
+      5: 'custom'
+    };
+    options.config = presetMap[preset];
+  }
+
+  const installer = new Installer(options);
+  await installer.install();
+};
+
 module.exports = Installer;
