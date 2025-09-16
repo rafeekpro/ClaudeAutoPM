@@ -119,7 +119,8 @@ describe('Install.js Migration Tests', () => {
       const installer = new Installer({
         path: testDir,
         yes: true,
-        config: 'minimal'
+        config: 'minimal',
+        silent: true
       });
 
       const config = await installer.getConfiguration();
@@ -146,7 +147,8 @@ describe('Install.js Migration Tests', () => {
       const installer = new Installer({
         path: testDir,
         yes: true,
-        config: 'devops'
+        config: 'devops',
+        silent: true
       });
 
       const config = await installer.getConfiguration();
@@ -334,7 +336,8 @@ describe('Install.js Migration Tests', () => {
         yes: true,
         config: 'minimal',
         noEnv: true,
-        noHooks: true
+        noHooks: true,
+        silent: true
       });
 
       installer.sourcePath = sourceDir;
