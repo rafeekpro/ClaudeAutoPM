@@ -580,7 +580,7 @@ module.exports = ${this.toPascalCase(scriptName)};
   toPascalCase(str) {
     return str
       .replace(/[-_]/g, ' ')
-      .replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())
+      .replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase())
       .replace(/\s/g, '');
   }
 
