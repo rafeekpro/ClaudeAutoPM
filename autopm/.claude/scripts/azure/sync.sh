@@ -83,7 +83,7 @@ else
     echo "Performing basic sync..."
 
     # Create basic metadata
-    SYNC_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date -u +"%Y-%m-%dT%H:%M:%SZ")
+    SYNC_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null)
 
     cat > .claude/azure/sync/last-sync.json << EOF
 {
