@@ -29,9 +29,19 @@ const ClaudeAutoPM_VERSION = packageJson.version;
 // Paths
 const SCRIPT_DIR = __dirname;
 const PACKAGE_DIR = path.dirname(SCRIPT_DIR);
-const INSTALL_SCRIPT = path.join(PACKAGE_DIR, 'install', 'install.sh');
-const MERGE_SCRIPT = path.join(PACKAGE_DIR, 'install', 'merge-claude.sh');
-const ENV_SETUP_SCRIPT = path.join(PACKAGE_DIR, 'install', 'setup-env.sh');
+// Use Node.js scripts if they exist, fallback to bash scripts
+const NODE_INSTALL_SCRIPT = path.join(PACKAGE_DIR, 'bin', 'node', 'install.js');
+const NODE_MERGE_SCRIPT = path.join(PACKAGE_DIR, 'bin', 'node', 'merge-claude.js');
+const NODE_ENV_SCRIPT = path.join(PACKAGE_DIR, 'bin', 'node', 'setup-env.js');
+// Fallback bash scripts
+const BASH_INSTALL_SCRIPT = path.join(PACKAGE_DIR, 'install', 'install.sh');
+const BASH_MERGE_SCRIPT = path.join(PACKAGE_DIR, 'install', 'merge-claude.sh');
+const BASH_ENV_SCRIPT = path.join(PACKAGE_DIR, 'install', 'setup-env.sh');
+
+// Determine which scripts to use
+const INSTALL_SCRIPT = fs.existsSync(NODE_INSTALL_SCRIPT) ? NODE_INSTALL_SCRIPT : BASH_INSTALL_SCRIPT;
+const MERGE_SCRIPT = fs.existsSync(NODE_MERGE_SCRIPT) ? NODE_MERGE_SCRIPT : BASH_MERGE_SCRIPT;
+const ENV_SETUP_SCRIPT = fs.existsSync(NODE_ENV_SCRIPT) ? NODE_ENV_SCRIPT : BASH_ENV_SCRIPT;
 
 // Helper functions
 const log = (message, color = 'reset') => {
@@ -58,35 +68,59 @@ const warning = (message) => {
 // Check if running on Windows
 const isWindows = os.platform() === 'win32';
 
-// Execute bash script (with Windows compatibility)
-const executeBashScript = (scriptPath, args = [], options = {}) => {
+// Execute script (Node.js or Bash) with compatibility
+const executeScript = (scriptPath, args = [], options = {}) => {
   if (!fs.existsSync(scriptPath)) {
     error(`Script not found: ${scriptPath}`);
   }
 
-  const command = isWindows ? 'bash' : scriptPath;
-  const scriptArgs = isWindows ? [scriptPath, ...args] : args;
+  // Detect script type
+  const isNodeScript = scriptPath.endsWith('.js');
+
+  let command;
+  let scriptArgs;
+
+  if (isNodeScript) {
+    // For Node.js scripts
+    command = 'node';
+    scriptArgs = [scriptPath, ...args];
+  } else {
+    // For Bash scripts
+    command = isWindows ? 'bash' : scriptPath;
+    scriptArgs = isWindows ? [scriptPath, ...args] : args;
+  }
 
   // Prepare environment variables from options
   const env = { ...process.env };
 
-  if (options.autoAccept) {
-    env.AUTOPM_AUTO_ACCEPT = '1';
-  }
-  if (options.config) {
-    env.AUTOPM_CONFIG_PRESET = options.config;
-  }
-  if (options.skipEnv) {
-    env.AUTOPM_SKIP_ENV = '1';
-  }
-  if (options.skipHooks) {
-    env.AUTOPM_SKIP_HOOKS = '1';
-  }
-  if (options.noBackup) {
-    env.AUTOPM_NO_BACKUP = '1';
-  }
-  if (options.cicd) {
-    env.AUTOPM_CICD_SYSTEM = options.cicd;
+  // For Node.js scripts, pass options as command-line arguments
+  if (isNodeScript) {
+    if (options.autoAccept) scriptArgs.push('--yes');
+    if (options.config) scriptArgs.push('--config', options.config);
+    if (options.skipEnv) scriptArgs.push('--no-env');
+    if (options.skipHooks) scriptArgs.push('--no-hooks');
+    if (options.noBackup) scriptArgs.push('--no-backup');
+    if (options.cicd) scriptArgs.push('--cicd', options.cicd);
+  } else {
+    // For bash scripts, use environment variables
+    if (options.autoAccept) {
+      env.AUTOPM_AUTO_ACCEPT = '1';
+    }
+    if (options.config) {
+      env.AUTOPM_CONFIG_PRESET = options.config;
+    }
+    if (options.skipEnv) {
+      env.AUTOPM_SKIP_ENV = '1';
+    }
+    if (options.skipHooks) {
+      env.AUTOPM_SKIP_HOOKS = '1';
+    }
+    if (options.noBackup) {
+      env.AUTOPM_NO_BACKUP = '1';
+    }
+    if (options.cicd) {
+      env.AUTOPM_CICD_SYSTEM = options.cicd;
+    }
   }
 
   try {
@@ -228,7 +262,7 @@ const initProject = (projectName) => {
     execSync('git init', { cwd: projectPath, stdio: 'inherit' });
     
     // Install ClaudeAutoPM
-    executeBashScript(INSTALL_SCRIPT, [projectPath]);
+    executeScript(INSTALL_SCRIPT, [projectPath]);
     
   } catch (err) {
     error(`Failed to initialize project: ${err.message}`);
@@ -398,26 +432,26 @@ const main = () => {
       checkPrerequisites();
       printBanner();
       info('Starting ClaudeAutoPM installation...');
-      executeBashScript(INSTALL_SCRIPT, parsed.path ? [parsed.path] : [], parsed.options);
+      executeScript(INSTALL_SCRIPT, parsed.path ? [parsed.path] : [], parsed.options);
       break;
 
     case 'update':
       checkPrerequisites();
       printBanner();
       info('Updating ClaudeAutoPM installation...');
-      executeBashScript(INSTALL_SCRIPT, parsed.path ? [parsed.path] : []);
+      executeScript(INSTALL_SCRIPT, parsed.path ? [parsed.path] : []);
       break;
 
     case 'merge':
       printBanner();
       info('Starting CLAUDE.md merge helper...');
-      executeBashScript(MERGE_SCRIPT);
+      executeScript(MERGE_SCRIPT);
       break;
 
     case 'setup-env':
       printBanner();
       info('Starting interactive .env configuration...');
-      executeBashScript(ENV_SETUP_SCRIPT, parsed.path ? [parsed.path] : []);
+      executeScript(ENV_SETUP_SCRIPT, parsed.path ? [parsed.path] : []);
       break;
 
     case 'init':
@@ -429,7 +463,7 @@ const main = () => {
     case 'config':
       printBanner();
       info('Starting ClaudeAutoPM configuration...');
-      executeBashScript(path.join(PACKAGE_DIR, '.claude', 'scripts', 'config', 'toggle-features.sh'), []);
+      executeScript(path.join(PACKAGE_DIR, '.claude', 'scripts', 'config', 'toggle-features.sh'), []);
       break;
 
     case 'mcp':
