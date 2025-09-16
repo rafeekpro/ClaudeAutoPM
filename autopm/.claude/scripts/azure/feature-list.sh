@@ -1,10 +1,30 @@
 #!/bin/bash
-# Azure DevOps Feature List Script
+# Azure DevOps Feature List Script (Backward Compatible Wrapper)
 # Lists all Features/Epics with status and progress
 # Usage: ./feature-list.sh [--status=active]
+#
+# This script now delegates to the Node.js implementation for better performance
+# and maintainability while preserving the original interface.
 
 set -e
 
+# Detect script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
+
+# Check if Node.js implementation exists
+NODE_SCRIPT="$PROJECT_ROOT/bin/node/azure-feature-list.js"
+
+if [ -f "$NODE_SCRIPT" ]; then
+    # Use Node.js implementation with all arguments passed through
+    exec node "$NODE_SCRIPT" "$@"
+else
+    # Fallback to original bash implementation
+    echo "⚠️  Node.js implementation not found, using fallback bash version"
+    echo ""
+fi
+
+# Original bash implementation follows as fallback
 STATUS_FILTER=${1:-""}
 
 echo "📦 Azure DevOps Features/Epics"
