@@ -8,7 +8,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const { execSync } = require('child_process');
-const inquirer = require('inquirer').default || require('inquirer');
+const inquirer = require('inquirer');
 // Use our custom colors module instead of chalk
 const colors = require('../../lib/utils/colors');
 
