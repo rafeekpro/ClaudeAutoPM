@@ -180,7 +180,6 @@ describe('Test Runner Migration Tests', () => {
       }
 
       const output = execSync(`node ${runnerPath} --cwd ${tempDir}`, {
-        
         encoding: 'utf8'
       }).toString();
 
