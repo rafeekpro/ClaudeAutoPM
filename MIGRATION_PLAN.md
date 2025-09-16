@@ -51,19 +51,19 @@ exports.handler = async (argv) => {
 ## 🔄 Remaining Commands to Migrate
 
 ### High Priority (Core PM Commands)
-- [ ] `pm/init.md` → `bin/commands/pm/init.js`
-- [ ] `pm/standup.md` → `bin/commands/pm/standup.js`
-- [ ] `pm/status.md` → `bin/commands/pm/status.js`
-- [ ] `pm/next.md` → `bin/commands/pm/next.js`
-- [ ] `pm/validate.md` → `bin/commands/pm/validate.js`
+- [x] `pm/init.md` → `bin/commands/pm/init.js`
+- [x] `pm/standup.md` → `bin/commands/pm/standup.js`
+- [x] `pm/status.md` → `bin/commands/pm/status.js`
+- [x] `pm/next.md` → `bin/commands/pm/next.js`
+- [x] `pm/validate.md` → `bin/commands/pm/validate.js`
 
 ### Azure DevOps Commands
-- [ ] `azure/task-new.md` → `bin/commands/azure/taskNew.js`
-- [ ] `azure/task-list.md` → `bin/commands/azure/taskList.js`
-- [ ] `azure/task-start.md` → `bin/commands/azure/taskStart.js`
-- [ ] `azure/task-close.md` → `bin/commands/azure/taskClose.js`
-- [ ] `azure/sprint-status.md` → `bin/commands/azure/sprintStatus.js`
-- [ ] `azure/standup.md` → `bin/commands/azure/standup.js`
+- [x] `azure/task-new.md` → `bin/commands/azure/taskNew.js`
+- [x] `azure/task-list.md` → `bin/commands/azure/taskList.js`
+- [x] `azure/task-start.md` → `bin/commands/azure/taskStart.js`
+- [x] `azure/task-close.md` → `bin/commands/azure/taskClose.js`
+- [x] `azure/sprint-status.md` → `bin/commands/azure/sprintStatus.js`
+- [x] `azure/standup.md` → `bin/commands/azure/standup.js`
 
 ### AI/Automation Commands
 - [ ] `ai/openai-chat.md` → `bin/commands/ai/openaiChat.js`
