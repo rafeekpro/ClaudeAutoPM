@@ -11,6 +11,14 @@
 
 Stop losing context. Stop blocking on tasks. Stop shipping bugs. ClaudeAutoPM transforms PRDs into epics, epics into issues, and issues into production code – with full traceability at every step.
 
+## 🎯 Key Features
+
+- **96 Professional CLI Commands** - Full yargs-based CLI with auto-generated help
+- **AI Agent Integration** - Parallel execution with specialized agents
+- **Azure DevOps & GitHub** - Complete project management integration
+- **Smart Context Management** - Never lose track of your work
+- **Automated Workflows** - From PRD to production deployment
+
 ## 🚀 Get Started in 5 Minutes
 
 ### 1. Install (30 seconds)
@@ -89,6 +97,31 @@ autopm install
 For comprehensive guides, advanced features, and detailed configuration:
 
 **👉 [Visit the ClaudeAutoPM Wiki](https://github.com/rafeekpro/ClaudeAutoPM/wiki)**
+
+### CLI System (96 Commands)
+
+ClaudeAutoPM features a professional CLI powered by **yargs** with 96 commands:
+
+```bash
+# View all commands
+autopm --help
+
+# Command categories:
+# - Azure DevOps (39 commands)
+# - Project Management (32 commands)
+# - AI & Automation (2 commands)
+# - Infrastructure & DevOps (7 commands)
+# - Testing & Context (5 commands)
+# - UI & Frontend (6 commands)
+# - Utilities (5 commands)
+
+# Examples:
+autopm pm:init --type web
+autopm azure:sprint-status
+autopm context:create
+```
+
+📖 [Full CLI Documentation](docs/wiki/CLI-YARGS-MIGRATION.md)
 
 ### Popular Topics
 - [Configuration Options](https://github.com/rafeekpro/ClaudeAutoPM/wiki/Configuration-Options)

@@ -397,4 +397,12 @@ if (require.main === module) {
   });
 }
 
+// Export run function for yargs integration
+ClaudeMerger.run = async function(file) {
+  const merger = new ClaudeMerger({
+    path: file
+  });
+  await merger.merge();
+};
+
 module.exports = ClaudeMerger;
