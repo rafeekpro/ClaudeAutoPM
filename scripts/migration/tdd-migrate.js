@@ -8,8 +8,9 @@
 const fs = require('fs-extra');
 const path = require('path');
 const { execSync } = require('child_process');
-const inquirer = require('inquirer');
-const chalk = require('chalk');
+const inquirer = require('inquirer').default || require('inquirer');
+// Use our custom colors module instead of chalk
+const colors = require('../../lib/utils/colors');
 
 class TDDMigrationAssistant {
   constructor() {
@@ -22,7 +23,7 @@ class TDDMigrationAssistant {
    * Main entry point
    */
   async run() {
-    console.log(chalk.bold.cyan('\n🚀 TDD Migration Assistant\n'));
+    console.log(colors.boldCyan('\n🚀 TDD Migration Assistant\n'));
 
     const { action } = await inquirer.prompt([
       {
@@ -81,28 +82,28 @@ class TDDMigrationAssistant {
       }
     ]);
 
-    console.log(chalk.yellow('\n📝 Starting TDD migration for:'), script);
+    console.log(colors.yellow('\n📝 Starting TDD migration for:'), script);
 
     // Step 1: Analyze the bash script
-    console.log(chalk.blue('\n1. Analyzing bash script...'));
+    console.log(colors.blue('\n1. Analyzing bash script...'));
     const analysis = await this.analyzeBashScript(script);
 
     // Step 2: Generate test file
-    console.log(chalk.blue('\n2. Generating test file...'));
+    console.log(colors.blue('\n2. Generating test file...'));
     const testFile = await this.createTestFile(script, analysis);
-    console.log(chalk.green('✓ Test file created:'), testFile);
+    console.log(colors.green('✓ Test file created:'), testFile);
 
     // Step 3: Run tests (should fail)
-    console.log(chalk.blue('\n3. Running tests (expected to fail)...'));
+    console.log(colors.blue('\n3. Running tests (expected to fail)...'));
     await this.runTestFile(testFile);
 
     // Step 4: Generate Node.js skeleton
-    console.log(chalk.blue('\n4. Generating Node.js skeleton...'));
+    console.log(colors.blue('\n4. Generating Node.js skeleton...'));
     const nodeFile = await this.generateSkeleton(script, analysis);
-    console.log(chalk.green('✓ Skeleton created:'), nodeFile);
+    console.log(colors.green('✓ Skeleton created:'), nodeFile);
 
     // Step 5: Open files for implementation
-    console.log(chalk.cyan('\n📋 Next steps:'));
+    console.log(colors.cyan('\n📋 Next steps:'));
     console.log('1. Implement the Node.js version to make tests pass');
     console.log('2. Run: npm run test:migration --', path.basename(testFile));
     console.log('3. Refactor and optimize once tests are green');
@@ -347,7 +348,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const { execSync } = require('child_process');
 const yargs = require('yargs');
-const chalk = require('chalk');
+// Use colors module already imported
 
 class ${this.toPascalCase(scriptName)} {
   constructor(options = {}) {
@@ -377,7 +378,7 @@ ${analysis.functions.map(func => `
 ${analysis.functions.map(func => `      // await this.${this.toCamelCase(func)}();`).join('\n')}
 
     } catch (error) {
-      console.error(chalk.red('Error:'), error.message);
+      console.error(colors.red('Error:'), error.message);
       if (this.verbose) {
         console.error(error.stack);
       }
@@ -470,14 +471,14 @@ module.exports = ${this.toPascalCase(scriptName)};
    */
   async runTestFile(testFile) {
     try {
-      console.log(chalk.yellow('\nRunning tests...'));
+      console.log(colors.yellow('\nRunning tests...'));
       execSync(`node --test ${testFile}`, {
         stdio: 'inherit',
         cwd: this.projectRoot
       });
-      console.log(chalk.green('✓ Tests passed!'));
+      console.log(colors.green('✓ Tests passed!'));
     } catch (error) {
-      console.log(chalk.red('✗ Tests failed (expected for new migration)'));
+      console.log(colors.red('✗ Tests failed (expected for new migration)'));
     }
   }
 
@@ -485,7 +486,7 @@ module.exports = ${this.toPascalCase(scriptName)};
    * Check migration status
    */
   async checkStatus() {
-    console.log(chalk.bold('\n📊 Migration Status\n'));
+    console.log(colors.bold('\n📊 Migration Status\n'));
 
     const migrated = fs.readdirSync(this.nodeScriptsDir).filter(f => f.endsWith('.js'));
     const tests = [];
@@ -497,9 +498,9 @@ module.exports = ${this.toPascalCase(scriptName)};
       }
     }
 
-    console.log('Migrated scripts:', chalk.green(migrated.length));
-    console.log('Test files:', chalk.yellow(tests.length));
-    console.log('Coverage:', chalk.cyan(`${Math.round((migrated.length / 56) * 100)}%`));
+    console.log('Migrated scripts:', colors.green(migrated.length));
+    console.log('Test files:', colors.yellow(tests.length));
+    console.log('Coverage:', colors.cyan(`${Math.round((migrated.length / 56) * 100)}%`));
 
     console.log('\nRecent migrations:');
     migrated.slice(-5).forEach(file => {
@@ -527,7 +528,7 @@ module.exports = ${this.toPascalCase(scriptName)};
 if (require.main === module) {
   const assistant = new TDDMigrationAssistant();
   assistant.run().catch(error => {
-    console.error(chalk.red('Fatal error:'), error);
+    console.error(colors.red('Fatal error:'), error);
     process.exit(1);
   });
 }
