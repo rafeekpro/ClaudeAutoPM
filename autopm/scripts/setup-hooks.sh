@@ -1,30 +1,10 @@
 #!/bin/bash
 
-# Setup script for git hooks
+# Setup Hooks - Bridge to Node.js implementation
+# This script now delegates to the Node.js version for better cross-platform support
 
-echo "🔧 Setting up git hooks for code protection..."
+# Get the directory of this script
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Check if we're in a git repository
-if [ ! -d ".git" ]; then
-    echo "❌ Error: Not in a git repository"
-    exit 1
-fi
-
-# Configure git to use our hooks directory
-git config core.hooksPath .githooks
-
-if [ $? -eq 0 ]; then
-    echo "✅ Git hooks configured successfully!"
-    echo ""
-    echo "📋 Active hooks:"
-    echo "  • pre-commit: Validates code integrity before commits"
-    echo ""
-    echo "To disable temporarily:"
-    echo "  git commit --no-verify"
-    echo ""
-    echo "To disable permanently:"
-    echo "  git config --unset core.hooksPath"
-else
-    echo "❌ Failed to configure git hooks"
-    exit 1
-fi
+# Execute the Node.js version
+exec node "$SCRIPT_DIR/setup-hooks.js" "$@"
