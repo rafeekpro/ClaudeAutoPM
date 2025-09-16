@@ -1,9 +1,29 @@
 #!/bin/bash
-# Azure DevOps Sprint Report Generator
+# Azure DevOps Sprint Report Generator (Backward Compatible Wrapper)
 # Usage: ./sprint-report.sh [sprint-name]
+#
+# This script now delegates to the Node.js implementation for better performance
+# and maintainability while preserving the original interface.
 
 set -e
 
+# Detect script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
+
+# Check if Node.js implementation exists
+NODE_SCRIPT="$PROJECT_ROOT/bin/node/azure-sprint-report.js"
+
+if [ -f "$NODE_SCRIPT" ]; then
+    # Use Node.js implementation with all arguments passed through
+    exec node "$NODE_SCRIPT" "$@"
+else
+    # Fallback to original bash implementation
+    echo "⚠️  Node.js implementation not found, using fallback bash version"
+    echo ""
+fi
+
+# Original bash implementation follows as fallback
 SPRINT_NAME=${1:-"current"}
 
 echo "📊 Generating Sprint Report: $SPRINT_NAME"
