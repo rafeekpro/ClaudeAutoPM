@@ -78,6 +78,10 @@ describe('Azure DevOps Active Work Migration Tests', () => {
     });
 
     it('should handle missing environment variables gracefully', () => {
+      const originalPAT = process.env.AZURE_DEVOPS_PAT;
+      const originalOrg = process.env.AZURE_DEVOPS_ORG;
+      const originalProject = process.env.AZURE_DEVOPS_PROJECT;
+
       delete process.env.AZURE_DEVOPS_PAT;
       delete process.env.AZURE_DEVOPS_ORG;
       delete process.env.AZURE_DEVOPS_PROJECT;
@@ -87,6 +91,11 @@ describe('Azure DevOps Active Work Migration Tests', () => {
           silent: true
         });
       }, /Missing required environment variables/);
+
+      // Restore environment variables
+      if (originalPAT) process.env.AZURE_DEVOPS_PAT = originalPAT;
+      if (originalOrg) process.env.AZURE_DEVOPS_ORG = originalOrg;
+      if (originalProject) process.env.AZURE_DEVOPS_PROJECT = originalProject;
     });
   });
 
