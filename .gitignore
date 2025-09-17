@@ -22,3 +22,8 @@ ZADANIA1709.md
 *.backup
 *.bak
 *~
+
+# Test artifacts
+test-dir/
+tmp/
+temp/
