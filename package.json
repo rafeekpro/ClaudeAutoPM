@@ -16,6 +16,7 @@
     "test:node:watch": "node --test --watch test/node-scripts/**/*.test.js",
     "test:node:coverage": "node --test --experimental-test-coverage test/node-scripts/**/*.test.js",
     "test:migration": "node --test test/migration/*.test.js",
+    "test:azure:integration": "AZURE_DEVOPS_INTEGRATION_TESTS=true node --test test/migration/azure-*.test.js",
     "migration:tdd": "node scripts/migration/tdd-migrate.js",
     "migration:next": "node scripts/migration/tdd-migrate.js next",
     "migration:test": "node --test test/node-scripts/",
