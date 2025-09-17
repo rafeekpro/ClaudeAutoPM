@@ -134,10 +134,15 @@ describe('Test Runner Migration Tests', () => {
         // execSync throws when the process exits with non-zero
         // The error.status contains the exit code
         // Sometimes the error code is undefined in test environments
-        const isExpectedFailure = error.status === 1 ||
-                                  error.code === 'ERR_ASSERTION' ||
-                                  error.message.includes('Command failed') ||
-                                  error.message.includes('exit code 1');
+        // Robust error detection: check exit code and error type
+        const isExpectedFailure =
+          (typeof error.status === 'number' && error.status === 1) ||
+          (error instanceof Error && error.name === 'Error' && error.status === 1) ||
+          // Fallback for legacy or unknown cases
+          (typeof error.message === 'string' && (
+            error.message.includes('Command failed') ||
+            error.message.includes('exit code 1')
+          ));
         assert.ok(isExpectedFailure, `Should exit with code 1 or throw expected error (got status: ${error.status}, code: ${error.code}, message: ${error.message?.substring(0, 50)})`);
       }
     });
