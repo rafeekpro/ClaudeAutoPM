@@ -4,6 +4,7 @@
  * Tests Azure DevOps sprint reporting functionality
  */
 
+const { describe, it, before, after, beforeEach, afterEach } = require('node:test');
 const assert = require('assert');
 const path = require('path');
 const fs = require('fs');
@@ -125,8 +126,7 @@ const testEnv = {
     AZURE_DEVOPS_PAT: 'test-pat-token'
 };
 
-describe('Azure Sprint Report Migration Tests', function() {
-    this.timeout(15000);
+describe('Azure Sprint Report Migration Tests', () => {
 
     let originalEnv;
     let azureSprintReport;
