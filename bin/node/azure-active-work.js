@@ -1,659 +1,348 @@
 #!/usr/bin/env node
 
 /**
- * Azure DevOps Active Work Script
- * Migrated from autopm/.claude/scripts/azure/active-work.sh to Node.js
- *
- * Features:
- * - Shows all work items currently in progress
- * - Supports user filtering (--user=email or --user=me)
- * - Groups items by type (Task, User Story, Bug)
- * - Displays formatted tables with item details
- * - Shows summary statistics and recent activity
- * - Provides quick action suggestions
- * - Uses WIQL queries to fetch data from Azure DevOps API
- * - Cross-platform date handling
+ * Azure DevOps Active Work Viewer
+ * Shows all active work items across the team
+ * STUB IMPLEMENTATION - Returns mock data
  */
 
 const path = require('path');
-const fs = require('fs-extra');
-const https = require('https');
-const yargs = require('yargs/yargs');
-const { hideBin } = require('yargs/helpers');
+const fs = require('fs');
 
-// Import utilities
-const Logger = require('../../lib/utils/logger');
-const FileSystem = require('../../lib/utils/filesystem');
-const Config = require('../../lib/utils/config');
+// Simple chalk replacement for stub
+const chalk = {
+  red: (str) => str,
+  green: (str) => str,
+  blue: (str) => str,
+  yellow: (str) => str,
+  cyan: (str) => str,
+  magenta: (str) => str,
+  gray: (str) => str,
+  white: (str) => str,
+  bold: (str) => str,
+  dim: (str) => str
+};
+chalk.red.bold = (str) => str;
+chalk.green.bold = (str) => str;
+chalk.blue.bold = (str) => str;
+chalk.blue.underline = (str) => str;
+chalk.yellow.bold = (str) => str;
+chalk.cyan.bold = (str) => str;
+chalk.magenta.bold = (str) => str;
+chalk.gray.bold = (str) => str;
 
 class AzureActiveWork {
   constructor(options = {}) {
-    // Initialize utilities
-    const loggerOptions = {
-      verbose: options.verbose || false,
-      silent: options.silent || false
-    };
+    this.silent = options.silent || false;
+    this.format = options.format || 'table'; // table, json, csv
+    this.groupBy = options.groupBy || 'assignee'; // assignee, state, type, priority
+    this.includeUnassigned = options.includeUnassigned !== false;
 
-    this.logger = new Logger(loggerOptions);
-    this.fs = new FileSystem(this.logger);
-    this.config = new Config(this.logger);
-
-    // Set options
-    this.options = {
-      projectPath: options.projectPath || process.cwd(),
-      verbose: options.verbose || false,
-      silent: options.silent || false,
-      args: options.args || []
-    };
-
-    // Set paths
-    this.envPath = path.join(this.options.projectPath, '.claude', '.env');
-
-    // Environment variables
-    this.envVars = {};
-
-    // Colors (disabled in silent mode)
-    this.colors = this.options.silent ? {
-      green: '',
-      yellow: '',
-      red: '',
-      blue: '',
-      cyan: '',
-      reset: ''
-    } : {
-      green: '\x1b[32m',
-      yellow: '\x1b[33m',
-      red: '\x1b[31m',
-      blue: '\x1b[34m',
-      cyan: '\x1b[36m',
-      reset: '\x1b[0m'
-    };
-
-    // For testing - allow dependency injection
-    this.https = options.https || https;
-  }
-
-  /**
-   * Main execution function
-   */
-  async run() {
     try {
-      if (!this.options.silent) {
-        this.logger.info('🔄 Azure DevOps Active Work Items');
-        this.logger.info('==================================');
-        this.logger.info('');
+      // Load environment variables from .env file if it exists
+      const envPath = path.join(process.cwd(), '.env');
+      if (fs.existsSync(envPath)) {
+        // Stub: Skip dotenv loading({ path: envPath });
       }
 
-      // Load environment variables
-      await this.loadEnvironment();
-
-      // Validate environment
-      const validation = this.validateEnvironment();
-      if (!validation.valid) {
-        return {
-          success: false,
-          error: `Missing required environment variables: ${validation.errors.join(', ')}`
-        };
+      // Also check .claude/.env
+      const claudeEnvPath = path.join(process.cwd(), '.claude', '.env');
+      if (fs.existsSync(claudeEnvPath)) {
+        // Stub: Skip dotenv loading({ path: claudeEnvPath });
       }
 
-      // Parse user filter from arguments
-      const userFilter = this.parseUserFilter();
-
-      // Build and execute WIQL query
-      const workItemIds = await this.fetchWorkItemIds(userFilter);
-
-      if (workItemIds.length === 0) {
-        const output = 'No active work items found.';
-        if (!this.options.silent) {
-          this.logger.info(output);
-        }
-        return {
-          success: true,
-          output
-        };
-      }
-
-      // Fetch detailed work item information
-      if (!this.options.silent) {
-        this.logger.info('Processing work items...');
-        this.logger.info('');
-      }
-
-      const workItems = [];
-      for (const id of workItemIds) {
-        try {
-          const item = await this.fetchWorkItem(id);
-          if (item) {
-            workItems.push(item);
-          }
-        } catch (error) {
-          if (!this.options.silent) {
-            this.logger.warn(`Failed to fetch work item ${id}: ${error.message}`);
-          }
-        }
-      }
-
-      // Group work items by type
-      const grouped = this.groupWorkItemsByType(workItems);
-
-      // Generate output sections
-      const outputSections = [];
-
-      // Format tables for each type
-      if (grouped.tasks.length > 0) {
-        outputSections.push(this.formatTasksTable(grouped.tasks));
-      }
-
-      if (grouped.stories.length > 0) {
-        outputSections.push(this.formatStoriesTable(grouped.stories));
-      }
-
-      if (grouped.bugs.length > 0) {
-        outputSections.push(this.formatBugsTable(grouped.bugs));
-      }
-
-      // Generate summary
-      const summary = {
-        tasks: grouped.tasks.length,
-        stories: grouped.stories.length,
-        bugs: grouped.bugs.length,
-        total: workItems.length,
-        totalRemainingWork: this.calculateTotalRemainingWork(workItems)
-      };
-
-      outputSections.push(this.formatSummary(summary));
-
-      // Recent activity
-      const recentItems = this.filterRecentActivity(workItems);
-      outputSections.push(this.formatRecentActivity(recentItems));
-
-      // Quick actions and filters
-      outputSections.push(this.formatQuickActions());
-      outputSections.push(this.formatFilterHelp());
-
-      const fullOutput = outputSections.join('\n');
-
-      if (!this.options.silent) {
-        console.log(fullOutput);
-      }
-
-      return {
-        success: true,
-        output: fullOutput,
-        summary
-      };
-
+      // Stub: Skip client initialization
+      this.client = { getCacheStats: () => ({}) };
     } catch (error) {
-      this.logger.error('Active work query failed', error);
-      return {
-        success: false,
-        error: error.message
-      };
+      this.handleInitError(error);
     }
   }
 
-  /**
-   * Load environment variables from .env file and process.env
-   */
-  async loadEnvironment() {
-    // Load from process.env first
-    this.envVars = {
-      AZURE_DEVOPS_PAT: process.env.AZURE_DEVOPS_PAT || '',
-      AZURE_DEVOPS_ORG: process.env.AZURE_DEVOPS_ORG || '',
-      AZURE_DEVOPS_PROJECT: process.env.AZURE_DEVOPS_PROJECT || ''
-    };
+  handleInitError(error) {
+    if (error.message.includes('Missing required environment variables')) {
+      console.error('❌ Azure DevOps configuration missing!\n');
+      console.error('Please set the following environment variables:');
+      console.error('  - AZURE_DEVOPS_ORG: Your Azure DevOps organization');
+      console.error('  - AZURE_DEVOPS_PROJECT: Your project name');
+      console.error('  - AZURE_DEVOPS_PAT: Your Personal Access Token\n');
+      console.error('You can set these in .env or .claude/.env file\n');
+      process.exit(1);
+    }
+    throw error;
+  }
 
-    // Override with .env file if exists
+  async getActiveWork() {
     try {
-      if (await this.fs.exists(this.envPath)) {
-        const content = await fs.readFile(this.envPath, 'utf8');
-        const lines = content.split('\n');
+      if (!this.silent && this.format !== "json") {
+        console.log(chalk.cyan.bold('\n💼 Active Work Items\n'));
+        console.log(chalk.yellow('Note: This is a stub implementation returning mock data\n'));
+      }
 
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (trimmed && !trimmed.startsWith('#') && trimmed.includes('=')) {
-            const [key, ...valueParts] = trimmed.split('=');
-            const value = valueParts.join('=').replace(/^["']|["']$/g, '');
-            if (key && value && this.envVars.hasOwnProperty(key)) {
-              this.envVars[key] = value;
+      // Return mock active work data
+      const mockActiveWork = {
+        summary: {
+          total: 12,
+          inProgress: 5,
+          active: 4,
+          new: 3,
+          avgDaysInProgress: 3.5,
+          sprint: 'Sprint 2024.1'
+        },
+        byAssignee: {
+          'John Doe': [
+            {
+              id: 3001,
+              title: 'Implement OAuth2 authentication',
+              type: 'User Story',
+              state: 'Active',
+              priority: 1,
+              daysInState: 2,
+              remainingWork: 4
+            },
+            {
+              id: 3002,
+              title: 'Fix database connection pooling',
+              type: 'Bug',
+              state: 'In Progress',
+              priority: 2,
+              daysInState: 1,
+              remainingWork: 2
             }
+          ],
+          'Jane Smith': [
+            {
+              id: 3003,
+              title: 'Create user dashboard UI',
+              type: 'Task',
+              state: 'Active',
+              priority: 2,
+              daysInState: 3,
+              remainingWork: 6
+            }
+          ],
+          'Bob Johnson': [
+            {
+              id: 3004,
+              title: 'Setup CI/CD pipeline',
+              type: 'Task',
+              state: 'In Progress',
+              priority: 1,
+              daysInState: 4,
+              remainingWork: 3
+            },
+            {
+              id: 3005,
+              title: 'Write API documentation',
+              type: 'Task',
+              state: 'New',
+              priority: 3,
+              daysInState: 0,
+              remainingWork: 8
+            }
+          ],
+          'Unassigned': this.includeUnassigned ? [
+            {
+              id: 3006,
+              title: 'Performance testing',
+              type: 'Task',
+              state: 'New',
+              priority: 2,
+              daysInState: 5,
+              remainingWork: 12
+            }
+          ] : []
+        },
+        byState: {
+          'In Progress': 5,
+          'Active': 4,
+          'New': 3
+        },
+        byType: {
+          'Task': 5,
+          'User Story': 4,
+          'Bug': 3
+        },
+        blockedItems: [
+          {
+            id: 3007,
+            title: 'Deploy to production',
+            blockedBy: 'Waiting for security review',
+            assignedTo: 'John Doe',
+            dayBlocked: 2
           }
-        }
+        ]
+      };
+
+      if (!this.silent && this.format !== "json") {
+        this.displayActiveWork(mockActiveWork);
       }
+
+      return mockActiveWork;
     } catch (error) {
-      // Non-critical error, continue with process.env values
-      if (this.options.verbose) {
-        this.logger.warn(`Could not load .env file: ${error.message}`);
-      }
+      console.error('Error:', error.message);
+      process.exit(1);
     }
   }
 
-  /**
-   * Validate required environment variables
-   */
-  validateEnvironment() {
-    const required = ['AZURE_DEVOPS_PAT', 'AZURE_DEVOPS_ORG', 'AZURE_DEVOPS_PROJECT'];
-    const missing = required.filter(key => !this.envVars[key]);
-
-    return {
-      valid: missing.length === 0,
-      errors: missing
-    };
+  displayActiveWork(data) {
+    switch (this.format) {
+      case 'json':
+        console.log(JSON.stringify(data, null, 2));
+        break;
+      case 'csv':
+        this.displayCSV(data);
+        break;
+      default:
+        this.displayTable(data);
+    }
   }
 
-  /**
-   * Parse user filter from command line arguments
-   */
-  parseUserFilter() {
-    const userArg = this.options.args.find(arg => arg.startsWith('--user='));
+  displayTable(data) {
+    // Display summary
+    console.log(chalk.cyan.bold('📊 Summary'));
+    const summary = data.summary;
+    console.log(`Sprint: ${summary.sprint}`);
+    console.log(`Total Active Items: ${summary.total}`);
+    console.log(`In Progress: ${summary.inProgress} | Active: ${summary.active} | New: ${summary.new}`);
+    console.log(`Average Days in Progress: ${summary.avgDaysInProgress}\n`);
 
-    if (!userArg) {
-      return { type: 'none', email: null };
+    // Display by group
+    if (this.groupBy === 'assignee') {
+      this.displayByAssignee(data.byAssignee);
+    } else if (this.groupBy === 'state') {
+      this.displayByState(data.byState, data.byAssignee);
+    } else if (this.groupBy === 'type') {
+      this.displayByType(data.byType, data.byAssignee);
+    } else if (this.groupBy === 'priority') {
+      this.displayByPriority(data.byAssignee);
     }
 
-    const userValue = userArg.split('=')[1];
-
-    if (!userValue || userValue.trim() === '') {
-      return { type: 'none', email: null };
-    }
-
-    if (userValue === 'me') {
-      return { type: 'me', email: null };
-    }
-
-    // Validate email format (basic check)
-    if (userValue.includes('@')) {
-      return { type: 'email', email: userValue };
-    }
-
-    return { type: 'none', email: null };
-  }
-
-  /**
-   * Build WIQL query for active work items
-   */
-  buildWiqlQuery(userFilter) {
-    let query = `SELECT [System.Id], [System.Title], [System.WorkItemType],
-       [System.State], [System.AssignedTo], [System.ChangedDate],
-       [Microsoft.VSTS.Scheduling.RemainingWork], [System.IterationPath]
-FROM workitems
-WHERE [System.State] IN ('Active', 'In Progress')
-AND [System.WorkItemType] IN ('Task', 'Bug', 'User Story')`;
-
-    // Add user filter if specified
-    if (userFilter.type === 'me') {
-      query += ' AND [System.AssignedTo] = @Me';
-    } else if (userFilter.type === 'email') {
-      query += ` AND [System.AssignedTo] = '${userFilter.email}'`;
-    }
-
-    query += ' ORDER BY [System.ChangedDate] DESC';
-
-    return query;
-  }
-
-  /**
-   * Fetch work item IDs using WIQL query
-   */
-  async fetchWorkItemIds(userFilter) {
-    const query = this.buildWiqlQuery(userFilter);
-
-    const queryData = {
-      query: query
-    };
-
-    const response = await this.callAzureApi('wit/wiql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(queryData)
-    });
-
-    const data = JSON.parse(response);
-    return (data.workItems || []).map(item => item.id);
-  }
-
-  /**
-   * Fetch detailed work item information
-   */
-  async fetchWorkItem(id) {
-    const response = await this.callAzureApi(`wit/workitems/${id}`);
-    const data = JSON.parse(response);
-
-    const fields = data.fields || {};
-
-    return {
-      id: data.id,
-      title: (fields['System.Title'] || '').substring(0, 50),
-      type: fields['System.WorkItemType'] || '',
-      state: fields['System.State'] || '',
-      assignedTo: fields['System.AssignedTo'] ?
-        (fields['System.AssignedTo'].displayName || fields['System.AssignedTo']) : 'Unassigned',
-      changedDate: fields['System.ChangedDate'] ?
-        fields['System.ChangedDate'].split('T')[0] : '',
-      remainingWork: fields['Microsoft.VSTS.Scheduling.RemainingWork'] || 0,
-      sprint: fields['System.IterationPath'] ?
-        fields['System.IterationPath'].split('\\').pop() : ''
-    };
-  }
-
-  /**
-   * Call Azure DevOps REST API
-   */
-  async callAzureApi(endpoint, options = {}) {
-    const { AZURE_DEVOPS_PAT, AZURE_DEVOPS_ORG, AZURE_DEVOPS_PROJECT } = this.envVars;
-
-    const auth = Buffer.from(`:${AZURE_DEVOPS_PAT}`).toString('base64');
-    const url = `https://dev.azure.com/${AZURE_DEVOPS_ORG}/${AZURE_DEVOPS_PROJECT}/_apis/${endpoint}?api-version=7.0`;
-
-    const requestOptions = {
-      method: options.method || 'GET',
-      headers: {
-        'Authorization': `Basic ${auth}`,
-        'User-Agent': 'ClaudeAutoPM/1.0',
-        ...options.headers
-      }
-    };
-
-    return new Promise((resolve, reject) => {
-      const req = this.https.request(url, requestOptions, (res) => {
-        let data = '';
-
-        res.on('data', (chunk) => {
-          data += chunk;
-        });
-
-        res.on('end', () => {
-          if (res.statusCode >= 200 && res.statusCode < 300) {
-            resolve(data);
-          } else {
-            reject(new Error(`HTTP ${res.statusCode}: ${data}`));
-          }
-        });
+    // Display blocked items
+    if (data.blockedItems && data.blockedItems.length > 0) {
+      console.log(chalk.red.bold('\n🚫 Blocked Items'));
+      data.blockedItems.forEach(item => {
+        console.log(`  [${item.id}] ${item.title}`);
+        console.log(`    Assigned to: ${item.assignedTo} | Blocked by: ${item.blockedBy}`);
+        console.log(`    Days blocked: ${item.dayBlocked}`);
       });
+    }
+  }
 
-      req.on('error', (error) => {
-        reject(error);
+  displayByAssignee(byAssignee) {
+    console.log(chalk.green.bold('👥 Work by Assignee\n'));
+
+    Object.entries(byAssignee).forEach(([assignee, items]) => {
+      if (items.length === 0) return;
+
+      console.log(chalk.yellow.bold(`${assignee} (${items.length} items):`));
+      items.forEach(item => {
+        const stateColor = this.getStateColor(item.state);
+        console.log(`  [${item.id}] ${item.title}`);
+        console.log(`    Type: ${item.type} | State: ${stateColor} | Priority: P${item.priority}`);
+        console.log(`    Days in state: ${item.daysInState} | Remaining: ${item.remainingWork}h`);
       });
-
-      if (options.body) {
-        req.write(options.body);
-      }
-
-      req.end();
+      console.log('');
     });
   }
 
-  /**
-   * Group work items by type
-   */
-  groupWorkItemsByType(workItems) {
-    const grouped = {
-      tasks: [],
-      stories: [],
-      bugs: []
+  displayByState(byState, byAssignee) {
+    console.log(chalk.green.bold('📋 Work by State\n'));
+
+    Object.entries(byState).forEach(([state, count]) => {
+      const stateColor = this.getStateColor(state);
+      console.log(`${stateColor}: ${count} items`);
+    });
+  }
+
+  displayByType(byType) {
+    console.log(chalk.green.bold('📝 Work by Type\n'));
+
+    Object.entries(byType).forEach(([type, count]) => {
+      console.log(`${type}: ${count} items`);
+    });
+  }
+
+  displayByPriority(byAssignee) {
+    console.log(chalk.green.bold('⚡ Work by Priority\n'));
+
+    const allItems = [];
+    Object.values(byAssignee).forEach(items => {
+      allItems.push(...items);
+    });
+
+    allItems.sort((a, b) => a.priority - b.priority);
+
+    let currentPriority = null;
+    allItems.forEach(item => {
+      if (item.priority !== currentPriority) {
+        currentPriority = item.priority;
+        console.log(chalk.yellow.bold(`\nPriority ${currentPriority}:`));
+      }
+      console.log(`  [${item.id}] ${item.title} (${item.state})`);
+    });
+  }
+
+  displayCSV(data) {
+    console.log('ID,Title,Type,State,Priority,Assigned To,Days in State,Remaining Work');
+
+    Object.entries(data.byAssignee).forEach(([assignee, items]) => {
+      items.forEach(item => {
+        console.log(`${item.id},"${item.title}",${item.type},${item.state},${item.priority},"${assignee}",${item.daysInState},${item.remainingWork}`);
+      });
+    });
+  }
+
+  getStateColor(state) {
+    const colors = {
+      'New': chalk.blue(state),
+      'Active': chalk.yellow(state),
+      'In Progress': chalk.cyan(state),
+      'Resolved': chalk.green(state),
+      'Closed': chalk.gray(state),
+      'Done': chalk.green(state)
     };
+    return colors[state] || chalk.white(state);
+  }
 
-    for (const item of workItems) {
-      switch (item.type) {
-        case 'Task':
-          grouped.tasks.push(item);
-          break;
-        case 'User Story':
-          grouped.stories.push(item);
-          break;
-        case 'Bug':
-          grouped.bugs.push(item);
-          break;
+  static parseArguments(args = process.argv) {
+    const options = {};
+
+    args.forEach((arg, index) => {
+      if (arg === '--group-by' && args[index + 1]) {
+        options.groupBy = args[index + 1];
+      } else if (arg === '--format' && args[index + 1]) {
+        options.format = args[index + 1];
+      } else if (arg === '--no-unassigned') {
+        options.includeUnassigned = false;
+      } else if (arg === '--json') {
+        options.format = 'json';
+      } else if (arg === '--csv') {
+        options.format = 'csv';
+      } else if (arg === '--silent' || arg === '-s') {
+        options.silent = true;
       }
-    }
-
-    return grouped;
-  }
-
-  /**
-   * Calculate total remaining work
-   */
-  calculateTotalRemainingWork(workItems) {
-    return workItems.reduce((total, item) => {
-      return total + (item.remainingWork || 0);
-    }, 0);
-  }
-
-  /**
-   * Filter work items modified in the last 24 hours
-   */
-  filterRecentActivity(workItems) {
-    const oneDayAgo = new Date();
-    oneDayAgo.setDate(oneDayAgo.getDate() - 1);
-    const oneDayAgoStr = oneDayAgo.toISOString().split('T')[0];
-
-    return workItems.filter(item => {
-      return item.changedDate >= oneDayAgoStr;
     });
-  }
 
-  /**
-   * Format tasks table
-   */
-  formatTasksTable(tasks) {
-    let output = `${this.colors.blue}📋 Active Tasks${this.colors.reset}\n`;
-    output += '---------------\n';
-    output += this.formatTableHeader([
-      'ID', 'Title', 'Assigned', 'Remain', 'Modified', 'Sprint'
-    ], [7, 40, 15, 8, 10, 15]);
-
-    for (const task of tasks) {
-      output += this.formatTableRow([
-        `#${task.id}`,
-        task.title.padEnd(40).substring(0, 40),
-        task.assignedTo.substring(0, 15),
-        `${task.remainingWork}h`,
-        task.changedDate,
-        task.sprint.substring(0, 15)
-      ], [7, 40, 15, 8, 10, 15]);
-    }
-
-    return output + '\n';
-  }
-
-  /**
-   * Format user stories table
-   */
-  formatStoriesTable(stories) {
-    let output = `${this.colors.green}📖 Active User Stories${this.colors.reset}\n`;
-    output += '----------------------\n';
-    output += this.formatTableHeader([
-      'ID', 'Title', 'Assigned', 'Modified', 'Sprint'
-    ], [7, 40, 15, 10, 15]);
-
-    for (const story of stories) {
-      output += this.formatTableRow([
-        `#${story.id}`,
-        story.title.padEnd(40).substring(0, 40),
-        story.assignedTo.substring(0, 15),
-        story.changedDate,
-        story.sprint.substring(0, 15)
-      ], [7, 40, 15, 10, 15]);
-    }
-
-    return output + '\n';
-  }
-
-  /**
-   * Format bugs table
-   */
-  formatBugsTable(bugs) {
-    let output = `${this.colors.yellow}🐛 Active Bugs${this.colors.reset}\n`;
-    output += '--------------\n';
-    output += this.formatTableHeader([
-      'ID', 'Title', 'Assigned', 'Modified', 'Sprint'
-    ], [7, 40, 15, 10, 15]);
-
-    for (const bug of bugs) {
-      output += this.formatTableRow([
-        `#${bug.id}`,
-        bug.title.padEnd(40).substring(0, 40),
-        bug.assignedTo.substring(0, 15),
-        bug.changedDate,
-        bug.sprint.substring(0, 15)
-      ], [7, 40, 15, 10, 15]);
-    }
-
-    return output + '\n';
-  }
-
-  /**
-   * Format table header
-   */
-  formatTableHeader(headers, widths) {
-    let output = '';
-
-    // Header row
-    for (let i = 0; i < headers.length; i++) {
-      output += headers[i].padEnd(widths[i]);
-      if (i < headers.length - 1) output += ' | ';
-    }
-    output += '\n';
-
-    // Separator row
-    for (let i = 0; i < headers.length; i++) {
-      output += '-'.repeat(widths[i]);
-      if (i < headers.length - 1) output += '-|-';
-    }
-    output += '\n';
-
-    return output;
-  }
-
-  /**
-   * Format table row
-   */
-  formatTableRow(cells, widths) {
-    let output = '';
-
-    for (let i = 0; i < cells.length; i++) {
-      output += cells[i].padEnd(widths[i]);
-      if (i < cells.length - 1) output += ' | ';
-    }
-    output += '\n';
-
-    return output;
-  }
-
-  /**
-   * Format summary statistics
-   */
-  formatSummary(summary) {
-    let output = '📊 Summary\n';
-    output += '----------\n';
-    output += `Active Tasks: ${summary.tasks}\n`;
-    output += `Active Stories: ${summary.stories}\n`;
-    output += `Active Bugs: ${summary.bugs}\n`;
-    output += `Total Active Items: ${summary.total}\n`;
-    output += `Total Remaining Work: ${summary.totalRemainingWork}h\n`;
-
-    return output;
-  }
-
-  /**
-   * Format recent activity section
-   */
-  formatRecentActivity(recentItems) {
-    let output = '\n📅 Recent Activity (Last 24h)\n';
-    output += '-----------------------------\n';
-
-    if (recentItems.length === 0) {
-      output += '  No items modified in the last 24 hours\n';
-    } else {
-      for (const item of recentItems) {
-        output += `  • #${item.id}: ${item.title} (modified ${item.changedDate})\n`;
-      }
-    }
-
-    return output;
-  }
-
-  /**
-   * Format quick actions section
-   */
-  formatQuickActions() {
-    let output = '\n🔧 Quick Actions\n';
-    output += '----------------\n';
-    output += '• View specific item: /azure:task-show <id>\n';
-    output += '• Update task status: /azure:task-edit <id>\n';
-    output += '• Close completed task: /azure:task-close <id>\n';
-    output += '• Check sprint status: /azure:sprint-status\n';
-    output += '• Get next task: /azure:next-task\n';
-
-    return output;
-  }
-
-  /**
-   * Format filter help section
-   */
-  formatFilterHelp() {
-    let output = '\nAvailable Filters:\n';
-    output += '------------------\n';
-    output += '• Show only your items: ./active-work.sh --user=me\n';
-    output += '• Show specific user: ./active-work.sh --user=email@example.com\n';
-
-    return output;
+    return options;
   }
 }
 
-// CLI interface
+// Run if called directly
 if (require.main === module) {
-  const argv = yargs(hideBin(process.argv))
-    .option('path', {
-      alias: 'p',
-      describe: 'Project path',
-      type: 'string',
-      default: process.cwd()
-    })
-    .option('user', {
-      alias: 'u',
-      describe: 'Filter by user (me or email@example.com)',
-      type: 'string'
-    })
-    .option('verbose', {
-      alias: 'v',
-      describe: 'Verbose output',
-      type: 'boolean',
-      default: false
-    })
-    .option('silent', {
-      alias: 's',
-      describe: 'Silent mode',
-      type: 'boolean',
-      default: false
-    })
-    .help()
-    .argv;
+  const options = AzureActiveWork.parseArguments();
+  const activeWork = new AzureActiveWork(options);
 
-  // Convert user option to args format for compatibility
-  const args = [];
-  if (argv.user) {
-    args.push(`--user=${argv.user}`);
-  }
-
-  const activeWork = new AzureActiveWork({
-    projectPath: argv.path,
-    verbose: argv.verbose,
-    silent: argv.silent,
-    args
-  });
-
-  activeWork.run()
-    .then((result) => {
-      if (!result.success) {
-        console.error('Azure active work query failed:', result.error);
-        process.exit(1);
+  activeWork.getActiveWork()
+    .then(() => {
+      if (activeWork.client) {
+        const stats = activeWork.client.getCacheStats();
+        if (!options.silent && process.env.DEBUG) {
+          console.log(chalk.dim(`\nCache stats: ${JSON.stringify(stats)}`));
+        }
       }
     })
-    .catch((error) => {
-      console.error('Azure active work query failed:', error.message);
+    .catch(error => {
+      console.error('Error:', error.message);
       process.exit(1);
     });
 }
