@@ -60,6 +60,8 @@ describe('AutoPM CLI Basic Commands', () => {
 
     // With yargs, no arguments shows an error message
     assert(!result.success, 'Should fail with no arguments');
+    assert(result.code !== 0, 'Should exit with non-zero code for no arguments');
+    // Optionally, still check for help hint in output
     const allOutput = (result.stderr || '') + (result.stdout || '');
     assert(allOutput.includes('provide a command') || allOutput.includes('--help'), 'Should show error message with help hint');
     console.log('✓ No arguments handling working');
