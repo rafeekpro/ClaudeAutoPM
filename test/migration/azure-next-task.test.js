@@ -4,6 +4,7 @@
  * Tests Azure DevOps next task recommendation functionality
  */
 
+const { describe, it, before, after, beforeEach, afterEach } = require('node:test');
 const assert = require('assert');
 const path = require('path');
 const { execSync } = require('child_process');
@@ -132,8 +133,7 @@ const testEnv = {
     AZURE_DEVOPS_PAT: 'test-pat-token'
 };
 
-describe('Azure Next Task Migration Tests', function() {
-    this.timeout(15000);
+describe('Azure Next Task Migration Tests', () => {
 
     let originalEnv;
     let azureNextTask;
