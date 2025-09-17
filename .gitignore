@@ -14,3 +14,11 @@ node_modules/
 test/regression/__snapshots__/health-report.json
 test/regression/__snapshots__/hybrid-strategy-latest.json
 ZADANIA1709.md
+
+# Backup folders and files
+*backup*
+**/backup*
+**/*backup*
+*.backup
+*.bak
+*~
