@@ -154,6 +154,29 @@ autopm context:create
 - **Git** (system installation)
 - **Claude Code** or compatible AI assistant
 
+## 🧪 Testing
+
+### Running Tests
+
+```bash
+# Run all unit tests (default)
+npm test
+
+# Run Azure DevOps integration tests (requires Azure environment)
+npm run test:azure:integration
+```
+
+### Test Separation
+
+Tests are separated into unit and integration categories:
+- **Unit tests** - Run without external dependencies (default)
+- **Integration tests** - Require Azure DevOps environment variables:
+  - `AZURE_DEVOPS_PAT` - Personal Access Token
+  - `AZURE_DEVOPS_ORG` - Organization name
+  - `AZURE_DEVOPS_PROJECT` - Project name
+
+To run integration tests, set `AZURE_DEVOPS_INTEGRATION_TESTS=true` along with the required environment variables.
+
 ## 🌟 Support This Project
 
 If ClaudeAutoPM helps your team ship better:

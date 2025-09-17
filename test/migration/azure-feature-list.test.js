@@ -6,6 +6,7 @@
 
 const { describe, it, before, after } = require('node:test');
 const assert = require('assert');
+const { describeIntegration } = require('../helpers/test-utils');
 
 // Mock Azure DevOps API responses
 const mockFeatureListResponse = {
@@ -91,7 +92,7 @@ const testEnv = {
     AZURE_DEVOPS_PAT: 'test-pat-token'
 };
 
-describe('Azure Feature List Migration Tests', () => {
+describeIntegration('Azure Feature List Migration Tests', () => {
 
     let originalEnv;
     let azureFeatureList;
