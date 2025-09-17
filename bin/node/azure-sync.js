@@ -387,7 +387,12 @@ class AzureSync {
   async syncWorkItems(workItemType, cacheDir) {
     // If called with parameters, sync specific type
     if (workItemType && cacheDir) {
+      // Ensure cache directories exist
+      await this.createCacheDirectories();
+
       const fullCacheDir = path.join(this.cachePath, cacheDir);
+      await fs.ensureDir(fullCacheDir);
+
       const result = await this.syncWorkItemType(cacheDir, fullCacheDir);
       result.success = true;
       return result;

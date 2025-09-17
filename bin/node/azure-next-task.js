@@ -230,8 +230,20 @@ class AzureNextTask {
         options.format = 'brief';
       } else if (arg === '--silent' || arg === '-s') {
         options.silent = true;
+      } else if (arg.startsWith('--user=')) {
+        options.userFilter = arg.substring(7);
+      } else if (arg === '--user' && args[index + 1]) {
+        options.userFilter = args[index + 1];
       }
     });
+
+    // Set defaults if not provided
+    if (!options.format) {
+      options.format = 'detailed';
+    }
+    if (!options.userFilter) {
+      options.userFilter = '@me';
+    }
 
     return options;
   }
