@@ -24,30 +24,6 @@ if ! command -v node &> /dev/null; then
     exit 1
 fi
 
-# Pass all arguments to the Node.js version
-# Convert positional arguments to named arguments for better compatibility
-ARGS=()
-
-# Process arguments
-for arg in "$@"; do
-    if [[ "$arg" == --user=* ]]; then
-        ARGS+=("$arg")
-    elif [[ "$arg" == --verbose ]] || [[ "$arg" == -v ]]; then
-        ARGS+=("--verbose")
-    elif [[ "$arg" == --silent ]] || [[ "$arg" == -s ]]; then
-        ARGS+=("--silent")
-    elif [[ "$arg" == --help ]] || [[ "$arg" == -h ]]; then
-        ARGS+=("--help")
-    else
-        # Handle legacy positional argument format (first arg as user filter)
-        if [ ${#ARGS[@]} -eq 0 ] && [[ "$arg" == --user=* ]]; then
-            ARGS+=("$arg")
-        fi
-    fi
-done
-
-# Set project path to current working directory
-ARGS+=("--path" "$(pwd)")
-
-# Execute the Node.js version with converted arguments
-exec node "$NODE_SCRIPT" "${ARGS[@]}"
+# Pass all arguments directly to the Node.js version
+# The Node.js script handles all argument parsing
+exec node "$NODE_SCRIPT" "$@"
