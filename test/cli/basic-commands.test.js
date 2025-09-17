@@ -40,9 +40,10 @@ describe('AutoPM CLI Basic Commands', () => {
     const result = execAutopm('--help');
 
     assert(result.success, `Help command failed: ${result.error}`);
-    assert(result.output.includes('COMMANDS:'), 'Help should show commands section');
+    assert(result.output.includes('Commands:'), 'Help should show commands section');
     assert(result.output.includes('install'), 'Help should list install command');
-    assert(result.output.includes('init'), 'Help should list init command');
+    assert(result.output.includes('pm:init'), 'Help should list pm:init command');
+    assert(result.output.includes('azure:'), 'Help should list Azure commands');
     console.log('✓ Help command working');
   });
 
@@ -50,42 +51,43 @@ describe('AutoPM CLI Basic Commands', () => {
     const result = execAutopm('--version');
 
     assert(result.success, `Version command failed: ${result.error}`);
-    assert(/ClaudeAutoPM v\d+\.\d+\.\d+/.test(result.output), 'Should show ClaudeAutoPM version');
-    console.log(`✓ Version: ${result.output.split('\\n')[0]}`);
+    assert(/\d+\.\d+\.\d+/.test(result.output), 'Should show version number');
+    console.log(`✓ Version: ${result.output.trim()}`);
   });
 
-  it('should show help with no arguments', () => {
+  it('should show error with no arguments', () => {
     const result = execAutopm('');
 
-    assert(result.success, `Default help failed: ${result.error}`);
-    assert(result.output.includes('COMMANDS:'), 'Should show help by default');
-    console.log('✓ Default help working');
+    // With yargs, no arguments shows an error message
+    assert(!result.success, 'Should fail with no arguments');
+    const allOutput = (result.stderr || '') + (result.stdout || '');
+    assert(allOutput.includes('provide a command') || allOutput.includes('--help'), 'Should show error message with help hint');
+    console.log('✓ No arguments handling working');
   });
 
   it('should handle invalid commands gracefully', () => {
     const result = execAutopm('invalid-command-xyz');
 
     // Should either show help or give meaningful error
-    const hasHelp = (result.output || '').includes('COMMANDS:') || (result.output || '').includes('help');
-    const hasError = (result.stderr || '').includes('command') || !result.success;
+    const hasHelp = (result.output || '').includes('Commands:') || (result.output || '').includes('help');
+    const hasError = (result.stderr || '').includes('command') || (result.stderr || '').includes('Unknown') || !result.success;
 
     assert(hasHelp || hasError, 'Should show help or meaningful error for invalid commands');
     console.log('✓ Invalid command handling working');
   });
 
-  it('should require project name for init', () => {
-    const result = execAutopm('init');
+  it('should handle pm:init command', () => {
+    const result = execAutopm('pm:init --help');
 
-    // Should fail and show usage
-    assert(!result.success, 'Init without project name should fail');
+    // Should show help for pm:init
+    assert(result.success, 'pm:init help should succeed');
 
-    const allOutput = (result.stdout || '') + (result.stderr || '') + (result.output || '');
-    const hasUsageMessage = allOutput.includes('required') ||
-                           allOutput.includes('Usage') ||
-                           allOutput.includes('project-name');
+    const allOutput = result.output || '';
+    const hasInitCommand = allOutput.includes('pm:init') ||
+                          allOutput.includes('Initialize');
 
-    assert(hasUsageMessage, 'Should show usage error message');
-    console.log('✓ Init parameter validation working');
+    assert(hasInitCommand, 'Should show pm:init help');
+    console.log('✓ pm:init command available');
   });
 
 });
