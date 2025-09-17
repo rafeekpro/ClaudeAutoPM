@@ -104,7 +104,10 @@ class AzureDashboard {
 
     // Also check .claude/.env
     const claudeEnvPath = path.join(this.projectPath, '.claude', '.env');
+    let foundEnvFile = false;
+
     if (fs.existsSync(claudeEnvPath)) {
+      foundEnvFile = true;
       require('dotenv').config({ path: claudeEnvPath });
 
       // Also read the file to populate credentials
@@ -127,6 +130,14 @@ class AzureDashboard {
     this.credentials.AZURE_DEVOPS_PAT = this.credentials.AZURE_DEVOPS_PAT || process.env.AZURE_DEVOPS_PAT;
     this.credentials.AZURE_DEVOPS_ORG = this.credentials.AZURE_DEVOPS_ORG || process.env.AZURE_DEVOPS_ORG;
     this.credentials.AZURE_DEVOPS_PROJECT = this.credentials.AZURE_DEVOPS_PROJECT || process.env.AZURE_DEVOPS_PROJECT;
+
+    // Check if we have all required credentials
+    const required = ['AZURE_DEVOPS_PAT', 'AZURE_DEVOPS_ORG', 'AZURE_DEVOPS_PROJECT'];
+    const missing = required.filter(key => !this.credentials[key]);
+
+    if (missing.length > 0 && !foundEnvFile && !fs.existsSync(envPath)) {
+      throw new Error('Azure DevOps credentials not configured. Please create .claude/.env file.');
+    }
 
     return this.credentials;
   }
@@ -620,6 +631,10 @@ class AzureDashboard {
     }
   }
 
+  async getCurrentSprintInfo() {
+    return this.fetchSprintInfo();
+  }
+
   async fetchSprintInfo() {
     const sprintInfo = await this.getSprintInfo();
 
@@ -683,6 +698,10 @@ class AzureDashboard {
     const empty = barLength - filled;
 
     return '█'.repeat(filled) + '░'.repeat(empty) + ` ${progress.percentage}%`;
+  }
+
+  async getWorkItemsSummary() {
+    return this.fetchWorkItems();
   }
 
   async fetchWorkItems() {
@@ -827,6 +846,43 @@ class AzureDashboard {
 
   generateOutput() {
     // Generate dashboard output - this is called by generateDashboard
+    return this.generateDashboard();
+  }
+
+  // Additional methods for test compatibility
+  async getWorkItemsOverview() {
+    return this.fetchWorkItems();
+  }
+
+  async getSprintBurndown() {
+    const sprintInfo = await this.fetchSprintInfo();
+    return this.calculateBurndown(sprintInfo);
+  }
+
+  async getTeamActivity() {
+    return this.analyzeTeamActivity();
+  }
+
+  async getBlockedItems() {
+    const alerts = await this.detectAlerts();
+    return alerts.blocked || [];
+  }
+
+  async getHighPriorityItems() {
+    const alerts = await this.detectAlerts();
+    return alerts.highPriority || [];
+  }
+
+  async getStaleItems() {
+    const alerts = await this.detectAlerts();
+    return alerts.stale || [];
+  }
+
+  async getRecentCompletions() {
+    return this.fetchRecentCompletions();
+  }
+
+  async getDashboardSummary() {
     return this.generateDashboard();
   }
 

@@ -385,7 +385,7 @@ AZURE_DEVOPS_PROJECT=test-project`;
     });
   });
 
-  describe.skip('Full Sync Mode - PENDING: Phase 3 migration', () => {
+  describe('Full Sync Mode', () => {
     // TODO: Enable after Azure DevOps Phase 3 migration
     it('should perform full sync for all work item types', async () => {
       const sync = new AzureSync({
