@@ -2,34 +2,15 @@
 
 /**
  * Azure DevOps Active Work Viewer
- * Shows all active work items across the team
- * STUB IMPLEMENTATION - Returns mock data
+ * Shows all active work items across the team with full API integration
  */
 
 const path = require('path');
 const fs = require('fs');
-
-// Simple chalk replacement for stub
-const chalk = {
-  red: (str) => str,
-  green: (str) => str,
-  blue: (str) => str,
-  yellow: (str) => str,
-  cyan: (str) => str,
-  magenta: (str) => str,
-  gray: (str) => str,
-  white: (str) => str,
-  bold: (str) => str,
-  dim: (str) => str
-};
-chalk.red.bold = (str) => str;
-chalk.green.bold = (str) => str;
-chalk.blue.bold = (str) => str;
-chalk.blue.underline = (str) => str;
-chalk.yellow.bold = (str) => str;
-chalk.cyan.bold = (str) => str;
-chalk.magenta.bold = (str) => str;
-chalk.gray.bold = (str) => str;
+const chalk = require('chalk');
+const AzureDevOpsClient = require('../../lib/azure/client');
+const AzureFormatter = require('../../lib/azure/formatter');
+const { table } = require('table');
 
 class AzureActiveWork {
   constructor(options = {}) {
@@ -37,22 +18,25 @@ class AzureActiveWork {
     this.format = options.format || 'table'; // table, json, csv
     this.groupBy = options.groupBy || 'assignee'; // assignee, state, type, priority
     this.includeUnassigned = options.includeUnassigned !== false;
+    this.user = options.user || null; // Filter by specific user or 'me'
+    this.state = options.state || null; // Filter by specific states
+    this.type = options.type || null; // Filter by work item types
 
     try {
       // Load environment variables from .env file if it exists
       const envPath = path.join(process.cwd(), '.env');
       if (fs.existsSync(envPath)) {
-        // Stub: Skip dotenv loading({ path: envPath });
+        require('dotenv').config({ path: envPath });
       }
 
       // Also check .claude/.env
       const claudeEnvPath = path.join(process.cwd(), '.claude', '.env');
       if (fs.existsSync(claudeEnvPath)) {
-        // Stub: Skip dotenv loading({ path: claudeEnvPath });
+        require('dotenv').config({ path: claudeEnvPath });
       }
 
-      // Stub: Skip client initialization
-      this.client = { getCacheStats: () => ({}) };
+      // Initialize Azure DevOps client
+      this.client = new AzureDevOpsClient();
     } catch (error) {
       this.handleInitError(error);
     }
@@ -74,110 +58,77 @@ class AzureActiveWork {
   async getActiveWork() {
     try {
       if (!this.silent && this.format !== "json") {
-        console.log(chalk.cyan.bold('\n💼 Active Work Items\n'));
-        console.log(chalk.yellow('Note: This is a stub implementation returning mock data\n'));
+        console.log(chalk.cyan.bold('\n💼 Fetching Active Work Items...\n'));
       }
 
-      // Return mock active work data
-      const mockActiveWork = {
-        summary: {
-          total: 12,
-          inProgress: 5,
-          active: 4,
-          new: 3,
-          avgDaysInProgress: 3.5,
-          sprint: 'Sprint 2024.1'
-        },
-        byAssignee: {
-          'John Doe': [
-            {
-              id: 3001,
-              title: 'Implement OAuth2 authentication',
-              type: 'User Story',
-              state: 'Active',
-              priority: 1,
-              daysInState: 2,
-              remainingWork: 4
-            },
-            {
-              id: 3002,
-              title: 'Fix database connection pooling',
-              type: 'Bug',
-              state: 'In Progress',
-              priority: 2,
-              daysInState: 1,
-              remainingWork: 2
-            }
-          ],
-          'Jane Smith': [
-            {
-              id: 3003,
-              title: 'Create user dashboard UI',
-              type: 'Task',
-              state: 'Active',
-              priority: 2,
-              daysInState: 3,
-              remainingWork: 6
-            }
-          ],
-          'Bob Johnson': [
-            {
-              id: 3004,
-              title: 'Setup CI/CD pipeline',
-              type: 'Task',
-              state: 'In Progress',
-              priority: 1,
-              daysInState: 4,
-              remainingWork: 3
-            },
-            {
-              id: 3005,
-              title: 'Write API documentation',
-              type: 'Task',
-              state: 'New',
-              priority: 3,
-              daysInState: 0,
-              remainingWork: 8
-            }
-          ],
-          'Unassigned': this.includeUnassigned ? [
-            {
-              id: 3006,
-              title: 'Performance testing',
-              type: 'Task',
-              state: 'New',
-              priority: 2,
-              daysInState: 5,
-              remainingWork: 12
-            }
-          ] : []
-        },
-        byState: {
-          'In Progress': 5,
-          'Active': 4,
-          'New': 3
-        },
-        byType: {
-          'Task': 5,
-          'User Story': 4,
-          'Bug': 3
-        },
-        blockedItems: [
-          {
-            id: 3007,
-            title: 'Deploy to production',
-            blockedBy: 'Waiting for security review',
-            assignedTo: 'John Doe',
-            dayBlocked: 2
-          }
-        ]
+      // Build WIQL query for active work items
+      const states = this.state ?
+        this.state.split(',').map(s => `'${s.trim()}'`).join(', ') :
+        "'New', 'Active', 'In Progress', 'Committed'";
+
+      const types = this.type ?
+        this.type.split(',').map(t => `'${t.trim()}'`).join(', ') :
+        "'Task', 'Bug', 'User Story', 'Feature'";
+
+      let query = `
+        SELECT [System.Id],
+               [System.Title],
+               [System.State],
+               [System.WorkItemType],
+               [System.AssignedTo],
+               [Microsoft.VSTS.Scheduling.RemainingWork],
+               [Microsoft.VSTS.Common.Priority],
+               [System.CreatedDate],
+               [System.ChangedDate],
+               [System.Tags],
+               [System.IterationPath]
+        FROM workitems
+        WHERE [System.State] IN (${states})
+        AND [System.WorkItemType] IN (${types})
+        AND [System.TeamProject] = '${this.client.project}'
+      `;
+
+      // Add user filter if specified
+      if (this.user) {
+        const userEmail = this.user === 'me' ? '@Me' : this.user;
+        query += ` AND [System.AssignedTo] = '${userEmail}'`;
+      } else if (!this.includeUnassigned) {
+        query += ` AND [System.AssignedTo] <> ''`;
+      }
+
+      query += ` ORDER BY [Microsoft.VSTS.Common.Priority] ASC, [System.ChangedDate] DESC`;
+
+      // Execute query
+      const queryResult = await this.client.executeWiql(query);
+
+      if (!queryResult || !queryResult.workItems || queryResult.workItems.length === 0) {
+        if (!this.silent) {
+          console.log(chalk.yellow('No active work items found.'));
+        }
+        return { summary: { total: 0 }, items: [] };
+      }
+
+      // Get full work item details
+      const ids = queryResult.workItems.map(item => item.id);
+      const workItems = await this.client.getWorkItems(ids);
+
+      // Get current sprint info
+      const currentSprint = await this.client.getCurrentSprint();
+
+      // Process and organize work items
+      const processedData = this.processWorkItems(workItems, currentSprint);
+
+      // Mock data structure for compatibility - will be replaced with real data
+      const activeWorkData = {
+        ...processedData,
+        rawItems: workItems
       };
 
       if (!this.silent && this.format !== "json") {
-        this.displayActiveWork(mockActiveWork);
+        this.displayActiveWork(activeWorkData);
       }
 
-      return mockActiveWork;
+      return activeWorkData;
     } catch (error) {
       console.error('Error:', error.message);
       process.exit(1);
@@ -201,10 +152,14 @@ class AzureActiveWork {
     // Display summary
     console.log(chalk.cyan.bold('📊 Summary'));
     const summary = data.summary;
-    console.log(`Sprint: ${summary.sprint}`);
-    console.log(`Total Active Items: ${summary.total}`);
-    console.log(`In Progress: ${summary.inProgress} | Active: ${summary.active} | New: ${summary.new}`);
-    console.log(`Average Days in Progress: ${summary.avgDaysInProgress}\n`);
+    console.log(`Sprint: ${chalk.blue(summary.sprint)}`);
+    console.log(`Total Active Items: ${chalk.green(summary.total)}`);
+    console.log(`In Progress: ${chalk.yellow(summary.inProgress)} | Active: ${chalk.blue(summary.active)} | New: ${chalk.gray(summary.new)}`);
+    console.log(`Average Days in Progress: ${summary.avgDaysInProgress}`);
+    if (summary.totalRemaining > 0) {
+      console.log(`Total Remaining Work: ${chalk.yellow(summary.totalRemaining + 'h')}`);
+    }
+    console.log('');
 
     // Display by group
     if (this.groupBy === 'assignee') {
@@ -214,32 +169,147 @@ class AzureActiveWork {
     } else if (this.groupBy === 'type') {
       this.displayByType(data.byType, data.byAssignee);
     } else if (this.groupBy === 'priority') {
-      this.displayByPriority(data.byAssignee);
+      this.displayByPriority(data.byPriority);
     }
 
     // Display blocked items
     if (data.blockedItems && data.blockedItems.length > 0) {
       console.log(chalk.red.bold('\n🚫 Blocked Items'));
       data.blockedItems.forEach(item => {
-        console.log(`  [${item.id}] ${item.title}`);
-        console.log(`    Assigned to: ${item.assignedTo} | Blocked by: ${item.blockedBy}`);
-        console.log(`    Days blocked: ${item.dayBlocked}`);
+        console.log(`  [${chalk.red(item.id)}] ${item.title}`);
+        console.log(`    Assigned to: ${item.assignedTo}`);
+        console.log(`    Tags/Reason: ${chalk.yellow(item.blockedBy)}`);
+        console.log(`    Days blocked: ${chalk.red(item.daysBlocked)}`);
       });
     }
+  }
+
+  processWorkItems(workItems, currentSprint) {
+    const byAssignee = {};
+    const byState = {};
+    const byType = {};
+    const byPriority = {};
+    const blockedItems = [];
+    let totalRemaining = 0;
+    let totalItems = 0;
+    let totalDaysInProgress = 0;
+    let inProgressCount = 0;
+
+    workItems.forEach(item => {
+      const fields = item.fields || {};
+      const assignedTo = fields['System.AssignedTo'] ?
+        (fields['System.AssignedTo'].displayName || fields['System.AssignedTo'].uniqueName || 'Unknown') :
+        'Unassigned';
+      const state = fields['System.State'] || 'Unknown';
+      const type = fields['System.WorkItemType'] || 'Unknown';
+      const priority = fields['Microsoft.VSTS.Common.Priority'] || 999;
+      const remainingWork = fields['Microsoft.VSTS.Scheduling.RemainingWork'] || 0;
+      const tags = fields['System.Tags'] || '';
+
+      // Calculate days in current state
+      const changedDate = new Date(fields['System.ChangedDate']);
+      const now = new Date();
+      const daysInState = Math.floor((now - changedDate) / (1000 * 60 * 60 * 24));
+
+      // Check if item is blocked
+      const isBlocked = tags.toLowerCase().includes('blocked') ||
+                       tags.toLowerCase().includes('waiting');
+
+      const workItemData = {
+        id: item.id,
+        title: fields['System.Title'],
+        type: type,
+        state: state,
+        priority: priority,
+        daysInState: daysInState,
+        remainingWork: remainingWork,
+        tags: tags,
+        iteration: fields['System.IterationPath']
+      };
+
+      // Group by assignee
+      if (!byAssignee[assignedTo]) byAssignee[assignedTo] = [];
+      byAssignee[assignedTo].push(workItemData);
+
+      // Group by state
+      byState[state] = (byState[state] || 0) + 1;
+
+      // Group by type
+      byType[type] = (byType[type] || 0) + 1;
+
+      // Group by priority
+      if (!byPriority[priority]) byPriority[priority] = [];
+      byPriority[priority].push(workItemData);
+
+      // Track blocked items
+      if (isBlocked) {
+        blockedItems.push({
+          ...workItemData,
+          assignedTo: assignedTo,
+          blockedBy: tags,
+          daysBlocked: daysInState
+        });
+      }
+
+      // Calculate stats
+      totalRemaining += remainingWork;
+      totalItems++;
+      if (state === 'In Progress' || state === 'Active') {
+        totalDaysInProgress += daysInState;
+        inProgressCount++;
+      }
+    });
+
+    const avgDaysInProgress = inProgressCount > 0 ?
+      (totalDaysInProgress / inProgressCount).toFixed(1) : 0;
+
+    return {
+      summary: {
+        total: totalItems,
+        inProgress: byState['In Progress'] || 0,
+        active: byState['Active'] || 0,
+        new: byState['New'] || 0,
+        avgDaysInProgress: parseFloat(avgDaysInProgress),
+        totalRemaining: totalRemaining,
+        sprint: currentSprint ? currentSprint.name : 'No active sprint'
+      },
+      byAssignee: byAssignee,
+      byState: byState,
+      byType: byType,
+      byPriority: byPriority,
+      blockedItems: blockedItems
+    };
   }
 
   displayByAssignee(byAssignee) {
     console.log(chalk.green.bold('👥 Work by Assignee\n'));
 
-    Object.entries(byAssignee).forEach(([assignee, items]) => {
+    // Sort assignees with Unassigned last
+    const sortedAssignees = Object.keys(byAssignee).sort((a, b) => {
+      if (a === 'Unassigned') return 1;
+      if (b === 'Unassigned') return -1;
+      return a.localeCompare(b);
+    });
+
+    sortedAssignees.forEach(assignee => {
+      const items = byAssignee[assignee];
       if (items.length === 0) return;
 
-      console.log(chalk.yellow.bold(`${assignee} (${items.length} items):`));
+      const totalRemaining = items.reduce((sum, item) => sum + (item.remainingWork || 0), 0);
+      console.log(chalk.yellow.bold(`${assignee} (${items.length} items, ${totalRemaining}h remaining):`));
+
+      // Sort items by priority
+      items.sort((a, b) => a.priority - b.priority);
+
       items.forEach(item => {
         const stateColor = this.getStateColor(item.state);
-        console.log(`  [${item.id}] ${item.title}`);
-        console.log(`    Type: ${item.type} | State: ${stateColor} | Priority: P${item.priority}`);
-        console.log(`    Days in state: ${item.daysInState} | Remaining: ${item.remainingWork}h`);
+        const priorityLabel = item.priority <= 3 ? chalk.red(`P${item.priority}`) : `P${item.priority}`;
+        console.log(`  [${chalk.blue(item.id)}] ${item.title}`);
+        console.log(`    Type: ${item.type} | State: ${stateColor} | Priority: ${priorityLabel}`);
+        console.log(`    Days in state: ${item.daysInState} | Remaining: ${item.remainingWork || 0}h`);
+        if (item.tags) {
+          console.log(`    Tags: ${chalk.dim(item.tags)}`);
+        }
       });
       console.log('');
     });
@@ -262,23 +332,25 @@ class AzureActiveWork {
     });
   }
 
-  displayByPriority(byAssignee) {
+  displayByPriority(byPriority) {
     console.log(chalk.green.bold('⚡ Work by Priority\n'));
 
-    const allItems = [];
-    Object.values(byAssignee).forEach(items => {
-      allItems.push(...items);
-    });
+    const priorities = Object.keys(byPriority).sort((a, b) => parseInt(a) - parseInt(b));
 
-    allItems.sort((a, b) => a.priority - b.priority);
+    priorities.forEach(priority => {
+      const items = byPriority[priority];
+      if (!items || items.length === 0) return;
 
-    let currentPriority = null;
-    allItems.forEach(item => {
-      if (item.priority !== currentPriority) {
-        currentPriority = item.priority;
-        console.log(chalk.yellow.bold(`\nPriority ${currentPriority}:`));
-      }
-      console.log(`  [${item.id}] ${item.title} (${item.state})`);
+      const priorityLabel = priority <= 3 ?
+        chalk.red.bold(`Priority ${priority} (High)`) :
+        chalk.yellow.bold(`Priority ${priority}`);
+
+      console.log(`\n${priorityLabel}:`);
+      items.forEach(item => {
+        const stateColor = this.getStateColor(item.state);
+        console.log(`  [${chalk.blue(item.id)}] ${item.title}`);
+        console.log(`    ${item.type} | ${stateColor} | ${item.remainingWork || 0}h remaining`);
+      });
     });
   }
 
@@ -312,6 +384,12 @@ class AzureActiveWork {
         options.groupBy = args[index + 1];
       } else if (arg === '--format' && args[index + 1]) {
         options.format = args[index + 1];
+      } else if (arg === '--user' && args[index + 1]) {
+        options.user = args[index + 1];
+      } else if (arg === '--state' && args[index + 1]) {
+        options.state = args[index + 1];
+      } else if (arg === '--type' && args[index + 1]) {
+        options.type = args[index + 1];
       } else if (arg === '--no-unassigned') {
         options.includeUnassigned = false;
       } else if (arg === '--json') {
@@ -320,6 +398,25 @@ class AzureActiveWork {
         options.format = 'csv';
       } else if (arg === '--silent' || arg === '-s') {
         options.silent = true;
+      } else if (arg === '--help' || arg === '-h') {
+        console.log(chalk.cyan.bold('\nAzure DevOps Active Work Viewer\n'));
+        console.log('Usage: azure-active-work [options]\n');
+        console.log('Options:');
+        console.log('  --user <email|me>    Filter by user (use "me" for current user)');
+        console.log('  --state <states>     Filter by states (comma-separated)');
+        console.log('  --type <types>       Filter by work item types (comma-separated)');
+        console.log('  --group-by <field>   Group results by: assignee, state, type, priority');
+        console.log('  --format <format>    Output format: table, json, csv');
+        console.log('  --no-unassigned      Exclude unassigned items');
+        console.log('  --json               Output as JSON');
+        console.log('  --csv                Output as CSV');
+        console.log('  --silent, -s         Silent mode (suppress non-data output)');
+        console.log('  --help, -h           Show this help\n');
+        console.log('Examples:');
+        console.log('  azure-active-work --user me');
+        console.log('  azure-active-work --state "Active,In Progress" --type Task');
+        console.log('  azure-active-work --group-by priority --json');
+        process.exit(0);
       }
     });
 
