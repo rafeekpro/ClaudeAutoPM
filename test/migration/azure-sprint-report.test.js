@@ -9,6 +9,7 @@ const assert = require('assert');
 const path = require('path');
 const fs = require('fs');
 const { execSync } = require('child_process');
+const { describeIntegration } = require('../helpers/test-utils');
 
 // Mock Azure DevOps API responses
 const mockCurrentIterationResponse = {
@@ -126,7 +127,7 @@ const testEnv = {
     AZURE_DEVOPS_PAT: 'test-pat-token'
 };
 
-describe('Azure Sprint Report Migration Tests', () => {
+describeIntegration('Azure Sprint Report Migration Tests', () => {
 
     let originalEnv;
     let azureSprintReport;
