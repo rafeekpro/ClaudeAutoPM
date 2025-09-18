@@ -1,0 +1,1958 @@
+
+> claude-autopm@1.4.0 test:all
+> npm run test:security && npm run test:regression && npm run test:install && npm run test:cli && npm run test:node && npm run test:migration
+
+
+> claude-autopm@1.4.0 test:security
+> node test/run-security-tests.js
+
+🔒 Running Hybrid Strategy Security Tests
+
+
+📋 Running: Core Security Tests
+──────────────────────────────────────────────────
+TAP version 13
+# Subtest: Hybrid Strategy Security Tests
+    # Subtest: Prompt Injection Prevention
+        # Subtest: should detect direct injection attempts
+        ok 1 - should detect direct injection attempts
+          ---
+          duration_ms: 1.361833
+          type: 'test'
+          ...
+        # Subtest: should allow legitimate prompts
+        ok 2 - should allow legitimate prompts
+          ---
+          duration_ms: 1.680584
+          type: 'test'
+          ...
+        # Subtest: should sanitize user inputs
+        ok 3 - should sanitize user inputs
+          ---
+          duration_ms: 1.80125
+          type: 'test'
+          ...
+        1..3
+    ok 1 - Prompt Injection Prevention
+      ---
+      duration_ms: 5.142625
+      type: 'suite'
+      ...
+    # Subtest: Context Isolation
+        # Subtest: should maintain context isolation between agents
+        ok 1 - should maintain context isolation between agents
+          ---
+          duration_ms: 1.690584
+          type: 'test'
+          ...
+        # Subtest: should validate context boundaries
+        ok 2 - should validate context boundaries
+          ---
+          duration_ms: 1.797084
+          type: 'test'
+          ...
+        1..2
+    ok 2 - Context Isolation
+      ---
+      duration_ms: 3.630333
+      type: 'suite'
+      ...
+    # Subtest: Resource Limits
+        # Subtest: should enforce rate limiting
+        ok 1 - should enforce rate limiting
+          ---
+          duration_ms: 1.519875
+          type: 'test'
+          ...
+        # Subtest: should prevent resource exhaustion
+        ok 2 - should prevent resource exhaustion
+          ---
+          duration_ms: 1.882917
+          type: 'test'
+          ...
+        1..2
+    ok 3 - Resource Limits
+      ---
+      duration_ms: 3.454375
+      type: 'suite'
+      ...
+    # Subtest: Parallel Execution Safety
+        # Subtest: should limit parallel contexts
+        ok 1 - should limit parallel contexts
+          ---
+          duration_ms: 0.897917
+          type: 'test'
+          ...
+        # Subtest: should handle race conditions
+        ok 2 - should handle race conditions
+          ---
+          duration_ms: 10.861
+          type: 'test'
+          ...
+        1..2
+    ok 4 - Parallel Execution Safety
+      ---
+      duration_ms: 11.830042
+      type: 'suite'
+      ...
+    1..4
+ok 1 - Hybrid Strategy Security Tests
+  ---
+  duration_ms: 24.39025
+  type: 'suite'
+  ...
+1..1
+# tests 9
+# suites 5
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 60.32975
+✅ Core Security Tests: PASSED
+
+📋 Running: Prompt Injection Prevention
+──────────────────────────────────────────────────
+TAP version 13
+# Subtest: Prompt Injection Security Tests
+    # Subtest: Direct Injection Attempts
+        # Subtest: should detect instruction override attempts
+        ok 1 - should detect instruction override attempts
+          ---
+          duration_ms: 2.407208
+          type: 'test'
+          ...
+        # Subtest: should detect role manipulation
+        ok 2 - should detect role manipulation
+          ---
+          duration_ms: 0.162125
+          type: 'test'
+          ...
+        1..2
+    ok 1 - Direct Injection Attempts
+      ---
+      duration_ms: 2.862625
+      type: 'suite'
+      ...
+    # Subtest: Code Injection Detection
+        # Subtest: should detect JavaScript injection attempts
+        ok 1 - should detect JavaScript injection attempts
+          ---
+          duration_ms: 0.290584
+          type: 'test'
+          ...
+        # Subtest: should detect Python injection attempts
+        ok 2 - should detect Python injection attempts
+          ---
+          duration_ms: 0.2095
+          type: 'test'
+          ...
+        1..2
+    ok 2 - Code Injection Detection
+      ---
+      duration_ms: 0.563334
+      type: 'suite'
+      ...
+    # Subtest: XSS and HTML Injection
+        # Subtest: should detect XSS attempts
+        ok 1 - should detect XSS attempts
+          ---
+          duration_ms: 0.193084
+          type: 'test'
+          ...
+        1..1
+    ok 3 - XSS and HTML Injection
+      ---
+      duration_ms: 0.221875
+      type: 'suite'
+      ...
+    # Subtest: Path Traversal
+        # Subtest: should detect path traversal attempts
+        ok 1 - should detect path traversal attempts
+          ---
+          duration_ms: 0.423916
+          type: 'test'
+          ...
+        1..1
+    ok 4 - Path Traversal
+      ---
+      duration_ms: 0.498208
+      type: 'suite'
+      ...
+    # Subtest: SQL Injection
+        # Subtest: should detect SQL injection attempts
+        ok 1 - should detect SQL injection attempts
+          ---
+          duration_ms: 0.085583
+          type: 'test'
+          ...
+        1..1
+    ok 5 - SQL Injection
+      ---
+      duration_ms: 0.113333
+      type: 'suite'
+      ...
+    # Subtest: Anomaly Detection
+        # Subtest: should detect length anomalies
+        ok 1 - should detect length anomalies
+          ---
+          duration_ms: 0.878417
+          type: 'test'
+          ...
+        # Subtest: should detect repetition patterns
+        ok 2 - should detect repetition patterns
+          ---
+          duration_ms: 0.226875
+          type: 'test'
+          ...
+        # Subtest: should detect excessive nesting
+        ok 3 - should detect excessive nesting
+          ---
+          duration_ms: 0.091334
+          type: 'test'
+          ...
+        1..3
+    ok 6 - Anomaly Detection
+      ---
+      duration_ms: 1.461125
+      type: 'suite'
+      ...
+    # Subtest: Safe Prompts
+        # Subtest: should allow legitimate prompts
+        ok 1 - should allow legitimate prompts
+          ---
+          duration_ms: 0.126709
+          type: 'test'
+          ...
+        1..1
+    ok 7 - Safe Prompts
+      ---
+      duration_ms: 0.158708
+      type: 'suite'
+      ...
+    1..7
+ok 1 - Prompt Injection Security Tests
+  ---
+  duration_ms: 6.263167
+  type: 'suite'
+  ...
+1..1
+# tests 11
+# suites 8
+# pass 11
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 42.975958
+✅ Prompt Injection Prevention: PASSED
+
+📋 Running: Integration & Isolation Tests
+──────────────────────────────────────────────────
+TAP version 13
+# Subtest: Hybrid Strategy Integration Tests
+    # Subtest: Context Lifecycle Management
+        # Subtest: should create and terminate contexts properly
+        ok 1 - should create and terminate contexts properly
+          ---
+          duration_ms: 0.78875
+          type: 'test'
+          ...
+        # Subtest: should prevent duplicate context creation
+        ok 2 - should prevent duplicate context creation
+          ---
+          duration_ms: 0.428167
+          type: 'test'
+          ...
+        # Subtest: should enforce context timeout
+        ok 3 - should enforce context timeout
+          ---
+          duration_ms: 151.171125
+          type: 'test'
+          ...
+        1..3
+    ok 1 - Context Lifecycle Management
+      ---
+      duration_ms: 153.2545
+      type: 'suite'
+      ...
+    # Subtest: Security Validation
+        # Subtest: should block dangerous operations
+        ok 1 - should block dangerous operations
+          ---
+          duration_ms: 0.604833
+          type: 'test'
+          ...
+        # Subtest: should allow safe operations
+        ok 2 - should allow safe operations
+          ---
+          duration_ms: 0.518208
+          type: 'test'
+          ...
+        1..2
+    ok 2 - Security Validation
+      ---
+      duration_ms: 1.231333
+      type: 'suite'
+      ...
+    # Subtest: Resource Limits
+        # Subtest: should enforce token limits
+        ok 1 - should enforce token limits
+          ---
+          duration_ms: 0.335542
+          type: 'test'
+          ...
+        # Subtest: should enforce depth limits
+        ok 2 - should enforce depth limits
+          ---
+          duration_ms: 0.641041
+          type: 'test'
+          ...
+        1..2
+    ok 3 - Resource Limits
+      ---
+      duration_ms: 1.132416
+      type: 'suite'
+      ...
+    # Subtest: Parallel Agent Management
+        # Subtest: should limit parallel agents
+        ok 1 - should limit parallel agents
+          ---
+          duration_ms: 0.76575
+          type: 'test'
+          ...
+        # Subtest: should isolate agent contexts
+        ok 2 - should isolate agent contexts
+          ---
+          duration_ms: 0.441
+          type: 'test'
+          ...
+        1..2
+    ok 4 - Parallel Agent Management
+      ---
+      duration_ms: 1.272125
+      type: 'suite'
+      ...
+    # Subtest: Context Isolation
+        # Subtest: should maintain isolation between contexts
+        ok 1 - should maintain isolation between contexts
+          ---
+          duration_ms: 0.784166
+          type: 'test'
+          ...
+        # Subtest: should detect isolation violations
+        ok 2 - should detect isolation violations
+          ---
+          duration_ms: 0.163417
+          type: 'test'
+          ...
+        1..2
+    ok 5 - Context Isolation
+      ---
+      duration_ms: 1.00675
+      type: 'suite'
+      ...
+    # Subtest: Error Recovery
+        # Subtest: should handle context failures gracefully
+        ok 1 - should handle context failures gracefully
+          ---
+          duration_ms: 0.1765
+          type: 'test'
+          ...
+        # Subtest: should cleanup terminated contexts
+        ok 2 - should cleanup terminated contexts
+          ---
+          duration_ms: 0.100084
+          type: 'test'
+          ...
+        1..2
+    ok 6 - Error Recovery
+      ---
+      duration_ms: 0.323792
+      type: 'suite'
+      ...
+    1..6
+ok 1 - Hybrid Strategy Integration Tests
+  ---
+  duration_ms: 158.682625
+  type: 'suite'
+  ...
+1..1
+# tests 13
+# suites 7
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 200.885125
+✅ Integration & Isolation Tests: PASSED
+
+📋 Running: Performance & Resource Limits
+──────────────────────────────────────────────────
+TAP version 13
+# Subtest: Performance and Resource Limit Tests
+    # Subtest: Performance Monitoring
+        # Subtest: should measure execution time accurately
+        ok 1 - should measure execution time accurately
+          ---
+          duration_ms: 102.443291
+          type: 'test'
+          ...
+        # Subtest: should track memory usage
+        ok 2 - should track memory usage
+          ---
+          duration_ms: 2.027375
+          type: 'test'
+          ...
+        1..2
+    ok 1 - Performance Monitoring
+      ---
+      duration_ms: 104.985792
+      type: 'suite'
+      ...
+    # Subtest: Load Testing
+        # Subtest: should handle concurrent requests
+        ok 1 - should handle concurrent requests
+          ---
+          duration_ms: 239.83225
+          type: 'test'
+          ...
+        # Subtest: should calculate performance percentiles
+        ok 2 - should calculate performance percentiles
+          ---
+          duration_ms: 1726.185708
+          type: 'test'
+          ...
+        1..2
+    ok 2 - Load Testing
+      ---
+      duration_ms: 1966.470208
+      type: 'suite'
+      ...
+    # Subtest: Resource Limiting
+        # Subtest: should enforce memory limits
+        ok 1 - should enforce memory limits
+          ---
+          duration_ms: 0.983583
+          type: 'test'
+          ...
+        # Subtest: should track multiple resources
+        ok 2 - should track multiple resources
+          ---
+          duration_ms: 0.272416
+          type: 'test'
+          ...
+        # Subtest: should release resources
+        ok 3 - should release resources
+          ---
+          duration_ms: 0.402875
+          type: 'test'
+          ...
+        # Subtest: should check limits without consuming
+        ok 4 - should check limits without consuming
+          ---
+          duration_ms: 0.188333
+          type: 'test'
+          ...
+        1..4
+    ok 3 - Resource Limiting
+      ---
+      duration_ms: 2.227208
+      type: 'suite'
+      ...
+    # Subtest: Rate Limiting
+        # Subtest: should implement token bucket algorithm
+        ok 1 - should implement token bucket algorithm
+          ---
+          duration_ms: 1001.521583
+          type: 'test'
+          ...
+        # Subtest: should refill tokens over time
+        ok 2 - should refill tokens over time
+          ---
+          duration_ms: 502.470666
+          type: 'test'
+          ...
+        1..2
+    ok 4 - Rate Limiting
+      ---
+      duration_ms: 1504.416917
+      type: 'suite'
+      ...
+    # Subtest: Stress Testing
+        # Subtest: should handle burst traffic
+        ok 1 - should handle burst traffic
+          ---
+          duration_ms: 1.099959
+          type: 'test'
+          ...
+        # Subtest: should detect memory leaks
+        ok 2 - should detect memory leaks
+          ---
+          duration_ms: 4.003667
+          type: 'test'
+          ...
+        # Subtest: should handle timeout scenarios
+        ok 3 - should handle timeout scenarios
+          ---
+          duration_ms: 102.560375
+          type: 'test'
+          ...
+        1..3
+    ok 5 - Stress Testing
+      ---
+      duration_ms: 108.583834
+      type: 'suite'
+      ...
+    # Subtest: Resource Exhaustion Prevention
+        # Subtest: should prevent infinite loops
+        ok 1 - should prevent infinite loops
+          ---
+          duration_ms: 1.099667
+          type: 'test'
+          ...
+        # Subtest: should limit recursive depth
+        ok 2 - should limit recursive depth
+          ---
+          duration_ms: 0.241459
+          type: 'test'
+          ...
+        # Subtest: should enforce payload size limits
+        ok 3 - should enforce payload size limits
+          ---
+          duration_ms: 10.813833
+          type: 'test'
+          ...
+        1..3
+    ok 6 - Resource Exhaustion Prevention
+      ---
+      duration_ms: 12.313792
+      type: 'suite'
+      ...
+    1..6
+ok 1 - Performance and Resource Limit Tests
+  ---
+  duration_ms: 3700.055291
+  type: 'suite'
+  ...
+1..1
+# tests 16
+# suites 7
+# pass 16
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3823.73225
+✅ Performance & Resource Limits: PASSED
+
+==================================================
+📊 Test Summary:
+==================================================
+✅ PASS - Core Security Tests
+✅ PASS - Prompt Injection Prevention
+✅ PASS - Integration & Isolation Tests
+✅ PASS - Performance & Resource Limits
+==================================================
+
+🎉 All security tests passed!
+✨ The Hybrid Strategy implementation is secure.
+
+
+> claude-autopm@1.4.0 test:regression
+> node --test --test-concurrency=1 test/regression/*.test.js
+
+TAP version 13
+# 📊 System Health Report:
+#    Overall Health: 87.5%
+#    Valid Files: 3/4
+#    Valid Features: 4/4
+# 📄 Health report saved to: /Users/rla/Projects/AUTOPM/test/regression/__snapshots__/health-report.json
+# Subtest: Critical Path Protection
+    # Subtest: Essential Files
+        # Subtest: should have all required files present
+        ok 1 - should have all required files present
+          ---
+          duration_ms: 0.39125
+          type: 'test'
+          ...
+        # Subtest: should maintain HYBRID_STRATEGY.md integrity
+        ok 2 - should maintain HYBRID_STRATEGY.md integrity
+          ---
+          duration_ms: 0.056791
+          type: 'test'
+          ...
+        # Subtest: should have valid package.json
+        ok 3 - should have valid package.json
+          ---
+          duration_ms: 0.099417
+          type: 'test'
+          ...
+        # Subtest: should maintain configuration files
+        ok 4 - should maintain configuration files
+          ---
+          duration_ms: 0.045375
+          type: 'test'
+          ...
+        1..4
+    ok 1 - Essential Files
+      ---
+      duration_ms: 0.849917
+      type: 'suite'
+      ...
+    # Subtest: Core Features
+        # Subtest: should preserve parallel execution capability
+        ok 1 - should preserve parallel execution capability
+          ---
+          duration_ms: 0.14075
+          type: 'test'
+          ...
+        # Subtest: should maintain context isolation
+        ok 2 - should maintain context isolation
+          ---
+          duration_ms: 0.043834
+          type: 'test'
+          ...
+        # Subtest: should enforce resource limits
+        ok 3 - should enforce resource limits
+          ---
+          duration_ms: 0.123458
+          type: 'test'
+          ...
+        # Subtest: should have error recovery mechanisms
+        ok 4 - should have error recovery mechanisms
+          ---
+          duration_ms: 0.120917
+          type: 'test'
+          ...
+        1..4
+    ok 2 - Core Features
+      ---
+      duration_ms: 0.742333
+      type: 'suite'
+      ...
+    # Subtest: Health Check
+        # Subtest: should maintain overall system health above 80%
+        ok 1 - should maintain overall system health above 80%
+          ---
+          duration_ms: 0.497625
+          type: 'test'
+          ...
+        # Subtest: should generate actionable report
+        ok 2 - should generate actionable report
+          ---
+          duration_ms: 0.346208
+          type: 'test'
+          ...
+        1..2
+    ok 3 - Health Check
+      ---
+      duration_ms: 0.899708
+      type: 'suite'
+      ...
+    1..3
+ok 1 - Critical Path Protection
+  ---
+  duration_ms: 4.853959
+  type: 'suite'
+  ...
+# ✅ Fully synchronous regression tests completed
+# 📄 Tests optimized for Node.js v22.19.0 test runner compatibility
+# ℹ️  File validated successfully
+# ℹ️  Strategy file validation simplified for Node.js compatibility
+# ⚠️  Environment warnings: [
+#   'Optional env var not set: CLAUDE_PARALLEL_ENABLED',
+#   'Optional env var not set: CLAUDE_MAX_AGENTS',
+#   'Optional env var not set: CLAUDE_CONTEXT_ISOLATION'
+# ]
+# ℹ️  Orchestrator not found - skipping
+# ℹ️  Prompts directory not found
+# Subtest: ACTIVE_STRATEGY Regression Tests
+    # Subtest: File Structure Integrity
+        # Subtest: should maintain critical file structure
+        ok 1 - should maintain critical file structure
+          ---
+          duration_ms: 0.3785
+          type: 'test'
+          ...
+        # Subtest: should detect file modifications
+        ok 2 - should detect file modifications
+          ---
+          duration_ms: 0.131916
+          type: 'test'
+          ...
+        1..2
+    ok 1 - File Structure Integrity
+      ---
+      duration_ms: 1.150791
+      type: 'suite'
+      ...
+    # Subtest: Core Functionality Preservation
+        # Subtest: should preserve context management patterns
+        ok 1 - should preserve context management patterns
+          ---
+          duration_ms: 0.077834
+          type: 'test'
+          ...
+        # Subtest: should maintain parallel execution capabilities
+        ok 2 - should maintain parallel execution capabilities
+          ---
+          duration_ms: 0.055542
+          type: 'test'
+          ...
+        # Subtest: should preserve resource management
+        ok 3 - should preserve resource management
+          ---
+          duration_ms: 0.049583
+          type: 'test'
+          ...
+        1..3
+    ok 2 - Core Functionality Preservation
+      ---
+      duration_ms: 0.338416
+      type: 'suite'
+      ...
+    # Subtest: Backward Compatibility
+        # Subtest: should maintain v1 API compatibility
+        ok 1 - should maintain v1 API compatibility
+          ---
+          duration_ms: 0.056458
+          type: 'test'
+          ...
+        # Subtest: should support v2 features
+        ok 2 - should support v2 features
+          ---
+          duration_ms: 0.183041
+          type: 'test'
+          ...
+        # Subtest: should provide safe migration paths
+        ok 3 - should provide safe migration paths
+          ---
+          duration_ms: 0.040292
+          type: 'test'
+          ...
+        1..3
+    ok 3 - Backward Compatibility
+      ---
+      duration_ms: 0.490834
+      type: 'suite'
+      ...
+    # Subtest: Configuration Stability
+        # Subtest: should preserve default configurations
+        ok 1 - should preserve default configurations
+          ---
+          duration_ms: 0.138292
+          type: 'test'
+          ...
+        # Subtest: should validate environment variables
+        ok 2 - should validate environment variables
+          ---
+          duration_ms: 0.2815
+          type: 'test'
+          ...
+        1..2
+    ok 4 - Configuration Stability
+      ---
+      duration_ms: 0.483167
+      type: 'suite'
+      ...
+    # Subtest: Integration Points
+        # Subtest: should maintain compatibility with orchestrator
+        ok 1 - should maintain compatibility with orchestrator
+          ---
+          duration_ms: 0.08775
+          type: 'test'
+          ...
+        # Subtest: should preserve prompt templates
+        ok 2 - should preserve prompt templates
+          ---
+          duration_ms: 0.0775
+          type: 'test'
+          ...
+        1..2
+    ok 5 - Integration Points
+      ---
+      duration_ms: 0.192042
+      type: 'suite'
+      ...
+    1..5
+ok 2 - ACTIVE_STRATEGY Regression Tests
+  ---
+  duration_ms: 2.959125
+  type: 'suite'
+  ...
+1..2
+# tests 22
+# suites 10
+# pass 22
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 80.164625
+
+> claude-autopm@1.4.0 test:install
+> bash test/installation/integration.test.sh
+
+
+════════════════════════════════════════
+  ClaudeAutoPM Integration Tests
+════════════════════════════════════════
+
+
+════════════════════════════════════════
+  Testing Scenario 1: Minimal
+════════════════════════════════════════
+
+▶ Testing: Setting up test directory
+✓ Test directory created
+▶ Testing: Running installation
+✓ Installation completed
+▶ Testing: Verifying core files
+✓ Minimal: .claude exists
+✓ Minimal: .claude/agents exists
+✓ Minimal: .claude/commands exists
+✓ Minimal: .claude/rules exists
+✓ Minimal: .claude/scripts exists
+✓ Minimal: CLAUDE.md exists
+✓ Minimal: scripts exists
+✓ Minimal: scripts/safe-commit.sh exists
+✓ Minimal: scripts/setup-hooks.sh exists
+▶ Testing: Verifying scenario-specific files
+✓ Minimal: Strategy file exists
+✓ Minimal: Sequential strategy configured
+
+════════════════════════════════════════
+  Testing Scenario 2: Docker-only
+════════════════════════════════════════
+
+▶ Testing: Setting up test directory
+✓ Test directory created
+▶ Testing: Running installation
+✓ Installation completed
+▶ Testing: Verifying core files
+✓ Docker-only: .claude exists
+✓ Docker-only: .claude/agents exists
+✓ Docker-only: .claude/commands exists
+✓ Docker-only: .claude/rules exists
+✓ Docker-only: .claude/scripts exists
+✓ Docker-only: CLAUDE.md exists
+✓ Docker-only: scripts exists
+✓ Docker-only: scripts/safe-commit.sh exists
+✓ Docker-only: scripts/setup-hooks.sh exists
+▶ Testing: Verifying scenario-specific files
+✓ Docker-only: Strategy file exists
+✓ Docker-only: Adaptive strategy configured
+
+════════════════════════════════════════
+  Testing Scenario 3: Full DevOps
+════════════════════════════════════════
+
+▶ Testing: Setting up test directory
+✓ Test directory created
+▶ Testing: Running installation
+✓ Installation completed
+▶ Testing: Verifying core files
+✓ Full DevOps: .claude exists
+✓ Full DevOps: .claude/agents exists
+✓ Full DevOps: .claude/commands exists
+✓ Full DevOps: .claude/rules exists
+✓ Full DevOps: .claude/scripts exists
+✓ Full DevOps: CLAUDE.md exists
+✓ Full DevOps: scripts exists
+✓ Full DevOps: scripts/safe-commit.sh exists
+✓ Full DevOps: scripts/setup-hooks.sh exists
+▶ Testing: Verifying scenario-specific files
+✓ Full DevOps: Strategy file exists
+✓ Full DevOps: Adaptive strategy configured
+
+════════════════════════════════════════
+  Testing Scenario 4: Performance
+════════════════════════════════════════
+
+▶ Testing: Setting up test directory
+✓ Test directory created
+▶ Testing: Running installation
+✓ Installation completed
+▶ Testing: Verifying core files
+✓ Performance: .claude exists
+✓ Performance: .claude/agents exists
+✓ Performance: .claude/commands exists
+✓ Performance: .claude/rules exists
+✓ Performance: .claude/scripts exists
+✓ Performance: CLAUDE.md exists
+✓ Performance: scripts exists
+✓ Performance: scripts/safe-commit.sh exists
+✓ Performance: scripts/setup-hooks.sh exists
+▶ Testing: Verifying scenario-specific files
+✓ Performance: Strategy file exists
+✓ Performance: Hybrid strategy configured
+
+════════════════════════════════════════
+  Test Summary
+════════════════════════════════════════
+
+Passed: 52 tests
+Failed: 0 tests
+
+Pass rate: 100%
+
+✅ All integration tests passed!
+
+> claude-autopm@1.4.0 test:cli
+> node --test test/cli/*.test.js
+
+TAP version 13
+# ⏭️  Skipping old CLI API tests (commands have been migrated to yargs)
+# Subtest: test/cli/autopm-commands.test.js
+ok 1 - test/cli/autopm-commands.test.js
+  ---
+  duration_ms: 30.381083
+  type: 'test'
+  ...
+# 🧪 Running Basic CLI Tests...
+# ✓ Help command working
+# ✓ Version: 1.4.0
+# ✓ No arguments handling working
+# ✓ Invalid command handling working
+# ✓ pm:init command available
+# Subtest: AutoPM CLI Basic Commands
+    # Subtest: should show help with --help
+    ok 1 - should show help with --help
+      ---
+      duration_ms: 60.524917
+      type: 'test'
+      ...
+    # Subtest: should show version with --version
+    ok 2 - should show version with --version
+      ---
+      duration_ms: 50.022292
+      type: 'test'
+      ...
+    # Subtest: should show error with no arguments
+    ok 3 - should show error with no arguments
+      ---
+      duration_ms: 51.859041
+      type: 'test'
+      ...
+    # Subtest: should handle invalid commands gracefully
+    ok 4 - should handle invalid commands gracefully
+      ---
+      duration_ms: 48.399708
+      type: 'test'
+      ...
+    # Subtest: should handle pm:init command
+    ok 5 - should handle pm:init command
+      ---
+      duration_ms: 51.814084
+      type: 'test'
+      ...
+    1..5
+ok 2 - AutoPM CLI Basic Commands
+  ---
+  duration_ms: 263.241292
+  type: 'suite'
+  ...
+1..2
+# tests 6
+# suites 1
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 301.871875
+
+> claude-autopm@1.4.0 test:node
+> node --test test/node-scripts/**/*.test.js
+
+TAP version 13
+# Subtest: Install.js Migration Tests
+    # Subtest: Prerequisites Check
+        # Subtest: should verify Node.js version
+        ok 1 - should verify Node.js version
+          ---
+          duration_ms: 221.891834
+          type: 'test'
+          ...
+        # Subtest: should check for Git installation
+        ok 2 - should check for Git installation
+          ---
+          duration_ms: 85.296583
+          type: 'test'
+          ...
+        1..2
+    ok 1 - Prerequisites Check
+      ---
+      duration_ms: 307.693625
+      type: 'suite'
+      ...
+    # Subtest: Installation Type Detection
+        # Subtest: should detect fresh installation
+        ok 1 - should detect fresh installation
+          ---
+          duration_ms: 3.270666
+          type: 'test'
+          ...
+        # Subtest: should detect existing installation
+        ok 2 - should detect existing installation
+          ---
+          duration_ms: 2.910708
+          type: 'test'
+          ...
+        1..2
+    ok 2 - Installation Type Detection
+      ---
+      duration_ms: 6.416917
+      type: 'suite'
+      ...
+    # Subtest: Configuration Management
+        # Subtest: should use preset configuration
+        ok 1 - should use preset configuration
+          ---
+          duration_ms: 2.807666
+          type: 'test'
+          ...
+        # Subtest: should use default configuration in non-interactive mode
+        ok 2 - should use default configuration in non-interactive mode
+          ---
+          duration_ms: 2.1205
+          type: 'test'
+          ...
+        # Subtest: should validate DevOps preset
+        ok 3 - should validate DevOps preset
+          ---
+          duration_ms: 2.86225
+          type: 'test'
+          ...
+        1..3
+    ok 3 - Configuration Management
+      ---
+      duration_ms: 8.123666
+      type: 'suite'
+      ...
+    # Subtest: File Operations
+        # Subtest: should copy framework files
+        ok 1 - should copy framework files
+          ---
+          duration_ms: 6.274083
+          type: 'test'
+          ...
+        # Subtest: should generate CLAUDE.md from template
+        ok 2 - should generate CLAUDE.md from template
+          ---
+          duration_ms: 3.688834
+          type: 'test'
+          ...
+        # Subtest: should update .gitignore
+        ok 3 - should update .gitignore
+          ---
+          duration_ms: 2.72875
+          type: 'test'
+          ...
+        1..3
+    ok 4 - File Operations
+      ---
+      duration_ms: 12.838458
+      type: 'suite'
+      ...
+    # Subtest: Backup and Rollback
+        # Subtest: should create backup of existing installation
+        ok 1 - should create backup of existing installation
+          ---
+          duration_ms: 4.509417
+          type: 'test'
+          ...
+        # Subtest: should rollback on failure
+        ok 2 - should rollback on failure
+          ---
+          duration_ms: 4.216583
+          type: 'test'
+          ...
+        1..2
+    ok 5 - Backup and Rollback
+      ---
+      duration_ms: 8.865792
+      type: 'suite'
+      ...
+    # Subtest: Cross-Platform Compatibility
+        # Subtest: should work on current platform
+        ok 1 - should work on current platform
+          ---
+          duration_ms: 2.329958
+          type: 'test'
+          ...
+        # Subtest: should handle paths correctly across platforms
+        ok 2 - should handle paths correctly across platforms
+          ---
+          duration_ms: 2.444208
+          type: 'test'
+          ...
+        1..2
+    ok 6 - Cross-Platform Compatibility
+      ---
+      duration_ms: 4.869083
+      type: 'suite'
+      ...
+    # Subtest: Non-Interactive Mode
+        # Subtest: should complete installation without prompts
+        ok 1 - should complete installation without prompts
+          ---
+          duration_ms: 7.154291
+          type: 'test'
+          ...
+        1..1
+    ok 7 - Non-Interactive Mode
+      ---
+      duration_ms: 7.230208
+      type: 'suite'
+      ...
+    # Subtest: Error Handling
+        # Subtest: should handle missing source files gracefully
+        ok 1 - should handle missing source files gracefully
+          ---
+          duration_ms: 178.612292
+          type: 'test'
+          ...
+        # Subtest: should validate configuration
+        ok 2 - should validate configuration
+          ---
+          duration_ms: 2.976625
+          type: 'test'
+          ...
+        1..2
+    ok 8 - Error Handling
+      ---
+      duration_ms: 181.709083
+      type: 'suite'
+      ...
+    1..8
+ok 1 - Install.js Migration Tests
+  ---
+  duration_ms: 538.159166
+  type: 'suite'
+  ...
+# Subtest: Merge-claude.js Migration Tests
+    # Subtest: ClaudeMerger Initialization
+        # Subtest: should create ClaudeMerger instance
+        ok 1 - should create ClaudeMerger instance
+          ---
+          duration_ms: 3.363958
+          type: 'test'
+          ...
+        # Subtest: should set correct paths
+        ok 2 - should set correct paths
+          ---
+          duration_ms: 1.124375
+          type: 'test'
+          ...
+        1..2
+    ok 1 - ClaudeMerger Initialization
+      ---
+      duration_ms: 5.036458
+      type: 'suite'
+      ...
+    # Subtest: File Discovery
+        # Subtest: should find existing CLAUDE.md file
+        ok 1 - should find existing CLAUDE.md file
+          ---
+          duration_ms: 3.625708
+          type: 'test'
+          ...
+        # Subtest: should find CLAUDE.md in alternative locations
+        ok 2 - should find CLAUDE.md in alternative locations
+          ---
+          duration_ms: 3.064458
+          type: 'test'
+          ...
+        # Subtest: should return null when no CLAUDE.md found
+        ok 3 - should return null when no CLAUDE.md found
+          ---
+          duration_ms: 1.020459
+          type: 'test'
+          ...
+        # Subtest: should find framework file
+        ok 4 - should find framework file
+          ---
+          duration_ms: 1.824917
+          type: 'test'
+          ...
+        # Subtest: should use specified files when provided
+        ok 5 - should use specified files when provided
+          ---
+          duration_ms: 1.410792
+          type: 'test'
+          ...
+        1..5
+    ok 2 - File Discovery
+      ---
+      duration_ms: 11.547416
+      type: 'suite'
+      ...
+    # Subtest: Merge Prompt Generation
+        # Subtest: should generate merge prompt with both files
+        ok 1 - should generate merge prompt with both files
+          ---
+          duration_ms: 3.098209
+          type: 'test'
+          ...
+        # Subtest: should generate prompt with only existing file
+        ok 2 - should generate prompt with only existing file
+          ---
+          duration_ms: 1.183
+          type: 'test'
+          ...
+        # Subtest: should include configuration in prompt
+        ok 3 - should include configuration in prompt
+          ---
+          duration_ms: 1.326667
+          type: 'test'
+          ...
+        1..3
+    ok 3 - Merge Prompt Generation
+      ---
+      duration_ms: 5.843
+      type: 'suite'
+      ...
+    # Subtest: Output Handling
+        # Subtest: should save prompt to file when output specified
+        ok 1 - should save prompt to file when output specified
+          ---
+          duration_ms: 1.0275
+          type: 'test'
+          ...
+        1..1
+    ok 4 - Output Handling
+      ---
+      duration_ms: 1.159
+      type: 'suite'
+      ...
+    # Subtest: Error Handling
+        # Subtest: should handle missing files gracefully
+        ok 1 - should handle missing files gracefully
+          ---
+          duration_ms: 0.493708
+          type: 'test'
+          ...
+        # Subtest: should handle empty directory
+        ok 2 - should handle empty directory
+          ---
+          duration_ms: 0.78525
+          type: 'test'
+          ...
+        1..2
+    ok 5 - Error Handling
+      ---
+      duration_ms: 1.3485
+      type: 'suite'
+      ...
+    1..5
+ok 2 - Merge-claude.js Migration Tests
+  ---
+  duration_ms: 25.295583
+  type: 'suite'
+  ...
+# Subtest: Setup-env.js Migration Tests
+    # Subtest: EnvSetup Initialization
+        # Subtest: should create EnvSetup instance
+        ok 1 - should create EnvSetup instance
+          ---
+          duration_ms: 3.976666
+          type: 'test'
+          ...
+        # Subtest: should set correct env path
+        ok 2 - should set correct env path
+          ---
+          duration_ms: 1.056709
+          type: 'test'
+          ...
+        1..2
+    ok 1 - EnvSetup Initialization
+      ---
+      duration_ms: 5.434166
+      type: 'suite'
+      ...
+    # Subtest: Environment File Operations
+        # Subtest: should detect missing .env file
+        ok 1 - should detect missing .env file
+          ---
+          duration_ms: 2.838458
+          type: 'test'
+          ...
+        # Subtest: should create backup of existing .env
+        ok 2 - should create backup of existing .env
+          ---
+          duration_ms: 5.602583
+          type: 'test'
+          ...
+        # Subtest: should load existing environment variables
+        ok 3 - should load existing environment variables
+          ---
+          duration_ms: 2.042125
+          type: 'test'
+          ...
+        1..3
+    ok 2 - Environment File Operations
+      ---
+      duration_ms: 10.903875
+      type: 'suite'
+      ...
+    # Subtest: Token Validation
+        # Subtest: should validate GitHub token formats
+        ok 1 - should validate GitHub token formats
+          ---
+          duration_ms: 0.865125
+          type: 'test'
+          ...
+        1..1
+    ok 3 - Token Validation
+      ---
+      duration_ms: 1.079334
+      type: 'suite'
+      ...
+    # Subtest: Environment File Generation
+        # Subtest: should generate properly formatted .env file
+        ok 1 - should generate properly formatted .env file
+          ---
+          duration_ms: 1.737875
+          type: 'test'
+          ...
+        # Subtest: should set secure permissions on .env file
+        ok 2 - should set secure permissions on .env file
+          ---
+          duration_ms: 1.242208
+          type: 'test'
+          ...
+        1..2
+    ok 4 - Environment File Generation
+      ---
+      duration_ms: 3.162083
+      type: 'suite'
+      ...
+    # Subtest: Non-Interactive Mode
+        # Subtest: should complete without prompts in non-interactive mode
+        ok 1 - should complete without prompts in non-interactive mode
+          ---
+          duration_ms: 1.519
+          type: 'test'
+          ...
+        1..1
+    ok 5 - Non-Interactive Mode
+      ---
+      duration_ms: 1.583125
+      type: 'suite'
+      ...
+    # Subtest: Configuration Summary
+        # Subtest: should generate correct summary
+        ok 1 - should generate correct summary
+          ---
+          duration_ms: 0.60275
+          type: 'test'
+          ...
+        1..1
+    ok 6 - Configuration Summary
+      ---
+      duration_ms: 0.663208
+      type: 'suite'
+      ...
+    1..6
+ok 3 - Setup-env.js Migration Tests
+  ---
+  duration_ms: 23.289083
+  type: 'suite'
+  ...
+# Subtest: Utility Tests
+    # Subtest: should load Logger
+    ok 1 - should load Logger
+      ---
+      duration_ms: 1.195167
+      type: 'test'
+      ...
+    # Subtest: should load FileSystem
+    ok 2 - should load FileSystem
+      ---
+      duration_ms: 14.482042
+      type: 'test'
+      ...
+    # Subtest: should load Shell
+    ok 3 - should load Shell
+      ---
+      duration_ms: 12.779667
+      type: 'test'
+      ...
+    # Subtest: should load Config
+    ok 4 - should load Config
+      ---
+      duration_ms: 8.049958
+      type: 'test'
+      ...
+    # Subtest: should load Prompts
+    ok 5 - should load Prompts
+      ---
+      duration_ms: 78.564292
+      type: 'test'
+      ...
+    # Subtest: should load Installer
+    ok 6 - should load Installer
+      ---
+      duration_ms: 7.76575
+      type: 'test'
+      ...
+    # Subtest: should get default config
+    ok 7 - should get default config
+      ---
+      duration_ms: 0.086917
+      type: 'test'
+      ...
+    1..7
+ok 4 - Utility Tests
+  ---
+  duration_ms: 123.730833
+  type: 'suite'
+  ...
+# Running AutoPM TDD tests...
+# These tests are expected to FAIL initially (RED phase)
+# Implement bin/node/autopm.js to make them pass (GREEN phase)
+# Subtest: AutoPM CLI Migration Tests
+    # Subtest: Command Routing
+        # Subtest: should display help when no arguments provided
+        ok 1 - should display help when no arguments provided
+          ---
+          duration_ms: 55.136917
+          type: 'test'
+          ...
+        # Subtest: should handle --version flag
+        ok 2 - should handle --version flag
+          ---
+          duration_ms: 45.506167
+          type: 'test'
+          ...
+        # Subtest: should route install command to install.js
+        ok 3 - should route install command to install.js
+          ---
+          duration_ms: 351.935208
+          type: 'test'
+          ...
+        # Subtest: should route setup-env command to setup-env.js
+        ok 4 - should route setup-env command to setup-env.js
+          ---
+          duration_ms: 310.477791
+          type: 'test'
+          ...
+        # Subtest: should route merge-claude command to merge-claude.js
+        ok 5 - should route merge-claude command to merge-claude.js
+          ---
+          duration_ms: 246.320959
+          type: 'test'
+          ...
+# Error: Unknown command 'unknown-command'
+        # Subtest: should handle unknown commands gracefully
+        ok 6 - should handle unknown commands gracefully
+          ---
+          duration_ms: 36.432167
+          type: 'test'
+          ...
+        1..6
+    ok 1 - Command Routing
+      ---
+      duration_ms: 1046.456125
+      type: 'suite'
+      ...
+    # Subtest: Environment Detection
+        # Subtest: should detect npm global installation
+        ok 1 - should detect npm global installation
+          ---
+          duration_ms: 2.093584
+          type: 'test'
+          ...
+        # Subtest: should detect local development environment
+        ok 2 - should detect local development environment
+          ---
+          duration_ms: 0.601292
+          type: 'test'
+          ...
+        # Subtest: should find autopm source directory
+        ok 3 - should find autopm source directory
+          ---
+          duration_ms: 0.637209
+          type: 'test'
+          ...
+        1..3
+    ok 2 - Environment Detection
+      ---
+      duration_ms: 3.536041
+      type: 'suite'
+      ...
+# Error: Unknown command 'test-exit-1'
+    # Subtest: Script Execution
+        # Subtest: should preserve exit codes from child processes
+        ok 1 - should preserve exit codes from child processes
+          ---
+          duration_ms: 35.262792
+          type: 'test'
+          ...
+        # Subtest: should pass arguments to child scripts
+        ok 2 - should pass arguments to child scripts
+          ---
+          duration_ms: 451.1835
+          type: 'test'
+          ...
+        # Subtest: should handle SIGINT gracefully
+        ok 3 - should handle SIGINT gracefully
+          ---
+          duration_ms: 103.076709
+          type: 'test'
+          ...
+        1..3
+    ok 3 - Script Execution
+      ---
+      duration_ms: 589.673208
+      type: 'suite'
+      ...
+    # Subtest: Backwards Compatibility
+        # Subtest: should support same CLI interface as bash version
+        ok 1 - should support same CLI interface as bash version
+          ---
+          duration_ms: 0.571917
+          type: 'test'
+          ...
+        # Subtest: should maintain same output format
+        ok 2 - should maintain same output format
+          ---
+          duration_ms: 47.359042
+          type: 'test'
+          ...
+        1..2
+    ok 4 - Backwards Compatibility
+      ---
+      duration_ms: 48.048625
+      type: 'suite'
+      ...
+    # Subtest: Performance
+        # Subtest: should start faster than bash version
+        ok 1 - should start faster than bash version
+          ---
+          duration_ms: 48.212625
+          type: 'test'
+          ...
+        # Subtest: should handle concurrent executions
+        ok 2 - should handle concurrent executions
+          ---
+          duration_ms: 235.63575
+          type: 'test'
+          ...
+        1..2
+    ok 5 - Performance
+      ---
+      duration_ms: 283.967542
+      type: 'suite'
+      ...
+    # Subtest: Error Handling
+        # Subtest: should show helpful error messages
+        ok 1 - should show helpful error messages
+          ---
+          duration_ms: 92.277916
+          type: 'test'
+          ...
+        # Subtest: should handle missing dependencies gracefully
+        ok 2 - should handle missing dependencies gracefully
+          ---
+          duration_ms: 0.803083
+          type: 'test'
+          ...
+        1..2
+    ok 6 - Error Handling
+      ---
+      duration_ms: 93.177875
+      type: 'suite'
+      ...
+    1..6
+ok 5 - AutoPM CLI Migration Tests
+  ---
+  duration_ms: 2065.387583
+  type: 'suite'
+  ...
+# Running Integration Test Migration tests...
+# These tests are expected to FAIL initially (RED phase)
+# Implement test/installation/integration.test.js to make them pass
+# Subtest: Integration Test Script Migration
+    # Subtest: Core Functionality
+        # Subtest: should check if Node.js version exists
+        ok 1 - should check if Node.js version exists
+          ---
+          duration_ms: 3.209416
+          type: 'test'
+          ...
+        # Subtest: should test multiple installation scenarios
+        ok 2 - should test multiple installation scenarios
+          ---
+          duration_ms: 0.740417
+          type: 'test'
+          ...
+        # Subtest: should create test directories for each scenario
+        ok 3 - should create test directories for each scenario
+          ---
+          duration_ms: 1.133541
+          type: 'test'
+          ...
+        # Subtest: should verify core files after installation
+        ok 4 - should verify core files after installation
+          ---
+          duration_ms: 0.702417
+          type: 'test'
+          ...
+        1..4
+    ok 1 - Core Functionality
+      ---
+      duration_ms: 6.259416
+      type: 'suite'
+      ...
+    # Subtest: Test Execution
+        # Subtest: should support running individual scenarios
+        ok 1 - should support running individual scenarios
+          ---
+          duration_ms: 0.612916
+          type: 'test'
+          ...
+        # Subtest: should run in test mode with AUTOPM_TEST_MODE
+        ok 2 - should run in test mode with AUTOPM_TEST_MODE
+          ---
+          duration_ms: 0.378958
+          type: 'test'
+          ...
+        1..2
+    ok 2 - Test Execution
+      ---
+      duration_ms: 1.196708
+      type: 'suite'
+      ...
+    # Subtest: Results Reporting
+        # Subtest: should track passed and failed tests
+        ok 1 - should track passed and failed tests
+          ---
+          duration_ms: 0.543459
+          type: 'test'
+          ...
+        # Subtest: should provide detailed summary
+        ok 2 - should provide detailed summary
+          ---
+          duration_ms: 0.411667
+          type: 'test'
+          ...
+        # Subtest: should exit with appropriate code
+        ok 3 - should exit with appropriate code
+          ---
+          duration_ms: 0.453875
+          type: 'test'
+          ...
+        1..3
+    ok 3 - Results Reporting
+      ---
+      duration_ms: 1.515958
+      type: 'suite'
+      ...
+    # Subtest: Cleanup
+        # Subtest: should clean up test directories
+        ok 1 - should clean up test directories
+          ---
+          duration_ms: 1.262916
+          type: 'test'
+          ...
+        # Subtest: should handle cleanup errors gracefully
+        ok 2 - should handle cleanup errors gracefully
+          ---
+          duration_ms: 0.510875
+          type: 'test'
+          ...
+        1..2
+    ok 4 - Cleanup
+      ---
+      duration_ms: 1.846291
+      type: 'suite'
+      ...
+    1..4
+ok 6 - Integration Test Script Migration
+  ---
+  duration_ms: 11.234209
+  type: 'suite'
+  ...
+# Running Local Test Runner TDD tests...
+# These tests are expected to FAIL initially (RED phase)
+# Implement scripts/local-test-runner.js to make them pass (GREEN phase)
+# Subtest: Local Test Runner Migration Tests
+    # Subtest: Core Functionality
+        # Subtest: should check if script exists
+        ok 1 - should check if script exists
+          ---
+          duration_ms: 3.899417
+          type: 'test'
+          ...
+        # Subtest: should run full test suite by default
+        ok 2 - should run full test suite by default
+          ---
+          duration_ms: 1171.137333
+          type: 'test'
+          ...
+        # Subtest: should support --quick mode
+        ok 3 - should support --quick mode
+          ---
+          duration_ms: 485.613792
+          type: 'test'
+          ...
+        1..3
+    ok 1 - Core Functionality
+      ---
+      duration_ms: 1661.364958
+      type: 'suite'
+      ...
+    # Subtest: Output Formatting
+        # Subtest: should use colored output
+        ok 1 - should use colored output
+          ---
+          duration_ms: 375.988625
+          type: 'test'
+          ...
+        # Subtest: should show test summary
+        ok 2 - should show test summary
+          ---
+          duration_ms: 352.442667
+          type: 'test'
+          ...
+        1..2
+    ok 2 - Output Formatting
+      ---
+      duration_ms: 728.593958
+      type: 'suite'
+      ...
+    # Subtest: Exit Codes
+        # Subtest: should exit with 0 when all tests pass
+        ok 1 - should exit with 0 when all tests pass
+          ---
+          duration_ms: 361.862875
+          type: 'test'
+          ...
+        # Subtest: should exit with 1 when tests fail
+        ok 2 - should exit with 1 when tests fail
+          ---
+          duration_ms: 347.930166
+          type: 'test'
+          ...
+        1..2
+    ok 3 - Exit Codes
+      ---
+      duration_ms: 710.133542
+      type: 'suite'
+      ...
+    # Subtest: Error Handling
+        # Subtest: should handle missing npm scripts gracefully
+        ok 1 - should handle missing npm scripts gracefully
+          ---
+          duration_ms: 189.218542
+          type: 'test'
+          ...
+        # Subtest: should provide helpful error messages
+        ok 2 - should provide helpful error messages
+          ---
+          duration_ms: 311.105458
+          type: 'test'
+          ...
+        1..2
+    ok 4 - Error Handling
+      ---
+      duration_ms: 500.444958
+      type: 'suite'
+      ...
+    1..4
+ok 7 - Local Test Runner Migration Tests
+  ---
+  duration_ms: 3601.033041
+  type: 'suite'
+  ...
+# Running Test Runner TDD tests...
+# These tests are expected to FAIL initially (RED phase)
+# Implement scripts/test.js to make them pass (GREEN phase)
+# Subtest: Test Runner Migration Tests
+    # Subtest: Core Functionality
+        # Subtest: should execute and exist
+        ok 1 - should execute and exist
+          ---
+          duration_ms: 3.457834
+          type: 'test'
+          ...
+        # Subtest: should run all test suites sequentially
+        ok 2 - should run all test suites sequentially
+          ---
+          duration_ms: 51.228709
+          type: 'test'
+          ...
+# (node:58990) Warning: node:test run() is being called recursively within a test file. skipping running files.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+        # Subtest: should exit with 0 on all tests passing
+        ok 3 - should exit with 0 on all tests passing
+          ---
+          duration_ms: 83.343583
+          type: 'test'
+          ...
+        # Subtest: should exit with 1 on any test failure
+        not ok 4 - should exit with 1 on any test failure
+          ---
+          duration_ms: 305.453125
+          type: 'test'
+          location: '/Users/rla/Projects/AUTOPM/test/node-scripts/p2/test-runner.test.js:110:5'
+          failureType: 'testCodeFailure'
+          error: |-
+            Should exit with code 1
+            
+            undefined !== 1
+            
+          code: 'ERR_ASSERTION'
+          name: 'AssertionError'
+          expected: 1
+          operator: 'strictEqual'
+          stack: |-
+            TestContext.<anonymous> (/Users/rla/Projects/AUTOPM/test/node-scripts/p2/test-runner.test.js:146:18)
+            async Test.run (node:internal/test_runner/test:1054:7)
+            async Suite.processPendingSubtests (node:internal/test_runner/test:744:7)
+          ...
+        1..4
+    not ok 1 - Core Functionality
+      ---
+      duration_ms: 444.292667
+      type: 'suite'
+      location: '/Users/rla/Projects/AUTOPM/test/node-scripts/p2/test-runner.test.js:45:3'
+      failureType: 'subtestsFailed'
+      error: '1 subtest failed'
+      code: 'ERR_TEST_FAILURE'
+      stack: |-
+        async Promise.all (index 0)
+      ...
+# (node:59108) Warning: node:test run() is being called recursively within a test file. skipping running files.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+    # Subtest: Test Suite Discovery
+        # Subtest: should discover unit tests
+        ok 1 - should discover unit tests
+          ---
+          duration_ms: 237.888209
+          type: 'test'
+          ...
+# (node:59152) Warning: node:test run() is being called recursively within a test file. skipping running files.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+        # Subtest: should discover Azure provider tests
+        ok 2 - should discover Azure provider tests
+          ---
+          duration_ms: 71.83
+          type: 'test'
+          ...
+        # Subtest: should skip installation tests in CI environment
+        ok 3 - should skip installation tests in CI environment
+          ---
+          duration_ms: 101.181334
+          type: 'test'
+          ...
+        1..3
+    ok 2 - Test Suite Discovery
+      ---
+      duration_ms: 411.242
+      type: 'suite'
+      ...
+    # Subtest: Output Formatting
+        # Subtest: should display emoji indicators
+        ok 1 - should display emoji indicators
+          ---
+          duration_ms: 75.976208
+          type: 'test'
+          ...
+        # Subtest: should show test summary with counts
+        ok 2 - should show test summary with counts
+          ---
+          duration_ms: 105.934209
+          type: 'test'
+          ...
+# (node:59235) Warning: node:test run() is being called recursively within a test file. skipping running files.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+        # Subtest: should list failed suites
+        ok 3 - should list failed suites
+          ---
+          duration_ms: 67.75575
+          type: 'test'
+          ...
+        1..3
+    ok 3 - Output Formatting
+      ---
+      duration_ms: 249.868334
+      type: 'suite'
+      ...
+    # Subtest: Error Handling
+        # Subtest: should handle missing test directories gracefully
+        ok 1 - should handle missing test directories gracefully
+          ---
+          duration_ms: 98.174542
+          type: 'test'
+          ...
+# (node:59282) Warning: node:test run() is being called recursively within a test file. skipping running files.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+        # Subtest: should handle test execution errors
+        ok 2 - should handle test execution errors
+          ---
+          duration_ms: 106.535708
+          type: 'test'
+          ...
+        1..2
+    ok 4 - Error Handling
+      ---
+      duration_ms: 204.838083
+      type: 'suite'
+      ...
+    # Subtest: Performance
+        # Subtest: should complete quickly with no tests
+        ok 1 - should complete quickly with no tests
+          ---
+          duration_ms: 35.7765
+          type: 'test'
+          ...
+        1..1
+    ok 5 - Performance
+      ---
+      duration_ms: 35.895084
+      type: 'suite'
+      ...
+    # Subtest: Backwards Compatibility
+        # Subtest: should maintain same output format as bash version
+        ok 1 - should maintain same output format as bash version
+          ---
+          duration_ms: 152.903666
+          type: 'test'
+          ...
+        # Subtest: should support same test discovery patterns
+        ok 2 - should support same test discovery patterns
+          ---
+          duration_ms: 0.604375
+          type: 'test'
+          ...
+        1..2
+    ok 6 - Backwards Compatibility
+      ---
+      duration_ms: 153.617791
+      type: 'suite'
+      ...
+    1..6
+not ok 8 - Test Runner Migration Tests
+  ---
+  duration_ms: 1500.23625
+  type: 'suite'
+  location: '/Users/rla/Projects/AUTOPM/test/node-scripts/p2/test-runner.test.js:17:1'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..8
+# tests 100
+# suites 47
+# pass 99
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3673.845375
