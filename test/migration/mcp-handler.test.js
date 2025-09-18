@@ -521,7 +521,7 @@ description: Test server
     });
   });
 
-  describe.skip('sync Method - PENDING: Implementation', () => {
+  describe('sync Method', () => {
     // TODO: Enable after implementing sync functionality
     beforeEach(() => {
       // Create test servers
@@ -640,7 +640,7 @@ description: Test server 2
     });
   });
 
-  describe.skip('validate Method - PENDING: Implementation', () => {
+  describe('validate Method', () => {
     // TODO: Enable after implementing validate functionality
     let originalExit;
     let exitCode;
@@ -757,7 +757,7 @@ env:
     });
   });
 
-  describe.skip('info Method - PENDING: Implementation', () => {
+  describe('info Method', () => {
     // TODO: Enable after implementing info functionality
     let originalExit;
     let exitCode;

@@ -177,7 +177,7 @@ AZURE_DEVOPS_PROJECT=test-project`;
     });
   });
 
-  describe.skip('Azure DevOps API Interaction - PENDING: Phase 3 migration', () => {
+  describe('Azure DevOps API Interaction', () => {
     // TODO: Enable after Azure DevOps Phase 3 migration
     // Requires proper environment setup and API mocking
     it('should make API calls with correct authentication', async () => {

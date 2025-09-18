@@ -139,7 +139,7 @@ describeIntegration('Azure Feature List Migration Tests', () => {
         });
     });
 
-    describe.skip('Environment Validation - PENDING: Implementation', () => {
+    describe('Environment Validation', () => {
         // TODO: Enable after implementing functionality
         it('should validate required environment variables', () => {
             if (azureFeatureList && azureFeatureList.validateEnvironment) {

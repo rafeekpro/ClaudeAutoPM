@@ -183,7 +183,7 @@ describe('Azure Next Task Migration Tests', () => {
         });
     });
 
-    describe.skip('Environment Validation - PENDING: Implementation', () => {
+    describe('Environment Validation', () => {
         // TODO: Enable after implementing functionality
         it('should validate required environment variables', () => {
             if (azureNextTask && azureNextTask.validateEnvironment) {
@@ -686,7 +686,7 @@ describe('Azure Next Task Migration Tests', () => {
         });
     });
 
-    describe.skip('Error Handling - PENDING: Implementation', () => {
+    describe('Error Handling', () => {
         // TODO: Enable after implementing functionality
         it('should handle API errors gracefully', async () => {
             if (azureNextTask && azureNextTask.getAvailableTasks) {

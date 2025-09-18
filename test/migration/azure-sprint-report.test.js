@@ -189,7 +189,7 @@ describeIntegration('Azure Sprint Report Migration Tests', () => {
         });
     });
 
-    describe.skip('Environment Validation - PENDING: Implementation', () => {
+    describe('Environment Validation', () => {
         // TODO: Enable after implementing functionality
         it('should validate required environment variables', () => {
             if (azureSprintReport && azureSprintReport.validateEnvironment) {
@@ -600,7 +600,7 @@ describeIntegration('Azure Sprint Report Migration Tests', () => {
         });
     });
 
-    describe.skip('Error Handling - PENDING: Implementation', () => {
+    describe('Error Handling', () => {
         // TODO: Enable after implementing functionality
         it('should handle API errors gracefully', async () => {
             if (azureSprintReport && azureSprintReport.getSprintInformation) {
