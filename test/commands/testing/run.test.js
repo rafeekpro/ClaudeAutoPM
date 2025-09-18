@@ -21,9 +21,8 @@ describe('testing:run command', () => {
     testDir = path.join(os.tmpdir(), `testing-run-test-${process.pid}-${Date.now()}-${Math.random().toString(36).substring(7)}`);
     await fs.mkdir(testDir, { recursive: true });
 
-    // Store original cwd and change to test directory
+    // Store original cwd but DO NOT change directory yet
     originalCwd = process.cwd();
-    process.chdir(testDir);
 
     // Create basic project structure
     await fs.mkdir(path.join(testDir, 'test'), { recursive: true });
@@ -31,8 +30,8 @@ describe('testing:run command', () => {
   });
 
   afterEach(async () => {
-    // Change back to original directory
-    if (originalCwd) {
+    // Make sure we're in original directory
+    if (originalCwd && process.cwd() !== originalCwd) {
       process.chdir(originalCwd);
     }
 
@@ -65,9 +64,9 @@ test('another test', () => {
 });`
       );
 
-      // Act
+      // Act - run command in test directory
       const { stdout } = await exec(
-        `node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run"`
+        `cd "${testDir}" && node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run"`
       );
 
       // Assert
@@ -77,9 +76,9 @@ test('another test', () => {
     });
 
     it('should handle no test files gracefully', async () => {
-      // Act
+      // Act - run in test directory with no test files
       const { stdout, stderr } = await exec(
-        `node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run"`
+        `cd "${testDir}" && rm -rf test/* && node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run"`
       );
 
       // Assert
@@ -96,9 +95,9 @@ test('another test', () => {
         'console.log("custom test");'
       );
 
-      // Act
+      // Act - run in test directory
       const { stdout } = await exec(
-        `node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run" --pattern "*.tests.js"`
+        `cd "${testDir}" && node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run" --pattern "*.tests.js"`
       );
 
       // Assert
@@ -130,7 +129,7 @@ test('simple test', () => {
 
       // Act - Catch both success and failure (tests might fail but command should run)
       const result = await exec(
-        `node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run"`
+        `cd "${testDir}" && node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run"`
       ).catch(err => err);
 
       const stdout = result.stdout || '';
@@ -157,7 +156,7 @@ test('simple test', () => {
 
       // Act
       const result = await exec(
-        `node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run" test/target.test.js`
+        `cd "${testDir}" && node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run" test/target.test.js`
       ).catch(err => err);
 
       const stdout = result.stdout || '';
@@ -182,7 +181,7 @@ test('test ${i}', async () => {
       // Act
       const startTime = Date.now();
       const { stdout } = await exec(
-        `node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run" --parallel`
+        `cd "${testDir}" && node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run" --parallel`
       );
       const duration = Date.now() - startTime;
 
@@ -209,7 +208,7 @@ test('test ${i}', async () => {
 
       // Act
       const { stdout } = await exec(
-        `node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run" --dry-run`
+        `cd "${testDir}" && node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run" --dry-run`
       );
 
       // Assert
@@ -232,7 +231,7 @@ test('test ${i}', async () => {
 
       // Act
       const { stdout } = await exec(
-        `node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run" --dry-run`
+        `cd "${testDir}" && node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run" --dry-run`
       );
 
       // Assert
@@ -249,7 +248,7 @@ test('node test', () => {});`
 
       // Act
       const { stdout } = await exec(
-        `node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run" --dry-run`
+        `cd "${testDir}" && node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run" --dry-run`
       );
 
       // Assert
@@ -283,7 +282,7 @@ test('add', () => {
 
       // Act
       const result = await exec(
-        `node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run" --coverage`
+        `cd "${testDir}" && node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run" --coverage`
       ).catch(err => err);
 
       const stdout = result.stdout || '';
@@ -305,7 +304,7 @@ test('dummy', () => {});`
 
       // Act
       await exec(
-        `node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run" --coverage --coverage-output coverage.json`
+        `cd "${testDir}" && node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run" --coverage --coverage-output coverage.json`
       ).catch(err => err);
 
       // Assert
@@ -328,7 +327,7 @@ test('format test', () => {});`
 
       // Act - Test TAP format (Node.js doesn't support JSON natively)
       const result = await exec(
-        `node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run" --reporter tap`
+        `cd "${testDir}" && node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run" --reporter tap`
       ).catch(err => err);
 
       const tapOutput = result.stdout || '';
@@ -357,7 +356,7 @@ test.skip('skip', () => {});`
 
       // Act
       const cmdResult = await exec(
-        `node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run"`
+        `cd "${testDir}" && node ${path.join(__dirname, '../../../bin/autopm.js')} "testing:run"`
       ).catch(err => err);
 
       // Assert
