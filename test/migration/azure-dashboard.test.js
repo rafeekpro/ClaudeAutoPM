@@ -132,9 +132,7 @@ AZURE_DEVOPS_PROJECT=test-project`;
     });
   });
 
-  describe.skip('Sprint Information Display - PENDING: Phase 3 migration', () => {
-    // TODO: Enable after Azure DevOps Phase 3 migration
-    // Requires proper environment setup and API mocking
+  describe('Sprint Information Display', () => {
     beforeEach(() => {
       // Mock current sprint API response
       const sprintResponse = {
@@ -216,9 +214,7 @@ AZURE_DEVOPS_PROJECT=test-project`;
     });
   });
 
-  describe.skip('Work Items Overview - PENDING: Phase 3 migration', () => {
-    // TODO: Enable after Azure DevOps Phase 3 migration
-    // Requires proper environment setup and API mocking
+  describe('Work Items Overview', () => {
     beforeEach(() => {
       // Mock work items query responses for different states
       const states = ['New', 'Active', 'In Progress', 'Resolved', 'Done', 'Closed'];
@@ -279,7 +275,7 @@ AZURE_DEVOPS_PROJECT=test-project`;
     });
   });
 
-  describe.skip('Sprint Burndown Analysis - PENDING: Phase 3 migration', () => {
+  describe('Sprint Burndown Analysis', () => {
     // TODO: Enable after Azure DevOps Phase 3 migration
     beforeEach(() => {
       // Mock sprint work items query
@@ -379,7 +375,7 @@ AZURE_DEVOPS_PROJECT=test-project`;
     });
   });
 
-  describe.skip('Team Activity Analysis - PENDING: Phase 3 migration', () => {
+  describe('Team Activity Analysis', () => {
     // TODO: Enable after Azure DevOps Phase 3 migration
     beforeEach(() => {
       // Mock team activity query
@@ -489,7 +485,7 @@ AZURE_DEVOPS_PROJECT=test-project`;
     });
   });
 
-  describe.skip('Alerts and Issues Detection - PENDING: Phase 3 migration', () => {
+  describe('Alerts and Issues Detection', () => {
     // TODO: Enable after Azure DevOps Phase 3 migration
     beforeEach(() => {
       // Mock blocked items query
@@ -570,7 +566,7 @@ AZURE_DEVOPS_PROJECT=test-project`;
     });
   });
 
-  describe.skip('Recent Completions Display - PENDING: Phase 3 migration', () => {
+  describe('Recent Completions Display', () => {
     // TODO: Enable after Azure DevOps Phase 3 migration
     beforeEach(() => {
       // Mock recent completions query
@@ -669,7 +665,7 @@ AZURE_DEVOPS_PROJECT=test-project`;
     });
   });
 
-  describe.skip('Dashboard Output Generation - PENDING: Phase 3 migration', () => {
+  describe('Dashboard Output Generation', () => {
     // TODO: Enable after Azure DevOps Phase 3 migration
     it('should generate complete dashboard output', async () => {
       // Mock all necessary API endpoints for a complete dashboard
@@ -832,7 +828,7 @@ AZURE_DEVOPS_PROJECT=test-project`;
     });
   });
 
-  describe.skip('Error Handling and Resilience - PENDING: Phase 3 migration', () => {
+  describe('Error Handling and Resilience', () => {
     // TODO: Enable after Azure DevOps Phase 3 migration
     it('should handle missing credentials gracefully', async () => {
       // Remove .env file

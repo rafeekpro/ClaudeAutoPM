@@ -89,6 +89,7 @@ class TestRunner {
 
   /**
    * Main test execution
+   * @returns {Promise<number>} Exit code (0 for success, 1 for failure)
    */
   async run() {
     console.log(colors.bold('🧪 Running ClaudeAutoPM Test Suite'));
@@ -155,11 +156,11 @@ class TestRunner {
       this.failedSuites.forEach(suite => {
         console.log(colors.red(`  - ${suite}`));
       });
-      process.exit(1);
+      return 1; // Return exit code instead of calling process.exit
     } else {
       console.log('');
       console.log(colors.green('🎉 All tests passed!'));
-      process.exit(0);
+      return 0; // Return exit code instead of calling process.exit
     }
   }
 }
@@ -178,10 +179,14 @@ if (require.main === module) {
   }
 
   const runner = new TestRunner(options);
-  runner.run().catch(error => {
-    console.error(colors.red('Fatal error:'), error);
-    process.exit(1);
-  });
+  runner.run()
+    .then(exitCode => {
+      process.exit(exitCode);
+    })
+    .catch(error => {
+      console.error(colors.red('Fatal error:'), error);
+      process.exit(1);
+    });
 }
 
 module.exports = TestRunner;

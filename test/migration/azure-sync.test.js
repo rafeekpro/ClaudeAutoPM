@@ -335,7 +335,7 @@ AZURE_DEVOPS_PROJECT=test-project`;
     });
   });
 
-  describe.skip('Quick Sync Mode - PENDING: Implementation', () => {
+  describe('Quick Sync Mode', () => {
     // TODO: Enable after implementing quick sync
     it('should perform quick sync for recent changes', async () => {
       const sync = new AzureSync({
@@ -385,7 +385,7 @@ AZURE_DEVOPS_PROJECT=test-project`;
     });
   });
 
-  describe.skip('Full Sync Mode - PENDING: Phase 3 migration', () => {
+  describe('Full Sync Mode', () => {
     // TODO: Enable after Azure DevOps Phase 3 migration
     it('should perform full sync for all work item types', async () => {
       const sync = new AzureSync({
@@ -440,7 +440,7 @@ AZURE_DEVOPS_PROJECT=test-project`;
     });
   });
 
-  describe.skip('Sync Metadata Management - PENDING: Implementation', () => {
+  describe('Sync Metadata Management', () => {
     // TODO: Enable after implementing metadata management
     it('should create sync metadata file', async () => {
       const sync = new AzureSync({
@@ -493,7 +493,7 @@ AZURE_DEVOPS_PROJECT=test-project`;
     });
   });
 
-  describe.skip('Error Handling - PENDING: Implementation', () => {
+  describe('Error Handling', () => {
     // TODO: Enable after implementing error handling
     it('should gracefully handle missing credentials', async () => {
       // Remove .env file
