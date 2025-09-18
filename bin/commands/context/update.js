@@ -1,299 +1,328 @@
+#!/usr/bin/env node
 /**
- * Update Context
- * Auto-migrated from context:update.md
+ * context:update command implementation
+ * Updates existing context files with new content
+ * TDD Phase: GREEN - Making tests pass
+ * Task: 1.3
  */
 
-const agentExecutor = require('../../../lib/agentExecutor');
-const {
-  validateInput,
-  loadEnvironment,
-  isVerbose,
-  printError,
-  printSuccess,
-  printInfo,
-  printWarning,
-  createSpinner
-} = require('../../../lib/commandHelpers');
+const fs = require('fs').promises;
+const path = require('path');
+const contextManager = require('../../../lib/context/manager');
+const readline = require('readline');
 
-// --- Agent Prompt ---
-const AGENT_PROMPT = `
-# Update Context
+/**
+ * Reads content from stdin
+ * @returns {Promise<string>} - Content from stdin
+ */
+async function readFromStdin() {
+  return new Promise((resolve) => {
+    let content = '';
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+      terminal: false
+    });
 
-This command updates the project context documentation in \`.claude/context/\` to reflect the current state of the project. Run this at the end of each development session to keep context accurate.
+    rl.on('line', (line) => {
+      content += line + '\n';
+    });
 
-## Required Rules
+    rl.on('close', () => {
+      resolve(content.trim());
+    });
+  });
+}
 
-**IMPORTANT:** Before executing this command, read and follow:
-- \`.claude/rules/datetime.md\` - For getting real current date/time
 
-## Preflight Checklist
+/**
+ * Appends content to existing context
+ * @param {string} existing - Existing content
+ * @param {string} newContent - New content to append
+ * @returns {string} - Updated content
+ */
+function appendContent(existing, newContent) {
+  return `${existing}\n\n${newContent}`;
+}
 
-Before proceeding, complete these validation steps.
-Do not bother the user with preflight checks progress ("I'm not going to ..."). Just do them and move on.
+/**
+ * Replaces context content
+ * @param {string} existing - Existing content
+ * @param {string} newContent - New content
+ * @returns {string} - New content
+ */
+function replaceContent(existing, newContent) {
+  return newContent;
+}
 
-### 1. Context Validation
-- Run: \`ls -la .claude/context/ 2>/dev/null\`
-- If directory doesn't exist or is empty:
-  - Tell user: "❌ No context to update. Please run /context:create first."
-  - Exit gracefully
-- Count existing files: \`ls -1 .claude/context/*.md 2>/dev/null | wc -l\`
-- Report: "📁 Found {count} context files to check for updates"
+/**
+ * Merges content by sections
+ * @param {string} existing - Existing content
+ * @param {string} newContent - New content to merge
+ * @returns {string} - Merged content
+ */
+function mergeContent(existing, newContent) {
+  // Parse sections from both contents
+  const parseSections = (content) => {
+    const sections = {};
+    const lines = content.split('\n');
+    let currentSection = '_header';
+    let sectionContent = [];
 
-### 2. Change Detection
+    for (const line of lines) {
+      if (line.startsWith('## ')) {
+        // Save previous section
+        if (sectionContent.length > 0) {
+          sections[currentSection] = sectionContent.join('\n').trim();
+        }
+        // Start new section
+        currentSection = line;
+        sectionContent = [];
+      } else {
+        sectionContent.push(line);
+      }
+    }
 
-Gather information about what has changed:
+    // Save last section
+    if (sectionContent.length > 0) {
+      sections[currentSection] = sectionContent.join('\n').trim();
+    }
 
-**Git Changes:**
-- Run: \`git status --short\` to see uncommitted changes
-- Run: \`git log --oneline -10\` to see recent commits
-- Run: \`git diff --stat HEAD~5..HEAD 2>/dev/null\` to see files changed recently
+    return sections;
+  };
 
-**File Modifications:**
-- Check context file ages: \`find .claude/context -name "*.md" -type f -exec ls -lt {} + | head -5\`
-- Note which context files are oldest and may need updates
+  const existingSections = parseSections(existing);
+  const newSections = parseSections(newContent);
 
-**Dependency Changes:**
-- Node.js: \`git diff HEAD~5..HEAD package.json 2>/dev/null\`
-- Python: \`git diff HEAD~5..HEAD requirements.txt 2>/dev/null\`
-- Check if new dependencies were added or versions changed
+  // Merge sections
+  const merged = { ...existingSections };
 
-### 3. Get Current DateTime
-- Run: \`date -u +"%Y-%m-%dT%H:%M:%SZ"\`
-- Store for updating \`last_updated\` field in modified files
+  for (const [section, content] of Object.entries(newSections)) {
+    if (merged[section] && section !== '_header') {
+      // Check for conflicts
+      if (content !== merged[section] && merged[section].length > 0) {
+        console.warn(`Warning: Merge conflict detected in section: ${section}`);
+      }
+    }
+    merged[section] = content;
+  }
 
-## Instructions
+  // Reconstruct content
+  let result = [];
 
-### 1. Systematic Change Analysis
+  // Add header first if exists
+  if (merged._header) {
+    result.push(merged._header);
+    delete merged._header;
+  }
 
-For each context file, determine if updates are needed:
+  // Add other sections
+  for (const [section, content] of Object.entries(merged)) {
+    if (section.startsWith('## ')) {
+      result.push('');
+      result.push(section);
+      result.push(content);
+    }
+  }
 
-**Check each file systematically:**
-#### \`progress.md\` - **Always Update**
-  - Check: Recent commits, current branch, uncommitted changes
-  - Update: Latest completed work, current blockers, next steps
-  - Run: \`git log --oneline -5\` to get recent commit messages
-  - Include completion percentages if applicable
+  return result.join('\n');
+}
 
-#### \`project-structure.md\` - **Update if Changed**
-  - Check: \`git diff --name-status HEAD~10..HEAD | grep -E '^A'\` for new files
-  - Update: New directories, moved files, structural reorganization
-  - Only update if significant structural changes occurred
+/**
+ * Updates a context file
+ * @param {string} name - Context name
+ * @param {object} options - Command options
+ */
+async function updateContext(name, options = {}) {
+  const projectRoot = process.cwd();
 
-#### \`tech-context.md\` - **Update if Dependencies Changed**
-  - Check: Package files for new dependencies or version changes
-  - Update: New libraries, upgraded versions, new dev tools
-  - Include security updates or breaking changes
+  try {
+    // Check if context exists
+    if (!await contextManager.contextExists(projectRoot, name)) {
+      // Write to stderr
+      process.stderr.write(`Error: Context not found: ${name}\n`);
+      process.exit(1);
+    }
 
-#### \`system-patterns.md\` - **Update if Architecture Changed**
-  - Check: New design patterns, architectural decisions
-  - Update: New patterns adopted, refactoring done
-  - Only update for significant architectural changes
+    // Read existing content
+    const existingContent = await contextManager.readContext(projectRoot, name);
 
-#### \`product-context.md\` - **Update if Requirements Changed**
-  - Check: New features implemented, user feedback incorporated
-  - Update: New user stories, changed requirements
-  - Include any pivot in product direction
+    // Get new content from appropriate source
+    let newContent = '';
 
-#### \`project-brief.md\` - **Rarely Update**
-  - Check: Only if fundamental project goals changed
-  - Update: Major scope changes, new objectives
-  - Usually remains stable
+    if (options.stdin) {
+      newContent = await readFromStdin();
+    } else if (options.file) {
+      const filePath = path.resolve(options.file);
+      newContent = await fs.readFile(filePath, 'utf8');
+    } else if (options.content) {
+      newContent = options.content;
+    } else {
+      console.error('Error: No content source specified. Use --file, --stdin, or --content');
+      process.exit(1);
+    }
 
-#### \`project-overview.md\` - **Update for Major Milestones**
-  - Check: Major features completed, significant progress
-  - Update: Feature status, capability changes
-  - Update when reaching project milestones
+    // Create backup
+    const backupPath = await contextManager.createContextBackup(projectRoot, name);
 
-#### \`project-vision.md\` - **Rarely Update**
-  - Check: Strategic direction changes
-  - Update: Only for major vision shifts
-  - Usually remains stable
+    // Apply update based on mode
+    let updatedContent;
+    let updateMode = 'append';
 
-#### \`project-style-guide.md\` - **Update if Conventions Changed**
-  - Check: New linting rules, style decisions
-  - Update: Convention changes, new patterns adopted
-  - Include examples of new patterns
-### 2. Smart Update Strategy
+    if (options.replace) {
+      updatedContent = replaceContent(existingContent, newContent);
+      updateMode = 'replace';
+    } else if (options.merge) {
+      updatedContent = mergeContent(existingContent, newContent);
+      updateMode = 'merge';
+    } else {
+      updatedContent = appendContent(existingContent, newContent);
+      updateMode = 'append';
+    }
 
-**For each file that needs updating:**
+    // Write updated content
+    await contextManager.writeContext(projectRoot, name, updatedContent);
 
-1. **Read existing file** to understand current content
-2. **Identify specific sections** that need updates
-3. **Preserve frontmatter** but update \`last_updated\` field:
-   \`\`\`yaml
-   ---
-   created: [preserve original]
-   last_updated: [Use REAL datetime from date command]
-   version: [increment if major update, e.g., 1.0 → 1.1]
-   author: Claude Code PM System
-   ---
-   \`\`\`
-4. **Make targeted updates** - don't rewrite entire file
-5. **Add update notes** at the bottom if significant:
-   \`\`\`markdown
-   ## Update History
-   - {date}: {summary of what changed}
-   \`\`\`
+    // Update history
+    await contextManager.updateContextHistory(projectRoot, name, {
+      mode: updateMode,
+      backup: backupPath,
+      contentLength: newContent.length
+    });
 
-### 3. Update Validation
+    // Output success
+    console.log(`Context updated successfully: ${name}`);
+    console.log(`Mode: ${updateMode}`);
+    console.log(`Backup created: ${path.basename(backupPath)}`);
 
-After updating each file:
-- Verify file still has valid frontmatter
-- Check file size is reasonable (not corrupted)
-- Ensure markdown formatting is preserved
-- Confirm updates accurately reflect changes
+    if (options.verbose) {
+      console.log(`Content added: ${newContent.length} characters`);
+      console.log(`Total size: ${updatedContent.length} characters`);
+    }
 
-### 4. Skip Optimization
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
+  }
+}
 
-**Skip files that don't need updates:**
-- If no relevant changes detected, skip the file
-- Report skipped files in summary
-- Don't update timestamp if content unchanged
-- This preserves accurate "last modified" information
-
-### 5. Error Handling
-
-**Common Issues:**
-- **File locked:** "❌ Cannot update {file} - may be open in editor"
-- **Permission denied:** "❌ Cannot write to {file} - check permissions"
-- **Corrupted file:** "⚠️ {file} appears corrupted - skipping update"
-- **Disk space:** "❌ Insufficient disk space for updates"
-
-If update fails:
-- Report which files were successfully updated
-- Note which files failed and why
-- Preserve original files (don't leave corrupted state)
-
-### 6. Update Summary
-
-Provide detailed summary of updates:
-
-\`\`\`
-🔄 Context Update Complete
-
-📊 Update Statistics:
-  - Files Scanned: {total_count}
-  - Files Updated: {updated_count}
-  - Files Skipped: {skipped_count} (no changes needed)
-  - Errors: {error_count}
-
-📝 Updated Files:
-  ✅ progress.md - Updated recent commits, current status
-  ✅ tech-context.md - Added 3 new dependencies
-  ✅ project-structure.md - Noted new /utils directory
-
-⏭️ Skipped Files (no changes):
-  - project-brief.md (last updated: 5 days ago)
-  - project-vision.md (last updated: 2 weeks ago)
-  - system-patterns.md (last updated: 3 days ago)
-
-⚠️ Issues:
-  {any warnings or errors}
-
-⏰ Last Update: {timestamp}
-🔄 Next: Run this command regularly to keep context current
-💡 Tip: Major changes? Consider running /context:create for full refresh
-\`\`\`
-
-### 7. Incremental Update Tracking
-
-**Track what was updated:**
-- Note which sections of each file were modified
-- Keep changes focused and surgical
-- Don't regenerate unchanged content
-- Preserve formatting and structure
-
-### 8. Performance Optimization
-
-For large projects:
-- Process files in parallel when possible
-- Show progress: "Updating context files... {current}/{total}"
-- Skip very large files with warning
-- Use git diff to quickly identify changed areas
-
-## Context Gathering Commands
-
-Use these commands to detect changes:
-- Context directory: \`.claude/context/\`
-- Current git status: \`git status --short\`
-- Recent commits: \`git log --oneline -10\`
-- Changed files: \`git diff --name-only HEAD~5..HEAD 2>/dev/null\`
-- Branch info: \`git branch --show-current\`
-- Uncommitted changes: \`git diff --stat\`
-- New untracked files: \`git ls-files --others --exclude-standard | head -10\`
-- Dependency changes: Check package.json, requirements.txt, etc.
-
-## Important Notes
-
-- **Only update files with actual changes** - preserve accurate timestamps
-- **Always use real datetime** from system clock for \`last_updated\`
-- **Make surgical updates** - don't regenerate entire files
-- **Validate each update** - ensure files remain valid
-- **Provide detailed summary** - show what changed and what didn't
-- **Handle errors gracefully** - don't corrupt existing context
-
-$ARGUMENTS
-`;
-
-// --- Command Definition ---
-exports.command = 'context:update';
-exports.describe = 'Update Context';
+// Command Definition for yargs
+exports.command = 'context:update <name>';
+exports.describe = 'Update an existing context file with new content';
 
 exports.builder = (yargs) => {
   return yargs
-    .option('verbose', {
-      describe: 'Verbose output',
-      type: 'boolean',
-      alias: 'v'
+    .positional('name', {
+      describe: 'Name of the context to update',
+      type: 'string',
+      demandOption: true
     })
-    .option('dry-run', {
-      describe: 'Simulate without making changes',
+    .option('file', {
+      describe: 'File containing content to add',
+      type: 'string',
+      alias: 'f'
+    })
+    .option('stdin', {
+      describe: 'Read content from stdin',
+      type: 'boolean'
+    })
+    .option('content', {
+      describe: 'Inline content to add',
+      type: 'string',
+      alias: 'c'
+    })
+    .option('replace', {
+      describe: 'Replace entire content instead of appending',
       type: 'boolean',
-      default: false
+      alias: 'r'
+    })
+    .option('merge', {
+      describe: 'Merge content by sections',
+      type: 'boolean',
+      alias: 'm'
+    })
+    .option('verbose', {
+      describe: 'Show detailed output',
+      type: 'boolean'
+    })
+    .check((argv) => {
+      // Ensure at least one content source is provided
+      if (!argv.file && !argv.stdin && !argv.content) {
+        throw new Error('Specify content source: --file, --stdin, or --content');
+      }
+      // Ensure only one update mode
+      if (argv.replace && argv.merge) {
+        throw new Error('Cannot use both --replace and --merge');
+      }
+      return true;
     });
 };
 
 exports.handler = async (argv) => {
-  const spinner = createSpinner('Executing context:update...');
-
   try {
-    spinner.start();
-
-    // Load environment if needed
-    loadEnvironment();
-
-    // Validate input if needed
-    
-
-    // Prepare context
-    const context = {
-      
-      verbose: isVerbose(argv),
-      dryRun: argv.dryRun
-    };
-
-    if (isVerbose(argv)) {
-      printInfo('Executing with context:');
-      console.log(JSON.stringify(context, null, 2));
-    }
-
-    // Execute agent
-    const agentType = 'general-specialist';
-
-    const result = await agentExecutor.run(agentType, AGENT_PROMPT, context);
-
-    if (result.status === 'success') {
-      spinner.succeed();
-      printSuccess('Command executed successfully!');
-    } else {
-      spinner.fail();
-      printError(`Command failed: ${result.message || 'Unknown error'}`);
-      process.exit(1);
-    }
-
+    await updateContext(argv.name, {
+      file: argv.file,
+      stdin: argv.stdin,
+      content: argv.content,
+      replace: argv.replace,
+      merge: argv.merge,
+      verbose: argv.verbose
+    });
   } catch (error) {
-    spinner.fail();
-    printError(`Error: ${error.message}`, error);
+    console.error(`Error: ${error.message}`);
     process.exit(1);
   }
 };
+
+// Export for direct execution
+if (require.main === module) {
+  const args = process.argv.slice(2);
+
+  // Parse arguments
+  const options = {
+    file: null,
+    stdin: false,
+    content: null,
+    replace: false,
+    merge: false,
+    verbose: false
+  };
+
+  let name = null;
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+
+    if (arg === '--file' || arg === '-f') {
+      options.file = args[++i];
+    } else if (arg === '--stdin') {
+      options.stdin = true;
+    } else if (arg === '--content' || arg === '-c') {
+      options.content = args[++i];
+    } else if (arg === '--replace' || arg === '-r') {
+      options.replace = true;
+    } else if (arg === '--merge' || arg === '-m') {
+      options.merge = true;
+    } else if (arg === '--verbose') {
+      options.verbose = true;
+    } else if (!arg.startsWith('-') && !name) {
+      name = arg;
+    }
+  }
+
+  if (!name) {
+    console.error('Error: Context name is required');
+    process.exit(1);
+  }
+
+  updateContext(name, options).catch(error => {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
+  });
+}
+
+// Export functions for testing
+module.exports.updateContext = updateContext;
+module.exports.appendContent = appendContent;
+module.exports.replaceContent = replaceContent;
+module.exports.mergeContent = mergeContent;

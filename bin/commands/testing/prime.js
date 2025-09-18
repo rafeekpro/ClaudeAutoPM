@@ -1,371 +1,670 @@
+#!/usr/bin/env node
 /**
- * Prime Testing Environment
- * Auto-migrated from testing:prime.md
+ * testing:prime command implementation
+ * Analyzes project testing needs and generates comprehensive test strategy
+ * TDD Phase: GREEN - Making tests pass
+ * Task: 2.2
  */
 
-const agentExecutor = require('../../../lib/agentExecutor');
-const {
-  validateInput,
-  loadEnvironment,
-  isVerbose,
-  printError,
-  printSuccess,
-  printInfo,
-  printWarning,
-  createSpinner
-} = require('../../../lib/commandHelpers');
+const fs = require('fs').promises;
+const path = require('path');
 
-// --- Agent Prompt ---
-const AGENT_PROMPT = `
-# Prime Testing Environment
+/**
+ * Configuration constants
+ */
+const TEST_CONFIG = {
+  frameworks: {
+    jest: { deps: ['jest'], config: ['jest.config.js'], script: 'jest' },
+    mocha: { deps: ['mocha'], config: ['.mocharc.json'], script: 'mocha' },
+    vitest: { deps: ['vitest'], config: [], script: 'vitest' },
+    node: { deps: [], config: [], script: 'node --test' }
+  },
+  patterns: {
+    source: ['src/**/*.js', 'lib/**/*.js', '*.js'],
+    test: ['test/**/*.test.js', 'test/**/*.spec.js', 'tests/**/*.test.js', '__tests__/**/*.js']
+  },
+  coverage: {
+    defaultThreshold: 80,
+    targets: {
+      statements: 80,
+      branches: 75,
+      functions: 80,
+      lines: 80
+    }
+  }
+};
 
-This command prepares the testing environment by detecting the test framework, validating dependencies, and configuring the test-runner agent for optimal test execution.
+/**
+ * Simple file finder (replacement for glob)
+ * @param {string} pattern - Pattern to match (simplified)
+ * @param {object} options - Options
+ * @returns {Promise<string[]>} - Array of matching files
+ */
+async function findFiles(pattern, options = {}) {
+  const results = [];
+  const cwd = options.cwd || process.cwd();
+  const ignore = options.ignore || [];
 
-## Preflight Checklist
+  // Extract directory and file pattern from pattern
+  let dir = cwd;
+  let filePattern = pattern;
 
-Before proceeding, complete these validation steps.
-Do not bother the user with preflight checks progress ("I'm not going to ..."). Just do them and move on.
+  if (pattern.includes('/')) {
+    const parts = pattern.split('/');
+    if (parts[0] === '**') {
+      // Recursive search from cwd
+      dir = cwd;
+      filePattern = parts[parts.length - 1];
+    } else if (parts[0] && !parts[0].includes('*')) {
+      // Specific directory
+      dir = path.join(cwd, parts[0]);
+      filePattern = parts[parts.length - 1];
+    }
+  }
 
-### 1. Test Framework Detection
+  async function walk(currentDir, depth = 0) {
+    if (depth > 5) return; // Limit recursion depth
 
-**JavaScript/Node.js:**
-- Check package.json for test scripts: \`grep -E '"test"|"spec"|"jest"|"mocha"' package.json 2>/dev/null\`
-- Look for test config files: \`ls -la jest.config.* mocha.opts .mocharc.* 2>/dev/null\`
-- Check for test directories: \`find . -type d \\( -name "test" -o -name "tests" -o -name "__tests__" -o -name "spec" \\) -maxdepth 3 2>/dev/null\`
+    try {
+      const entries = await fs.readdir(currentDir, { withFileTypes: true });
 
-**Python:**
-- Check for pytest: \`find . -name "pytest.ini" -o -name "conftest.py" -o -name "setup.cfg" 2>/dev/null | head -5\`
-- Check for unittest: \`find . -path "*/test*.py" -o -path "*/test_*.py" 2>/dev/null | head -5\`
-- Check requirements: \`grep -E "pytest|unittest|nose" requirements.txt 2>/dev/null\`
+      for (const entry of entries) {
+        const fullPath = path.join(currentDir, entry.name);
+        const relativePath = path.relative(cwd, fullPath);
 
-**Rust:**
-- Check for Cargo tests: \`grep -E '\\[dev-dependencies\\]' Cargo.toml 2>/dev/null\`
-- Look for test modules: \`find . -name "*.rs" -exec grep -l "#\\[cfg(test)\\]" {} \\; 2>/dev/null | head -5\`
+        // Check if should ignore
+        if (ignore.some(pattern => relativePath.includes(pattern.replace('/**', '')))) {
+          continue;
+        }
 
-**Go:**
-- Check for test files: \`find . -name "*_test.go" 2>/dev/null | head -5\`
-- Check go.mod exists: \`test -f go.mod && echo "Go module found"\`
+        if (entry.isDirectory()) {
+          // Recurse into directories
+          if (pattern.startsWith('**') || pattern.includes('/**')) {
+            await walk(fullPath, depth + 1);
+          }
+        } else if (entry.isFile()) {
+          // Check if file matches pattern
+          const fileName = entry.name;
+          const simplePattern = filePattern.replace('*', '');
 
-**Other Languages:**
-- Ruby: Check for RSpec: \`find . -name ".rspec" -o -name "spec_helper.rb" 2>/dev/null\`
-- Java: Check for JUnit: \`find . -name "pom.xml" -exec grep -l "junit" {} \\; 2>/dev/null\`
+          if (filePattern === '*' || fileName.includes(simplePattern)) {
+            results.push(relativePath);
+          }
+        }
+      }
+    } catch (error) {
+      // Ignore errors (e.g., permission denied)
+    }
+  }
 
-### 2. Test Environment Validation
+  await walk(dir);
+  return results;
+}
 
-If no test framework detected:
-- Tell user: "⚠️ No test framework detected. Please specify your testing setup."
-- Ask: "What test command should I use? (e.g., npm test, pytest, cargo test)"
-- Store response for future use
+/**
+ * Analyzes project structure to understand testing needs
+ * @param {string} projectRoot - Project root directory
+ * @returns {Promise<object>} - Project analysis results
+ */
+async function analyzeProject(projectRoot) {
+  const analysis = {
+    framework: null,
+    sourceFiles: [],
+    testFiles: [],
+    coverage: null,
+    patterns: {
+      hasAsync: false,
+      hasAPI: false,
+      hasDatabase: false,
+      hasUI: false
+    }
+  };
 
-### 3. Dependency Check
+  try {
+    // Check for package.json
+    const packageJsonPath = path.join(projectRoot, 'package.json');
+    const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8').catch(() => '{}'));
 
-**For detected framework:**
-- Node.js: Run \`npm list --depth=0 2>/dev/null | grep -E "jest|mocha|chai|jasmine"\`
-- Python: Run \`pip list 2>/dev/null | grep -E "pytest|unittest|nose"\`
-- Verify test dependencies are installed
+    // Detect test framework
+    for (const [framework, config] of Object.entries(TEST_CONFIG.frameworks)) {
+      // Check dependencies
+      for (const dep of config.deps) {
+        if (packageJson.devDependencies?.[dep] || packageJson.dependencies?.[dep]) {
+          analysis.framework = framework;
+          break;
+        }
+      }
+      // Check test script
+      if (!analysis.framework && config.script && packageJson.scripts?.test?.includes(config.script)) {
+        analysis.framework = framework;
+      }
+      if (analysis.framework) break;
+    }
 
-If dependencies missing:
-- Tell user: "❌ Test dependencies not installed"
-- Suggest: "Run: npm install (or pip install -r requirements.txt)"
+    // Find source files
+    for (const pattern of TEST_CONFIG.patterns.source) {
+      const files = await findFiles(pattern, { cwd: projectRoot, ignore: ['node_modules/**', 'test/**', 'tests/**'] });
+      analysis.sourceFiles.push(...files);
+    }
 
-## Instructions
+    // Find test files
+    for (const pattern of TEST_CONFIG.patterns.test) {
+      const files = await findFiles(pattern, { cwd: projectRoot });
+      analysis.testFiles.push(...files);
+    }
 
-### 1. Framework-Specific Configuration
+    // Analyze code patterns
+    for (const file of analysis.sourceFiles.slice(0, 10)) { // Sample first 10 files
+      try {
+        const content = await fs.readFile(path.join(projectRoot, file), 'utf8');
+        if (content.includes('async') || content.includes('await') || content.includes('Promise')) {
+          analysis.patterns.hasAsync = true;
+        }
+        if (content.includes('fetch') || content.includes('axios') || content.includes('api')) {
+          analysis.patterns.hasAPI = true;
+        }
+        if (content.includes('database') || content.includes('query') || content.includes('mongodb')) {
+          analysis.patterns.hasDatabase = true;
+        }
+        if (content.includes('react') || content.includes('vue') || content.includes('angular')) {
+          analysis.patterns.hasUI = true;
+        }
+      } catch (error) {
+        // Ignore read errors
+      }
+    }
+  } catch (error) {
+    // Continue with partial analysis
+  }
 
-Based on detected framework, create test configuration:
+  return analysis;
+}
 
-#### JavaScript/Node.js (Jest)
-\`\`\`yaml
-framework: jest
-test_command: npm test
-test_directory: __tests__
-config_file: jest.config.js
-options:
-  - --verbose
-  - --no-coverage
-  - --runInBand
-environment:
-  NODE_ENV: test
+/**
+ * Generates test strategy document
+ * @param {object} analysis - Project analysis results
+ * @returns {string} - Test strategy markdown content
+ */
+function generateTestStrategy(analysis) {
+  const framework = analysis.framework || 'node';
+  const date = new Date().toISOString().split('T')[0];
+
+  let strategy = `# Test Strategy
+Generated: ${date}
+Framework: ${framework}
+
+## Project Overview
+- Source Files: ${analysis.sourceFiles.length}
+- Test Files: ${analysis.testFiles.length}
+- Test Coverage: ${analysis.testFiles.length > 0 ? 'Partial' : 'None'}
+
+## Coverage Goals
+- Unit Tests: 80% minimum coverage
+- Integration Tests: Critical paths covered
+- E2E Tests: User journeys validated
+
+## Testing Framework
+${framework === 'jest' ? `### Jest Configuration
+- Fast execution with parallel testing
+- Built-in mocking capabilities
+- Snapshot testing for UI components` :
+  framework === 'mocha' ? `### Mocha Configuration
+- Flexible test structure
+- Extensive plugin ecosystem
+- Async testing support` :
+  framework === 'vitest' ? `### Vitest Configuration
+- Vite-powered for speed
+- Jest-compatible API
+- Native ESM support` :
+  `### Node.js Test Runner
+- Zero dependencies
+- Built into Node.js
+- Simple and fast`}
+
+## Test Patterns
+${analysis.patterns.hasAsync ? `### Async Testing
+- Use async/await for cleaner test code
+- Properly handle Promise rejections
+- Test timeout configurations` : ''}
+${analysis.patterns.hasAPI ? `### API Testing
+- Mock external HTTP requests
+- Test error responses
+- Validate request/response schemas` : ''}
+${analysis.patterns.hasDatabase ? `### Database Testing
+- Use test databases or in-memory alternatives
+- Transaction rollback for test isolation
+- Seed data management` : ''}
+${analysis.patterns.hasUI ? `### UI Testing
+- Component unit tests
+- Snapshot testing for UI consistency
+- User interaction testing` : ''}
+
+## Test Organization
+\`\`\`
+test/
+├── unit/           # Unit tests
+├── integration/    # Integration tests
+├── e2e/           # End-to-end tests
+├── fixtures/      # Test data
+└── helpers/       # Test utilities
 \`\`\`
 
-#### JavaScript/Node.js (Mocha)
-\`\`\`yaml
-framework: mocha
-test_command: npm test
-test_directory: test
-config_file: .mocharc.js
-options:
-  - --reporter spec
-  - --recursive
-  - --bail
-environment:
-  NODE_ENV: test
-\`\`\`
+## Coverage Targets
+| Type | Target | Priority |
+|------|--------|----------|
+| Statements | ${TEST_CONFIG.coverage.targets.statements}% | High |
+| Branches | ${TEST_CONFIG.coverage.targets.branches}% | High |
+| Functions | ${TEST_CONFIG.coverage.targets.functions}% | Medium |
+| Lines | ${TEST_CONFIG.coverage.targets.lines}% | High |
 
-#### Python (Pytest)
-\`\`\`yaml
-framework: pytest
-test_command: pytest
-test_directory: tests
-config_file: pytest.ini
-options:
-  - -v
-  - --tb=short
-  - --strict-markers
-environment:
-  PYTHONPATH: .
-\`\`\`
+## Testing Checklist
+- [ ] All public APIs have tests
+- [ ] Error conditions are tested
+- [ ] Edge cases are covered
+- [ ] Performance-critical code is benchmarked
+- [ ] Security-sensitive code is thoroughly tested
 
-#### Rust
-\`\`\`yaml
-framework: cargo
-test_command: cargo test
-test_directory: tests
-config_file: Cargo.toml
-options:
-  - --verbose
-  - --nocapture
-environment: {}
-\`\`\`
+## Continuous Integration
+- Run tests on every commit
+- Block merging if tests fail
+- Generate coverage reports
+- Monitor test performance
 
-#### Go
-\`\`\`yaml
-framework: go
-test_command: go test
-test_directory: .
-config_file: go.mod
-options:
-  - -v
-  - ./...
-environment: {}
-\`\`\`
-
-### 2. Test Discovery
-
-Scan for test files:
-- Count total test files found
-- Identify test naming patterns used
-- Note any test utilities or helpers
-- Check for test fixtures or data
-
-\`\`\`bash
-# Example for Node.js
-find . -path "*/node_modules" -prune -o -name "*.test.js" -o -name "*.spec.js" | wc -l
-\`\`\`
-
-### 3. Create Test Runner Configuration
-
-Create \`.claude/testing-config.md\` with discovered information:
-
-\`\`\`markdown
-
-# Testing Configuration
-
-## Framework
-- Type: {framework_name}
-- Version: {framework_version}
-- Config File: {config_file_path}
-
-## Test Structure
-- Test Directory: {test_dir}
-- Test Files: {count} files found
-- Naming Pattern: {pattern}
-
-## Commands
-- Run All Tests: \`{full_test_command}\`
-- Run Specific Test: \`{specific_test_command}\`
-- Run with Debugging: \`{debug_command}\`
-
-## Environment
-- Required ENV vars: {list}
-- Test Database: {if applicable}
-- Test Servers: {if applicable}
-
-## Test Runner Agent Configuration
-- Use verbose output for debugging
-- Run tests sequentially (no parallel)
-- Capture full stack traces
-- No mocking - use real implementations
-- Wait for each test to complete
-\`\`\`
-
-### 4. Configure Test-Runner Agent
-
-Prepare agent context based on framework:
-
-\`\`\`markdown
-# Test-Runner Agent Configuration
-
-## Project Testing Setup
-- Framework: {framework}
-- Test Location: {directories}
-- Total Tests: {count}
-- Last Run: Never
-
-## Execution Rules
-1. Always use the test-runner agent from \`.claude/agents/test-runner.md\`
-2. Run with maximum verbosity for debugging
-3. No mock services - use real implementations
-4. Execute tests sequentially - no parallel execution
-5. Capture complete output including stack traces
-6. If test fails, analyze test structure before assuming code issue
-7. Report detailed failure analysis with context
-
-## Test Command Templates
-- Full Suite: \`{full_command}\`
-- Single File: \`{single_file_command}\`
-- Pattern Match: \`{pattern_command}\`
-- Watch Mode: \`{watch_command}\` (if available)
-
-## Common Issues to Check
-- Environment variables properly set
-- Test database/services running
-- Dependencies installed
-- Proper file permissions
-- Clean test state between runs
-\`\`\`
-
-### 5. Validation Steps
-
-After configuration:
-- Try running a simple test to validate setup
-- Check if test command works: \`{test_command} --version\` or equivalent
-- Verify test files are discoverable
-- Ensure no permission issues
-
-### 6. Output Summary
-
-\`\`\`
-🧪 Testing Environment Primed
-
-🔍 Detection Results:
-  ✅ Framework: {framework_name} {version}
-  ✅ Test Files: {count} files in {directories}
-  ✅ Config: {config_file}
-  ✅ Dependencies: All installed
-
-📋 Test Structure:
-  - Pattern: {test_file_pattern}
-  - Directories: {test_directories}
-  - Utilities: {test_helpers}
-
-🤖 Agent Configuration:
-  ✅ Test-runner agent configured
-  ✅ Verbose output enabled
-  ✅ Sequential execution set
-  ✅ Real services (no mocks)
-
-⚡ Ready Commands:
-  - Run all tests: /testing:run
-  - Run specific: /testing:run {test_file}
-  - Run pattern: /testing:run {pattern}
-
-💡 Tips:
-  - Always run tests with verbose output
-  - Check test structure if tests fail
-  - Use real services, not mocks
-  - Let each test complete fully
-\`\`\`
-
-### 7. Error Handling
-
-**Common Issues:**
-
-**No Framework Detected:**
-- Message: "⚠️ No test framework found"
-- Solution: "Please specify test command manually"
-- Store user's response for future use
-
-**Missing Dependencies:**
-- Message: "❌ Test framework not installed"
-- Solution: "Install dependencies first: npm install / pip install -r requirements.txt"
-
-**No Test Files:**
-- Message: "⚠️ No test files found"
-- Solution: "Create tests first or check test directory location"
-
-**Permission Issues:**
-- Message: "❌ Cannot access test files"
-- Solution: "Check file permissions"
-
-### 8. Save Configuration
-
-If successful, save configuration for future sessions:
-- Store in \`.claude/testing-config.md\`
-- Include all discovered settings
-- Update on subsequent runs if changes detected
-
-## Important Notes
-
-- **Always detect** rather than assume test framework
-- **Validate dependencies** before claiming ready
-- **Configure for debugging** - verbose output is critical
-- **No mocking** - use real services for accurate testing
-- **Sequential execution** - avoid parallel test issues
-- **Store configuration** for consistent future runs
-
-$ARGUMENTS
+## Next Steps
+1. Review uncovered files
+2. Generate missing test files
+3. Improve test quality
+4. Set up CI/CD pipeline
 `;
 
-// --- Command Definition ---
+  return strategy;
+}
+
+/**
+ * Generates test file for a source file
+ * @param {string} sourceFile - Path to source file
+ * @param {string} projectRoot - Project root directory
+ * @param {string} framework - Test framework to use
+ * @returns {Promise<string>} - Generated test content
+ */
+async function generateTestFile(sourceFile, projectRoot, framework = 'node') {
+  const sourcePath = path.join(projectRoot, sourceFile);
+  const sourceContent = await fs.readFile(sourcePath, 'utf8');
+
+  // Extract function names (simple regex-based approach)
+  const functionMatches = sourceContent.matchAll(/function\s+(\w+)|const\s+(\w+)\s*=\s*(?:async\s*)?\(/g);
+  const functions = [];
+  for (const match of functionMatches) {
+    functions.push(match[1] || match[2]);
+  }
+
+  const moduleName = path.basename(sourceFile, path.extname(sourceFile));
+
+  // Generate test content based on framework
+  let testContent = '';
+
+  if (framework === 'jest' || framework === 'vitest') {
+    testContent = `const { ${functions.join(', ')} } = require('../src/${moduleName}');
+
+describe('${moduleName}', () => {
+${functions.map(fn => `  describe('${fn}', () => {
+    it('should work correctly', () => {
+      // TODO: Add test implementation
+      expect(${fn}).toBeDefined();
+    });
+
+    it('should handle edge cases', () => {
+      // TODO: Test edge cases
+    });
+  });`).join('\n\n')}
+});`;
+  } else if (framework === 'mocha') {
+    testContent = `const assert = require('assert');
+const { ${functions.join(', ')} } = require('../src/${moduleName}');
+
+describe('${moduleName}', () => {
+${functions.map(fn => `  describe('${fn}', () => {
+    it('should work correctly', () => {
+      // TODO: Add test implementation
+      assert(${fn});
+    });
+
+    it('should handle edge cases', () => {
+      // TODO: Test edge cases
+    });
+  });`).join('\n\n')}
+});`;
+  } else {
+    // Node.js test runner
+    testContent = `const { test, describe } = require('node:test');
+const assert = require('assert');
+const { ${functions.join(', ')} } = require('../src/${moduleName}');
+
+describe('${moduleName}', () => {
+${functions.map(fn => `  test('${fn} should work correctly', () => {
+    // TODO: Add test implementation
+    assert(${fn});
+  });
+
+  test('${fn} should handle edge cases', () => {
+    // TODO: Test edge cases
+  });`).join('\n\n')}
+});`;
+  }
+
+  return testContent;
+}
+
+/**
+ * Analyzes test coverage
+ * @param {string} projectRoot - Project root directory
+ * @returns {Promise<object>} - Coverage analysis
+ */
+async function analyzeCoverage(projectRoot) {
+  const analysis = {
+    covered: [],
+    uncovered: [],
+    partial: []
+  };
+
+  try {
+    const srcFiles = await findFiles('src/**/*.js', { cwd: projectRoot });
+    const testFiles = await findFiles('test/**/*.test.js', { cwd: projectRoot });
+
+    for (const srcFile of srcFiles) {
+      const baseName = path.basename(srcFile, '.js');
+      const hasTest = testFiles.some(testFile => testFile.includes(baseName));
+
+      if (hasTest) {
+        analysis.covered.push(srcFile);
+      } else {
+        analysis.uncovered.push(srcFile);
+      }
+    }
+  } catch (error) {
+    // Return partial analysis
+  }
+
+  return analysis;
+}
+
+/**
+ * Generates test recommendations
+ * @param {string} projectRoot - Project root directory
+ * @returns {Promise<string[]>} - List of recommendations
+ */
+async function generateRecommendations(projectRoot) {
+  const recommendations = [];
+
+  try {
+    // Check for test files without assertions
+    const testFiles = await findFiles('test/**/*.test.js', { cwd: projectRoot });
+
+    for (const testFile of testFiles.slice(0, 5)) { // Check first 5 test files
+      const content = await fs.readFile(path.join(projectRoot, testFile), 'utf8');
+
+      if (!content.includes('assert') && !content.includes('expect')) {
+        recommendations.push(`Add assertions to ${testFile}`);
+      }
+
+      if (content.includes('// TODO')) {
+        recommendations.push(`Complete TODO items in ${testFile}`);
+      }
+    }
+
+    // Check for async code patterns
+    const srcFiles = await findFiles('src/**/*.js', { cwd: projectRoot });
+
+    for (const srcFile of srcFiles.slice(0, 5)) {
+      const content = await fs.readFile(path.join(projectRoot, srcFile), 'utf8');
+
+      if (content.includes('fetch') || content.includes('axios')) {
+        recommendations.push(`Add mock for API calls in ${srcFile}`);
+      }
+
+      if (content.includes('async') || content.includes('Promise')) {
+        recommendations.push(`Ensure async tests for ${srcFile}`);
+      }
+    }
+  } catch (error) {
+    recommendations.push('Review test coverage and quality');
+  }
+
+  return recommendations;
+}
+
+/**
+ * Loads testing configuration
+ * @param {string} projectRoot - Project root directory
+ * @returns {Promise<object>} - Testing configuration
+ */
+async function loadTestConfig(projectRoot) {
+  const configPath = path.join(projectRoot, '.claude', 'testing.config.json');
+
+  try {
+    const content = await fs.readFile(configPath, 'utf8');
+    return JSON.parse(content);
+  } catch (error) {
+    return {
+      framework: null,
+      coverageThreshold: TEST_CONFIG.coverage.defaultThreshold,
+      testPattern: '**/*.test.js'
+    };
+  }
+}
+
+/**
+ * Main function for testing:prime command
+ * @param {object} options - Command options
+ */
+async function primeTests(options = {}) {
+  const projectRoot = process.cwd();
+
+  try {
+    // Load configuration
+    const config = await loadTestConfig(projectRoot);
+
+    // Analyze project
+    console.log('Analyzing project structure...');
+    const analysis = await analyzeProject(projectRoot);
+
+    // Override framework if configured
+    if (config.framework) {
+      analysis.framework = config.framework;
+      console.log(`Using configured framework: ${config.framework}`);
+    }
+
+    // Generate test strategy
+    const strategy = generateTestStrategy(analysis);
+
+    // Save strategy
+    const strategyPath = path.join(projectRoot, '.claude', 'test-strategy.md');
+    await fs.mkdir(path.dirname(strategyPath), { recursive: true });
+    await fs.writeFile(strategyPath, strategy);
+
+    console.log('Test strategy generated successfully');
+    console.log(`Saved to: ${strategyPath}`);
+
+    // Generate test files if requested
+    if (options.generate) {
+      console.log('\nGenerating test files...');
+
+      const coverage = await analyzeCoverage(projectRoot);
+
+      for (const uncoveredFile of coverage.uncovered.slice(0, 5)) { // Limit to 5 files
+        const testContent = await generateTestFile(uncoveredFile, projectRoot, analysis.framework);
+        const testFile = path.join(projectRoot, 'test', path.basename(uncoveredFile, '.js') + '.test.js');
+
+        // Check if test already exists
+        const exists = await fs.access(testFile).then(() => true).catch(() => false);
+
+        if (!exists) {
+          await fs.mkdir(path.dirname(testFile), { recursive: true });
+          await fs.writeFile(testFile, testContent);
+          console.log(`Created: ${testFile}`);
+        }
+      }
+    }
+
+    // Analyze coverage if requested
+    if (options.analyze) {
+      console.log('\nCoverage Analysis:');
+      const coverage = await analyzeCoverage(projectRoot);
+
+      if (coverage.covered.length > 0 || coverage.uncovered.length > 0) {
+        console.log(`Files analyzed: ${coverage.covered.length + coverage.uncovered.length}`);
+        console.log(`Covered: ${coverage.covered.length}`);
+        console.log(`Uncovered: ${coverage.uncovered.length}`);
+
+        if (coverage.uncovered.length > 0) {
+          console.log('\nUncovered files:');
+          coverage.uncovered.slice(0, 10).forEach(file => {
+            console.log(`  - ${file}`);
+          });
+        }
+      } else {
+        console.log('No coverage data available');
+      }
+    }
+
+    // Generate recommendations if requested
+    if (options.recommend) {
+      console.log('\nRecommendations:');
+      const recommendations = await generateRecommendations(projectRoot);
+
+      if (recommendations.length > 0) {
+        recommendations.forEach(rec => {
+          console.log(`  • ${rec}`);
+        });
+      } else {
+        console.log('  No specific recommendations at this time');
+      }
+
+      // Always add general recommendations
+      console.log('\nGeneral improvements:');
+      console.log('  • Add more assertions to existing tests');
+      console.log('  • Test error conditions and edge cases');
+      console.log('  • Mock external dependencies');
+      console.log('  • Improve test descriptions');
+    }
+
+    // Handle interactive mode
+    if (options.interactive) {
+      if (options.dryRun) {
+        console.log('\nWould enter interactive mode');
+        console.log('Dry run mode - no changes made');
+      } else {
+        console.log('\nInteractive mode not yet implemented');
+        console.log('Use --generate, --analyze, or --recommend flags instead');
+      }
+    }
+
+    // Show framework info
+    console.log(`\nDetected framework: ${analysis.framework || 'Node.js test runner'}`);
+
+    if (config.coverageThreshold) {
+      console.log(`Coverage threshold: ${config.coverageThreshold}%`);
+    }
+
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
+  }
+}
+
+// Command Definition for yargs
 exports.command = 'testing:prime';
-exports.describe = 'Prime Testing Environment';
+exports.describe = 'Analyze project and generate comprehensive test strategy';
 
 exports.builder = (yargs) => {
   return yargs
-    .option('verbose', {
-      describe: 'Verbose output',
-      type: 'boolean',
-      alias: 'v'
-    })
-    .option('dry-run', {
-      describe: 'Simulate without making changes',
+    .option('generate', {
+      describe: 'Generate test files for uncovered code',
       type: 'boolean',
       default: false
+    })
+    .option('analyze', {
+      describe: 'Analyze current test coverage',
+      type: 'boolean',
+      default: false
+    })
+    .option('recommend', {
+      describe: 'Generate test improvement recommendations',
+      type: 'boolean',
+      default: false
+    })
+    .option('interactive', {
+      describe: 'Interactive test generation mode',
+      type: 'boolean',
+      default: false
+    })
+    .option('dry-run', {
+      describe: 'Show what would be done without making changes',
+      type: 'boolean',
+      default: false
+    })
+    .option('output', {
+      describe: 'Output file for test strategy',
+      type: 'string'
     });
 };
 
 exports.handler = async (argv) => {
-  const spinner = createSpinner('Executing testing:prime...');
-
   try {
-    spinner.start();
-
-    // Load environment if needed
-    loadEnvironment();
-
-    // Validate input if needed
-    
-
-    // Prepare context
-    const context = {
-      
-      verbose: isVerbose(argv),
-      dryRun: argv.dryRun
-    };
-
-    if (isVerbose(argv)) {
-      printInfo('Executing with context:');
-      console.log(JSON.stringify(context, null, 2));
-    }
-
-    // Execute agent
-    const agentType = 'testing-specialist';
-
-    const result = await agentExecutor.run(agentType, AGENT_PROMPT, context);
-
-    if (result.status === 'success') {
-      spinner.succeed();
-      printSuccess('Command executed successfully!');
-    } else {
-      spinner.fail();
-      printError(`Command failed: ${result.message || 'Unknown error'}`);
-      process.exit(1);
-    }
-
+    await primeTests({
+      generate: argv.generate,
+      analyze: argv.analyze,
+      recommend: argv.recommend,
+      interactive: argv.interactive,
+      dryRun: argv.dryRun,
+      output: argv.output
+    });
   } catch (error) {
-    spinner.fail();
-    printError(`Error: ${error.message}`, error);
+    console.error(`Error: ${error.message}`);
     process.exit(1);
   }
 };
+
+// Export for direct execution
+if (require.main === module) {
+  const args = process.argv.slice(2);
+
+  const options = {
+    generate: false,
+    analyze: false,
+    recommend: false,
+    interactive: false,
+    dryRun: false,
+    output: null
+  };
+
+  // Parse arguments
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+
+    if (arg === '--generate') {
+      options.generate = true;
+    } else if (arg === '--analyze') {
+      options.analyze = true;
+    } else if (arg === '--recommend') {
+      options.recommend = true;
+    } else if (arg === '--interactive') {
+      options.interactive = true;
+    } else if (arg === '--dry-run') {
+      options.dryRun = true;
+    } else if (arg === '--output' && args[i + 1]) {
+      options.output = args[++i];
+    }
+  }
+
+  primeTests(options).catch(error => {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
+  });
+}
+
+// Export functions for testing
+module.exports.analyzeProject = analyzeProject;
+module.exports.generateTestStrategy = generateTestStrategy;
+module.exports.analyzeCoverage = analyzeCoverage;
+module.exports.generateRecommendations = generateRecommendations;

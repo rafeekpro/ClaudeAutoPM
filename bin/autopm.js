@@ -60,7 +60,6 @@ function main() {
     })
     // Global options
     .option('verbose', {
-      alias: 'v',
       type: 'boolean',
       description: 'Run with verbose logging'
     })
@@ -75,7 +74,8 @@ function main() {
     .alias('help', 'h')
     // Error handling and requirements
     .demandCommand(1, 'You must provide a command. Use --help to see available options.')
-    .strict()
+    .recommendCommands()
+    .strictCommands()
     .wrap(cli.terminalWidth())
     // Custom epilogue
     .epilogue('For more information, visit: https://github.com/rafeekpro/ClaudeAutoPM')

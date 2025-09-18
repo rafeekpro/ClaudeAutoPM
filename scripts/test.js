@@ -61,9 +61,9 @@ class TestRunner {
   }
 
   /**
-   * Check if test files exist in directory
+   * Check if test files exist in directory (recursively)
    */
-  hasTestFiles(dir, pattern = '*.test.js') {
+  hasTestFiles(dir, pattern = '*.test.js', recursive = false) {
     const fullPath = path.isAbsolute(dir) ? dir : path.join(this.projectRoot, dir);
 
     if (!fs.existsSync(fullPath)) {
@@ -71,17 +71,29 @@ class TestRunner {
     }
 
     try {
-      const files = fs.readdirSync(fullPath);
-      const testFiles = files.filter(file => {
-        if (pattern.includes('*')) {
-          // Simple glob pattern matching
-          const regex = new RegExp('^' + pattern.replace('*', '.*') + '$');
-          return regex.test(file);
-        }
-        return file === pattern;
-      });
+      const findTestFiles = (currentPath) => {
+        const files = fs.readdirSync(currentPath);
 
-      return testFiles.length > 0;
+        for (const file of files) {
+          const filePath = path.join(currentPath, file);
+          const stat = fs.statSync(filePath);
+
+          if (stat.isDirectory() && recursive) {
+            if (findTestFiles(filePath)) return true;
+          } else if (stat.isFile()) {
+            if (pattern.includes('*')) {
+              // Simple glob pattern matching
+              const regex = new RegExp('^' + pattern.replace('*', '.*') + '$');
+              if (regex.test(file)) return true;
+            } else if (file === pattern) {
+              return true;
+            }
+          }
+        }
+        return false;
+      };
+
+      return findTestFiles(fullPath);
     } catch (error) {
       return false;
     }
@@ -121,6 +133,13 @@ class TestRunner {
       await this.runTestSuite('Regression Tests', 'node', ['--test', 'test/regression/*.test.js']);
     } else {
       console.log(colors.yellow('⚠️  No regression tests found'));
+    }
+
+    // Run command tests
+    if (this.hasTestFiles('test/commands', '*.test.js', true)) {
+      await this.runTestSuite('Command Tests', 'node', ['--test', 'test/commands/**/*.test.js']);
+    } else {
+      console.log(colors.yellow('⚠️  No command tests found'));
     }
 
     // Run installation tests (skip in CI)
