@@ -13,7 +13,7 @@ const { describeIntegration } = require('../helpers/test-utils');
 describeIntegration('Azure Scripts Integration Tests', () => {
     const projectRoot = path.join(__dirname, '..', '..');
 
-    describe.skip('Node.js Implementations - PENDING: Implementation', () => {
+    describe('Node.js Implementations', () => {
         // TODO: Enable after implementing Azure scripts
         it('azure-feature-list.js should validate environment and show error', () => {
             try {
@@ -58,7 +58,7 @@ describeIntegration('Azure Scripts Integration Tests', () => {
         });
     });
 
-    describe.skip('Bash Wrapper Delegation - PENDING: Implementation', () => {
+    describe('Bash Wrapper Delegation', () => {
         // TODO: Enable after implementing bash wrappers
         it('feature-list.sh should delegate to Node.js implementation', () => {
             try {
@@ -197,7 +197,7 @@ describeIntegration('Azure Scripts Integration Tests', () => {
         });
     });
 
-    describe.skip('Module Exports - REQUIRES FULL IMPLEMENTATION', () => {
+    describe('Module Exports', () => {
         it('azure-feature-list.js should export required functions', () => {
             const azureFeatureList = require('../../bin/node/azure-feature-list.js');
 
