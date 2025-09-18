@@ -197,7 +197,7 @@ Test server for integration testing.`;
     });
   }
 
-  describe.skip('list.sh Script - PENDING: Implementation', () => {
+  describe('list.sh Script', () => {
     // TODO: Enable after implementing list.sh functionality
     test('should execute successfully and call mcp-handler list', () => {
       const result = executeScript('list.sh');
@@ -247,7 +247,7 @@ Test server for integration testing.`;
     });
   });
 
-  describe.skip('enable.sh Script - PENDING: Implementation', () => {
+  describe('enable.sh Script', () => {
     // TODO: Enable after implementing enable.sh functionality
     beforeEach(() => {
       createTestServer('enable-test-server');
@@ -303,7 +303,7 @@ Test server for integration testing.`;
     });
   });
 
-  describe.skip('disable.sh Script - PENDING: Implementation', () => {
+  describe('disable.sh Script', () => {
     // TODO: Enable after implementing disable.sh functionality
     beforeEach(() => {
       createTestServer('disable-test-server');
@@ -526,7 +526,7 @@ Test server for integration testing.`;
     });
   });
 
-  describe.skip('Error Handling and Edge Cases - PENDING: Implementation', () => {
+  describe('Error Handling and Edge Cases', () => {
     // TODO: Enable after implementing error handling
     test('should handle corrupted config.json gracefully', () => {
       // Create corrupted config file
@@ -591,7 +591,7 @@ Test server for integration testing.`;
     });
   });
 
-  describe.skip('Integration with Real MCP Handler - PENDING: Implementation', () => {
+  describe('Integration with Real MCP Handler', () => {
     // TODO: Enable after implementing real MCP handler
     test('should pass through all commands correctly', () => {
       createTestServer('integration-server');
