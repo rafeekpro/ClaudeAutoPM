@@ -215,8 +215,6 @@ AZURE_DEVOPS_PROJECT=test-project`;
   });
 
   describe('Work Items Overview', () => {
-    // TODO: Enable after Azure DevOps Phase 3 migration
-    // Requires proper environment setup and API mocking
     beforeEach(() => {
       // Mock work items query responses for different states
       const states = ['New', 'Active', 'In Progress', 'Resolved', 'Done', 'Closed'];
