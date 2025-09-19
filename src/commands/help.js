@@ -1,7 +1,3 @@
-/**
- * Help Command - Migrated to Yargs
- * Provides help information for ClaudeAutoPM commands
- */
 
 module.exports = {
   command: 'help [command]',

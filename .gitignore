@@ -1,29 +1,109 @@
+# ==========================================
+# ClaudeAutoPM .gitignore
+# ==========================================
+
+# Operating System Files
+# ----------------------
 .DS_Store
+Thumbs.db
+desktop.ini
 
-# Environment variables with secrets
-.claude/.env
+# Environment & Secrets
+# --------------------
 .env
+.env.local
+.env.*.local
+.claude/.env
+CLAUDE.md
 
-# MCP server logs and cache
+# Dependencies
+# ------------
+node_modules/
+bower_components/
+jspm_packages/
+
+# Build Outputs & Artifacts
+# ------------------------
+dist/
+build/
+out/
+.next/
+.nuxt/
+.vuepress/dist
+.serverless/
+*.tgz
+autopm-framework-*.tgz
+repomix-output.xml
+
+# Test & Coverage
+# ---------------
+coverage/
+.nyc_output/
+test-dir/
+tmp/
+temp/
+test/regression/__snapshots__/
+*.lcov
+
+# Logs
+# ----
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+
+# IDE & Editors
+# -------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-workspace
+*.sublime-project
+.project
+.classpath
+.settings/
+
+# Git Local Config
+# ----------------
+.gitconfig.local
+
+# MCP & Claude Specific
+# --------------------
 .claude/mcp-cache/
 .claude/context-pools/
-repomix-output.xml
-autopm-framework-*.tgz
-node_modules/
-# package-lock.json should be committed to ensure consistent dependencies
-test/regression/__snapshots__/health-report.json
-test/regression/__snapshots__/hybrid-strategy-latest.json
-ZADANIA1709.md
 
-# Backup folders and files
+# Documentation Build
+# -------------------
+docs-site/docs/.vitepress/dist/
+docs-site/docs/.vitepress/cache/
+
+# Backup Files
+# ------------
 *backup*
 **/backup*
 **/*backup*
 *.backup
 *.bak
-*~
+*.orig
+*.save
 
-# Test artifacts
-test-dir/
-tmp/
-temp/
+# Project Specific
+# ----------------
+ZADANIA1709.md
+PROJECT_STRUCTURE_ANALYSIS.md
+
+# Shell Completions Cache
+# -----------------------
+completions/*.cache
+
+# Temporary Python Files
+# ---------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so

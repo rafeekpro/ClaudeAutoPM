@@ -3,11 +3,29 @@
  * Helps new users set up ClaudeAutoPM with a step-by-step wizard
  */
 
-const inquirer = require('inquirer');
 const fs = require('fs-extra');
 const path = require('path');
 const { exec, execSync } = require('child_process');
-const chalk = require('chalk');
+
+// Handle ESM/CJS compatibility for chalk and inquirer
+let chalk, inquirer;
+try {
+  chalk = require('chalk').default || require('chalk');
+} catch (e) {
+  chalk = {
+    cyan: (str) => str,
+    green: (str) => str,
+    red: (str) => str,
+    yellow: (str) => str,
+    gray: (str) => str
+  };
+}
+
+try {
+  inquirer = require('inquirer').default || require('inquirer');
+} catch (e) {
+  inquirer = { prompt: async () => ({}) };
+}
 
 module.exports = {
   command: 'guide',
