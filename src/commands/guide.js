@@ -73,11 +73,11 @@ class InteractiveGuide {
         await this.verifyDependencies();
       }
 
-      // Step 3: Project Setup
-      await this.setupProject();
-
-      // Step 4: Configure Provider
+      // Step 3: Configure Provider FIRST (to know if we need git)
       await this.configureProvider();
+
+      // Step 4: Project Setup (git init only if using GitHub)
+      await this.setupProject();
 
       // Step 5: Install ClaudeAutoPM
       await this.installFramework();
@@ -112,9 +112,9 @@ class InteractiveGuide {
 
     console.log(chalk.gray('This guide will help you:'));
     console.log('  • Verify system requirements');
-    console.log('  • Set up your project');
+    console.log('  • Choose your project management provider (GitHub/Azure)');
+    console.log('  • Set up your project with version control');
     console.log('  • Install ClaudeAutoPM framework');
-    console.log('  • Configure your project management provider');
     console.log('  • Create your first task');
     console.log('  • Learn essential commands\n');
 
@@ -198,47 +198,104 @@ class InteractiveGuide {
   async setupProject() {
     console.log(chalk.cyan('\n📁 Project Setup\n'));
 
-    // Check if we're in an existing project or need to create one
-    const gitExists = await this.checkCommand('git rev-parse --git-dir 2>/dev/null');
+    // Only setup git if using GitHub provider
+    if (this.config.provider === 'github') {
+      // Check if we're in an existing git repository
+      const gitExists = await this.checkCommand('git rev-parse --git-dir 2>/dev/null');
 
-    if (!gitExists) {
-      const { createProject } = await inquirer.prompt([
-        {
-          type: 'confirm',
-          name: 'createProject',
-          message: 'No git repository found. Would you like to initialize one?',
-          default: true
-        }
-      ]);
+      if (!gitExists) {
+        console.log(chalk.yellow('⚠️  GitHub requires a git repository'));
 
-      if (createProject) {
-        const { projectName } = await inquirer.prompt([
+        const { initGit } = await inquirer.prompt([
           {
-            type: 'input',
-            name: 'projectName',
-            message: 'Enter project name:',
-            default: path.basename(process.cwd()),
-            validate: (input) => input ? true : 'Project name is required'
+            type: 'confirm',
+            name: 'initGit',
+            message: 'Initialize a new git repository?',
+            default: true
           }
         ]);
 
-        // Initialize git repository
-        try {
-          execSync('git init', { stdio: 'pipe' });
-          console.log(chalk.green('  ✓ Git repository initialized'));
+        if (initGit) {
+          // Initialize git repository
+          try {
+            execSync('git init', { stdio: 'pipe' });
+            console.log(chalk.green('  ✓ Git repository initialized'));
 
-          // Create initial commit
-          await fs.writeFile('.gitignore', 'node_modules/\n.env\n.DS_Store\n');
-          execSync('git add .gitignore', { stdio: 'pipe' });
-          execSync('git commit -m "Initial commit"', { stdio: 'pipe' });
-          console.log(chalk.green('  ✓ Initial commit created'));
-        } catch (error) {
-          console.log(chalk.yellow('  ⚠️  Could not initialize git repository'));
+            // Create initial .gitignore
+            const gitignoreContent = `# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.claude/.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# ClaudeAutoPM
+.claude/epics/
+.claude/prds/
+.claude/*.backup-*
+`;
+            await fs.writeFile('.gitignore', gitignoreContent);
+            execSync('git add .gitignore', { stdio: 'pipe' });
+            execSync('git commit -m "Initial commit - ClaudeAutoPM setup"', { stdio: 'pipe' });
+            console.log(chalk.green('  ✓ Initial commit created'));
+          } catch (error) {
+            console.log(chalk.yellow('  ⚠️  Could not initialize git repository'));
+            console.log(chalk.gray('  You may need to initialize it manually later'));
+          }
+        } else {
+          console.log(chalk.yellow('  ⚠️  Skipping git initialization'));
+          console.log(chalk.gray('  You\'ll need to set up git manually to use GitHub features'));
         }
+      } else {
+        console.log(chalk.green('  ✓ Git repository already exists'));
+      }
+    } else if (this.config.provider === 'azure') {
+      console.log(chalk.gray('  Azure DevOps can work with or without local git'));
+
+      // Optional git setup for Azure
+      const gitExists = await this.checkCommand('git rev-parse --git-dir 2>/dev/null');
+      if (!gitExists) {
+        const { wantGit } = await inquirer.prompt([
+          {
+            type: 'confirm',
+            name: 'wantGit',
+            message: 'Would you like to initialize git for version control? (optional)',
+            default: false
+          }
+        ]);
+
+        if (wantGit) {
+          try {
+            execSync('git init', { stdio: 'pipe' });
+            console.log(chalk.green('  ✓ Git repository initialized'));
+          } catch (error) {
+            console.log(chalk.yellow('  ⚠️  Could not initialize git repository'));
+          }
+        }
+      } else {
+        console.log(chalk.green('  ✓ Git repository already exists'));
       }
     } else {
-      console.log(chalk.green('  ✓ Git repository detected'));
+      // No provider selected or 'none'
+      console.log(chalk.gray('  Skipping version control setup (no provider selected)'));
     }
+
+    // Get project name for later use
+    this.projectName = path.basename(process.cwd());
+    console.log(chalk.gray(`  Project name: ${this.projectName}`));
   }
 
   async installFramework() {
@@ -295,9 +352,11 @@ class InteractiveGuide {
   async generateClaudeMd() {
     console.log(chalk.cyan('\n📝 Generating CLAUDE.md\n'));
 
-    const projectName = path.basename(process.cwd());
+    const projectName = this.projectName || path.basename(process.cwd());
     const repoUrl = this.config.provider === 'github' && this.config.github
       ? `https://github.com/${this.config.github.repository}`
+      : this.config.provider === 'azure' && this.config.azure
+      ? `https://dev.azure.com/${this.config.azure.organization}/${this.config.azure.project}`
       : 'https://github.com/your-org/your-repo';
 
     const claudeMdContent = `# ${projectName}

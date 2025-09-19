@@ -5,6 +5,74 @@ All notable changes to the ClaudeAutoPM framework will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.5] - 2025-09-19
+
+### Fixed
+- Fixed `autopm guide` workflow order - provider selection now comes before git initialization
+- Git repository setup is now only required for GitHub provider (optional for Azure DevOps)
+- More logical flow: choose provider → setup git (if needed) → install framework → configure
+
+### Changed
+- Improved guide workflow to be more intuitive and user-friendly
+- Provider-specific git requirements are now properly handled
+
+## [1.5.4] - 2025-09-19
+
+### Added
+- CLAUDE.md generation in `autopm guide` with comprehensive project context
+- Project-specific Claude instructions tailored to the chosen configuration
+- Automatic project folder creation during guide setup
+
+### Fixed
+- GitHub issue creation now uses `gh` CLI and actually creates issues
+- Configuration properly saved to `.claude/config.json` and `.claude/.env`
+- Project folder creation and navigation during guide
+
+## [1.5.3] - 2025-09-19
+
+### Added
+- Complete setup workflow in `autopm guide` including:
+  - Project folder creation
+  - Git repository initialization
+  - Automatic `autopm install` execution
+  - GitHub issue creation with gh CLI
+  - Configuration persistence
+  - Reset option for reconfiguration
+
+### Fixed
+- ESM/CJS compatibility issues with chalk and inquirer
+- Guide now properly saves configuration to files
+- Framework installation integrated into guide workflow
+
+## [1.5.2] - 2025-09-19
+
+### Fixed
+- Added missing `src/` directory to npm package files
+- Resolved `ENOENT` error during npm installation
+- Included all necessary source files in published package
+
+## [1.5.1] - 2025-09-19
+
+### Added
+- Interactive setup guide (`autopm guide`) for new users
+- Streamlined onboarding with provider detection
+- Step-by-step configuration wizard
+
+### Fixed
+- Module compatibility issues
+- Installation path resolution
+
+## [1.5.0] - 2025-09-19
+
+### Added
+- Complete TDD implementation with comprehensive command infrastructure
+- Full migration from legacy implementation
+- Enhanced testing coverage
+
+### Fixed
+- Test isolation and cleanup of obsolete files
+- Command execution reliability
+
 ## [1.3.0] - 2025-09-16
 
 ### 🚀 Major Release - Bash to Node.js Migration (Phase 3 Complete)
