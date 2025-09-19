@@ -96,6 +96,7 @@
   "files": [
     "bin/",
     "lib/",
+    "src/",
     "autopm/",
     ".github/",
     "scripts/",
