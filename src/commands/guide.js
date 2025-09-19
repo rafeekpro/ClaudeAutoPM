@@ -52,8 +52,10 @@ module.exports = {
 class InteractiveGuide {
   constructor(options = {}) {
     this.options = options;
-    this.configPath = path.join(process.cwd(), '.autopm', 'config.json');
+    this.configPath = path.join(process.cwd(), '.claude', 'config.json');
+    this.envPath = path.join(process.cwd(), '.claude', '.env');
     this.config = {};
+    this.projectPath = process.cwd();
   }
 
   async run() {
@@ -71,13 +73,19 @@ class InteractiveGuide {
         await this.verifyDependencies();
       }
 
-      // Step 3: Configure Provider
+      // Step 3: Project Setup
+      await this.setupProject();
+
+      // Step 4: Configure Provider
       await this.configureProvider();
 
-      // Step 4: Create First Task (optional)
+      // Step 5: Install ClaudeAutoPM
+      await this.installFramework();
+
+      // Step 6: Create First Task (optional)
       await this.createFirstTask();
 
-      // Step 5: Show Summary
+      // Step 7: Show Summary
       await this.showSummary();
 
     } catch (error) {
@@ -104,6 +112,8 @@ class InteractiveGuide {
 
     console.log(chalk.gray('This guide will help you:'));
     console.log('  • Verify system requirements');
+    console.log('  • Set up your project');
+    console.log('  • Install ClaudeAutoPM framework');
     console.log('  • Configure your project management provider');
     console.log('  • Create your first task');
     console.log('  • Learn essential commands\n');
@@ -170,6 +180,104 @@ class InteractiveGuide {
         resolve(!error);
       });
     });
+  }
+
+  async resetConfiguration() {
+    console.log(chalk.yellow('\n⚠️  Resetting configuration...\n'));
+
+    try {
+      // Remove existing configuration files
+      await fs.remove(this.configPath);
+      await fs.remove(this.envPath);
+      console.log(chalk.green('  ✓ Configuration reset successfully'));
+    } catch (error) {
+      console.log(chalk.gray('  No existing configuration found'));
+    }
+  }
+
+  async setupProject() {
+    console.log(chalk.cyan('\n📁 Project Setup\n'));
+
+    // Check if we're in an existing project or need to create one
+    const gitExists = await this.checkCommand('git rev-parse --git-dir 2>/dev/null');
+
+    if (!gitExists) {
+      const { createProject } = await inquirer.prompt([
+        {
+          type: 'confirm',
+          name: 'createProject',
+          message: 'No git repository found. Would you like to initialize one?',
+          default: true
+        }
+      ]);
+
+      if (createProject) {
+        const { projectName } = await inquirer.prompt([
+          {
+            type: 'input',
+            name: 'projectName',
+            message: 'Enter project name:',
+            default: path.basename(process.cwd()),
+            validate: (input) => input ? true : 'Project name is required'
+          }
+        ]);
+
+        // Initialize git repository
+        try {
+          execSync('git init', { stdio: 'pipe' });
+          console.log(chalk.green('  ✓ Git repository initialized'));
+
+          // Create initial commit
+          await fs.writeFile('.gitignore', 'node_modules/\n.env\n.DS_Store\n');
+          execSync('git add .gitignore', { stdio: 'pipe' });
+          execSync('git commit -m "Initial commit"', { stdio: 'pipe' });
+          console.log(chalk.green('  ✓ Initial commit created'));
+        } catch (error) {
+          console.log(chalk.yellow('  ⚠️  Could not initialize git repository'));
+        }
+      }
+    } else {
+      console.log(chalk.green('  ✓ Git repository detected'));
+    }
+  }
+
+  async installFramework() {
+    console.log(chalk.cyan('\n📦 Installing ClaudeAutoPM Framework\n'));
+
+    const claudeExists = await fs.pathExists(path.join(process.cwd(), '.claude'));
+
+    if (claudeExists) {
+      console.log(chalk.green('  ✓ ClaudeAutoPM already installed'));
+      return;
+    }
+
+    const { installNow } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'installNow',
+        message: 'Install ClaudeAutoPM framework in this project?',
+        default: true
+      }
+    ]);
+
+    if (!installNow) {
+      console.log(chalk.yellow('  ⚠️  Skipping framework installation'));
+      console.log(chalk.gray('  You can install it later with: autopm install'));
+      return;
+    }
+
+    try {
+      console.log(chalk.gray('  Installing framework files...'));
+
+      // Run autopm install with preset 3 (Full DevOps - recommended)
+      const installScript = require('../node/install.js');
+      await installScript.run(3);
+
+      console.log(chalk.green('\n  ✓ ClaudeAutoPM framework installed successfully'));
+    } catch (error) {
+      console.log(chalk.yellow('\n  ⚠️  Could not install framework automatically'));
+      console.log(chalk.gray('  Please run manually: autopm install'));
+    }
   }
 
   async configureProvider() {
@@ -285,9 +393,51 @@ class InteractiveGuide {
 
   async saveConfiguration() {
     try {
+      // Ensure .claude directory exists
       await fs.ensureDir(path.dirname(this.configPath));
-      await fs.writeJson(this.configPath, this.config, { spaces: 2 });
+
+      // Save config.json
+      const configData = {
+        projectManagement: {
+          provider: this.config.provider || 'github',
+          defaultLabels: ['autopm'],
+          autoSync: true
+        },
+        features: {
+          docker_first_development: true,
+          docker_compose_required: false,
+          parallel_execution: true,
+          context_isolation: true
+        }
+      };
+
+      await fs.writeJson(this.configPath, configData, { spaces: 2 });
+
+      // Save .env file with credentials
+      let envContent = '';
+
+      if (this.config.provider === 'github' && this.config.github) {
+        envContent += `# GitHub Configuration\n`;
+        envContent += `GITHUB_TOKEN=${this.config.github.token}\n`;
+        envContent += `GITHUB_REPOSITORY=${this.config.github.repository}\n`;
+        envContent += `GITHUB_OWNER=${this.config.github.repository.split('/')[0]}\n`;
+        envContent += `GITHUB_REPO=${this.config.github.repository.split('/')[1]}\n\n`;
+      } else if (this.config.provider === 'azure' && this.config.azure) {
+        envContent += `# Azure DevOps Configuration\n`;
+        envContent += `AZURE_DEVOPS_PAT=${this.config.azure.token}\n`;
+        envContent += `AZURE_DEVOPS_ORG=${this.config.azure.organization}\n`;
+        envContent += `AZURE_DEVOPS_PROJECT=${this.config.azure.project}\n\n`;
+      }
+
+      envContent += `# Environment\n`;
+      envContent += `NODE_ENV=development\n`;
+      envContent += `DEBUG=false\n`;
+
+      await fs.writeFile(this.envPath, envContent);
+
       console.log(chalk.green('\n✅ Configuration saved successfully!\n'));
+      console.log(chalk.gray('  Config: .claude/config.json'));
+      console.log(chalk.gray('  Credentials: .claude/.env'));
     } catch (error) {
       console.error(chalk.red('\n❌ Failed to save configuration:'), error.message);
       throw error;
@@ -330,22 +480,37 @@ class InteractiveGuide {
     console.log(chalk.cyan('\n📝 Creating task...\n'));
 
     try {
-      let command;
       if (this.config.provider === 'github') {
-        command = `autopm pm:issue-new "${answers.taskTitle}" "${answers.taskDescription}"`;
-      } else if (this.config.provider === 'azure') {
-        command = `autopm azure:task-new "${answers.taskTitle}" "${answers.taskDescription}"`;
-      }
+        // Use gh CLI to create issue directly
+        const repo = this.config.github.repository;
+        const command = `gh issue create --repo ${repo} --title "${answers.taskTitle}" --body "${answers.taskDescription}"`;
 
-      if (command) {
-        execSync(command, { stdio: 'inherit' });
-        console.log(chalk.green('\n✅ Task created successfully!\n'));
+        // Set GITHUB_TOKEN for gh CLI
+        const env = { ...process.env, GITHUB_TOKEN: this.config.github.token };
+        const result = execSync(command, { env, encoding: 'utf-8' });
+
+        console.log(chalk.green('\n✅ Issue created successfully!'));
+        console.log(chalk.gray(`  ${result.trim()}`));
+      } else if (this.config.provider === 'azure') {
+        // For Azure, we need to use the Azure DevOps API
+        console.log(chalk.yellow('\n⚠️  Azure task creation requires additional setup.'));
+        console.log('You can create it manually with:');
+        console.log(chalk.gray(`  autopm azure:task-new "${answers.taskTitle}" "${answers.taskDescription}"`));
       }
     } catch (error) {
       console.log(chalk.yellow('\n⚠️  We couldn\'t create the task automatically.'));
-      console.log('You can create it manually with:');
+
+      // Check if gh CLI is installed
+      try {
+        execSync('gh --version', { stdio: 'pipe' });
+      } catch {
+        console.log(chalk.yellow('  GitHub CLI (gh) is not installed.'));
+        console.log(chalk.gray('  Install it from: https://cli.github.com'));
+      }
+
+      console.log('\nYou can create it manually with:');
       if (this.config.provider === 'github') {
-        console.log(chalk.gray(`  autopm pm:issue-new "Title" "Description"`));
+        console.log(chalk.gray(`  gh issue create --repo ${this.config.github.repository} --title "Title" --body "Description"`));
       } else {
         console.log(chalk.gray(`  autopm azure:task-new "Title" "Description"`));
       }
