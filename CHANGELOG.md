@@ -5,6 +5,18 @@ All notable changes to the ClaudeAutoPM framework will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.9] - 2025-09-19
+
+### Fixed
+- Added Azure DevOps support for PRD workflow in `autopm guide`
+- Provider-specific next steps for GitHub vs Azure
+- Azure CLI commands for creating work items
+
+### Added
+- Azure-specific commands after PRD creation (`/pm:azure-sync`, `/pm:azure-next`)
+- Azure work item creation instructions with `az boards` CLI
+- Proper routing based on selected provider (GitHub or Azure)
+
 ## [1.5.8] - 2025-09-19
 
 ### Added

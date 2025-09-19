@@ -927,16 +927,33 @@ Next steps:
       console.log(chalk.gray(`  Location: .claude/prds/${answers.featureName}.md`));
       console.log(chalk.cyan('\n📚 Next Steps:\n'));
       console.log(chalk.gray('  In Claude Code, run these commands:'));
-      console.log(chalk.yellow(`\n  1. /pm:prd-parse ${answers.featureName}`));
-      console.log(chalk.gray('     → Transforms PRD into technical Epic'));
-      console.log(chalk.yellow(`\n  2. /pm:epic-decompose ${answers.featureName}`));
-      console.log(chalk.gray('     → Breaks Epic into actionable tasks'));
-      console.log(chalk.yellow(`\n  3. /pm:epic-sync ${answers.featureName}`));
-      console.log(chalk.gray('     → Pushes tasks to GitHub/Azure'));
-      console.log(chalk.yellow('\n  4. /pm:next'));
-      console.log(chalk.gray('     → Get your first task to work on'));
 
-      // Optionally create initial GitHub issue
+      if (this.config.provider === 'github') {
+        console.log(chalk.yellow(`\n  1. /pm:prd-parse ${answers.featureName}`));
+        console.log(chalk.gray('     → Transforms PRD into technical Epic'));
+        console.log(chalk.yellow(`\n  2. /pm:epic-decompose ${answers.featureName}`));
+        console.log(chalk.gray('     → Breaks Epic into actionable tasks'));
+        console.log(chalk.yellow(`\n  3. /pm:epic-sync ${answers.featureName}`));
+        console.log(chalk.gray('     → Pushes tasks to GitHub'));
+        console.log(chalk.yellow('\n  4. /pm:next'));
+        console.log(chalk.gray('     → Get your first task to work on'));
+      } else if (this.config.provider === 'azure') {
+        console.log(chalk.yellow(`\n  1. /pm:prd-parse ${answers.featureName}`));
+        console.log(chalk.gray('     → Transforms PRD into technical Epic'));
+        console.log(chalk.yellow(`\n  2. /pm:epic-decompose ${answers.featureName}`));
+        console.log(chalk.gray('     → Breaks Epic into actionable tasks'));
+        console.log(chalk.yellow(`\n  3. /pm:azure-sync ${answers.featureName}`));
+        console.log(chalk.gray('     → Creates Work Items in Azure DevOps'));
+        console.log(chalk.yellow('\n  4. /pm:azure-next'));
+        console.log(chalk.gray('     → Get your first task to work on'));
+
+        console.log(chalk.cyan('\n  Or use Azure-specific commands:'));
+        console.log(chalk.gray(`  • Create epic: `) + chalk.yellow(`autopm azure:epic-new "${answers.featureName}"`));
+        console.log(chalk.gray(`  • Create task: `) + chalk.yellow(`autopm azure:task-new "Task title"`));
+        console.log(chalk.gray(`  • List tasks: `) + chalk.yellow(`autopm azure:task-list`));
+      }
+
+      // Optionally create initial issue/work item
       if (this.config.provider === 'github' && this.config.github.token) {
         const { createIssue } = await inquirer.prompt([
           {
@@ -978,6 +995,30 @@ ${answers.userStory}
           } catch (error) {
             console.log(chalk.yellow('\n⚠️  Could not create GitHub issue automatically'));
           }
+        }
+      } else if (this.config.provider === 'azure' && this.config.azure.token) {
+        const { createWorkItem } = await inquirer.prompt([
+          {
+            type: 'confirm',
+            name: 'createWorkItem',
+            message: 'Create an Azure DevOps work item to track this PRD?',
+            default: true
+          }
+        ]);
+
+        if (createWorkItem) {
+          console.log(chalk.cyan('\n📝 Creating Azure DevOps work item...\n'));
+
+          // Azure DevOps work item creation would require Azure CLI or API
+          console.log(chalk.yellow('⚠️  Azure work item creation requires Azure CLI setup.'));
+          console.log(chalk.gray('You can create it manually with:'));
+          console.log(chalk.yellow(`\n  az boards work-item create \\`));
+          console.log(chalk.yellow(`    --title "PRD: ${answers.featureName}" \\`));
+          console.log(chalk.yellow(`    --type "Epic" \\`));
+          console.log(chalk.yellow(`    --org https://dev.azure.com/${this.config.azure.organization} \\`));
+          console.log(chalk.yellow(`    --project "${this.config.azure.project}"`));
+
+          console.log(chalk.gray('\nOr use the Azure DevOps web interface to create the epic.'));
         }
       }
     } catch (error) {
@@ -1024,10 +1065,20 @@ ${answers.userStory}
         console.log(chalk.gray('  • Start working: ') + chalk.yellow('/pm:next'));
         console.log(chalk.gray('  • Create PRD for bigger features: ') + chalk.yellow('/pm:prd-new'));
       } else if (this.config.provider === 'azure') {
-        // For Azure, we need to use the Azure DevOps API
-        console.log(chalk.yellow('\n⚠️  Azure task creation requires additional setup.'));
-        console.log('You can create it manually with:');
-        console.log(chalk.gray(`  autopm azure:task-new "${answers.taskTitle}" "${answers.taskDescription}"`));
+        // For Azure, provide CLI commands
+        console.log(chalk.yellow('\n⚠️  Azure task creation requires Azure CLI.'));
+        console.log(chalk.gray('You can create it with:'));
+
+        console.log(chalk.yellow(`\n  az boards work-item create \\`));
+        console.log(chalk.yellow(`    --title "${answers.taskTitle}" \\`));
+        console.log(chalk.yellow(`    --type "Task" \\`));
+        console.log(chalk.yellow(`    --org https://dev.azure.com/${this.config.azure.organization} \\`));
+        console.log(chalk.yellow(`    --project "${this.config.azure.project}"`));
+
+        console.log(chalk.cyan('\n📚 You can now:'));
+        console.log(chalk.gray('  • List tasks: ') + chalk.yellow('autopm azure:task-list'));
+        console.log(chalk.gray('  • Create epic: ') + chalk.yellow('autopm azure:epic-new'));
+        console.log(chalk.gray('  • Create PRD for bigger features: ') + chalk.yellow('/pm:prd-new'));
       }
     } catch (error) {
       console.log(chalk.yellow('\n⚠️  We couldn\'t create the task automatically.'));
