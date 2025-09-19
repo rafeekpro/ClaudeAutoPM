@@ -73,19 +73,25 @@ class InteractiveGuide {
         await this.verifyDependencies();
       }
 
-      // Step 3: Configure Provider FIRST (to know if we need git)
+      // Step 3: Choose project location FIRST
+      await this.chooseProjectLocation();
+
+      // Step 4: Get project details (name, description)
+      await this.getProjectDetails();
+
+      // Step 5: Configure Provider (GitHub/Azure)
       await this.configureProvider();
 
-      // Step 4: Project Setup (git init only if using GitHub)
-      await this.setupProject();
+      // Step 6: Setup version control (git) if needed
+      await this.setupVersionControl();
 
-      // Step 5: Install ClaudeAutoPM
+      // Step 7: Install ClaudeAutoPM framework
       await this.installFramework();
 
-      // Step 6: Create First Task (optional)
+      // Step 8: Create First Task (optional)
       await this.createFirstTask();
 
-      // Step 7: Show Summary
+      // Step 9: Show Summary
       await this.showSummary();
 
     } catch (error) {
@@ -111,9 +117,10 @@ class InteractiveGuide {
 `));
 
     console.log(chalk.gray('This guide will help you:'));
-    console.log('  • Verify system requirements');
-    console.log('  • Choose your project management provider (GitHub/Azure)');
-    console.log('  • Set up your project with version control');
+    console.log('  • Choose or create project folder');
+    console.log('  • Set up project details');
+    console.log('  • Select project management provider (GitHub/Azure)');
+    console.log('  • Configure version control if needed');
     console.log('  • Install ClaudeAutoPM framework');
     console.log('  • Create your first task');
     console.log('  • Learn essential commands\n');
@@ -195,8 +202,94 @@ class InteractiveGuide {
     }
   }
 
-  async setupProject() {
-    console.log(chalk.cyan('\n📁 Project Setup\n'));
+  async chooseProjectLocation() {
+    console.log(chalk.cyan('\n📁 Project Location\n'));
+
+    const currentDir = process.cwd();
+    const currentDirName = path.basename(currentDir);
+
+    const { location } = await inquirer.prompt([
+      {
+        type: 'input',
+        name: 'location',
+        message: `Where should the project be located? (Enter for current: ${currentDirName})`,
+        default: '.',
+        validate: (input) => {
+          if (!input || input === '.') return true;
+          // Check if path is valid
+          try {
+            const resolvedPath = path.resolve(input);
+            return true;
+          } catch (error) {
+            return 'Please enter a valid path';
+          }
+        }
+      }
+    ]);
+
+    if (location && location !== '.') {
+      // Create directory if it doesn't exist
+      const projectPath = path.resolve(location);
+
+      if (!fs.existsSync(projectPath)) {
+        const { createDir } = await inquirer.prompt([
+          {
+            type: 'confirm',
+            name: 'createDir',
+            message: `Directory '${location}' doesn't exist. Create it?`,
+            default: true
+          }
+        ]);
+
+        if (createDir) {
+          await fs.ensureDir(projectPath);
+          console.log(chalk.green(`  ✓ Created directory: ${projectPath}`));
+        } else {
+          throw new Error('User cancelled - directory not created');
+        }
+      }
+
+      // Change to the project directory
+      process.chdir(projectPath);
+      this.projectPath = projectPath;
+      this.configPath = path.join(projectPath, '.claude', 'config.json');
+      this.envPath = path.join(projectPath, '.claude', '.env');
+      console.log(chalk.green(`  ✓ Working in: ${projectPath}`));
+    } else {
+      console.log(chalk.green(`  ✓ Using current directory: ${currentDir}`));
+    }
+  }
+
+  async getProjectDetails() {
+    console.log(chalk.cyan('\n📝 Project Details\n'));
+
+    const defaultName = path.basename(this.projectPath || process.cwd());
+
+    const answers = await inquirer.prompt([
+      {
+        type: 'input',
+        name: 'projectName',
+        message: 'Enter your project name:',
+        default: defaultName,
+        validate: (input) => input.length > 0 ? true : 'Project name is required'
+      },
+      {
+        type: 'input',
+        name: 'description',
+        message: 'Enter project description:',
+        default: 'A project managed with ClaudeAutoPM'
+      }
+    ]);
+
+    this.projectName = answers.projectName;
+    this.projectDescription = answers.description;
+
+    console.log(chalk.green(`\n  ✓ Project: ${this.projectName}`));
+    console.log(chalk.gray(`  ${this.projectDescription}`));
+  }
+
+  async setupVersionControl() {
+    console.log(chalk.cyan('\n🔧 Version Control Setup\n'));
 
     // Only setup git if using GitHub provider
     if (this.config.provider === 'github') {
@@ -292,10 +385,6 @@ npm-debug.log*
       // No provider selected or 'none'
       console.log(chalk.gray('  Skipping version control setup (no provider selected)'));
     }
-
-    // Get project name for later use
-    this.projectName = path.basename(process.cwd());
-    console.log(chalk.gray(`  Project name: ${this.projectName}`));
   }
 
   async installFramework() {
@@ -329,12 +418,29 @@ npm-debug.log*
       return;
     }
 
+    // Ask for installation scenario
+    const { scenario } = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'scenario',
+        message: 'Choose your installation scenario:',
+        choices: [
+          { name: 'Full DevOps (Recommended) - All features enabled', value: 3 },
+          { name: 'Docker-only - Adaptive with Docker support', value: 2 },
+          { name: 'Minimal - Sequential execution, basic features', value: 1 },
+          { name: 'Performance - Hybrid parallel for power users', value: 4 },
+          { name: 'Custom - Configure manually', value: 5 }
+        ],
+        default: 3
+      }
+    ]);
+
     try {
       console.log(chalk.gray('  Installing framework files...'));
 
-      // Run autopm install with preset 3 (Full DevOps - recommended)
+      // Run autopm install with selected scenario
       const installScript = require('../node/install.js');
-      await installScript.run(3);
+      await installScript.run(scenario);
 
       console.log(chalk.green('\n  ✓ ClaudeAutoPM framework installed successfully'));
 
@@ -353,6 +459,7 @@ npm-debug.log*
     console.log(chalk.cyan('\n📝 Generating CLAUDE.md\n'));
 
     const projectName = this.projectName || path.basename(process.cwd());
+    const projectDescription = this.projectDescription || 'A project managed with ClaudeAutoPM';
     const repoUrl = this.config.provider === 'github' && this.config.github
       ? `https://github.com/${this.config.github.repository}`
       : this.config.provider === 'azure' && this.config.azure
@@ -360,6 +467,8 @@ npm-debug.log*
       : 'https://github.com/your-org/your-repo';
 
     const claudeMdContent = `# ${projectName}
+
+${projectDescription}
 
 > Project managed by ClaudeAutoPM framework
 > Repository: ${repoUrl}
@@ -697,8 +806,15 @@ Generated by ClaudeAutoPM - ${new Date().toISOString()}
   async showSummary() {
     console.log(chalk.cyan('\n🎉 Setup Complete!\n'));
 
+    console.log(chalk.green('Project Summary:'));
+    console.log(`  • Name: ${this.projectName || path.basename(process.cwd())}`);
+    console.log(`  • Location: ${this.projectPath || process.cwd()}`);
+    if (this.projectDescription) {
+      console.log(`  • Description: ${this.projectDescription}`);
+    }
+
     if (this.config.provider && this.config.provider !== 'none') {
-      console.log(chalk.green('Configuration Summary:'));
+      console.log(chalk.green('\nConfiguration Summary:'));
       console.log(`  • Provider: ${this.config.provider === 'github' ? 'GitHub' : 'Azure DevOps'}`);
 
       if (this.config.provider === 'github') {

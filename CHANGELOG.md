@@ -5,6 +5,23 @@ All notable changes to the ClaudeAutoPM framework will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.6] - 2025-09-19
+
+### Fixed
+- Complete reorder of `autopm guide` workflow for better user experience
+- New logical flow: choose folder → set project details → select provider → setup git → install framework
+
+### Changed
+- Project location selection now comes first (can create new folder or use current)
+- Project name and description collected before provider selection
+- Installation scenario selection added to framework setup
+- Better separation of concerns in guide workflow
+
+### Added
+- Interactive folder selection with directory creation option
+- Project description field for better context
+- Installation scenario choice during framework setup
+
 ## [1.5.5] - 2025-09-19
 
 ### Fixed
