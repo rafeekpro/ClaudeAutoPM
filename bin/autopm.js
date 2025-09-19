@@ -19,8 +19,13 @@ function main() {
   const cli = yargs(hideBin(process.argv));
 
   cli
-    // Load commands from the commands directory
+    // Load commands from both legacy and new directories
     .commandDir(path.join(__dirname, 'commands'), {
+      recurse: true,
+      extensions: ['js']
+    })
+    // Load new migrated commands from src/commands
+    .commandDir(path.join(__dirname, '../src/commands'), {
       recurse: true,
       extensions: ['js']
     })
