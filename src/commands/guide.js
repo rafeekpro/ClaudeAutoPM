@@ -1362,39 +1362,76 @@ Next steps:
         }
       ]);
 
-      console.log(chalk.cyan('\n📚 Next Steps:\n'));
+      console.log(chalk.cyan('\n📚 Installation Complete! Next Steps:\n'));
+
+      // Step 1: Navigate to project
+      console.log(chalk.yellow('  Step 1: Navigate to your project directory'));
+      console.log(chalk.cyan(`  cd ${this.projectPath || process.cwd()}`));
+
+      // Step 2: Open Claude
+      console.log(chalk.yellow('\n  Step 2: Open Claude Code'));
+      console.log(chalk.cyan('  claude'));
+      console.log(chalk.gray('  If you encounter permission issues:'));
+      console.log(chalk.cyan('  claude --bypass-permissions-check'));
 
       if (openClaude) {
-        console.log(chalk.yellow('  Opening Claude Code...'));
-        console.log(chalk.gray('  Once open, run these commands:\n'));
-      } else {
-        console.log(chalk.gray('  In Claude Code, run these commands:\n'));
+        console.log(chalk.gray('\n  (Attempting to open automatically...)'));
       }
+
+      // Step 3: Commands to run
+      console.log(chalk.yellow('\n  Step 3: In Claude Code, run these commands:'));
 
       if (this.config.provider === 'github') {
-        console.log(chalk.yellow(`  1. /pm:prd-parse ${answers.featureName}`));
-        console.log(chalk.gray('     → Transforms PRD into technical Epic'));
-        console.log(chalk.yellow(`\n  2. /pm:epic-decompose ${answers.featureName}`));
-        console.log(chalk.gray('     → Breaks Epic into actionable tasks'));
-        console.log(chalk.yellow(`\n  3. /pm:epic-sync ${answers.featureName}`));
-        console.log(chalk.gray('     → Pushes tasks to GitHub'));
-        console.log(chalk.yellow('\n  4. /pm:next'));
-        console.log(chalk.gray('     → Get your first task to work on'));
-      } else if (this.config.provider === 'azure') {
-        console.log(chalk.yellow(`  1. /pm:prd-parse ${answers.featureName}`));
-        console.log(chalk.gray('     → Transforms PRD into technical Epic'));
-        console.log(chalk.yellow(`\n  2. /pm:epic-decompose ${answers.featureName}`));
-        console.log(chalk.gray('     → Breaks Epic into actionable tasks'));
-        console.log(chalk.yellow(`\n  3. /pm:azure-sync ${answers.featureName}`));
-        console.log(chalk.gray('     → Creates Work Items in Azure DevOps'));
-        console.log(chalk.yellow('\n  4. /pm:azure-next'));
-        console.log(chalk.gray('     → Get your first task to work on'));
+        // Option A: Create new PRD with Claude's help
+        console.log(chalk.cyan('\n  Option A: Create PRD with Claude\'s assistance'));
+        console.log(chalk.green(`  /pm:prd-new ${answers.featureName}`));
+        console.log(chalk.gray('     → Claude will help you create a comprehensive PRD'));
 
-        console.log(chalk.cyan('\n  Or use CLI commands (outside Claude Code):'));
-        console.log(chalk.gray(`  • Create epic: `) + chalk.yellow(`autopm azure:epic-new "${answers.featureName}"`));
-        console.log(chalk.gray(`  • Create task: `) + chalk.yellow(`autopm azure:task-new "Task title"`));
-        console.log(chalk.gray(`  • List tasks: `) + chalk.yellow(`autopm azure:task-list`));
+        // Option B: Use the PRD we just created
+        console.log(chalk.cyan('\n  Option B: Use the PRD created by guide'));
+        console.log(chalk.green(`  /pm:prd-parse ${answers.featureName}`));
+        console.log(chalk.gray('     → Parse the existing PRD into technical Epic'));
+
+        // Then continue with the workflow
+        console.log(chalk.yellow('\n  Then continue with:'));
+        console.log(chalk.green(`  /pm:epic-decompose ${answers.featureName}`));
+        console.log(chalk.gray('     → Break down Epic into specific development tasks'));
+        console.log(chalk.green(`  /pm:epic-sync ${answers.featureName}`));
+        console.log(chalk.gray('     → Create GitHub issues for each task'));
+        console.log(chalk.green('  /pm:next'));
+        console.log(chalk.gray('     → Start working on your first task'));
+      } else if (this.config.provider === 'azure') {
+        // Option A: Create new PRD with Claude's help
+        console.log(chalk.cyan('\n  Option A: Create PRD with Claude\'s assistance'));
+        console.log(chalk.green(`  /pm:prd-new ${answers.featureName}`));
+        console.log(chalk.gray('     → Claude will help you create a comprehensive PRD'));
+
+        // Option B: Use the PRD we just created
+        console.log(chalk.cyan('\n  Option B: Use the PRD created by guide'));
+        console.log(chalk.green(`  /pm:prd-parse ${answers.featureName}`));
+        console.log(chalk.gray('     → Parse the existing PRD into technical Epic'));
+
+        // Then continue with the workflow
+        console.log(chalk.yellow('\n  Then continue with:'));
+        console.log(chalk.green(`  /pm:epic-decompose ${answers.featureName}`));
+        console.log(chalk.gray('     → Break down Epic into specific development tasks'));
+        console.log(chalk.green(`  /pm:azure-sync ${answers.featureName}`));
+        console.log(chalk.gray('     → Create Work Items in Azure DevOps'));
+        console.log(chalk.green('  /pm:azure-next'));
+        console.log(chalk.gray('     → Start working on your first task'));
+
+        console.log(chalk.cyan('\n  Alternative: Use CLI commands (outside Claude Code):'));
+        console.log(chalk.gray(`  • `) + chalk.yellow(`autopm azure:epic-new "${answers.featureName}"`));
+        console.log(chalk.gray(`  • `) + chalk.yellow(`autopm azure:task-new "Task title"`));
+        console.log(chalk.gray(`  • `) + chalk.yellow(`autopm azure:task-list`));
       }
+
+      // Add helpful tips
+      console.log(chalk.cyan('\n💡 Important Notes:'));
+      console.log(chalk.gray('  • All /pm commands work ONLY in Claude Code, not in terminal'));
+      console.log(chalk.gray('  • Use /pm:prd-new for AI-assisted PRD creation (recommended)'));
+      console.log(chalk.gray('  • Use /pm:prd-parse to use the basic PRD created by guide'));
+      console.log(chalk.gray('  • Claude can see your entire project context for better suggestions'));
 
       if (openClaude) {
         try {
@@ -1593,9 +1630,9 @@ After opening this project in Claude Code, run these commands:
   }
 
   async showSummary() {
-    console.log(chalk.cyan('\n🎉 Setup Complete!\n'));
+    console.log(chalk.cyan('\n✅ ClaudeAutoPM Setup Complete!\n'));
 
-    console.log(chalk.green('Project Summary:'));
+    console.log(chalk.green('📌 Project Configuration:'));
     console.log(`  • Name: ${this.projectName || path.basename(process.cwd())}`);
     console.log(`  • Location: ${this.projectPath || process.cwd()}`);
     if (this.projectDescription) {
@@ -1614,7 +1651,22 @@ After opening this project in Claude Code, run these commands:
       }
     }
 
-    console.log(chalk.cyan('\n📚 Next Steps:\n'));
+    // Quick start guide
+    console.log(chalk.cyan('\n🚀 Quick Start - Get Working in 3 Steps:\n'));
+
+    console.log(chalk.yellow('  1️⃣  Navigate to project:'));
+    console.log(chalk.white(`     cd ${this.projectPath || process.cwd()}`));
+
+    console.log(chalk.yellow('\n  2️⃣  Open Claude Code:'));
+    console.log(chalk.white('     claude'));
+    console.log(chalk.gray('     (or: claude --bypass-permissions-check)'));
+
+    console.log(chalk.yellow('\n  3️⃣  Start creating tasks:'));
+    console.log(chalk.white('     /pm:prd-new feature-name'));
+    console.log(chalk.gray('     Let Claude help you create a comprehensive PRD'));
+    console.log(chalk.gray('     Then follow the workflow shown in Claude Code'));
+
+    console.log(chalk.cyan('\n🛠️ CLI Commands (for quick tasks):\n'));
 
     const commands = this.config.provider === 'github'
       ? [
@@ -1635,13 +1687,17 @@ After opening this project in Claude Code, run these commands:
           'autopm help             - Show all available commands'
         ];
 
-    console.log('Useful commands:');
     commands.forEach(cmd => console.log(`  ${chalk.gray(cmd)}`));
 
-    console.log(chalk.cyan('\n📖 Documentation:\n'));
-    console.log('  • Full docs: https://github.com/rafeekpro/ClaudeAutoPM');
-    console.log('  • Quick start: https://github.com/rafeekpro/ClaudeAutoPM#quick-start');
-    console.log('  • Issues: https://github.com/rafeekpro/ClaudeAutoPM/issues');
+    console.log(chalk.cyan('\n🔗 Resources:\n'));
+    console.log('  • Documentation: https://github.com/rafeekpro/ClaudeAutoPM');
+    console.log('  • Report issues: https://github.com/rafeekpro/ClaudeAutoPM/issues');
+    console.log('  • NPM package: https://www.npmjs.com/package/claude-autopm');
+
+    console.log(chalk.yellow('\n⚠️ Remember:'));
+    console.log(chalk.gray('  • All /pm commands work ONLY in Claude Code'));
+    console.log(chalk.gray('  • Use autopm commands in terminal for CLI operations'));
+    console.log(chalk.gray('  • PRD = What to build, Epic = How to build, Tasks = Actual work'));
 
     console.log(chalk.green('\n✨ Happy coding with ClaudeAutoPM!\n'));
   }
