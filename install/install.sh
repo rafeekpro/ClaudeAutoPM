@@ -439,10 +439,19 @@ choose_provider() {
                         print_msg "$CYAN" "GitHub repo name: test-repo (auto-filled)"
                     fi
                 else
-                    echo -n "Enter GitHub owner/org: "
-                    read github_owner
-                    echo -n "Enter GitHub repo name: "
-                    read github_repo
+                    # Check if values were passed via environment variables from guide.js
+                    if [ -n "$GITHUB_OWNER" ] && [ -n "$GITHUB_REPO" ]; then
+                        github_owner="$GITHUB_OWNER"
+                        github_repo="$GITHUB_REPO"
+                        print_msg "$CYAN" "Using GitHub configuration from guide:"
+                        print_msg "$CYAN" "  Owner/org: $github_owner"
+                        print_msg "$CYAN" "  Repository: $github_repo"
+                    else
+                        echo -n "Enter GitHub owner/org: "
+                        read github_owner
+                        echo -n "Enter GitHub repo name: "
+                        read github_repo
+                    fi
                 fi
 
                 export GITHUB_OWNER="$github_owner"
