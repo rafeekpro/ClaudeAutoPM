@@ -5,6 +5,25 @@ All notable changes to the ClaudeAutoPM framework will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.8] - 2025-09-19
+
+### Added
+- Complete PRD (Product Requirements Document) creation workflow in `autopm guide`
+- Full ClaudeAutoPM workflow explanation showing 5-phase process
+- Option to create first PRD with guided wizard
+- Automatic PRD file generation with template structure
+- GitHub issue creation for PRD tracking
+- Choice between full PRD workflow or simple task creation
+
+### Changed
+- Guide now offers structured workflow options: PRD creation, simple task, or skip
+- Enhanced onboarding with complete workflow understanding
+
+### Features
+- PRD wizard collects: feature name, project type, description, user story
+- Generated PRD includes: requirements, success criteria, timeline, next steps
+- Clear instructions for continuing with /pm:prd-parse, /pm:epic-decompose, /pm:epic-sync
+
 ## [1.5.7] - 2025-09-19
 
 ### Added
