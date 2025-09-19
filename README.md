@@ -21,13 +21,30 @@ Stop losing context. Stop blocking on tasks. Stop shipping bugs. ClaudeAutoPM tr
 
 ## 🚀 Get Started in 5 Minutes
 
-### 1. Install (30 seconds)
+### 🎯 Quick Start for New Users
+
+```bash
+npm install -g claude-autopm
+
+# Run the interactive guide
+autopm guide
+```
+
+The interactive guide will walk you through:
+- ✅ System requirements verification
+- ⚙️ Provider configuration (GitHub/Azure)
+- 📝 Creating your first task
+- 📚 Learning essential commands
+
+### Manual Setup
+
+#### 1. Install (30 seconds)
 
 ```bash
 npm install -g claude-autopm
 ```
 
-### 2. Setup Your Project (2 minutes)
+#### 2. Setup Your Project (2 minutes)
 
 ```bash
 # Navigate to your project
@@ -42,7 +59,7 @@ autopm install
 # 3) Full DevOps - Enterprise with Docker + K8s
 ```
 
-### 3. Initialize PM System (1 minute)
+#### 3. Initialize PM System (1 minute)
 
 ```bash
 # In Claude Code, run:
@@ -52,7 +69,7 @@ autopm install
 /init include rules from .claude/CLAUDE.md
 ```
 
-### 4. Ship Your First Feature (90 seconds)
+#### 4. Ship Your First Feature (90 seconds)
 
 ```bash
 # Create a PRD through guided brainstorming

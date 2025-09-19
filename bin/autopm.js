@@ -24,6 +24,11 @@ function main() {
       recurse: true,
       extensions: ['js']
     })
+    // Load new migrated commands from src/commands
+    .commandDir(path.join(__dirname, '../src/commands'), {
+      recurse: true,
+      extensions: ['js']
+    })
     // Legacy commands (temporarily keep for backwards compatibility)
     .command('install [preset]', 'Install ClaudeAutoPM in current directory',
       (yargs) => {
