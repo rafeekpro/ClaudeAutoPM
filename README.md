@@ -11,6 +11,16 @@
 
 Stop losing context. Stop blocking on tasks. Stop shipping bugs. ClaudeAutoPM transforms PRDs into epics, epics into issues, and issues into production code – with full traceability at every step.
 
+## 📖 Documentation
+
+Full documentation is available at: **[https://rafeekpro.github.io/ClaudeAutoPM/](https://rafeekpro.github.io/ClaudeAutoPM/)**
+
+- 📚 [Complete Guide](https://rafeekpro.github.io/ClaudeAutoPM/guide/getting-started)
+- 📝 [Command Reference](https://rafeekpro.github.io/ClaudeAutoPM/commands/overview)
+- 🤖 [Agent Registry](https://rafeekpro.github.io/ClaudeAutoPM/agents/registry)
+- 🔧 [Development Guide](https://rafeekpro.github.io/ClaudeAutoPM/development/docker-first)
+- ⚙️ [Configuration](https://rafeekpro.github.io/ClaudeAutoPM/reference/configuration)
+
 ## 🎯 Key Features
 
 - **96 Professional CLI Commands** - Full yargs-based CLI with auto-generated help
