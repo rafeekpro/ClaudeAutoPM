@@ -22,7 +22,9 @@ export default defineConfig({
       { text: 'Home', link: '/' },
       { text: 'Guide', link: '/guide/getting-started' },
       { text: 'Commands', link: '/commands/overview' },
-      { text: 'Architecture', link: '/architecture/overview' },
+      { text: 'Agents', link: '/agents/registry' },
+      { text: 'Development', link: '/development/docker-first' },
+      { text: 'Reference', link: '/reference/configuration' },
       {
         text: 'Resources',
         items: [
@@ -41,9 +43,10 @@ export default defineConfig({
           collapsed: false,
           items: [
             { text: 'Getting Started', link: '/guide/getting-started' },
-            { text: 'Interactive Setup', link: '/guide/interactive-setup' },
             { text: 'Quick Start', link: '/guide/quick-start' },
-            { text: 'Installation Options', link: '/guide/installation-options' }
+            { text: 'Interactive Setup', link: '/guide/interactive-setup' },
+            { text: 'Installation Guide', link: '/guide/installation' },
+            { text: 'First Project', link: '/guide/first-project' }
           ]
         },
         {
@@ -82,25 +85,14 @@ export default defineConfig({
           collapsed: false,
           items: [
             { text: 'Overview', link: '/commands/overview' },
-            { text: 'CLI Usage', link: '/commands/cli-usage' }
-          ]
-        },
-        {
-          text: 'Core Commands',
-          collapsed: false,
-          items: [
-            { text: 'autopm guide', link: '/commands/guide' },
-            { text: 'autopm install', link: '/commands/install' },
-            { text: 'autopm help', link: '/commands/help' }
+            { text: 'CLI Reference', link: '/commands/cli-reference' }
           ]
         },
         {
           text: 'Project Management',
           collapsed: false,
           items: [
-            { text: 'pm:init', link: '/commands/pm-init' },
-            { text: 'pm:status', link: '/commands/pm-status' },
-            { text: 'pm:sync', link: '/commands/pm-sync' },
+            { text: 'PM Commands', link: '/commands/pm-commands' },
             { text: 'Epic Commands', link: '/commands/pm-epic' },
             { text: 'Issue Commands', link: '/commands/pm-issue' },
             { text: 'PRD Commands', link: '/commands/pm-prd' }
@@ -108,9 +100,9 @@ export default defineConfig({
         },
         {
           text: 'Azure DevOps',
-          collapsed: true,
+          collapsed: false,
           items: [
-            { text: 'azure:init', link: '/commands/azure-init' },
+            { text: 'Azure Integration', link: '/commands/azure-devops' },
             { text: 'Task Commands', link: '/commands/azure-task' },
             { text: 'User Story Commands', link: '/commands/azure-us' },
             { text: 'Feature Commands', link: '/commands/azure-feature' }
@@ -127,6 +119,48 @@ export default defineConfig({
           ]
         }
       ],
+      '/agents/': [
+        {
+          text: 'Agent System',
+          collapsed: false,
+          items: [
+            { text: 'Agent Registry', link: '/agents/registry' },
+            { text: 'Selection Guide', link: '/agents/selection-guide' },
+            { text: 'Custom Agents', link: '/agents/custom-agents' }
+          ]
+        }
+      ],
+      '/development/': [
+        {
+          text: 'Development Guide',
+          collapsed: false,
+          items: [
+            { text: 'Docker First Development', link: '/development/docker-first' },
+            { text: 'Testing Strategies', link: '/development/testing' },
+            { text: 'Quality Assurance', link: '/development/quality' },
+            { text: 'GitHub Actions', link: '/development/github-actions' }
+          ]
+        }
+      ],
+      '/reference/': [
+        {
+          text: 'Configuration',
+          collapsed: false,
+          items: [
+            { text: 'Configuration Options', link: '/reference/configuration' },
+            { text: 'Environment Variables', link: '/reference/environment-vars' },
+            { text: 'Feature Toggles', link: '/reference/feature-toggles' }
+          ]
+        },
+        {
+          text: 'Templates & Guides',
+          collapsed: false,
+          items: [
+            { text: 'CLAUDE Templates', link: '/reference/claude-templates' },
+            { text: 'Troubleshooting', link: '/reference/troubleshooting' }
+          ]
+        }
+      ],
       '/architecture/': [
         {
           text: 'System Architecture',
@@ -135,26 +169,6 @@ export default defineConfig({
             { text: 'Overview', link: '/architecture/overview' },
             { text: 'Project Structure', link: '/architecture/structure' },
             { text: 'Core Components', link: '/architecture/components' }
-          ]
-        },
-        {
-          text: 'Agent System',
-          collapsed: false,
-          items: [
-            { text: 'Agent Architecture', link: '/architecture/agent-system' },
-            { text: 'Agent Registry', link: '/architecture/agent-registry' },
-            { text: 'Execution Strategies', link: '/architecture/execution-strategies' },
-            { text: 'Agent Communication', link: '/architecture/agent-communication' }
-          ]
-        },
-        {
-          text: 'Technical Details',
-          collapsed: false,
-          items: [
-            { text: 'Provider System', link: '/architecture/providers' },
-            { text: 'Command Router', link: '/architecture/command-router' },
-            { text: 'Configuration', link: '/architecture/configuration' },
-            { text: 'Security', link: '/architecture/security' }
           ]
         }
       ]
