@@ -5,6 +5,19 @@ All notable changes to the ClaudeAutoPM framework will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.7] - 2025-09-19
+
+### Added
+- Detailed explanations for each installation scenario in `autopm guide`
+- Comparison table showing complexity, speed, features for each scenario
+- Clear recommendations for which projects suit each installation type
+- Visual indicators (stars, colors) to help users choose the right option
+
+### Improved
+- Installation scenario selection now includes comprehensive guidance
+- Each scenario lists specific use cases and project types
+- Better user experience with clear visual hierarchy
+
 ## [1.5.6] - 2025-09-19
 
 ### Fixed

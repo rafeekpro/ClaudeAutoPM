@@ -418,6 +418,50 @@ npm-debug.log*
       return;
     }
 
+    // Show scenario explanations
+    console.log(chalk.cyan('\n📋 Installation Scenarios Explained:\n'));
+
+    // Quick comparison
+    console.log(chalk.gray('┌─────────────┬──────────────┬───────────┬──────────┬────────────┐'));
+    console.log(chalk.gray('│ Scenario    │ Complexity   │ Speed     │ Features │ Best For   │'));
+    console.log(chalk.gray('├─────────────┼──────────────┼───────────┼──────────┼────────────┤'));
+    console.log(chalk.gray('│ Minimal     │ ⭐           │ Fast      │ Basic    │ Learning   │'));
+    console.log(chalk.gray('│ Docker      │ ⭐⭐         │ Moderate  │ Container│ Microservices│'));
+    console.log(chalk.gray('│ ') + chalk.green('Full DevOps') + chalk.gray(' │ ⭐⭐⭐       │ Adaptive  │ ') + chalk.green('All') + chalk.gray('      │ ') + chalk.green('Production') + chalk.gray(' │'));
+    console.log(chalk.gray('│ Performance │ ⭐⭐⭐⭐     │ ') + chalk.yellow('Parallel') + chalk.gray('  │ Advanced │ Large Apps │'));
+    console.log(chalk.gray('│ Custom      │ ⭐⭐⭐⭐⭐   │ Variable  │ Custom   │ Special    │'));
+    console.log(chalk.gray('└─────────────┴──────────────┴───────────┴──────────┴────────────┘\n'));
+
+    console.log(chalk.yellow('1. Minimal') + chalk.gray(' - Best for:'));
+    console.log(chalk.gray('   • Small personal projects (< 10 files)'));
+    console.log(chalk.gray('   • Learning ClaudeAutoPM basics'));
+    console.log(chalk.gray('   • Simple scripts and utilities'));
+    console.log(chalk.gray('   • Projects without CI/CD needs\n'));
+
+    console.log(chalk.yellow('2. Docker-only') + chalk.gray(' - Best for:'));
+    console.log(chalk.gray('   • Microservices and containerized apps'));
+    console.log(chalk.gray('   • Projects requiring consistent environments'));
+    console.log(chalk.gray('   • Teams using Docker for development'));
+    console.log(chalk.gray('   • Cloud-native applications\n'));
+
+    console.log(chalk.green('3. Full DevOps (RECOMMENDED)') + chalk.gray(' - Best for:'));
+    console.log(chalk.gray('   • Production applications'));
+    console.log(chalk.gray('   • Team projects with CI/CD pipelines'));
+    console.log(chalk.gray('   • Enterprise software development'));
+    console.log(chalk.gray('   • Projects needing all automation features\n'));
+
+    console.log(chalk.yellow('4. Performance') + chalk.gray(' - Best for:'));
+    console.log(chalk.gray('   • Large codebases (1000+ files)'));
+    console.log(chalk.gray('   • High-performance computing projects'));
+    console.log(chalk.gray('   • Teams with powerful development machines'));
+    console.log(chalk.gray('   • Projects requiring maximum parallelization\n'));
+
+    console.log(chalk.yellow('5. Custom') + chalk.gray(' - Best for:'));
+    console.log(chalk.gray('   • Unique project requirements'));
+    console.log(chalk.gray('   • Hybrid cloud/on-premise setups'));
+    console.log(chalk.gray('   • Projects with specific compliance needs'));
+    console.log(chalk.gray('   • Advanced users who want full control\n'));
+
     // Ask for installation scenario
     const { scenario } = await inquirer.prompt([
       {
@@ -425,11 +469,11 @@ npm-debug.log*
         name: 'scenario',
         message: 'Choose your installation scenario:',
         choices: [
-          { name: 'Full DevOps (Recommended) - All features enabled', value: 3 },
-          { name: 'Docker-only - Adaptive with Docker support', value: 2 },
-          { name: 'Minimal - Sequential execution, basic features', value: 1 },
-          { name: 'Performance - Hybrid parallel for power users', value: 4 },
-          { name: 'Custom - Configure manually', value: 5 }
+          { name: chalk.green('Full DevOps (RECOMMENDED)') + ' - All features, CI/CD, team collaboration', value: 3 },
+          { name: chalk.yellow('Docker-only') + ' - Containerized development, microservices', value: 2 },
+          { name: chalk.yellow('Minimal') + ' - Simple projects, learning, basic features', value: 1 },
+          { name: chalk.yellow('Performance') + ' - Large codebases, maximum speed', value: 4 },
+          { name: chalk.gray('Custom') + ' - Configure everything manually', value: 5 }
         ],
         default: 3
       }
