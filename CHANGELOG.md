@@ -5,6 +5,28 @@ All notable changes to the ClaudeAutoPM framework will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.10] - 2025-09-19
+
+### Added
+- Comprehensive token acquisition guides for GitHub and Azure DevOps
+- Step-by-step instructions for getting Personal Access Tokens
+- GitHub repository creation with automatic `gh repo create` integration
+- Azure DevOps project creation instructions
+- Token validation with optional entry (can skip and add later)
+
+### Improved
+- Token entry is now optional - users can add it later to `.claude/.env`
+- Clear instructions on where to find and create tokens
+- Repository verification and creation workflow for GitHub
+- Better error handling when gh CLI is not installed
+- Links to token creation pages for both providers
+
+### Features
+- GitHub: Auto-create repository if it doesn't exist (with gh CLI)
+- GitHub: Set up git remote automatically after repo creation
+- Azure: Clear instructions for manual project creation
+- Both: Token scopes clearly specified (repo, workflow for GitHub; Work Items, Code for Azure)
+
 ## [1.5.9] - 2025-09-19
 
 ### Fixed
