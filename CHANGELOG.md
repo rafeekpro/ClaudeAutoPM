@@ -5,6 +5,157 @@ All notable changes to the ClaudeAutoPM framework will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.10] - 2025-09-19
+
+### Added
+- Comprehensive token acquisition guides for GitHub and Azure DevOps
+- Step-by-step instructions for getting Personal Access Tokens
+- GitHub repository creation with automatic `gh repo create` integration
+- Azure DevOps project creation instructions
+- Token validation with optional entry (can skip and add later)
+
+### Improved
+- Token entry is now optional - users can add it later to `.claude/.env`
+- Clear instructions on where to find and create tokens
+- Repository verification and creation workflow for GitHub
+- Better error handling when gh CLI is not installed
+- Links to token creation pages for both providers
+
+### Features
+- GitHub: Auto-create repository if it doesn't exist (with gh CLI)
+- GitHub: Set up git remote automatically after repo creation
+- Azure: Clear instructions for manual project creation
+- Both: Token scopes clearly specified (repo, workflow for GitHub; Work Items, Code for Azure)
+
+## [1.5.9] - 2025-09-19
+
+### Fixed
+- Added Azure DevOps support for PRD workflow in `autopm guide`
+- Provider-specific next steps for GitHub vs Azure
+- Azure CLI commands for creating work items
+
+### Added
+- Azure-specific commands after PRD creation (`/pm:azure-sync`, `/pm:azure-next`)
+- Azure work item creation instructions with `az boards` CLI
+- Proper routing based on selected provider (GitHub or Azure)
+
+## [1.5.8] - 2025-09-19
+
+### Added
+- Complete PRD (Product Requirements Document) creation workflow in `autopm guide`
+- Full ClaudeAutoPM workflow explanation showing 5-phase process
+- Option to create first PRD with guided wizard
+- Automatic PRD file generation with template structure
+- GitHub issue creation for PRD tracking
+- Choice between full PRD workflow or simple task creation
+
+### Changed
+- Guide now offers structured workflow options: PRD creation, simple task, or skip
+- Enhanced onboarding with complete workflow understanding
+
+### Features
+- PRD wizard collects: feature name, project type, description, user story
+- Generated PRD includes: requirements, success criteria, timeline, next steps
+- Clear instructions for continuing with /pm:prd-parse, /pm:epic-decompose, /pm:epic-sync
+
+## [1.5.7] - 2025-09-19
+
+### Added
+- Detailed explanations for each installation scenario in `autopm guide`
+- Comparison table showing complexity, speed, features for each scenario
+- Clear recommendations for which projects suit each installation type
+- Visual indicators (stars, colors) to help users choose the right option
+
+### Improved
+- Installation scenario selection now includes comprehensive guidance
+- Each scenario lists specific use cases and project types
+- Better user experience with clear visual hierarchy
+
+## [1.5.6] - 2025-09-19
+
+### Fixed
+- Complete reorder of `autopm guide` workflow for better user experience
+- New logical flow: choose folder → set project details → select provider → setup git → install framework
+
+### Changed
+- Project location selection now comes first (can create new folder or use current)
+- Project name and description collected before provider selection
+- Installation scenario selection added to framework setup
+- Better separation of concerns in guide workflow
+
+### Added
+- Interactive folder selection with directory creation option
+- Project description field for better context
+- Installation scenario choice during framework setup
+
+## [1.5.5] - 2025-09-19
+
+### Fixed
+- Fixed `autopm guide` workflow order - provider selection now comes before git initialization
+- Git repository setup is now only required for GitHub provider (optional for Azure DevOps)
+- More logical flow: choose provider → setup git (if needed) → install framework → configure
+
+### Changed
+- Improved guide workflow to be more intuitive and user-friendly
+- Provider-specific git requirements are now properly handled
+
+## [1.5.4] - 2025-09-19
+
+### Added
+- CLAUDE.md generation in `autopm guide` with comprehensive project context
+- Project-specific Claude instructions tailored to the chosen configuration
+- Automatic project folder creation during guide setup
+
+### Fixed
+- GitHub issue creation now uses `gh` CLI and actually creates issues
+- Configuration properly saved to `.claude/config.json` and `.claude/.env`
+- Project folder creation and navigation during guide
+
+## [1.5.3] - 2025-09-19
+
+### Added
+- Complete setup workflow in `autopm guide` including:
+  - Project folder creation
+  - Git repository initialization
+  - Automatic `autopm install` execution
+  - GitHub issue creation with gh CLI
+  - Configuration persistence
+  - Reset option for reconfiguration
+
+### Fixed
+- ESM/CJS compatibility issues with chalk and inquirer
+- Guide now properly saves configuration to files
+- Framework installation integrated into guide workflow
+
+## [1.5.2] - 2025-09-19
+
+### Fixed
+- Added missing `src/` directory to npm package files
+- Resolved `ENOENT` error during npm installation
+- Included all necessary source files in published package
+
+## [1.5.1] - 2025-09-19
+
+### Added
+- Interactive setup guide (`autopm guide`) for new users
+- Streamlined onboarding with provider detection
+- Step-by-step configuration wizard
+
+### Fixed
+- Module compatibility issues
+- Installation path resolution
+
+## [1.5.0] - 2025-09-19
+
+### Added
+- Complete TDD implementation with comprehensive command infrastructure
+- Full migration from legacy implementation
+- Enhanced testing coverage
+
+### Fixed
+- Test isolation and cleanup of obsolete files
+- Command execution reliability
+
 ## [1.3.0] - 2025-09-16
 
 ### 🚀 Major Release - Bash to Node.js Migration (Phase 3 Complete)
