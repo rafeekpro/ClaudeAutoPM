@@ -66,7 +66,7 @@ describe('traefik:setup command', () => {
       assert.ok(configFile, 'Should create traefik.yml configuration file');
     });
 
-    it('should generate docker-compose configuration', async () => {
+    it('should generate docker compose configuration', async () => {
       // Act
       const result = await exec(
         `node ${path.join(__dirname, '../../../bin/autopm.js')} traefik:setup docker`
@@ -77,9 +77,9 @@ describe('traefik:setup command', () => {
       // Assert
       assert.ok(!result.stderr || result.code === 0, 'Should generate docker config without errors');
       assert.ok(stdout.includes('Docker') || stdout.includes('Compose'),
-        'Should show docker-compose generation');
+        'Should show docker compose generation');
 
-      // Check if docker-compose was created
+      // Check if docker compose was created
       const dockerFile = await fs.readFile(
         path.join(testDir, '.claude', 'traefik', 'docker-compose.yml'),
         'utf8'
