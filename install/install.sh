@@ -1451,13 +1451,17 @@ main() {
             read env_choice
 
             if [ "$env_choice" = "a" ] || [ "$env_choice" = "A" ]; then
-                create_env_interactive "$source_dir"
+                # Pass the installation scenario to create_env_interactive
+                local scenario="${INSTALLATION_SCENARIO:-${AUTOPM_SCENARIO:-3}}"
+                create_env_interactive "$source_dir" "$scenario"
             else
                 # Create basic .env from guide configuration
                 create_basic_env_from_guide
             fi
         elif confirm "🔧 Would you like to set up your .env configuration interactively?"; then
-            create_env_interactive "$source_dir"
+            # Pass the installation scenario to create_env_interactive
+            local scenario="${INSTALLATION_SCENARIO:-${AUTOPM_SCENARIO:-3}}"
+            create_env_interactive "$source_dir" "$scenario"
         else
             print_msg "$YELLOW" "⏭️  Skipping .env setup - you can copy .claude/.env.example to .claude/.env manually"
         fi
