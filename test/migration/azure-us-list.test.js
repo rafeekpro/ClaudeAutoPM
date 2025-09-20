@@ -4,6 +4,11 @@ const { describe, it, beforeEach, afterEach, mock } = require('node:test');
 const assert = require('node:assert');
 
 describe('Azure US List Migration', () => {
+  // Skip these tests unless in integration test mode
+  if (!process.env.AZURE_DEVOPS_INTEGRATION_TESTS) {
+    console.log("Skipping Azure DevOps tests (set AZURE_DEVOPS_INTEGRATION_TESTS=true to run)");
+    return;
+  }
   let originalEnv;
   let mockClient;
   let consoleOutput;

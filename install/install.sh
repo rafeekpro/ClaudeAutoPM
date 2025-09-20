@@ -36,7 +36,6 @@ INSTALL_ITEMS=(
     ".claude/mcp"
     ".claude/.env.example"
     ".claude-code"
-    "scripts"
 )
 
 # Print banner
@@ -407,14 +406,38 @@ choose_provider() {
         fi
     fi
 
-    print_msg "$YELLOW" "\n🎯 Choose your project management platform:"
-    echo ""
-    echo "  1) 📙 GitHub (Recommended) - Best for open source, startups"
-    echo "  2) 🔷 Azure DevOps - Best for enterprise, Agile teams"
-    echo ""
+    # Check if provider was already selected (passed from guide.js)
+    if [ -n "$AUTOPM_PROVIDER" ]; then
+        case "$AUTOPM_PROVIDER" in
+            github)
+                choice="1"
+                print_msg "$GREEN" "✓ Using GitHub (pre-selected)"
+                ;;
+            azure)
+                choice="2"
+                print_msg "$GREEN" "✓ Using Azure DevOps (pre-selected)"
+                ;;
+            *)
+                print_msg "$YELLOW" "\n🎯 Choose your project management platform:"
+                echo ""
+                echo "  1) 📙 GitHub (Recommended) - Best for open source, startups"
+                echo "  2) 🔷 Azure DevOps - Best for enterprise, Agile teams"
+                echo ""
+                ;;
+        esac
+    else
+        print_msg "$YELLOW" "\n🎯 Choose your project management platform:"
+        echo ""
+        echo "  1) 📙 GitHub (Recommended) - Best for open source, startups"
+        echo "  2) 🔷 Azure DevOps - Best for enterprise, Agile teams"
+        echo ""
+    fi
 
     while true; do
-        if [ "$AUTOPM_TEST_MODE" = "1" ]; then
+        if [ -n "$choice" ]; then
+            # Choice was pre-selected, skip prompt
+            true
+        elif [ "$AUTOPM_TEST_MODE" = "1" ]; then
             choice="1"
             print_msg "$CYAN" "❓ Your choice [1-2]: 1 (auto-selected GitHub in test mode)"
         else
@@ -439,10 +462,19 @@ choose_provider() {
                         print_msg "$CYAN" "GitHub repo name: test-repo (auto-filled)"
                     fi
                 else
-                    echo -n "Enter GitHub owner/org: "
-                    read github_owner
-                    echo -n "Enter GitHub repo name: "
-                    read github_repo
+                    # Check if values were passed via environment variables from guide.js
+                    if [ -n "$GITHUB_OWNER" ] && [ -n "$GITHUB_REPO" ]; then
+                        github_owner="$GITHUB_OWNER"
+                        github_repo="$GITHUB_REPO"
+                        print_msg "$CYAN" "Using GitHub configuration from guide:"
+                        print_msg "$CYAN" "  Owner/org: $github_owner"
+                        print_msg "$CYAN" "  Repository: $github_repo"
+                    else
+                        echo -n "Enter GitHub owner/org: "
+                        read github_owner
+                        echo -n "Enter GitHub repo name: "
+                        read github_repo
+                    fi
                 fi
 
                 export GITHUB_OWNER="$github_owner"
@@ -467,6 +499,15 @@ choose_provider() {
                         print_msg "$CYAN" "Azure project: test-project (auto-filled)"
                         print_msg "$CYAN" "Azure team: (default, auto-filled)"
                     fi
+                elif [ -n "$AZURE_ORG" ] && [ -n "$AZURE_PROJECT" ]; then
+                    # Use environment variables from guide.js
+                    azure_org="$AZURE_ORG"
+                    azure_project="$AZURE_PROJECT"
+                    azure_team="${AZURE_TEAM:-}"
+                    print_msg "$CYAN" "Using Azure configuration from guide:"
+                    print_msg "$CYAN" "  Organization: $azure_org"
+                    print_msg "$CYAN" "  Project: $azure_project"
+                    [ -n "$azure_team" ] && print_msg "$CYAN" "  Team: $azure_team"
                 else
                     echo -n "Enter Azure organization: "
                     read azure_org
@@ -526,10 +567,10 @@ choose_configuration() {
             print_msg "$CYAN" "🔧 Using preset configuration: $AUTOPM_CONFIG_PRESET"
             # Clear the preset after using it once to exit the loop
             AUTOPM_CONFIG_PRESET=""
-        # In test mode, auto-select Full DevOps configuration (option 3)
+        # In test mode, read the choice from stdin (tests will provide it)
         elif [ "$AUTOPM_TEST_MODE" = "1" ]; then
-            choice="3"
-            print_msg "$CYAN" "❓ Your choice [1-5]: 3 (auto-selected Full DevOps in test mode)"
+            read -r choice
+            print_msg "$CYAN" "❓ Your choice [1-5]: $choice (test mode)"
         else
             echo -n "Your choice [1-5]: "
             read -r choice
@@ -941,99 +982,198 @@ get_input() {
     echo "$default"
 }
 
+# Create basic .env from guide configuration
+create_basic_env_from_guide() {
+    local target_env="$TARGET_DIR/.claude/.env"
+
+    print_msg "$CYAN" "Creating basic .env with provided credentials..."
+
+    local env_content=""
+    env_content+="# ============================================\n"
+    env_content+="# Basic Configuration from Guide Setup\n"
+    env_content+="# Generated on $(date)\n"
+    env_content+="# ============================================\n\n"
+
+    if [ -n "$GITHUB_TOKEN" ]; then
+        env_content+="# GitHub Configuration\n"
+        env_content+="GITHUB_TOKEN=${GITHUB_TOKEN}\n"
+        env_content+="GITHUB_REPOSITORY=${GITHUB_OWNER}/${GITHUB_REPO}\n"
+        env_content+="GITHUB_OWNER=${GITHUB_OWNER}\n"
+        env_content+="GITHUB_REPO=${GITHUB_REPO}\n\n"
+    fi
+
+    if [ -n "$AZURE_PAT" ]; then
+        env_content+="# Azure DevOps Configuration\n"
+        env_content+="AZURE_DEVOPS_PAT=${AZURE_PAT}\n"
+        env_content+="AZURE_DEVOPS_ORG=${AZURE_ORG}\n"
+        env_content+="AZURE_DEVOPS_PROJECT=${AZURE_PROJECT}\n\n"
+    fi
+
+    env_content+="# Environment\n"
+    env_content+="NODE_ENV=development\n"
+    env_content+="DEBUG=false\n\n"
+
+    env_content+="# ============================================\n"
+    env_content+="# To add MCP servers and AI integrations,\n"
+    env_content+="# run: autopm install and choose advanced setup\n"
+    env_content+="# ============================================\n"
+
+    echo -e "$env_content" > "$target_env"
+    print_success ".env file created with basic configuration"
+}
+
 # Interactive .env creator
 create_env_interactive() {
     local source_dir="$1"
     local env_example="$source_dir/.claude/.env.example"
     local target_env="$TARGET_DIR/.claude/.env"
-    
+
     if [ ! -f "$env_example" ]; then
         print_warning ".env.example not found, skipping .env creation"
         return
     fi
-    
+
     if [ -f "$target_env" ]; then
-        if ! confirm "📝 .env file already exists. Would you like to recreate it interactively?"; then
+        if ! confirm "📝 .env file already exists. Would you like to recreate it?"; then
             return
         fi
-        
+
         # Backup existing .env
         cp "$target_env" "$target_env.backup.$(date +%Y%m%d_%H%M%S)"
         print_success "Existing .env backed up"
     fi
     
-    print_msg "$BLUE$BOLD" "\n🔧 Interactive .env Configuration"
-    print_msg "$CYAN" "Let's set up your environment configuration step by step."
+    # Determine what to configure based on scenario
+    local configure_mcp=false
+    local configure_ai=false
+    local configure_cloud=false
+    local configure_playwright=false
+
+    case "$scenario" in
+        1)  # Minimal - only basic credentials
+            print_msg "$BLUE$BOLD" "\n🔧 Basic .env Configuration (Minimal)"
+            print_msg "$CYAN" "Setting up essential credentials only."
+            ;;
+        2)  # Docker-only - add Docker-related
+            configure_playwright=true
+            print_msg "$BLUE$BOLD" "\n🔧 Docker-focused .env Configuration"
+            print_msg "$CYAN" "Setting up Docker and testing credentials."
+            ;;
+        3|4)  # Full DevOps or Performance - everything
+            configure_mcp=true
+            configure_ai=true
+            configure_cloud=true
+            configure_playwright=true
+            print_msg "$BLUE$BOLD" "\n🔧 Complete .env Configuration"
+            print_msg "$CYAN" "Setting up all integrations and services."
+            ;;
+        *)  # Custom/default - ask what they want
+            print_msg "$BLUE$BOLD" "\n🔧 Custom .env Configuration"
+            configure_mcp=$(confirm "Configure MCP servers (Context7, etc)?" && echo true || echo false)
+            configure_ai=$(confirm "Configure AI providers (OpenAI, etc)?" && echo true || echo false)
+            configure_cloud=$(confirm "Configure cloud providers (AWS, Azure, GCP)?" && echo true || echo false)
+            configure_playwright=$(confirm "Configure Playwright testing?" && echo true || echo false)
+            ;;
+    esac
+
     print_msg "$YELLOW" "You can skip optional fields by pressing Enter."
     echo ""
-    
+
     # Start building the .env content
     local env_content=""
-    
+
     # Add header
     env_content+="# ============================================\n"
-    env_content+="# MCP (Model Context Protocol) Configuration\n"
+    env_content+="# Environment Configuration\n"
     env_content+="# Generated on $(date)\n"
-    env_content+="# ============================================\n\n"
-    
-    # Context7 Configuration
-    print_msg "$GREEN$BOLD" "📚 Context7 MCP Server Configuration"
-    print_msg "$CYAN" "Context7 provides documentation and codebase context for AI agents."
-    
-    local context7_key
-    context7_key=$(get_input "Context7 API Key (get from https://context7.com/account)" "" "token" false)
-    local context7_workspace
-    context7_workspace=$(get_input "Context7 Workspace ID or name" "" "text" false)
-    
-    env_content+="# Context7 MCP Server Configuration\n"
-    env_content+="# ------------------------------------------\n"
-    env_content+="CONTEXT7_API_KEY=${context7_key}\n"
-    env_content+="CONTEXT7_MCP_URL=mcp.context7.com/mcp\n"
-    env_content+="CONTEXT7_API_URL=context7.com/api/v1\n"
-    env_content+="CONTEXT7_WORKSPACE=${context7_workspace}\n"
-    env_content+="CONTEXT7_MODE=documentation\n"
-    env_content+="CONTEXT7_CACHE_TTL=3600\n\n"
+    env_content+="# Scenario: "
+    case "$scenario" in
+        1) env_content+="Minimal" ;;
+        2) env_content+="Docker-only" ;;
+        3) env_content+="Full DevOps" ;;
+        4) env_content+="Performance" ;;
+        *) env_content+="Custom" ;;
+    esac
+    env_content+="\n# ============================================\n\n"
+
+    # Context7 Configuration (only if MCP is enabled)
+    if [ "$configure_mcp" = true ]; then
+        print_msg "$GREEN$BOLD" "📚 Context7 MCP Server Configuration"
+        print_msg "$CYAN" "Context7 provides documentation and codebase context for AI agents."
+
+        local context7_key
+        context7_key=$(get_input "Context7 API Key (get from https://context7.com/account)" "" "token" false)
+        local context7_workspace
+        context7_workspace=$(get_input "Context7 Workspace ID or name" "" "text" false)
+
+        env_content+="# Context7 MCP Server Configuration\n"
+        env_content+="# ------------------------------------------\n"
+        env_content+="CONTEXT7_API_KEY=${context7_key}\n"
+        env_content+="CONTEXT7_MCP_URL=mcp.context7.com/mcp\n"
+        env_content+="CONTEXT7_API_URL=context7.com/api/v1\n"
+        env_content+="CONTEXT7_WORKSPACE=${context7_workspace}\n"
+        env_content+="CONTEXT7_MODE=documentation\n"
+        env_content+="CONTEXT7_CACHE_TTL=3600\n\n"
+    fi
     
     # GitHub Configuration
     print_msg "$GREEN$BOLD" "🐙 GitHub Configuration"
     print_msg "$CYAN" "GitHub integration for repository operations and issue management."
-    
+
     local github_token
-    github_token=$(get_input "GitHub Personal Access Token (create at: https://github.com/settings/tokens)" "" "token" false)
+    if [ -n "$GITHUB_TOKEN" ]; then
+        print_msg "$GREEN" "✓ Using GitHub token from guide setup"
+        github_token="$GITHUB_TOKEN"
+    else
+        github_token=$(get_input "GitHub Personal Access Token (create at: https://github.com/settings/tokens)" "" "token" false)
+    fi
     
     env_content+="# GitHub MCP Server Configuration\n"
     env_content+="# ============================================\n"
     env_content+="GITHUB_TOKEN=${github_token}\n"
     env_content+="GITHUB_API_URL=https://api.github.com\n\n"
     
-    # Playwright Configuration
-    print_msg "$GREEN$BOLD" "🎭 Playwright Configuration"
-    print_msg "$CYAN" "Browser automation for testing (optional)."
-    
-    local playwright_browser
-    playwright_browser=$(get_input "Playwright Browser" "chromium" "text" false)
-    local playwright_headless
-    if confirm "Run Playwright in headless mode?"; then
-        playwright_headless="true"
-    else
-        playwright_headless="false"
+    # Playwright Configuration (only if enabled)
+    if [ "$configure_playwright" = true ]; then
+        print_msg "$GREEN$BOLD" "🎭 Playwright Configuration"
+        print_msg "$CYAN" "Browser automation for testing (optional)."
+
+        local playwright_browser
+        playwright_browser=$(get_input "Playwright Browser" "chromium" "text" false)
+        local playwright_headless
+        if confirm "Run Playwright in headless mode?"; then
+            playwright_headless="true"
+        else
+            playwright_headless="false"
+        fi
+
+        env_content+="# Playwright MCP Server Configuration\n"
+        env_content+="# ============================================\n"
+        env_content+="PLAYWRIGHT_BROWSER=${playwright_browser}\n"
+        env_content+="PLAYWRIGHT_HEADLESS=${playwright_headless}\n\n"
     fi
-    
-    env_content+="# Playwright MCP Server Configuration\n"
-    env_content+="# ============================================\n"
-    env_content+="PLAYWRIGHT_BROWSER=${playwright_browser}\n"
-    env_content+="PLAYWRIGHT_HEADLESS=${playwright_headless}\n\n"
     
     # Azure DevOps (Optional)
     print_msg "$GREEN$BOLD" "🔷 Azure DevOps Configuration (Optional)"
-    if confirm "Would you like to configure Azure DevOps integration?"; then
+    if [ -n "$AZURE_PAT" ]; then
+        print_msg "$GREEN" "✓ Using Azure DevOps configuration from guide setup"
+        local azdo_pat="$AZURE_PAT"
+        local azdo_org="$AZURE_ORG"
+        local azdo_project="$AZURE_PROJECT"
+
+        env_content+="# Azure DevOps Configuration\n"
+        env_content+="# ============================================\n"
+        env_content+="AZURE_DEVOPS_PAT=${azdo_pat}\n"
+        env_content+="AZURE_DEVOPS_ORG=${azdo_org}\n"
+        env_content+="AZURE_DEVOPS_PROJECT=${azdo_project}\n\n"
+    elif confirm "Would you like to configure Azure DevOps integration?"; then
         local azdo_pat
         azdo_pat=$(get_input "Azure DevOps Personal Access Token" "" "token" false)
         local azdo_org
         azdo_org=$(get_input "Azure DevOps Organization" "" "text" false)
         local azdo_project
         azdo_project=$(get_input "Azure DevOps Project" "" "text" false)
-        
+
         env_content+="# Azure DevOps Configuration\n"
         env_content+="# ============================================\n"
         env_content+="AZURE_DEVOPS_PAT=${azdo_pat}\n"
@@ -1047,9 +1187,10 @@ create_env_interactive() {
         env_content+="# AZURE_DEVOPS_PROJECT=your-project\n\n"
     fi
     
-    # Cloud Providers (Optional)
-    print_msg "$GREEN$BOLD" "☁️ Cloud Provider Configuration (Optional)"
-    if confirm "Would you like to configure cloud provider credentials?"; then
+    # Cloud Providers (only if enabled)
+    if [ "$configure_cloud" = true ]; then
+        print_msg "$GREEN$BOLD" "☁️ Cloud Provider Configuration"
+        print_msg "$CYAN" "Configure cloud provider credentials for deployment and infrastructure."
         
         # AWS
         if confirm "Configure AWS credentials?"; then
@@ -1100,9 +1241,10 @@ create_env_interactive() {
         fi
     fi
     
-    # AI Provider API Keys (Optional)
-    print_msg "$GREEN$BOLD" "🤖 AI Provider API Keys (Optional)"
-    if confirm "Would you like to configure AI provider API keys?"; then
+    # AI Provider API Keys (only if enabled)
+    if [ "$configure_ai" = true ]; then
+        print_msg "$GREEN$BOLD" "🤖 AI Provider API Keys"
+        print_msg "$CYAN" "Configure AI provider credentials for enhanced capabilities."
         
         # OpenAI
         if confirm "Configure OpenAI API key?"; then
@@ -1180,17 +1322,17 @@ setup_git_safety() {
     fi
     
     print_step "Setting up git safety features..."
-    
-    # Create scripts directory if it doesn't exist
-    if [ ! -d "$TARGET_DIR/scripts" ]; then
-        mkdir -p "$TARGET_DIR/scripts"
+
+    # Create scripts directory in .claude if it doesn't exist
+    if [ ! -d "$TARGET_DIR/.claude/scripts" ]; then
+        mkdir -p "$TARGET_DIR/.claude/scripts"
     fi
-    
-    # Copy safe-commit script
-    if [ -f "$BASE_DIR/.claude/scripts-templates/safe-commit.sh" ]; then
-        cp "$BASE_DIR/.claude/scripts-templates/safe-commit.sh" "$TARGET_DIR/scripts/safe-commit.sh"
-        chmod +x "$TARGET_DIR/scripts/safe-commit.sh"
-        print_msg "$CYAN" "  ✓ Installed safe-commit script"
+
+    # Copy safe-commit script to .claude/scripts
+    if [ -f "$BASE_DIR/autopm/.claude/templates/scripts-templates/safe-commit.sh" ]; then
+        cp "$BASE_DIR/autopm/.claude/templates/scripts-templates/safe-commit.sh" "$TARGET_DIR/.claude/scripts/safe-commit.sh"
+        chmod +x "$TARGET_DIR/.claude/scripts/safe-commit.sh"
+        print_msg "$CYAN" "  ✓ Installed safe-commit script in .claude/scripts"
     fi
     
     # Offer to install git hooks (skip if --no-hooks flag is set)
@@ -1335,8 +1477,35 @@ main() {
     # Interactive .env setup (skip if --no-env flag is set)
     if [ "$AUTOPM_SKIP_ENV" != "1" ]; then
         echo ""
-        if confirm "🔧 Would you like to set up your .env configuration interactively?"; then
-            create_env_interactive "$source_dir"
+        print_msg "$BLUE$BOLD" "📋 Environment Configuration Options"
+        print_msg "$CYAN" "The .env file configures:"
+        echo "   • MCP servers (Context7, GitHub, Playwright, SQLite)"
+        echo "   • AI integrations (OpenAI, Anthropic, Google)"
+        echo "   • Development tools (Docker, CI/CD)"
+        echo "   • Project-specific settings"
+        echo ""
+
+        if [ -n "$GITHUB_TOKEN" ] || [ -n "$AZURE_PAT" ]; then
+            print_msg "$GREEN" "✓ Basic credentials detected from guide setup"
+            echo -n "❓ Would you like to create a "
+            print_msg "$YELLOW" "default .env" -n
+            echo -n " (basic) or configure "
+            print_msg "$GREEN" "advanced options" -n
+            echo "? [d/a]: "
+            read env_choice
+
+            if [ "$env_choice" = "a" ] || [ "$env_choice" = "A" ]; then
+                # Pass the installation scenario to create_env_interactive
+                local scenario="${INSTALLATION_SCENARIO:-${AUTOPM_SCENARIO:-3}}"
+                create_env_interactive "$source_dir" "$scenario"
+            else
+                # Create basic .env from guide configuration
+                create_basic_env_from_guide
+            fi
+        elif confirm "🔧 Would you like to set up your .env configuration interactively?"; then
+            # Pass the installation scenario to create_env_interactive
+            local scenario="${INSTALLATION_SCENARIO:-${AUTOPM_SCENARIO:-3}}"
+            create_env_interactive "$source_dir" "$scenario"
         else
             print_msg "$YELLOW" "⏭️  Skipping .env setup - you can copy .claude/.env.example to .claude/.env manually"
         fi
@@ -1346,31 +1515,40 @@ main() {
     
     # No cleanup needed - using local package files only
     
-    # Final message
+    # Final message with clear visual separation
     echo ""
-    print_msg "$GREEN$BOLD" "✨ ClaudeAutoPM installation completed successfully!"
     echo ""
-    
+    echo -e "${GREEN}${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    print_msg "$GREEN$BOLD" "            ✨ ClaudeAutoPM Installation Complete! ✨"
+    echo ""
+    print_msg "$GREEN" "            Your project is now configured and ready!"
+    echo ""
+    echo -e "${GREEN}${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+
     if [ "$is_update" = true ] && [ -n "$backup_dir" ]; then
         print_msg "$CYAN" "📁 Backup location: $backup_dir"
+        echo ""
     fi
-    
+
     # Check if .env was created
+    print_msg "$CYAN$BOLD" "📚 Next steps:"
+    echo ""
     if [ -f "$TARGET_DIR/.claude/.env" ]; then
-        print_msg "$CYAN" "📚 Next steps:"
-        echo "   1. Review and customize CLAUDE.md for your project"
-        echo "   2. ✅ .env file already configured"
-        echo "   3. Review .claude/rules/ for development standards"
-        echo "   4. Check README.md for usage guidelines"
+        print_msg "$CYAN" "   1. Review and customize CLAUDE.md for your project"
+        print_msg "$GREEN" "   2. ✅ .env file already configured"
+        print_msg "$CYAN" "   3. Review .claude/rules/ for development standards"
+        print_msg "$CYAN" "   4. Check README.md for usage guidelines"
     else
-        print_msg "$CYAN" "📚 Next steps:"
-        echo "   1. Review and customize CLAUDE.md for your project"
-        echo "   2. Copy .claude/.env.example to .claude/.env and add your API keys"
-        echo "   3. Review .claude/rules/ for development standards"
-        echo "   4. Check README.md for usage guidelines"
+        print_msg "$CYAN" "   1. Review and customize CLAUDE.md for your project"
+        print_msg "$YELLOW" "   2. ⚠️  Copy .claude/.env.example to .claude/.env and add your API keys"
+        print_msg "$CYAN" "   3. Review .claude/rules/ for development standards"
+        print_msg "$CYAN" "   4. Check README.md for usage guidelines"
     fi
     echo ""
-    print_msg "$GREEN" "🎉 Happy coding with ClaudeAutoPM!"
+    print_msg "$GREEN$BOLD" "🎉 Happy coding with ClaudeAutoPM!"
+    echo ""
 }
 
 # Run main function

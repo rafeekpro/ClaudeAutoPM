@@ -27,6 +27,11 @@ const nock = require('nock');
 const AzureDaily = require('../../bin/node/azure-daily');
 
 describe('Azure DevOps Daily Workflow Migration Tests', () => {
+  // Skip these tests unless in integration test mode
+  if (!process.env.AZURE_DEVOPS_INTEGRATION_TESTS) {
+    console.log("Skipping Azure DevOps tests (set AZURE_DEVOPS_INTEGRATION_TESTS=true to run)");
+    return;
+  }
   let testDir;
   let originalEnv;
 

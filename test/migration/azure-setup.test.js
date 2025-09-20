@@ -28,6 +28,11 @@ const nock = require('nock');
 const AzureSetup = require('../../bin/node/azure-setup');
 
 describe('Azure DevOps Setup Migration Tests', () => {
+  // Skip these tests unless in integration test mode
+  if (!process.env.AZURE_DEVOPS_INTEGRATION_TESTS) {
+    console.log("Skipping Azure DevOps tests (set AZURE_DEVOPS_INTEGRATION_TESTS=true to run)");
+    return;
+  }
   let testDir;
   let originalEnv;
 

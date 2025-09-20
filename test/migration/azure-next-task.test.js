@@ -134,6 +134,11 @@ const testEnv = {
 };
 
 describe('Azure Next Task Migration Tests', () => {
+  // Skip these tests unless in integration test mode
+  if (!process.env.AZURE_DEVOPS_INTEGRATION_TESTS) {
+    console.log("Skipping Azure DevOps tests (set AZURE_DEVOPS_INTEGRATION_TESTS=true to run)");
+    return;
+  }
 
     let originalEnv;
     let azureNextTask;

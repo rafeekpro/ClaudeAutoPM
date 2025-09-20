@@ -5,6 +5,48 @@ All notable changes to the ClaudeAutoPM framework will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.15] - 2025-09-19
+
+### Added
+- Comprehensive GitHub PAT format validation for all token types
+- Live token validation by connecting to GitHub API
+- Automatic username mismatch detection and correction
+- Token scope and permission validation
+- Enhanced error reporting with specific troubleshooting steps
+
+### Improved
+- GitHub setup flow now asks for username first
+- Repository name suggestions based on current directory
+- Better error messages with actionable solutions
+- Azure DevOps configuration follows same improved flow
+- Clear preview of repository/project URLs before creation
+
+### Security
+- Validates token authenticity before use
+- Detects revoked or invalid tokens immediately
+- Checks for required permissions (repo scope)
+- Clears invalid tokens automatically
+
+## [1.5.14] - 2025-09-19
+
+### Fixed
+- Token validation improvements and error handling
+
+## [1.5.13] - 2025-09-19
+
+### Fixed
+- Repository creation error reporting
+
+## [1.5.12] - 2025-09-19
+
+### Fixed
+- GitHub configuration user flow improvements
+
+## [1.5.11] - 2025-09-19
+
+### Fixed
+- Email validator implementation
+
 ## [1.5.10] - 2025-09-19
 
 ### Added
