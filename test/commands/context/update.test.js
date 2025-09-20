@@ -92,7 +92,7 @@ Updated content with new information`;
     it('should handle non-existent context gracefully', async () => {
       // Act & Assert
       const result = await exec(
-        `node ${path.join(__dirname, '../../../bin/autopm.js')} "context:update" non-existent --content "test"`
+        `cd "${testDir}" && node ${path.join(__dirname, '../../../bin/autopm.js')} "context:update" non-existent --content "test"`
       ).catch(err => err);
 
       assert.ok(result.stderr.includes('Context not found'), 'Should show context not found error');
@@ -184,7 +184,7 @@ New Content C`;
 
       // Act
       const { stdout } = await exec(
-        `node ${path.join(__dirname, '../../../bin/autopm.js')} "context:update" ${contextName} --file update.md --merge`
+        `cd "${testDir}" && node ${path.join(__dirname, '../../../bin/autopm.js')} "context:update" ${contextName} --file update.md --merge`
       );
 
       // Assert

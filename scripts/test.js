@@ -107,9 +107,9 @@ class TestRunner {
     console.log(colors.bold('🧪 Running ClaudeAutoPM Test Suite'));
     console.log('='.repeat(34));
 
-    // Run unit tests
-    if (this.hasTestFiles('test/unit')) {
-      await this.runTestSuite('Unit Tests', 'node', ['--test', 'test/unit/*.test.js']);
+    // Run unit tests (including subdirectories)
+    if (this.hasTestFiles('test/unit', '*.test.js', true)) {
+      await this.runTestSuite('Unit Tests', 'node', ['--test', 'test/unit/**/*.test.js']);
     } else {
       console.log(colors.yellow('⚠️  No unit tests found'));
     }
