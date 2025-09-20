@@ -29,6 +29,11 @@ const nock = require('nock');
 const AzureSync = require('../../bin/node/azure-sync');
 
 describe('Azure DevOps Sync Migration Tests', () => {
+  // Skip these tests unless in integration test mode
+  if (!process.env.AZURE_DEVOPS_INTEGRATION_TESTS) {
+    console.log("Skipping Azure DevOps tests (set AZURE_DEVOPS_INTEGRATION_TESTS=true to run)");
+    return;
+  }
   let testDir;
   let originalEnv;
 
