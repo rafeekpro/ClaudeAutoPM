@@ -155,7 +155,7 @@ class IntegrationTestRunner {
     let filesValid = true;
 
     // Check for strategy file
-    const strategyFile = path.join(testDir, '.claude', 'strategies', 'execution-strategy.md');
+    const strategyFile = path.join(testDir, '.claude', 'strategies', 'ACTIVE_STRATEGY.md');
     if (await fs.pathExists(strategyFile)) {
       this.printPass(`${scenarioName}: Strategy file exists`);
 

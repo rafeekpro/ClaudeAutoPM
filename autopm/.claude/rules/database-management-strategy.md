@@ -11,7 +11,7 @@ This document outlines the required strategy for managing databases across all p
 
 ### Key Principles
 
-1. **Local:** Use a named Docker volume to persist data between `docker-compose up/down` cycles.
+1. **Local:** Use a named Docker volume to persist data between `docker compose up/down` cycles.
 2. **CI/CD:** The database MUST be created from scratch for every test run to ensure perfect isolation and repeatability. DO NOT use persistent volumes in CI.
 3. **Staging:** The database schema should be an exact mirror of production. Data should be a recent, anonymized copy of production data.
 4. **Migrations:** All schema changes in every environment MUST be handled by a migration tool (e.g., Alembic, Flyway). No manual `ALTER TABLE` commands.

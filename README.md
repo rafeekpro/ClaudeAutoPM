@@ -62,12 +62,27 @@ cd your-project/
 
 # Install ClaudeAutoPM framework
 autopm install
-
-# Choose configuration:
-# 1) Minimal - Traditional development (no Docker/K8s)
-# 2) Docker-only - Container-first development
-# 3) Full DevOps - Enterprise with Docker + K8s
 ```
+
+During installation, you'll be asked to:
+
+**1. Choose a configuration preset:**
+
+| Preset | Description | Best For |
+|--------|-------------|----------|
+| **Minimal** | Traditional development without containers | Small projects, beginners |
+| **Docker-only** | Container-first with adaptive execution | Medium projects, local development |
+| **Full DevOps** 🎯 | Docker + Kubernetes with CI/CD | Production projects (RECOMMENDED) |
+| **Performance** | Maximum parallelization (8 agents) | Large projects, powerful machines |
+| **Custom** | Configure each option manually | Specific requirements |
+
+**2. Select your project management provider:**
+
+| Provider | Integration | Use Case |
+|----------|-------------|----------|
+| **GitHub Issues** | Full GitHub API integration | Open source, startups |
+| **Azure DevOps** | Azure Boards & Pipelines | Enterprise, Agile teams |
+| **Skip for now** | Local files only | Evaluation, offline work |
 
 #### 3. Initialize PM System (1 minute)
 
@@ -203,6 +218,106 @@ Tests are separated into unit and integration categories:
   - `AZURE_DEVOPS_PROJECT` - Project name
 
 To run integration tests, set `AZURE_DEVOPS_INTEGRATION_TESTS=true` along with the required environment variables.
+
+## 📊 Configuration Preset Details
+
+### Feature Comparison
+
+| Feature | Minimal | Docker-only | Full DevOps | Performance |
+|---------|---------|-------------|-------------|-------------|
+| **Docker Support** | ❌ | ✅ | ✅ | ✅ |
+| **Kubernetes** | ❌ | ❌ | ✅ | ✅ |
+| **Git Safety Hooks** | ❌ | ✅ | ✅ | ✅ |
+| **CI/CD Simulation (TODO)** | ❌ | ✅ | ✅ | ✅ |
+| **Max Parallel Agents** | 1 | 3 | 5 | 8 |
+| **Execution Strategy** | Sequential | Adaptive | Adaptive | Hybrid |
+| **Context Optimization (TODO)** | ❌ | ✅ | ✅ | ✅ |
+| **Integration Tests** | ❌ | ❌ | ✅ | ✅ |
+| **Learning Mode (TODO)** | ❌ | ❌ | ✅ | ❌ |
+
+### Execution Strategies
+
+- **Sequential**: Safe, one agent at a time, predictable
+- **Adaptive**: Intelligent parallelization based on task complexity (learning mode planned)
+- **Hybrid**: Maximum parallelization, fastest but requires monitoring
+
+### When to Choose Each Preset
+
+**Minimal**
+- New to ClaudeAutoPM
+- Small personal projects
+- No Docker environment available
+- Learning the system
+
+**Docker-only**
+- Medium-sized projects
+- Local development focus
+- Docker available but not Kubernetes
+- Team of 2-10 developers
+
+**Full DevOps** (Recommended)
+- Production projects
+- CI/CD pipelines required
+- Enterprise environments
+- Teams with DevOps practices
+- Best balance of features and safety
+
+**Performance**
+- Large codebases (>100k LOC)
+- Powerful development machines (16+ cores)
+- Experienced teams
+- When build speed is critical
+
+### What Gets Installed
+
+All presets install the same core files:
+- `.claude/agents/` - AI agent definitions
+- `.claude/commands/` - PM command library
+- `.claude/rules/` - Development rules
+- `.claude/scripts/` - Helper scripts
+- `.claude/checklists/` - Development checklists
+- `.claude/mcp/` - Model Context Protocol configs
+
+Optional components (based on preset):
+- Git hooks → `.git/hooks/` (Docker-only, Full DevOps, Performance)
+- Docker configurations → `.claude/docker/` (all except Minimal)
+- Kubernetes manifests → `.claude/k8s/` (Full DevOps, Performance)
+- CI/CD templates → `.github/workflows/` or `.azure-pipelines/`
+
+### Git Hooks Installation
+
+Git hooks install in two phases:
+
+1. **Automatic enablement** (based on preset):
+   - Minimal: No hooks
+   - Docker-only, Full DevOps, Performance: Hooks enabled
+
+2. **User confirmation** (if enabled):
+   ```
+   Would you like to install git hooks for automated commit/push validation? (y/n)
+   ```
+   - Yes → Installs `pre-commit` and `pre-push` hooks
+   - No → Skips, can install later with `.claude/scripts/setup-hooks.sh`
+
+### Provider Integration Details
+
+**GitHub Issues**
+- Creates issues and PRs via GitHub API
+- Syncs epics as GitHub milestones
+- Requires: `GITHUB_TOKEN` with repo scope
+- Commands: All `pm:*` plus `github:*` commands
+
+**Azure DevOps**
+- Integrates with Azure Boards work items
+- Syncs with Azure Pipelines
+- Requires: `AZURE_DEVOPS_PAT` with Work Items scope
+- Commands: All `pm:*` plus `azure:*` commands
+
+**Skip for now**
+- All data stored locally in `.claude/`
+- No external synchronization
+- Can migrate to provider later
+- Perfect for evaluation or offline work
 
 ## 🌟 Support This Project
 

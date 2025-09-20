@@ -26,7 +26,7 @@ Based on `.claude/rules/tdd.enforcement.md`:
 
 ```bash
 # Run unit tests
-docker-compose run app npm run test:unit
+docker compose run app npm run test:unit
 ```
 
 ### Integration Tests
@@ -37,7 +37,7 @@ docker-compose run app npm run test:unit
 
 ```bash
 # Run integration tests
-docker-compose run app npm run test:integration
+docker compose run app npm run test:integration
 ```
 
 ### End-to-End Tests
@@ -48,7 +48,7 @@ docker-compose run app npm run test:integration
 
 ```bash
 # Run E2E tests
-docker-compose run e2e npm run test:e2e
+docker compose run e2e npm run test:e2e
 ```
 
 ### Security Tests
@@ -59,7 +59,7 @@ docker-compose run e2e npm run test:e2e
 
 ```bash
 # Run security tests
-docker-compose run app npm run test:security
+docker compose run app npm run test:security
 ```
 
 ### Performance Tests
@@ -70,7 +70,7 @@ docker-compose run app npm run test:security
 
 ```bash
 # Run performance tests
-docker-compose run perf npm run test:performance
+docker compose run perf npm run test:performance
 ```
 
 ## Container-Based Testing
@@ -116,16 +116,16 @@ services:
 
 ```bash
 # All tests
-docker-compose -f docker-compose.test.yml run app
+docker compose -f docker-compose.test.yml run app
 
 # Specific test suite
-docker-compose run app npm run test:unit
+docker compose run app npm run test:unit
 
 # With coverage
-docker-compose run app npm run test:coverage
+docker compose run app npm run test:coverage
 
 # Watch mode (development)
-docker-compose run app npm run test:watch
+docker compose run app npm run test:watch
 ```
 
 ## Test Structure
@@ -337,13 +337,13 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Run Unit Tests
-        run: docker-compose run app npm run test:unit
+        run: docker compose run app npm run test:unit
 
       - name: Run Integration Tests
-        run: docker-compose run app npm run test:integration
+        run: docker compose run app npm run test:integration
 
       - name: Run E2E Tests
-        run: docker-compose run e2e npm run test:e2e
+        run: docker compose run e2e npm run test:e2e
 
       - name: Upload Coverage
         uses: codecov/codecov-action@v3
@@ -375,13 +375,13 @@ jobs:
 
 ```bash
 # Generate coverage report
-docker-compose run app npm run test:coverage
+docker compose run app npm run test:coverage
 
 # View HTML report
 open coverage/index.html
 
 # Check coverage in CI
-docker-compose run app npm run test:coverage:ci
+docker compose run app npm run test:coverage:ci
 ```
 
 ## Agent-Driven Testing
@@ -542,10 +542,10 @@ describe('Security Tests', () => {
 
 ```bash
 # Run tests with debugging
-docker-compose run app npm run test:debug
+docker compose run app npm run test:debug
 
 # Access container for investigation
-docker-compose run app sh
+docker compose run app sh
 > npm test -- --verbose
 > npm test -- --detectOpenHandles
 ```
@@ -554,10 +554,10 @@ docker-compose run app sh
 
 ```bash
 # Run with headed browser
-docker-compose run -e HEADLESS=false e2e npm run test:e2e
+docker compose run -e HEADLESS=false e2e npm run test:e2e
 
 # Debug mode
-docker-compose run e2e npx playwright test --debug
+docker compose run e2e npx playwright test --debug
 ```
 
 ## Related Pages

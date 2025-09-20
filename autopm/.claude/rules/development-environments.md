@@ -6,7 +6,7 @@ This document defines the two primary development environments for this project.
 
 The local development workflow MUST remain pure `docker-compose`. This ensures zero disruption for developers and maintains a fast, familiar iteration cycle.
 
-- **Tooling**: `docker-compose up`, `docker build`, `docker run`.
+- **Tooling**: `docker compose up`, `docker build`, `docker run`.
 - **Configuration**: `docker-compose.yml` and `docker-compose.dev.yml`.
 - **Philosophy**: Developers should not need to learn `kubectl` or Kubernetes for local work. The experience is seamless and unchanged.
 

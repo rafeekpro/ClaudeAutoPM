@@ -75,13 +75,13 @@ When Docker is enabled, `docker-workflow.md` is included:
 ## Docker-First Development
 
 All development MUST happen inside Docker containers:
-- Use docker-compose for local development
+- Use docker compose for local development
 - Commands like npm, pip, gem run in containers
 - Database operations through containerized services
 
 Example:
 - ❌ npm install express
-- ✅ docker-compose run app npm install express
+- ✅ docker compose run app npm install express
 ```
 
 ### DevOps Agents Add-on

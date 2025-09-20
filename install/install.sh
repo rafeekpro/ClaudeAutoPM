@@ -301,27 +301,23 @@ install_strategy() {
         "sequential")
             print_step "Installing Sequential (Safe) execution strategy..."
             cp "$source_dir/sequential-safe.md" "$strategy_dir/ACTIVE_STRATEGY.md"
-            cp "$source_dir/sequential-safe.md" "$strategy_dir/execution-strategy.md"
             print_success "Sequential strategy installed - safe, predictable execution"
             ;;
         "hybrid")
             print_step "Installing Hybrid (Parallel) execution strategy..."
             cp "$source_dir/hybrid-parallel.md" "$strategy_dir/ACTIVE_STRATEGY.md"
-            cp "$source_dir/hybrid-parallel.md" "$strategy_dir/execution-strategy.md"
             print_success "Hybrid strategy installed - maximum performance with parallel execution"
             print_msg "$CYAN" "  📋 This enables parallel agent spawning for complex tasks"
             ;;
         "adaptive")
             print_step "Installing Adaptive (Smart) execution strategy..."
             cp "$source_dir/adaptive-smart.md" "$strategy_dir/ACTIVE_STRATEGY.md"
-            cp "$source_dir/adaptive-smart.md" "$strategy_dir/execution-strategy.md"
             print_success "Adaptive strategy installed - intelligent mode selection"
             print_msg "$CYAN" "  📋 Claude will automatically choose the best execution mode"
             ;;
         *)
             print_warning "Unknown strategy mode: $mode, defaulting to adaptive"
             cp "$source_dir/adaptive-smart.md" "$strategy_dir/ACTIVE_STRATEGY.md"
-            cp "$source_dir/adaptive-smart.md" "$strategy_dir/execution-strategy.md"
             ;;
     esac
 

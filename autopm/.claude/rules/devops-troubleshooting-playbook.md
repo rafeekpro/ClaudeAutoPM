@@ -165,7 +165,7 @@ Database management strategy MUST align with environment purpose:
 
 | Environment | Tool | Purpose | Persistence | Backup Strategy |
 |------------|------|---------|-------------|-----------------|
-| **Local (Dev)** | docker-compose | Convenience | Yes (Named Volume) | Optional |
+| **Local (Dev)** | docker compose | Convenience | Yes (Named Volume) | Optional |
 | **Testing (CI/CD)** | kubectl | Isolation | No (Ephemeral) | Not Required |
 | **Staging** | Managed DB | Pre-prod Testing | Yes (PVC) | Daily |
 | **Production** | Managed Service | Reliability | Yes (HA + Backups) | Continuous |
