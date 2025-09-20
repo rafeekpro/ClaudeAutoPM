@@ -36,7 +36,6 @@ INSTALL_ITEMS=(
     ".claude/mcp"
     ".claude/.env.example"
     ".claude-code"
-    "scripts"
 )
 
 # Print banner
@@ -1323,17 +1322,17 @@ setup_git_safety() {
     fi
     
     print_step "Setting up git safety features..."
-    
-    # Create scripts directory if it doesn't exist
-    if [ ! -d "$TARGET_DIR/scripts" ]; then
-        mkdir -p "$TARGET_DIR/scripts"
+
+    # Create scripts directory in .claude if it doesn't exist
+    if [ ! -d "$TARGET_DIR/.claude/scripts" ]; then
+        mkdir -p "$TARGET_DIR/.claude/scripts"
     fi
-    
-    # Copy safe-commit script
-    if [ -f "$BASE_DIR/.claude/scripts-templates/safe-commit.sh" ]; then
-        cp "$BASE_DIR/.claude/scripts-templates/safe-commit.sh" "$TARGET_DIR/scripts/safe-commit.sh"
-        chmod +x "$TARGET_DIR/scripts/safe-commit.sh"
-        print_msg "$CYAN" "  ✓ Installed safe-commit script"
+
+    # Copy safe-commit script to .claude/scripts
+    if [ -f "$BASE_DIR/autopm/.claude/templates/scripts-templates/safe-commit.sh" ]; then
+        cp "$BASE_DIR/autopm/.claude/templates/scripts-templates/safe-commit.sh" "$TARGET_DIR/.claude/scripts/safe-commit.sh"
+        chmod +x "$TARGET_DIR/.claude/scripts/safe-commit.sh"
+        print_msg "$CYAN" "  ✓ Installed safe-commit script in .claude/scripts"
     fi
     
     # Offer to install git hooks (skip if --no-hooks flag is set)
@@ -1516,31 +1515,40 @@ main() {
     
     # No cleanup needed - using local package files only
     
-    # Final message
+    # Final message with clear visual separation
     echo ""
-    print_msg "$GREEN$BOLD" "✨ ClaudeAutoPM installation completed successfully!"
     echo ""
-    
+    echo -e "${GREEN}${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    print_msg "$GREEN$BOLD" "            ✨ ClaudeAutoPM Installation Complete! ✨"
+    echo ""
+    print_msg "$GREEN" "            Your project is now configured and ready!"
+    echo ""
+    echo -e "${GREEN}${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+
     if [ "$is_update" = true ] && [ -n "$backup_dir" ]; then
         print_msg "$CYAN" "📁 Backup location: $backup_dir"
+        echo ""
     fi
-    
+
     # Check if .env was created
+    print_msg "$CYAN$BOLD" "📚 Next steps:"
+    echo ""
     if [ -f "$TARGET_DIR/.claude/.env" ]; then
-        print_msg "$CYAN" "📚 Next steps:"
-        echo "   1. Review and customize CLAUDE.md for your project"
-        echo "   2. ✅ .env file already configured"
-        echo "   3. Review .claude/rules/ for development standards"
-        echo "   4. Check README.md for usage guidelines"
+        print_msg "$CYAN" "   1. Review and customize CLAUDE.md for your project"
+        print_msg "$GREEN" "   2. ✅ .env file already configured"
+        print_msg "$CYAN" "   3. Review .claude/rules/ for development standards"
+        print_msg "$CYAN" "   4. Check README.md for usage guidelines"
     else
-        print_msg "$CYAN" "📚 Next steps:"
-        echo "   1. Review and customize CLAUDE.md for your project"
-        echo "   2. Copy .claude/.env.example to .claude/.env and add your API keys"
-        echo "   3. Review .claude/rules/ for development standards"
-        echo "   4. Check README.md for usage guidelines"
+        print_msg "$CYAN" "   1. Review and customize CLAUDE.md for your project"
+        print_msg "$YELLOW" "   2. ⚠️  Copy .claude/.env.example to .claude/.env and add your API keys"
+        print_msg "$CYAN" "   3. Review .claude/rules/ for development standards"
+        print_msg "$CYAN" "   4. Check README.md for usage guidelines"
     fi
     echo ""
-    print_msg "$GREEN" "🎉 Happy coding with ClaudeAutoPM!"
+    print_msg "$GREEN$BOLD" "🎉 Happy coding with ClaudeAutoPM!"
+    echo ""
 }
 
 # Run main function
