@@ -407,14 +407,38 @@ choose_provider() {
         fi
     fi
 
-    print_msg "$YELLOW" "\n🎯 Choose your project management platform:"
-    echo ""
-    echo "  1) 📙 GitHub (Recommended) - Best for open source, startups"
-    echo "  2) 🔷 Azure DevOps - Best for enterprise, Agile teams"
-    echo ""
+    # Check if provider was already selected (passed from guide.js)
+    if [ -n "$AUTOPM_PROVIDER" ]; then
+        case "$AUTOPM_PROVIDER" in
+            github)
+                choice="1"
+                print_msg "$GREEN" "✓ Using GitHub (pre-selected)"
+                ;;
+            azure)
+                choice="2"
+                print_msg "$GREEN" "✓ Using Azure DevOps (pre-selected)"
+                ;;
+            *)
+                print_msg "$YELLOW" "\n🎯 Choose your project management platform:"
+                echo ""
+                echo "  1) 📙 GitHub (Recommended) - Best for open source, startups"
+                echo "  2) 🔷 Azure DevOps - Best for enterprise, Agile teams"
+                echo ""
+                ;;
+        esac
+    else
+        print_msg "$YELLOW" "\n🎯 Choose your project management platform:"
+        echo ""
+        echo "  1) 📙 GitHub (Recommended) - Best for open source, startups"
+        echo "  2) 🔷 Azure DevOps - Best for enterprise, Agile teams"
+        echo ""
+    fi
 
     while true; do
-        if [ "$AUTOPM_TEST_MODE" = "1" ]; then
+        if [ -n "$choice" ]; then
+            # Choice was pre-selected, skip prompt
+            true
+        elif [ "$AUTOPM_TEST_MODE" = "1" ]; then
             choice="1"
             print_msg "$CYAN" "❓ Your choice [1-2]: 1 (auto-selected GitHub in test mode)"
         else
@@ -476,6 +500,15 @@ choose_provider() {
                         print_msg "$CYAN" "Azure project: test-project (auto-filled)"
                         print_msg "$CYAN" "Azure team: (default, auto-filled)"
                     fi
+                elif [ -n "$AZURE_ORG" ] && [ -n "$AZURE_PROJECT" ]; then
+                    # Use environment variables from guide.js
+                    azure_org="$AZURE_ORG"
+                    azure_project="$AZURE_PROJECT"
+                    azure_team="${AZURE_TEAM:-}"
+                    print_msg "$CYAN" "Using Azure configuration from guide:"
+                    print_msg "$CYAN" "  Organization: $azure_org"
+                    print_msg "$CYAN" "  Project: $azure_project"
+                    [ -n "$azure_team" ] && print_msg "$CYAN" "  Team: $azure_team"
                 else
                     echo -n "Enter Azure organization: "
                     read azure_org
