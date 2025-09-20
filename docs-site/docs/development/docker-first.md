@@ -49,18 +49,18 @@ These commands **must run** in containers:
 
 ```bash
 # Package Managers - IN DOCKER
-docker-compose run app npm install
-docker-compose run python pip install
-docker-compose run ruby gem install
+docker compose run app npm install
+docker compose run python pip install
+docker compose run ruby gem install
 
 # Runtime Commands - IN DOCKER
-docker-compose up app
-docker-compose run web python manage.py runserver
-docker-compose exec app node server.js
+docker compose up app
+docker compose run web python manage.py runserver
+docker compose exec app node server.js
 
 # Database Operations - IN DOCKER
-docker-compose exec db mysql
-docker-compose run postgres psql
+docker compose exec db mysql
+docker compose run postgres psql
 ```
 
 ### Git Hook Enforcement
@@ -74,7 +74,7 @@ Pre-commit hooks enforce Docker-First:
 # Check for blocked commands in staged files
 if grep -r "npm install\|pip install" --include="*.sh" .; then
   echo "❌ ERROR: Direct package installation detected!"
-  echo "Use: docker-compose run app npm install"
+  echo "Use: docker compose run app npm install"
   exit 1
 fi
 ```
@@ -150,46 +150,46 @@ autopm init my-project
 # Choose: Docker-only or Full DevOps
 
 # 2. All subsequent commands in Docker
-docker-compose run app npm init -y
-docker-compose run app npm install express
-docker-compose run app npm install -D nodemon
+docker compose run app npm init -y
+docker compose run app npm install express
+docker compose run app npm install -D nodemon
 
 # 3. Start development
-docker-compose up
+docker compose up
 ```
 
 ### Daily Development Workflow
 
 ```bash
 # Morning: Start services
-docker-compose up -d
+docker compose up -d
 
 # Development: Run commands in containers
-docker-compose exec app npm test
-docker-compose exec app npm run lint
-docker-compose run app npm install new-package
+docker compose exec app npm test
+docker compose exec app npm run lint
+docker compose run app npm install new-package
 
 # Debugging: Access container shell
-docker-compose exec app sh
+docker compose exec app sh
 
 # Evening: Stop services
-docker-compose down
+docker compose down
 ```
 
 ### Database Operations
 
 ```bash
 # Run migrations
-docker-compose run app npm run migrate
+docker compose run app npm run migrate
 
 # Access database console
-docker-compose exec db psql -U developer -d myapp
+docker compose exec db psql -U developer -d myapp
 
 # Backup database
-docker-compose exec db pg_dump -U developer myapp > backup.sql
+docker compose exec db pg_dump -U developer myapp > backup.sql
 
 # Restore database
-docker-compose exec -T db psql -U developer myapp < backup.sql
+docker compose exec -T db psql -U developer myapp < backup.sql
 ```
 
 ## Agent Integration
@@ -204,7 +204,7 @@ AI agents respect Docker-First rules:
 
 # Docker-First intercepts and corrects:
 🐳 Docker-First Active: Redirecting to container
-→ docker-compose run app npm install
+→ docker compose run app npm install
 ```
 
 ### Test Execution
@@ -214,7 +214,7 @@ AI agents respect Docker-First rules:
 
 # Automatically runs in Docker:
 🐳 Executing in container: app
-→ docker-compose run --rm app npm test
+→ docker compose run --rm app npm test
 ```
 
 ## Configuration
@@ -335,18 +335,18 @@ services:
 
 ```bash
 # Check logs
-docker-compose logs app
+docker compose logs app
 
 # Rebuild if needed
-docker-compose build --no-cache app
-docker-compose up
+docker compose build --no-cache app
+docker compose up
 ```
 
 ### Permission Issues
 
 ```bash
 # Fix ownership
-docker-compose run --rm app chown -R $(id -u):$(id -g) .
+docker compose run --rm app chown -R $(id -u):$(id -g) .
 
 # Or in Dockerfile
 USER node
@@ -444,8 +444,8 @@ autopm install
 ```json
 // package.json
 "scripts": {
-  "dev": "docker-compose up",
-  "test": "docker-compose run app npm test"
+  "dev": "docker compose up",
+  "test": "docker compose run app npm test"
 }
 ```
 
@@ -454,8 +454,8 @@ autopm install
 # README.md
 ## Development
 All development happens in Docker:
-- Start: `docker-compose up`
-- Install: `docker-compose run app npm install`
+- Start: `docker compose up`
+- Install: `docker compose run app npm install`
 ```
 
 ## Related Pages

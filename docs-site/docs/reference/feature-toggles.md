@@ -34,8 +34,8 @@ This launches an interactive menu that guides you through configuration options.
 ```
 
 **Impact on workflow**:
-- Commands like `npm install` must run as `docker-compose run app npm install`
-- Python commands execute in containers: `docker-compose run python pip install`
+- Commands like `npm install` must run as `docker compose run app npm install`
+- Python commands execute in containers: `docker compose run python pip install`
 - Database operations happen in containers only
 
 ### Kubernetes DevOps Testing
@@ -266,7 +266,7 @@ With Docker-First **enabled**:
 npm install express
 
 # Use this instead:
-docker-compose run app npm install express
+docker compose run app npm install express
 ```
 
 With Docker-First **disabled**:

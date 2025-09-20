@@ -117,7 +117,7 @@ async function handleDocker(options) {
   console.log(`  ${result.compose}: Created`);
   console.log(`  Port: ${result.port}`);
   console.log(`  Services: ${result.services.join(', ')}`);
-  console.log('\nRun: docker-compose up');
+  console.log('\nRun: docker compose up');
 }
 
 /**

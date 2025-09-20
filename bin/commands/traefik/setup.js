@@ -45,7 +45,7 @@ async function handleDocker(options) {
   console.log('  Network: web (external)');
   console.log('\nTo start Traefik:');
   console.log('  docker network create web');
-  console.log(`  cd ${path.dirname(result.path)} && docker-compose up -d`);
+  console.log(`  cd ${path.dirname(result.path)} && docker compose up -d`);
 }
 
 /**

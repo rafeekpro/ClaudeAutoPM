@@ -158,11 +158,16 @@ Conduct a thorough brainstorming session before writing the PRD. Ask questions, 
 `;
 
 // --- Command Definition ---
-exports.command = 'pm:prd-new';
-exports.describe = 'PRD New';
+exports.command = 'pm:prd-new <feature_name>';
+exports.describe = 'PRD New - Launch brainstorming for new product requirement document';
 
 exports.builder = (yargs) => {
   return yargs
+    .positional('feature_name', {
+      describe: 'Name of the feature for the PRD (kebab-case)',
+      type: 'string',
+      demandOption: true
+    })
     .option('verbose', {
       describe: 'Verbose output',
       type: 'boolean',
@@ -185,11 +190,17 @@ exports.handler = async (argv) => {
     loadEnvironment();
 
     // Validate input if needed
-    
+    if (!argv.feature_name) {
+      spinner.fail();
+      printError('Missing required argument: feature_name');
+      printInfo('Usage: autopm pm:prd-new <feature_name>');
+      printInfo('Example: autopm pm:prd-new user-authentication');
+      process.exit(1);
+    }
 
     // Prepare context
     const context = {
-      
+      arguments: argv.feature_name,
       verbose: isVerbose(argv),
       dryRun: argv.dryRun
     };
@@ -207,6 +218,17 @@ exports.handler = async (argv) => {
     if (result.status === 'success') {
       spinner.succeed();
       printSuccess('Command executed successfully!');
+      if (result.prompt) {
+        printInfo('Note: Command executed via Claude Code Task tool');
+      }
+    } else if (result.status === 'simulation') {
+      spinner.warn();
+      printWarning('Command displayed in simulation mode (no API key)');
+      printInfo('See instructions above for how to execute this command');
+    } else if (result.status === 'pending') {
+      spinner.warn();
+      printWarning('API execution pending implementation');
+      printInfo('Use Claude Code or wait for API implementation');
     } else {
       spinner.fail();
       printError(`Command failed: ${result.message || 'Unknown error'}`);
