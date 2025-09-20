@@ -1044,37 +1044,78 @@ create_env_interactive() {
         print_success "Existing .env backed up"
     fi
     
-    print_msg "$BLUE$BOLD" "\n🔧 Interactive .env Configuration"
-    print_msg "$CYAN" "Let's set up your environment configuration step by step."
+    # Determine what to configure based on scenario
+    local configure_mcp=false
+    local configure_ai=false
+    local configure_cloud=false
+    local configure_playwright=false
+
+    case "$scenario" in
+        1)  # Minimal - only basic credentials
+            print_msg "$BLUE$BOLD" "\n🔧 Basic .env Configuration (Minimal)"
+            print_msg "$CYAN" "Setting up essential credentials only."
+            ;;
+        2)  # Docker-only - add Docker-related
+            configure_playwright=true
+            print_msg "$BLUE$BOLD" "\n🔧 Docker-focused .env Configuration"
+            print_msg "$CYAN" "Setting up Docker and testing credentials."
+            ;;
+        3|4)  # Full DevOps or Performance - everything
+            configure_mcp=true
+            configure_ai=true
+            configure_cloud=true
+            configure_playwright=true
+            print_msg "$BLUE$BOLD" "\n🔧 Complete .env Configuration"
+            print_msg "$CYAN" "Setting up all integrations and services."
+            ;;
+        *)  # Custom/default - ask what they want
+            print_msg "$BLUE$BOLD" "\n🔧 Custom .env Configuration"
+            configure_mcp=$(confirm "Configure MCP servers (Context7, etc)?" && echo true || echo false)
+            configure_ai=$(confirm "Configure AI providers (OpenAI, etc)?" && echo true || echo false)
+            configure_cloud=$(confirm "Configure cloud providers (AWS, Azure, GCP)?" && echo true || echo false)
+            configure_playwright=$(confirm "Configure Playwright testing?" && echo true || echo false)
+            ;;
+    esac
+
     print_msg "$YELLOW" "You can skip optional fields by pressing Enter."
     echo ""
-    
+
     # Start building the .env content
     local env_content=""
-    
+
     # Add header
     env_content+="# ============================================\n"
-    env_content+="# MCP (Model Context Protocol) Configuration\n"
+    env_content+="# Environment Configuration\n"
     env_content+="# Generated on $(date)\n"
-    env_content+="# ============================================\n\n"
-    
-    # Context7 Configuration
-    print_msg "$GREEN$BOLD" "📚 Context7 MCP Server Configuration"
-    print_msg "$CYAN" "Context7 provides documentation and codebase context for AI agents."
-    
-    local context7_key
-    context7_key=$(get_input "Context7 API Key (get from https://context7.com/account)" "" "token" false)
-    local context7_workspace
-    context7_workspace=$(get_input "Context7 Workspace ID or name" "" "text" false)
-    
-    env_content+="# Context7 MCP Server Configuration\n"
-    env_content+="# ------------------------------------------\n"
-    env_content+="CONTEXT7_API_KEY=${context7_key}\n"
-    env_content+="CONTEXT7_MCP_URL=mcp.context7.com/mcp\n"
-    env_content+="CONTEXT7_API_URL=context7.com/api/v1\n"
-    env_content+="CONTEXT7_WORKSPACE=${context7_workspace}\n"
-    env_content+="CONTEXT7_MODE=documentation\n"
-    env_content+="CONTEXT7_CACHE_TTL=3600\n\n"
+    env_content+="# Scenario: "
+    case "$scenario" in
+        1) env_content+="Minimal" ;;
+        2) env_content+="Docker-only" ;;
+        3) env_content+="Full DevOps" ;;
+        4) env_content+="Performance" ;;
+        *) env_content+="Custom" ;;
+    esac
+    env_content+="\n# ============================================\n\n"
+
+    # Context7 Configuration (only if MCP is enabled)
+    if [ "$configure_mcp" = true ]; then
+        print_msg "$GREEN$BOLD" "📚 Context7 MCP Server Configuration"
+        print_msg "$CYAN" "Context7 provides documentation and codebase context for AI agents."
+
+        local context7_key
+        context7_key=$(get_input "Context7 API Key (get from https://context7.com/account)" "" "token" false)
+        local context7_workspace
+        context7_workspace=$(get_input "Context7 Workspace ID or name" "" "text" false)
+
+        env_content+="# Context7 MCP Server Configuration\n"
+        env_content+="# ------------------------------------------\n"
+        env_content+="CONTEXT7_API_KEY=${context7_key}\n"
+        env_content+="CONTEXT7_MCP_URL=mcp.context7.com/mcp\n"
+        env_content+="CONTEXT7_API_URL=context7.com/api/v1\n"
+        env_content+="CONTEXT7_WORKSPACE=${context7_workspace}\n"
+        env_content+="CONTEXT7_MODE=documentation\n"
+        env_content+="CONTEXT7_CACHE_TTL=3600\n\n"
+    fi
     
     # GitHub Configuration
     print_msg "$GREEN$BOLD" "🐙 GitHub Configuration"
@@ -1093,23 +1134,25 @@ create_env_interactive() {
     env_content+="GITHUB_TOKEN=${github_token}\n"
     env_content+="GITHUB_API_URL=https://api.github.com\n\n"
     
-    # Playwright Configuration
-    print_msg "$GREEN$BOLD" "🎭 Playwright Configuration"
-    print_msg "$CYAN" "Browser automation for testing (optional)."
-    
-    local playwright_browser
-    playwright_browser=$(get_input "Playwright Browser" "chromium" "text" false)
-    local playwright_headless
-    if confirm "Run Playwright in headless mode?"; then
-        playwright_headless="true"
-    else
-        playwright_headless="false"
+    # Playwright Configuration (only if enabled)
+    if [ "$configure_playwright" = true ]; then
+        print_msg "$GREEN$BOLD" "🎭 Playwright Configuration"
+        print_msg "$CYAN" "Browser automation for testing (optional)."
+
+        local playwright_browser
+        playwright_browser=$(get_input "Playwright Browser" "chromium" "text" false)
+        local playwright_headless
+        if confirm "Run Playwright in headless mode?"; then
+            playwright_headless="true"
+        else
+            playwright_headless="false"
+        fi
+
+        env_content+="# Playwright MCP Server Configuration\n"
+        env_content+="# ============================================\n"
+        env_content+="PLAYWRIGHT_BROWSER=${playwright_browser}\n"
+        env_content+="PLAYWRIGHT_HEADLESS=${playwright_headless}\n\n"
     fi
-    
-    env_content+="# Playwright MCP Server Configuration\n"
-    env_content+="# ============================================\n"
-    env_content+="PLAYWRIGHT_BROWSER=${playwright_browser}\n"
-    env_content+="PLAYWRIGHT_HEADLESS=${playwright_headless}\n\n"
     
     # Azure DevOps (Optional)
     print_msg "$GREEN$BOLD" "🔷 Azure DevOps Configuration (Optional)"
@@ -1145,9 +1188,10 @@ create_env_interactive() {
         env_content+="# AZURE_DEVOPS_PROJECT=your-project\n\n"
     fi
     
-    # Cloud Providers (Optional)
-    print_msg "$GREEN$BOLD" "☁️ Cloud Provider Configuration (Optional)"
-    if confirm "Would you like to configure cloud provider credentials?"; then
+    # Cloud Providers (only if enabled)
+    if [ "$configure_cloud" = true ]; then
+        print_msg "$GREEN$BOLD" "☁️ Cloud Provider Configuration"
+        print_msg "$CYAN" "Configure cloud provider credentials for deployment and infrastructure."
         
         # AWS
         if confirm "Configure AWS credentials?"; then
@@ -1198,9 +1242,10 @@ create_env_interactive() {
         fi
     fi
     
-    # AI Provider API Keys (Optional)
-    print_msg "$GREEN$BOLD" "🤖 AI Provider API Keys (Optional)"
-    if confirm "Would you like to configure AI provider API keys?"; then
+    # AI Provider API Keys (only if enabled)
+    if [ "$configure_ai" = true ]; then
+        print_msg "$GREEN$BOLD" "🤖 AI Provider API Keys"
+        print_msg "$CYAN" "Configure AI provider credentials for enhanced capabilities."
         
         # OpenAI
         if confirm "Configure OpenAI API key?"; then
