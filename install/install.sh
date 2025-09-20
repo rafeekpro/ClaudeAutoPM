@@ -983,22 +983,62 @@ get_input() {
     echo "$default"
 }
 
+# Create basic .env from guide configuration
+create_basic_env_from_guide() {
+    local target_env="$TARGET_DIR/.claude/.env"
+
+    print_msg "$CYAN" "Creating basic .env with provided credentials..."
+
+    local env_content=""
+    env_content+="# ============================================\n"
+    env_content+="# Basic Configuration from Guide Setup\n"
+    env_content+="# Generated on $(date)\n"
+    env_content+="# ============================================\n\n"
+
+    if [ -n "$GITHUB_TOKEN" ]; then
+        env_content+="# GitHub Configuration\n"
+        env_content+="GITHUB_TOKEN=${GITHUB_TOKEN}\n"
+        env_content+="GITHUB_REPOSITORY=${GITHUB_OWNER}/${GITHUB_REPO}\n"
+        env_content+="GITHUB_OWNER=${GITHUB_OWNER}\n"
+        env_content+="GITHUB_REPO=${GITHUB_REPO}\n\n"
+    fi
+
+    if [ -n "$AZURE_PAT" ]; then
+        env_content+="# Azure DevOps Configuration\n"
+        env_content+="AZURE_DEVOPS_PAT=${AZURE_PAT}\n"
+        env_content+="AZURE_DEVOPS_ORG=${AZURE_ORG}\n"
+        env_content+="AZURE_DEVOPS_PROJECT=${AZURE_PROJECT}\n\n"
+    fi
+
+    env_content+="# Environment\n"
+    env_content+="NODE_ENV=development\n"
+    env_content+="DEBUG=false\n\n"
+
+    env_content+="# ============================================\n"
+    env_content+="# To add MCP servers and AI integrations,\n"
+    env_content+="# run: autopm install and choose advanced setup\n"
+    env_content+="# ============================================\n"
+
+    echo -e "$env_content" > "$target_env"
+    print_success ".env file created with basic configuration"
+}
+
 # Interactive .env creator
 create_env_interactive() {
     local source_dir="$1"
     local env_example="$source_dir/.claude/.env.example"
     local target_env="$TARGET_DIR/.claude/.env"
-    
+
     if [ ! -f "$env_example" ]; then
         print_warning ".env.example not found, skipping .env creation"
         return
     fi
-    
+
     if [ -f "$target_env" ]; then
-        if ! confirm "📝 .env file already exists. Would you like to recreate it interactively?"; then
+        if ! confirm "📝 .env file already exists. Would you like to recreate it?"; then
             return
         fi
-        
+
         # Backup existing .env
         cp "$target_env" "$target_env.backup.$(date +%Y%m%d_%H%M%S)"
         print_success "Existing .env backed up"
@@ -1039,9 +1079,14 @@ create_env_interactive() {
     # GitHub Configuration
     print_msg "$GREEN$BOLD" "🐙 GitHub Configuration"
     print_msg "$CYAN" "GitHub integration for repository operations and issue management."
-    
+
     local github_token
-    github_token=$(get_input "GitHub Personal Access Token (create at: https://github.com/settings/tokens)" "" "token" false)
+    if [ -n "$GITHUB_TOKEN" ]; then
+        print_msg "$GREEN" "✓ Using GitHub token from guide setup"
+        github_token="$GITHUB_TOKEN"
+    else
+        github_token=$(get_input "GitHub Personal Access Token (create at: https://github.com/settings/tokens)" "" "token" false)
+    fi
     
     env_content+="# GitHub MCP Server Configuration\n"
     env_content+="# ============================================\n"
@@ -1068,14 +1113,25 @@ create_env_interactive() {
     
     # Azure DevOps (Optional)
     print_msg "$GREEN$BOLD" "🔷 Azure DevOps Configuration (Optional)"
-    if confirm "Would you like to configure Azure DevOps integration?"; then
+    if [ -n "$AZURE_PAT" ]; then
+        print_msg "$GREEN" "✓ Using Azure DevOps configuration from guide setup"
+        local azdo_pat="$AZURE_PAT"
+        local azdo_org="$AZURE_ORG"
+        local azdo_project="$AZURE_PROJECT"
+
+        env_content+="# Azure DevOps Configuration\n"
+        env_content+="# ============================================\n"
+        env_content+="AZURE_DEVOPS_PAT=${azdo_pat}\n"
+        env_content+="AZURE_DEVOPS_ORG=${azdo_org}\n"
+        env_content+="AZURE_DEVOPS_PROJECT=${azdo_project}\n\n"
+    elif confirm "Would you like to configure Azure DevOps integration?"; then
         local azdo_pat
         azdo_pat=$(get_input "Azure DevOps Personal Access Token" "" "token" false)
         local azdo_org
         azdo_org=$(get_input "Azure DevOps Organization" "" "text" false)
         local azdo_project
         azdo_project=$(get_input "Azure DevOps Project" "" "text" false)
-        
+
         env_content+="# Azure DevOps Configuration\n"
         env_content+="# ============================================\n"
         env_content+="AZURE_DEVOPS_PAT=${azdo_pat}\n"
@@ -1377,7 +1433,30 @@ main() {
     # Interactive .env setup (skip if --no-env flag is set)
     if [ "$AUTOPM_SKIP_ENV" != "1" ]; then
         echo ""
-        if confirm "🔧 Would you like to set up your .env configuration interactively?"; then
+        print_msg "$BLUE$BOLD" "📋 Environment Configuration Options"
+        print_msg "$CYAN" "The .env file configures:"
+        echo "   • MCP servers (Context7, GitHub, Playwright, SQLite)"
+        echo "   • AI integrations (OpenAI, Anthropic, Google)"
+        echo "   • Development tools (Docker, CI/CD)"
+        echo "   • Project-specific settings"
+        echo ""
+
+        if [ -n "$GITHUB_TOKEN" ] || [ -n "$AZURE_PAT" ]; then
+            print_msg "$GREEN" "✓ Basic credentials detected from guide setup"
+            echo -n "❓ Would you like to create a "
+            print_msg "$YELLOW" "default .env" -n
+            echo -n " (basic) or configure "
+            print_msg "$GREEN" "advanced options" -n
+            echo "? [d/a]: "
+            read env_choice
+
+            if [ "$env_choice" = "a" ] || [ "$env_choice" = "A" ]; then
+                create_env_interactive "$source_dir"
+            else
+                # Create basic .env from guide configuration
+                create_basic_env_from_guide
+            fi
+        elif confirm "🔧 Would you like to set up your .env configuration interactively?"; then
             create_env_interactive "$source_dir"
         else
             print_msg "$YELLOW" "⏭️  Skipping .env setup - you can copy .claude/.env.example to .claude/.env manually"
