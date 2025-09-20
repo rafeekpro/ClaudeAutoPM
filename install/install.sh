@@ -1315,14 +1315,7 @@ setup_git_safety() {
         return
     fi
     
-    local git_safety=$(jq -r '.features.git_safety_hooks // false' "$config_file")
-    
-    if [ "$git_safety" != "true" ]; then
-        return
-    fi
-    
-    print_step "Setting up git safety features..."
-
+    # Always copy the script files (they're part of core functionality)
     # Create scripts directory in .claude if it doesn't exist
     if [ ! -d "$TARGET_DIR/.claude/scripts" ]; then
         mkdir -p "$TARGET_DIR/.claude/scripts"
@@ -1334,6 +1327,21 @@ setup_git_safety() {
         chmod +x "$TARGET_DIR/.claude/scripts/safe-commit.sh"
         print_msg "$CYAN" "  ✓ Installed safe-commit script in .claude/scripts"
     fi
+
+    # Copy setup-hooks script to .claude/scripts
+    if [ -f "$BASE_DIR/autopm/.claude/templates/scripts-templates/setup-hooks.sh" ]; then
+        cp "$BASE_DIR/autopm/.claude/templates/scripts-templates/setup-hooks.sh" "$TARGET_DIR/.claude/scripts/setup-hooks.sh"
+        chmod +x "$TARGET_DIR/.claude/scripts/setup-hooks.sh"
+        print_msg "$CYAN" "  ✓ Installed setup-hooks script in .claude/scripts"
+    fi
+
+    local git_safety=$(jq -r '.features.git_safety_hooks // false' "$config_file")
+
+    if [ "$git_safety" != "true" ]; then
+        return
+    fi
+
+    print_step "Setting up git safety features..."
     
     # Offer to install git hooks (skip if --no-hooks flag is set)
     if [ "$AUTOPM_SKIP_HOOKS" != "1" ]; then

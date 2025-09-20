@@ -129,9 +129,8 @@ class IntegrationTestRunner {
       '.claude/rules',
       '.claude/scripts',
       'CLAUDE.md',
-      'scripts',
-      'scripts/safe-commit.sh',
-      'scripts/setup-hooks.sh'
+      '.claude/scripts/safe-commit.sh',
+      '.claude/scripts/setup-hooks.sh'
     ];
 
     let allExist = true;
