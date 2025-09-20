@@ -592,7 +592,10 @@ description: Test server 2
       handler.sync();
 
       assert.ok(consoleLogMock.mock.calls.some(call => call.arguments[0] === 'ℹ️ No active servers to sync'));
-      assert.ok(!fs.existsSync(handler.mcpServersPath));
+      // Should still create empty mcp-servers.json for consistency
+      assert.ok(fs.existsSync(handler.mcpServersPath));
+      const mcpConfig = JSON.parse(fs.readFileSync(handler.mcpServersPath, 'utf8'));
+      assert.deepStrictEqual(mcpConfig.mcpServers, {});
     });
 
     test('should warn about missing servers and skip them', () => {
@@ -606,7 +609,9 @@ description: Test server 2
 
       handler.sync();
 
-      assert.ok(consoleWarnMock.mock.calls.some(call => call.arguments[0] ==='⚠️ Server \'nonexistent-server\' not found, skipping'));
+      assert.ok(consoleLogMock.mock.calls.some(call =>
+        call.arguments[0] && call.arguments[0].includes('nonexistent-server') && call.arguments[0].includes('not found')
+      ));
 
       const mcpConfig = JSON.parse(fs.readFileSync(handler.mcpServersPath, 'utf8'));
       assert.ok(mcpConfig.mcpServers.server1);
@@ -726,6 +731,7 @@ name: suspicious-env-server
 command: npx
 args: ["@suspicious/server"]
 description: Server with suspicious env syntax
+category: testing
 env:
   CORRECT_VAR: "\${CORRECT_VAR:-default}"
   SUSPICIOUS_VAR: "value:with:colons"

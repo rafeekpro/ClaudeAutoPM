@@ -6,8 +6,38 @@
 
 const fs = require('fs');
 const path = require('path');
-const yaml = require('js-yaml');
 const { execSync } = require('child_process');
+
+// Try to load js-yaml from multiple locations
+let yaml;
+try {
+  // First try normal require
+  yaml = require('js-yaml');
+} catch (e) {
+  try {
+    // Try from framework root node_modules
+    const frameworkRoot = path.join(__dirname, '..');
+    yaml = require(path.join(frameworkRoot, 'node_modules', 'js-yaml'));
+  } catch (e2) {
+    try {
+      // Try from project root node_modules
+      const projectRoot = process.cwd();
+      yaml = require(path.join(projectRoot, 'node_modules', 'js-yaml'));
+    } catch (e3) {
+      // If js-yaml is not available, provide a fallback
+      console.error('Warning: js-yaml module not found. YAML features will be disabled.');
+      yaml = {
+        load: (content) => {
+          console.error('YAML parsing not available');
+          return {};
+        },
+        dump: (obj) => {
+          return JSON.stringify(obj, null, 2);
+        }
+      };
+    }
+  }
+}
 
 class MCPHandler {
   constructor() {
@@ -191,8 +221,21 @@ class MCPHandler {
     const config = this.loadConfig();
     const activeServers = config.mcp?.activeServers || [];
 
+    // Ensure .claude directory exists even if no servers
+    this.ensureClaudeDir();
+
     if (activeServers.length === 0) {
       console.log('ℹ️ No active servers to sync');
+      // Still create empty mcp-servers.json
+      const emptyConfig = {
+        mcpServers: {},
+        contextPools: config.mcp?.contextPools || {},
+        documentationSources: config.mcp?.documentationSources || {}
+      };
+      fs.writeFileSync(
+        this.mcpServersPath,
+        JSON.stringify(emptyConfig, null, 2)
+      );
       return;
     }
 
@@ -206,7 +249,7 @@ class MCPHandler {
     activeServers.forEach(serverName => {
       const server = this.getServer(serverName);
       if (!server) {
-        console.warn(`⚠️ Server '${serverName}' not found, skipping`);
+        console.log(`  ⚠️ Server '${serverName}' not found, skipping`);
         return;
       }
 
@@ -221,7 +264,6 @@ class MCPHandler {
     });
 
     // Write configuration
-    this.ensureClaudeDir();
     fs.writeFileSync(
       this.mcpServersPath,
       JSON.stringify(mcpConfig, null, 2)
@@ -294,6 +336,7 @@ class MCPHandler {
     if (!server) {
       console.error(`❌ Server '${serverName}' not found`);
       process.exit(1);
+      return; // Add return to prevent further execution in tests
     }
 
     const config = this.loadConfig();
