@@ -568,10 +568,10 @@ choose_configuration() {
             print_msg "$CYAN" "🔧 Using preset configuration: $AUTOPM_CONFIG_PRESET"
             # Clear the preset after using it once to exit the loop
             AUTOPM_CONFIG_PRESET=""
-        # In test mode, auto-select Full DevOps configuration (option 3)
+        # In test mode, read the choice from stdin (tests will provide it)
         elif [ "$AUTOPM_TEST_MODE" = "1" ]; then
-            choice="3"
-            print_msg "$CYAN" "❓ Your choice [1-5]: 3 (auto-selected Full DevOps in test mode)"
+            read -r choice
+            print_msg "$CYAN" "❓ Your choice [1-5]: $choice (test mode)"
         else
             echo -n "Your choice [1-5]: "
             read -r choice

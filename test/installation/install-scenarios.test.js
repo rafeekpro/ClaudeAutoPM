@@ -104,13 +104,21 @@ class InstallationTester {
     const scenarioConfig = this.scenarios[scenario];
 
     // Simulate user input for the installation choice
-    const installCommand = `echo "${scenarioConfig.choice}" | bash ${this.installScript}`;
+    // For minimal scenario, use AUTOPM_AUTO_ACCEPT to skip CI/CD prompt
+    const envVars = scenario === 'minimal' ?
+      { ...process.env, AUTOPM_TEST_MODE: '1', AUTOPM_AUTO_ACCEPT: '1', AUTOPM_CONFIG_PRESET: 'minimal' } :
+      { ...process.env, AUTOPM_TEST_MODE: '1' };
+
+    // Provide both config choice and CI/CD choice (5 = No CI/CD for minimal, 1 = GitHub Actions for others)
+    const cicdChoice = scenario === 'minimal' ? '5' : '1';
+    const installCommand = `printf "${scenarioConfig.choice}\\n${cicdChoice}\\n" | bash ${this.installScript}`;
 
     try {
       execSync(installCommand, {
         cwd: this.testDir,
         stdio: 'pipe', // Suppress output during tests
-        env: { ...process.env, AUTOPM_TEST_MODE: '1' }
+        env: envVars,
+        timeout: 30000 // 30 second timeout
       });
     } catch (error) {
       throw new Error(`Installation failed for ${scenario}: ${error.message}`);
@@ -166,9 +174,11 @@ class InstallationTester {
       const strategyContent = await fs.readFile(strategyPath, 'utf8');
       const errors = [];
 
-      // Check if strategy contains expected mode
-      const expectedMode = scenarioConfig.expectedStrategy.toUpperCase();
-      if (!strategyContent.includes(expectedMode)) {
+      // Check if strategy contains expected mode (case-insensitive)
+      const expectedMode = scenarioConfig.expectedStrategy;
+      const strategyContentUpper = strategyContent.toUpperCase();
+      const expectedModeUpper = expectedMode.toUpperCase();
+      if (!strategyContentUpper.includes(expectedModeUpper)) {
         errors.push(`Strategy doesn't contain expected mode: ${expectedMode}`);
       }
 
