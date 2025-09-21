@@ -1,88 +1,31 @@
 /**
- * This is an ephemeral command
- * Auto-migrated from prompt.md
+ * prompt Command
+ * Execute custom AI prompt
  */
 
-const agentExecutor = require('../../lib/agentExecutor');
 const {
-  validateInput,
-  loadEnvironment,
-  isVerbose,
-  printError,
-  printSuccess,
   printInfo,
-  printWarning,
-  createSpinner
+  printWarning
 } = require('../../lib/commandHelpers');
 
-// --- Agent Prompt ---
-const AGENT_PROMPT = `
-# This is an ephemeral command
-
-Some complex prompts (with numerous @ references) may fail if entered directly into the prompt input.
-
-If that happens, write your prompt here and type in \`/prompt\` in the prompt command.
-`;
-
-// --- Command Definition ---
 exports.command = 'prompt';
-exports.describe = 'This is an ephemeral command';
+exports.describe = 'Execute custom AI prompt';
 
-exports.builder = (yargs) => {
-  return yargs
-    .option('verbose', {
-      describe: 'Verbose output',
-      type: 'boolean',
-      alias: 'v'
-    })
-    .option('dry-run', {
-      describe: 'Simulate without making changes',
-      type: 'boolean',
-      default: false
-    });
-};
+exports.builder = (yargs) => yargs;
 
 exports.handler = async (argv) => {
-  const spinner = createSpinner('Executing prompt...');
+  console.log();
+  console.log('╔════════════════════════════════════════════════╗');
+  console.log('║    🤖 AI-Powered Command (Claude Code Only)    ║');
+  console.log('╚════════════════════════════════════════════════╝');
+  console.log();
+  printWarning('This command requires Claude Code');
+  console.log();
 
-  try {
-    spinner.start();
+  printInfo('📍 To use in Claude Code:');
+  console.log('   /prompt');
+  console.log();
 
-    // Load environment if needed
-    loadEnvironment();
-
-    // Validate input if needed
-    
-
-    // Prepare context
-    const context = {
-      
-      verbose: isVerbose(argv),
-      dryRun: argv.dryRun
-    };
-
-    if (isVerbose(argv)) {
-      printInfo('Executing with context:');
-      console.log(JSON.stringify(context, null, 2));
-    }
-
-    // Execute agent
-    const agentType = 'general-specialist';
-
-    const result = await agentExecutor.run(agentType, AGENT_PROMPT, context);
-
-    if (result.status === 'success') {
-      spinner.succeed();
-      printSuccess('Command executed successfully!');
-    } else {
-      spinner.fail();
-      printError(`Command failed: ${result.message || 'Unknown error'}`);
-      process.exit(1);
-    }
-
-  } catch (error) {
-    spinner.fail();
-    printError(`Error: ${error.message}`, error);
-    process.exit(1);
-  }
+  printInfo('📄 Command definition:');
+  console.log('   .claude/commands/prompt.md');
 };

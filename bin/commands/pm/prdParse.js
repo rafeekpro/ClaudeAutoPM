@@ -1,13 +1,11 @@
 /**
- * PRD Parse
- * Auto-migrated from pm:prd-parse.md
+ * PRD Parse Command
+ * Hybrid: Basic epic generation (deterministic) + AI decomposition (Claude Code)
  */
 
-const agentExecutor = require('../../../lib/agentExecutor');
+const fs = require('fs-extra');
+const path = require('path');
 const {
-  validateInput,
-  loadEnvironment,
-  isVerbose,
   printError,
   printSuccess,
   printInfo,
@@ -15,232 +13,254 @@ const {
   createSpinner
 } = require('../../../lib/commandHelpers');
 
-// --- Agent Prompt ---
-const AGENT_PROMPT = `
-# PRD Parse
+// Epic template for deterministic mode
+const EPIC_TEMPLATE = `---
+name: $NAME
+description: $DESCRIPTION
+status: planning
+created: $DATE
+source_prd: $PRD_NAME
+tasks: []
+---
 
-Convert PRD to technical implementation epic.
-
-## Usage
-\`\`\`
-/pm:prd-parse <feature_name>
-\`\`\`
-
-## Required Rules
-
-**IMPORTANT:** Before executing this command, read and follow:
-- \`.claude/rules/datetime.md\` - For getting real current date/time
-
-## Preflight Checklist
-
-Before proceeding, complete these validation steps.
-Do not bother the user with preflight checks progress ("I'm not going to ..."). Just do them and move on.
-
-### Validation Steps
-1. **Verify <feature_name> was provided as a parameter:**
-   - If not, tell user: "❌ <feature_name> was not provided as parameter. Please run: /pm:prd-parse <feature_name>"
-   - Stop execution if <feature_name> was not provided
-
-2. **Verify PRD exists:**
-   - Check if \`.claude/prds/$ARGUMENTS.md\` exists
-   - If not found, tell user: "❌ PRD not found: $ARGUMENTS. First create it with: /pm:prd-new $ARGUMENTS"
-   - Stop execution if PRD doesn't exist
-
-3. **Validate PRD frontmatter:**
-   - Verify PRD has valid frontmatter with: name, description, status, created
-   - If frontmatter is invalid or missing, tell user: "❌ Invalid PRD frontmatter. Please check: .claude/prds/$ARGUMENTS.md"
-   - Show what's missing or invalid
-
-4. **Check for existing epic:**
-   - Check if \`.claude/epics/$ARGUMENTS/epic.md\` already exists
-   - If it exists, ask user: "⚠️ Epic '$ARGUMENTS' already exists. Overwrite? (yes/no)"
-   - Only proceed with explicit 'yes' confirmation
-   - If user says no, suggest: "View existing epic with: /pm:epic-show $ARGUMENTS"
-
-5. **Verify directory permissions:**
-   - Ensure \`.claude/epics/\` directory exists or can be created
-   - If cannot create, tell user: "❌ Cannot create epic directory. Please check permissions."
-
-## Instructions
-
-You are a technical lead converting a Product Requirements Document into a detailed implementation epic for: **$ARGUMENTS**
-
-### 1. Read the PRD
-- Load the PRD from \`.claude/prds/$ARGUMENTS.md\`
-- Analyze all requirements and constraints
-- Understand the user stories and success criteria
-- Extract the PRD description from frontmatter
-
-### 2. Technical Analysis
-- Identify architectural decisions needed
-- Determine technology stack and approaches
-- Map functional requirements to technical components
-- Identify integration points and dependencies
-
-### 3. File Format with Frontmatter
-Create the epic file at: \`.claude/epics/$ARGUMENTS/epic.md\` with this exact structure:
-
-\`\`\`markdown
-
-# Epic: $ARGUMENTS
+# Epic: $NAME
 
 ## Overview
-Brief technical summary of the implementation approach
+$DESCRIPTION
 
-## Architecture Decisions
-- Key technical decisions and rationale
-- Technology choices
-- Design patterns to use
+## Source PRD
+- **Document**: .claude/prds/$PRD_NAME.md
+- **Created**: $PRD_DATE
 
-## Technical Approach
-### Frontend Components
-- UI components needed
-- State management approach
-- User interaction patterns
+## Objectives
+$OBJECTIVES
 
-### Backend Services
-- API endpoints required
-- Data models and schema
-- Business logic components
+## Implementation Tasks
 
-### Infrastructure
-- Deployment considerations
-- Scaling requirements
-- Monitoring and observability
+### Phase 1: Foundation
+- [ ] Technical design document
+- [ ] Architecture review
+- [ ] Set up development environment
+- [ ] Create project structure
 
-## Implementation Strategy
-- Development phases
-- Risk mitigation
-- Testing approach
+### Phase 2: Core Implementation
+- [ ] [Core feature 1 from PRD]
+- [ ] [Core feature 2 from PRD]
+- [ ] [Core feature 3 from PRD]
+- [ ] Unit tests for core features
 
-## Task Breakdown Preview
-High-level task categories that will be created:
-- [ ] Category 1: Description
-- [ ] Category 2: Description
-- [ ] etc.
+### Phase 3: Integration
+- [ ] API endpoints
+- [ ] Database schema
+- [ ] External service integration
+- [ ] Integration tests
+
+### Phase 4: UI/UX
+- [ ] UI components
+- [ ] User flows
+- [ ] Responsive design
+- [ ] Accessibility compliance
+
+### Phase 5: Testing & Documentation
+- [ ] End-to-end tests
+- [ ] Performance testing
+- [ ] Security review
+- [ ] User documentation
+- [ ] API documentation
+
+### Phase 6: Deployment
+- [ ] Deployment pipeline
+- [ ] Environment configuration
+- [ ] Monitoring setup
+- [ ] Rollback plan
+
+## Acceptance Criteria
+[Copied from PRD success criteria]
 
 ## Dependencies
-- External service dependencies
-- Internal team dependencies
-- Prerequisite work
+[Copied from PRD dependencies]
 
-## Success Criteria (Technical)
-- Performance benchmarks
-- Quality gates
-- Acceptance criteria
+## Timeline Estimate
+- **Phase 1**: 1 week
+- **Phase 2**: 2-3 weeks
+- **Phase 3**: 1 week
+- **Phase 4**: 1-2 weeks
+- **Phase 5**: 1 week
+- **Phase 6**: 3 days
+- **Total**: 6-8 weeks
 
-## Estimated Effort
-- Overall timeline estimate
-- Resource requirements
-- Critical path items
-\`\`\`
-
-### 4. Frontmatter Guidelines
-- **name**: Use the exact feature name (same as $ARGUMENTS)
-- **status**: Always start with "backlog" for new epics
-- **created**: Get REAL current datetime by running: \`date -u +"%Y-%m-%dT%H:%M:%SZ"\`
-- **progress**: Always start with "0%" for new epics
-- **prd**: Reference the source PRD file path
-- **github**: Leave placeholder text - will be updated during sync
-
-### 5. Output Location
-Create the directory structure if it doesn't exist:
-- \`.claude/epics/$ARGUMENTS/\` (directory)
-- \`.claude/epics/$ARGUMENTS/epic.md\` (epic file)
-
-### 6. Quality Validation
-
-Before saving the epic, verify:
-- [ ] All PRD requirements are addressed in the technical approach
-- [ ] Task breakdown categories cover all implementation areas
-- [ ] Dependencies are technically accurate
-- [ ] Effort estimates are realistic
-- [ ] Architecture decisions are justified
-
-### 7. Post-Creation
-
-After successfully creating the epic:
-1. Confirm: "✅ Epic created: .claude/epics/$ARGUMENTS/epic.md"
-2. Show summary of:
-   - Number of task categories identified
-   - Key architecture decisions
-   - Estimated effort
-3. Suggest next step: "Ready to break down into tasks? Run: /pm:epic-decompose $ARGUMENTS"
-
-## Error Recovery
-
-If any step fails:
-- Clearly explain what went wrong
-- If PRD is incomplete, list specific missing sections
-- If technical approach is unclear, identify what needs clarification
-- Never create an epic with incomplete information
-
-Focus on creating a technically sound implementation plan that addresses all PRD requirements while being practical and achievable for "$ARGUMENTS".
-
-## IMPORTANT:
-- Aim for as few tasks as possible and limit the total number of tasks to 10 or less.
-- When creating the epic, identify ways to simplify and improve it. Look for ways to leverage existing functionality instead of creating more code when possible.
+---
+*Next Steps: Review and refine tasks, then run \`autopm pm:epic-decompose $NAME\` for detailed breakdown*
 `;
 
-// --- Command Definition ---
-exports.command = 'pm:prd-parse';
-exports.describe = 'PRD Parse';
+// Command Definition
+exports.command = 'pm:prd-parse <feature_name>';
+exports.describe = 'Convert PRD to implementation epic (basic or AI-powered)';
 
 exports.builder = (yargs) => {
   return yargs
-    .option('verbose', {
-      describe: 'Verbose output',
-      type: 'boolean',
-      alias: 'v'
+    .positional('feature_name', {
+      describe: 'Name of the PRD to parse',
+      type: 'string',
+      demandOption: true
     })
-    .option('dry-run', {
-      describe: 'Simulate without making changes',
+    .option('basic', {
+      describe: 'Create basic epic structure (no AI)',
       type: 'boolean',
+      alias: 'b',
       default: false
-    });
+    })
+    .option('force', {
+      describe: 'Overwrite existing epic',
+      type: 'boolean',
+      alias: 'f',
+      default: false
+    })
+    .example('$0 pm:prd-parse user-auth --basic', 'Create basic epic structure')
+    .example('/pm:prd-parse user-auth', 'AI-powered decomposition in Claude Code');
 };
 
+/**
+ * Extract key information from PRD content
+ */
+function extractPRDInfo(prdContent) {
+  const info = {
+    objectives: [],
+    criteria: [],
+    dependencies: []
+  };
+
+  // Extract objectives from Executive Summary or Problem Statement
+  const execSummaryMatch = prdContent.match(/## Executive Summary\n([\s\S]*?)(?=\n##|$)/);
+  if (execSummaryMatch) {
+    info.objectives.push(execSummaryMatch[1].trim());
+  }
+
+  // Extract success criteria
+  const criteriaMatch = prdContent.match(/## Success Criteria\n([\s\S]*?)(?=\n##|$)/);
+  if (criteriaMatch) {
+    info.criteria = criteriaMatch[1].trim();
+  }
+
+  // Extract dependencies
+  const depsMatch = prdContent.match(/## Dependencies\n([\s\S]*?)(?=\n##|$)/);
+  if (depsMatch) {
+    info.dependencies = depsMatch[1].trim();
+  }
+
+  return info;
+}
+
 exports.handler = async (argv) => {
-  const spinner = createSpinner('Executing pm:prd-parse...');
+  const spinner = createSpinner('Processing PRD...');
 
   try {
-    spinner.start();
-
-    // Load environment if needed
-    loadEnvironment();
-
-    // Validate input if needed
-    
-
-    // Prepare context
-    const context = {
-      
-      verbose: isVerbose(argv),
-      dryRun: argv.dryRun
-    };
-
-    if (isVerbose(argv)) {
-      printInfo('Executing with context:');
-      console.log(JSON.stringify(context, null, 2));
-    }
-
-    // Execute agent
-    const agentType = 'pm-specialist';
-
-    const result = await agentExecutor.run(agentType, AGENT_PROMPT, context);
-
-    if (result.status === 'success') {
-      spinner.succeed();
-      printSuccess('Command executed successfully!');
-    } else {
+    // Check if PRD exists
+    const prdPath = path.join(process.cwd(), '.claude', 'prds', `${argv.feature_name}.md`);
+    if (!await fs.pathExists(prdPath)) {
       spinner.fail();
-      printError(`Command failed: ${result.message || 'Unknown error'}`);
+      printError(`❌ PRD not found: ${argv.feature_name}`);
+      printInfo(`First create it with: autopm pm:prd-new ${argv.feature_name}`);
       process.exit(1);
     }
 
+    // Read PRD content
+    const prdContent = await fs.readFile(prdPath, 'utf-8');
+
+    // Parse PRD frontmatter
+    const frontmatterMatch = prdContent.match(/^---\n([\s\S]*?)\n---/);
+    if (!frontmatterMatch) {
+      spinner.fail();
+      printError('PRD missing required frontmatter');
+      process.exit(1);
+    }
+
+    // Extract PRD metadata
+    const frontmatter = frontmatterMatch[1];
+    const descMatch = frontmatter.match(/description:\s*(.+)/);
+    const createdMatch = frontmatter.match(/created:\s*(.+)/);
+
+    const prdDescription = descMatch ? descMatch[1] : `Implementation of ${argv.feature_name}`;
+    const prdCreated = createdMatch ? createdMatch[1] : new Date().toISOString();
+
+    // Ensure epics directory exists
+    const epicDir = path.join(process.cwd(), '.claude', 'epics');
+    await fs.ensureDir(epicDir);
+
+    // Check for existing epic
+    const epicPath = path.join(epicDir, `${argv.feature_name}.md`);
+    if (await fs.pathExists(epicPath) && !argv.force) {
+      spinner.fail();
+      printError(`⚠️ Epic '${argv.feature_name}' already exists`);
+      printInfo('Options:');
+      printInfo('  • Use --force to overwrite');
+      printInfo(`  • Run: autopm pm:epic-decompose ${argv.feature_name} to break down existing epic`);
+      process.exit(1);
+    }
+
+    // BASIC MODE - Deterministic epic creation
+    if (argv.basic) {
+      spinner.text = 'Creating basic epic structure...';
+
+      const prdInfo = extractPRDInfo(prdContent);
+      const now = new Date().toISOString();
+
+      // Generate epic from template
+      const content = EPIC_TEMPLATE
+        .replace(/\$NAME/g, argv.feature_name)
+        .replace(/\$DESCRIPTION/g, prdDescription)
+        .replace(/\$DATE/g, now)
+        .replace(/\$PRD_NAME/g, argv.feature_name)
+        .replace(/\$PRD_DATE/g, prdCreated)
+        .replace(/\$OBJECTIVES/g, prdInfo.objectives.join('\n'))
+        .replace('[Copied from PRD success criteria]', prdInfo.criteria || '[Review PRD for success criteria]')
+        .replace('[Copied from PRD dependencies]', prdInfo.dependencies || '[Review PRD for dependencies]');
+
+      // Write epic file
+      await fs.writeFile(epicPath, content);
+
+      spinner.succeed();
+      printSuccess(`✅ Epic created: .claude/epics/${argv.feature_name}.md`);
+      console.log();
+      printInfo('Next steps:');
+      printInfo('1. Review and refine the epic tasks');
+      printInfo(`2. Run: autopm pm:epic-decompose ${argv.feature_name} for detailed breakdown`);
+      printInfo(`3. Run: autopm pm:epic-sync ${argv.feature_name} to push to GitHub/Azure`);
+      return;
+    }
+
+    // AI MODE - Redirect to Claude Code
+    spinner.stop();
+    console.log();
+    console.log('╔════════════════════════════════════════════════╗');
+    console.log('║   🤖 AI-Powered PRD Analysis Required         ║');
+    console.log('╚════════════════════════════════════════════════╝');
+    console.log();
+    printWarning('This command requires Claude Code for intelligent PRD parsing');
+    console.log();
+
+    printInfo('📍 To parse PRD with AI assistance:');
+    console.log(`   In Claude Code, run: \`/pm:prd-parse ${argv.feature_name}\``);
+    console.log();
+
+    printInfo('💡 AI mode provides:');
+    console.log('   • Intelligent requirement analysis');
+    console.log('   • Automatic task decomposition');
+    console.log('   • Dependency mapping');
+    console.log('   • Effort estimation');
+    console.log('   • Risk identification');
+    console.log();
+
+    printInfo('📝 Or create a basic epic now:');
+    console.log(`   autopm pm:prd-parse ${argv.feature_name} --basic`);
+    console.log();
+
+    printInfo('📄 AI command definition:');
+    console.log('   .claude/commands/pm/prd-parse.md');
+
   } catch (error) {
     spinner.fail();
-    printError(`Error: ${error.message}`, error);
+    printError(`Error: ${error.message}`);
     process.exit(1);
   }
 };

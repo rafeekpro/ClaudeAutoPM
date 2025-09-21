@@ -1,13 +1,11 @@
 /**
- * PRD New
- * Auto-migrated from pm:prd-new.md
+ * PRD New Command
+ * Hybrid: Template generation (deterministic) + AI assistance (Claude Code)
  */
 
-const agentExecutor = require('../../../lib/agentExecutor');
+const fs = require('fs-extra');
+const path = require('path');
 const {
-  validateInput,
-  loadEnvironment,
-  isVerbose,
   printError,
   printSuccess,
   printInfo,
@@ -15,229 +13,229 @@ const {
   createSpinner
 } = require('../../../lib/commandHelpers');
 
-// --- Agent Prompt ---
-const AGENT_PROMPT = `
-# PRD New
+// PRD Template for deterministic mode
+const PRD_TEMPLATE = `---
+name: $NAME
+description: $DESCRIPTION
+status: backlog
+created: $DATE
+---
 
-Launch brainstorming for new product requirement document.
-
-## Usage
-\`\`\`
-/pm:prd-new <feature_name>
-\`\`\`
-
-## Required Rules
-
-**IMPORTANT:** Before executing this command, read and follow:
-- \`.claude/rules/datetime.md\` - For getting real current date/time
-
-## Preflight Checklist
-
-Before proceeding, complete these validation steps.
-Do not bother the user with preflight checks progress ("I'm not going to ..."). Just do them and move on.
-
-### Input Validation
-1. **Validate feature name format:**
-   - Must contain only lowercase letters, numbers, and hyphens
-   - Must start with a letter
-   - No spaces or special characters allowed
-   - If invalid, tell user: "❌ Feature name must be kebab-case (lowercase letters, numbers, hyphens only). Examples: user-auth, payment-v2, notification-system"
-
-2. **Check for existing PRD:**
-   - Check if \`.claude/prds/$ARGUMENTS.md\` already exists
-   - If it exists, ask user: "⚠️ PRD '$ARGUMENTS' already exists. Do you want to overwrite it? (yes/no)"
-   - Only proceed with explicit 'yes' confirmation
-   - If user says no, suggest: "Use a different name or run: /pm:prd-parse $ARGUMENTS to create an epic from the existing PRD"
-
-3. **Verify directory structure:**
-   - Check if \`.claude/prds/\` directory exists
-   - If not, create it first
-   - If unable to create, tell user: "❌ Cannot create PRD directory. Please manually create: .claude/prds/"
-
-## Instructions
-
-You are a product manager creating a comprehensive Product Requirements Document (PRD) for: **$ARGUMENTS**
-
-Follow this structured approach:
-
-### 1. Discovery & Context
-- Ask clarifying questions about the feature/product "$ARGUMENTS"
-- Understand the problem being solved
-- Identify target users and use cases
-- Gather constraints and requirements
-
-### 2. PRD Structure
-Create a comprehensive PRD with these sections:
-
-#### Executive Summary
-- Brief overview and value proposition
-
-#### Problem Statement
-- What problem are we solving?
-- Why is this important now?
-
-#### User Stories
-- Primary user personas
-- Detailed user journeys
-- Pain points being addressed
-
-#### Requirements
-**Functional Requirements**
-- Core features and capabilities
-- User interactions and flows
-
-**Non-Functional Requirements**
-- Performance expectations
-- Security considerations
-- Scalability needs
-
-#### Success Criteria
-- Measurable outcomes
-- Key metrics and KPIs
-
-#### Constraints & Assumptions
-- Technical limitations
-- Timeline constraints
-- Resource limitations
-
-#### Out of Scope
-- What we're explicitly NOT building
-
-#### Dependencies
-- External dependencies
-- Internal team dependencies
-
-### 3. File Format with Frontmatter
-Save the completed PRD to: \`.claude/prds/$ARGUMENTS.md\` with this exact structure:
-
-\`\`\`markdown
-
-# PRD: $ARGUMENTS
+# PRD: $NAME
 
 ## Executive Summary
-[Content...]
+[Brief overview of the feature and its value proposition]
 
 ## Problem Statement
-[Content...]
+### What problem are we solving?
+[Describe the core problem this feature addresses]
 
-[Continue with all sections...]
-\`\`\`
+### Why is this important now?
+[Explain the urgency and business impact]
 
-### 4. Frontmatter Guidelines
-- **name**: Use the exact feature name (same as $ARGUMENTS)
-- **description**: Write a concise one-line summary of what this PRD covers
-- **status**: Always start with "backlog" for new PRDs
-- **created**: Get REAL current datetime by running: \`date -u +"%Y-%m-%dT%H:%M:%SZ"\`
-  - Never use placeholder text
-  - Must be actual system time in ISO 8601 format
+## User Stories
+### Primary Personas
+- **User Type 1**: [Description and needs]
+- **User Type 2**: [Description and needs]
 
-### 5. Quality Checks
+### Key User Journeys
+1. **Journey 1**: [Step-by-step user flow]
+2. **Journey 2**: [Step-by-step user flow]
 
-Before saving the PRD, verify:
-- [ ] All sections are complete (no placeholder text)
-- [ ] User stories include acceptance criteria
-- [ ] Success criteria are measurable
-- [ ] Dependencies are clearly identified
-- [ ] Out of scope items are explicitly listed
+## Requirements
 
-### 6. Post-Creation
+### Functional Requirements
+- [ ] [Core feature 1]
+- [ ] [Core feature 2]
+- [ ] [Core feature 3]
+- [ ] [User interaction requirement]
+- [ ] [Data handling requirement]
 
-After successfully creating the PRD:
-1. Confirm: "✅ PRD created: .claude/prds/$ARGUMENTS.md"
-2. Show brief summary of what was captured
-3. Suggest next step: "Ready to create implementation epic? Run: /pm:prd-parse $ARGUMENTS"
+### Non-Functional Requirements
+- **Performance**: [Response time, load capacity]
+- **Security**: [Authentication, authorization, data protection]
+- **Scalability**: [Expected growth, resource needs]
+- **Accessibility**: [WCAG compliance, device support]
+- **Compatibility**: [Browser, platform requirements]
 
-## Error Recovery
+## Success Criteria
+- [ ] [Measurable outcome 1 - e.g., "Reduce task completion time by 30%"]
+- [ ] [Measurable outcome 2 - e.g., "Achieve 90% user satisfaction score"]
+- [ ] [Key metric/KPI - e.g., "Support 10,000 concurrent users"]
 
-If any step fails:
-- Clearly explain what went wrong
-- Provide specific steps to fix the issue
-- Never leave partial or corrupted files
+## Constraints & Assumptions
+### Technical Constraints
+- [Existing system limitations]
+- [Technology stack requirements]
+- [Integration constraints]
 
-Conduct a thorough brainstorming session before writing the PRD. Ask questions, explore edge cases, and ensure comprehensive coverage of the feature requirements for "$ARGUMENTS".
+### Business Constraints
+- [Budget limitations]
+- [Timeline requirements]
+- [Resource availability]
+
+### Assumptions
+- [Assumption about user behavior]
+- [Assumption about technical feasibility]
+- [Assumption about market conditions]
+
+## Out of Scope
+- [Feature explicitly not included in this phase]
+- [Future enhancement for later consideration]
+- [Related feature handled separately]
+
+## Dependencies
+### External Dependencies
+- [Third-party service/API]
+- [External team deliverable]
+- [Vendor component]
+
+### Internal Dependencies
+- [Other team's feature]
+- [Infrastructure requirement]
+- [Shared component]
+
+## Timeline & Milestones
+- **PRD Approval**: [Date]
+- **Design Complete**: [Date]
+- **Development Start**: [Date]
+- **Testing Complete**: [Date]
+- **Launch**: [Date]
+
+## Risks & Mitigation
+| Risk | Probability | Impact | Mitigation |
+|------|------------|--------|------------|
+| [Risk 1] | High/Med/Low | High/Med/Low | [Mitigation strategy] |
+| [Risk 2] | High/Med/Low | High/Med/Low | [Mitigation strategy] |
+
+## Open Questions
+- [ ] [Question requiring stakeholder input]
+- [ ] [Technical feasibility question]
+- [ ] [Business strategy question]
+
+---
+*Next Steps: Complete this PRD and run \`autopm pm:prd-parse $NAME\` to create implementation epic*
 `;
 
-// --- Command Definition ---
+// Command Definition
 exports.command = 'pm:prd-new <feature_name>';
-exports.describe = 'PRD New - Launch brainstorming for new product requirement document';
+exports.describe = 'Create a Product Requirements Document (template or AI-assisted)';
 
 exports.builder = (yargs) => {
   return yargs
     .positional('feature_name', {
-      describe: 'Name of the feature for the PRD (kebab-case)',
+      describe: 'Feature name in kebab-case (e.g., user-auth)',
       type: 'string',
       demandOption: true
     })
-    .option('verbose', {
-      describe: 'Verbose output',
+    .option('template', {
+      describe: 'Create PRD from template (no AI)',
       type: 'boolean',
-      alias: 'v'
-    })
-    .option('dry-run', {
-      describe: 'Simulate without making changes',
-      type: 'boolean',
+      alias: 't',
       default: false
-    });
+    })
+    .option('description', {
+      describe: 'Brief description (for template mode)',
+      type: 'string',
+      alias: 'd',
+      default: ''
+    })
+    .option('force', {
+      describe: 'Overwrite existing PRD',
+      type: 'boolean',
+      alias: 'f',
+      default: false
+    })
+    .example('$0 pm:prd-new user-auth --template', 'Create PRD template')
+    .example('$0 pm:prd-new payment-v2 -t -d "Payment system redesign"', 'Template with description')
+    .example('/pm:prd-new user-auth', 'AI-assisted in Claude Code');
 };
 
 exports.handler = async (argv) => {
-  const spinner = createSpinner('Executing pm:prd-new...');
+  const spinner = createSpinner('Processing PRD request...');
 
   try {
-    spinner.start();
-
-    // Load environment if needed
-    loadEnvironment();
-
-    // Validate input if needed
-    if (!argv.feature_name) {
+    // Validate feature name format (kebab-case)
+    const kebabRegex = /^[a-z][a-z0-9-]*$/;
+    if (!kebabRegex.test(argv.feature_name)) {
       spinner.fail();
-      printError('Missing required argument: feature_name');
-      printInfo('Usage: autopm pm:prd-new <feature_name>');
-      printInfo('Example: autopm pm:prd-new user-authentication');
+      printError('❌ Feature name must be kebab-case (lowercase letters, numbers, hyphens)');
+      printInfo('Examples: user-auth, payment-v2, notification-system');
       process.exit(1);
     }
 
-    // Prepare context
-    const context = {
-      arguments: argv.feature_name,
-      verbose: isVerbose(argv),
-      dryRun: argv.dryRun
-    };
+    // Ensure PRD directory exists
+    const prdDir = path.join(process.cwd(), '.claude', 'prds');
+    await fs.ensureDir(prdDir);
 
-    if (isVerbose(argv)) {
-      printInfo('Executing with context:');
-      console.log(JSON.stringify(context, null, 2));
+    // Check for existing PRD
+    const prdPath = path.join(prdDir, `${argv.feature_name}.md`);
+    if (await fs.pathExists(prdPath) && !argv.force) {
+      spinner.fail();
+      printError(`⚠️ PRD '${argv.feature_name}' already exists`);
+      printInfo('Options:');
+      printInfo('  • Use --force to overwrite');
+      printInfo('  • Choose a different name');
+      printInfo(`  • Run: autopm pm:prd-parse ${argv.feature_name} to create epic from existing PRD`);
+      process.exit(1);
     }
 
-    // Execute agent
-    const agentType = 'pm-specialist';
+    // TEMPLATE MODE - Deterministic PRD creation
+    if (argv.template) {
+      spinner.text = 'Creating PRD template...';
 
-    const result = await agentExecutor.run(agentType, AGENT_PROMPT, context);
+      const now = new Date().toISOString();
+      const description = argv.description || `Product requirements for ${argv.feature_name}`;
 
-    if (result.status === 'success') {
+      // Generate PRD from template
+      const content = PRD_TEMPLATE
+        .replace(/\$NAME/g, argv.feature_name)
+        .replace(/\$DESCRIPTION/g, description)
+        .replace(/\$DATE/g, now);
+
+      // Write PRD file
+      await fs.writeFile(prdPath, content);
+
       spinner.succeed();
-      printSuccess('Command executed successfully!');
-      if (result.prompt) {
-        printInfo('Note: Command executed via Claude Code Task tool');
-      }
-    } else if (result.status === 'simulation') {
-      spinner.warn();
-      printWarning('Command displayed in simulation mode (no API key)');
-      printInfo('See instructions above for how to execute this command');
-    } else if (result.status === 'pending') {
-      spinner.warn();
-      printWarning('API execution pending implementation');
-      printInfo('Use Claude Code or wait for API implementation');
-    } else {
-      spinner.fail();
-      printError(`Command failed: ${result.message || 'Unknown error'}`);
-      process.exit(1);
+      printSuccess(`✅ PRD template created: .claude/prds/${argv.feature_name}.md`);
+      console.log();
+      printInfo('Next steps:');
+      printInfo('1. Edit the PRD to fill in requirements');
+      printInfo(`2. Run: autopm pm:prd-parse ${argv.feature_name} to create epic`);
+      return;
     }
+
+    // AI MODE - Redirect to Claude Code
+    spinner.stop();
+    console.log();
+    console.log('╔════════════════════════════════════════════════╗');
+    console.log('║     🤖 AI-Powered PRD Creation Required       ║');
+    console.log('╚════════════════════════════════════════════════╝');
+    console.log();
+    printWarning('This command requires Claude Code for AI assistance');
+    console.log();
+
+    printInfo('📍 To create PRD with AI brainstorming:');
+    console.log(`   In Claude Code, run: ${('`/pm:prd-new ' + argv.feature_name + '`')}`);
+    console.log();
+
+    printInfo('💡 AI mode provides:');
+    console.log('   • Interactive brainstorming session');
+    console.log('   • Guided requirements gathering');
+    console.log('   • Comprehensive PRD generation');
+    console.log('   • Stakeholder question exploration');
+    console.log();
+
+    printInfo('📝 Or create a template now:');
+    console.log(`   autopm pm:prd-new ${argv.feature_name} --template`);
+    console.log();
+
+    printInfo('📄 AI command definition:');
+    console.log('   .claude/commands/pm/prd-new.md');
 
   } catch (error) {
     spinner.fail();
-    printError(`Error: ${error.message}`, error);
+    printError(`Error: ${error.message}`);
     process.exit(1);
   }
 };
