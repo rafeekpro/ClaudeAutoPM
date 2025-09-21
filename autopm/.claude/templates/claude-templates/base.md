@@ -51,6 +51,8 @@ Always run formatters and linters BEFORE marking any task as complete.
 
 ### Agent Documentation (`.claude/agents/`)
 
+**📋 Complete Agent Registry**: See `.claude/agents/AGENT-REGISTRY.md` for comprehensive list of all available agents with descriptions, tools, and direct links.
+
 Agents are organized by category for better maintainability:
 
 - **Core Agents** (`.claude/agents/core/`) - Essential agents for all projects
