@@ -74,3 +74,7 @@ Use Docker-aware agents for containerized development:
 - Container registry management
 - Multi-arch image builds
 - Security scanning in CI/CD
+
+---
+
+**📋 Full Agent Details**: For complete agent descriptions, parameters, tools, and file locations, see `.claude/agents/AGENT-REGISTRY.md`

@@ -23,8 +23,19 @@ Full documentation is available at: **[https://rafeekpro.github.io/ClaudeAutoPM/
 
 ## 🎯 Key Features
 
+### Hybrid Command System
+ClaudeAutoPM uses a **hybrid approach** combining deterministic operations with AI-powered intelligence:
+
+| Command Type | Implementation | Use Case | Example |
+|-------------|---------------|----------|---------|
+| **Deterministic** | JavaScript/Templates | Scaffolding, templates, automation | `autopm docker:create`, `autopm scaffold:api` |
+| **AI-Powered** | Claude Code + Markdown | Analysis, brainstorming, decomposition | `/pm:prd-new`, `/pm:epic-decompose` |
+| **Hybrid** | Both modes available | Flexible workflows | `pm:prd-new --template` or `/pm:prd-new` |
+
+### Core Capabilities
 - **96 Professional CLI Commands** - Full yargs-based CLI with auto-generated help
-- **AI Agent Integration** - Parallel execution with specialized agents
+- **Hybrid Execution** - Choose between templates (deterministic) or AI assistance
+- **AI Agent Integration** - Parallel execution with specialized agents (in Claude Code)
 - **Azure DevOps & GitHub** - Complete project management integration
 - **Smart Context Management** - Never lose track of your work
 - **Automated Workflows** - From PRD to production deployment
@@ -96,16 +107,34 @@ During installation, you'll be asked to:
 
 #### 4. Ship Your First Feature (90 seconds)
 
+##### Option A: Using Templates (Works Everywhere)
 ```bash
-# Create a PRD through guided brainstorming
+# Create PRD from template
+autopm pm:prd-new user-auth --template
+
+# Convert PRD to basic epic structure
+autopm pm:prd-parse user-auth --basic
+
+# Generate tasks from template
+autopm pm:epic-decompose user-auth --template backend
+
+# Push to GitHub/Azure DevOps
+autopm pm:epic-sync user-auth
+```
+
+##### Option B: AI-Powered in Claude Code
+```bash
+# Create PRD through AI brainstorming
 /pm:prd-new user-auth
 
-# Transform PRD into technical epic with tasks
+# AI-powered PRD analysis and epic creation
 /pm:prd-parse user-auth
 
+# Intelligent task decomposition
+/pm:epic-decompose user-auth
+
 # Push to GitHub and start building
-/pm:epic-oneshot user-auth
-/pm:issue-start 1234
+/pm:epic-sync user-auth
 ```
 
 **That's it!** You're now using structured, spec-driven development with AI agents.

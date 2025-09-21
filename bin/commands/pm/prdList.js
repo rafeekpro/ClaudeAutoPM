@@ -1,32 +1,18 @@
 /**
+ * prdList Command
  * prd-list
- * Auto-migrated from pm:prd-list.md
  */
 
-const agentExecutor = require('../../../lib/agentExecutor');
+const fs = require('fs-extra');
+const path = require('path');
+const { spawn } = require('child_process');
 const {
-  validateInput,
-  loadEnvironment,
-  isVerbose,
   printError,
-  printSuccess,
   printInfo,
   printWarning,
   createSpinner
 } = require('../../../lib/commandHelpers');
 
-// --- Agent Prompt ---
-const AGENT_PROMPT = `
-Run \`bash .claude/scripts/pm/prd-list.sh\` using a sub-agent and show me the complete output.
-
-- DO NOT truncate.
-- DO NOT collapse.
-- DO NOT abbreviate.
-- Show ALL lines in full.
-- DO NOT print any other comments.
-`;
-
-// --- Command Definition ---
 exports.command = 'pm:prd-list';
 exports.describe = 'prd-list';
 
@@ -36,55 +22,60 @@ exports.builder = (yargs) => {
       describe: 'Verbose output',
       type: 'boolean',
       alias: 'v'
-    })
-    .option('dry-run', {
-      describe: 'Simulate without making changes',
-      type: 'boolean',
-      default: false
     });
 };
 
 exports.handler = async (argv) => {
-  const spinner = createSpinner('Executing pm:prd-list...');
+  const spinner = createSpinner('Running pm:prd-list...');
 
   try {
-    spinner.start();
+    // Check if we're in Claude Code for enhanced functionality
+    const isClaudeCode = process.env.CLAUDE_CODE === 'true' ||
+                        process.env.ANTHROPIC_WORKSPACE === 'true';
 
-    // Load environment if needed
-    loadEnvironment();
-
-    // Validate input if needed
-    
-
-    // Prepare context
-    const context = {
-      
-      verbose: isVerbose(argv),
-      dryRun: argv.dryRun
-    };
-
-    if (isVerbose(argv)) {
-      printInfo('Executing with context:');
-      console.log(JSON.stringify(context, null, 2));
+    if (isClaudeCode) {
+      spinner.info();
+      console.log();
+      console.log('🤖 AI-enhanced version available in Claude Code');
+      console.log('Run: /pm:prd-list for intelligent PRD listing');
+      return;
     }
 
-    // Execute agent
-    const agentType = 'pm-specialist';
+    // Run the deterministic script
+    const scriptPath = path.join(process.cwd(), '.claude', 'scripts', 'pm/prd-list.sh');
 
-    const result = await agentExecutor.run(agentType, AGENT_PROMPT, context);
-
-    if (result.status === 'success') {
-      spinner.succeed();
-      printSuccess('Command executed successfully!');
-    } else {
+    if (!await fs.pathExists(scriptPath)) {
       spinner.fail();
-      printError(`Command failed: ${result.message || 'Unknown error'}`);
+      printError('Script not found. Is the project initialized?');
+      printInfo('Run: autopm pm:init to initialize');
       process.exit(1);
     }
 
+    spinner.stop();
+
+    return new Promise((resolve, reject) => {
+      const child = spawn('bash', [scriptPath], {
+        stdio: 'inherit',
+        cwd: process.cwd()
+      });
+
+      child.on('error', (error) => {
+        printError(`Failed to run script: ${error.message}`);
+        reject(error);
+      });
+
+      child.on('exit', (code) => {
+        if (code === 0) {
+          resolve();
+        } else {
+          reject(new Error(`Script exited with code ${code}`));
+        }
+      });
+    });
+
   } catch (error) {
     spinner.fail();
-    printError(`Error: ${error.message}`, error);
+    printError(`Error: ${error.message}`);
     process.exit(1);
   }
 };

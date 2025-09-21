@@ -1,13 +1,12 @@
 /**
- * Epic Decompose
- * Auto-migrated from pm:epic-decompose.md
+ * Epic Decompose Command
+ * Hybrid: Task templates (deterministic) + AI decomposition (Claude Code)
  */
 
-const agentExecutor = require('../../../lib/agentExecutor');
+const fs = require('fs-extra');
+const path = require('path');
+const yaml = require('js-yaml');
 const {
-  validateInput,
-  loadEnvironment,
-  isVerbose,
   printError,
   printSuccess,
   printInfo,
@@ -15,285 +14,232 @@ const {
   createSpinner
 } = require('../../../lib/commandHelpers');
 
-// --- Agent Prompt ---
-const AGENT_PROMPT = `
-# Epic Decompose
+// Task templates for different types
+const TASK_TEMPLATES = {
+  'backend': [
+    { id: '001', title: 'API Design', description: 'Design RESTful API endpoints and contracts', estimate: '2d' },
+    { id: '002', title: 'Database Schema', description: 'Design and implement database schema', estimate: '1d' },
+    { id: '003', title: 'Business Logic', description: 'Implement core business logic', estimate: '3d' },
+    { id: '004', title: 'API Implementation', description: 'Implement API endpoints', estimate: '2d' },
+    { id: '005', title: 'Unit Tests', description: 'Write unit tests for business logic', estimate: '2d' },
+    { id: '006', title: 'Integration Tests', description: 'Write API integration tests', estimate: '1d' },
+    { id: '007', title: 'Documentation', description: 'Write API documentation', estimate: '1d' }
+  ],
+  'frontend': [
+    { id: '001', title: 'UI Design', description: 'Create UI mockups and designs', estimate: '2d' },
+    { id: '002', title: 'Component Architecture', description: 'Design component structure', estimate: '1d' },
+    { id: '003', title: 'UI Components', description: 'Implement reusable UI components', estimate: '3d' },
+    { id: '004', title: 'State Management', description: 'Implement state management', estimate: '1d' },
+    { id: '005', title: 'API Integration', description: 'Connect frontend to backend API', estimate: '2d' },
+    { id: '006', title: 'Unit Tests', description: 'Write component unit tests', estimate: '1d' },
+    { id: '007', title: 'E2E Tests', description: 'Write end-to-end tests', estimate: '2d' },
+    { id: '008', title: 'Responsive Design', description: 'Ensure responsive on all devices', estimate: '1d' }
+  ],
+  'fullstack': [
+    { id: '001', title: 'Technical Design', description: 'Create technical design document', estimate: '2d' },
+    { id: '002', title: 'Database Design', description: 'Design database schema', estimate: '1d' },
+    { id: '003', title: 'API Design', description: 'Design API contracts', estimate: '1d' },
+    { id: '004', title: 'Backend Implementation', description: 'Implement backend services', estimate: '3d' },
+    { id: '005', title: 'Frontend Implementation', description: 'Implement UI components', estimate: '3d' },
+    { id: '006', title: 'Integration', description: 'Integrate frontend with backend', estimate: '1d' },
+    { id: '007', title: 'Testing', description: 'Write comprehensive tests', estimate: '2d' },
+    { id: '008', title: 'Documentation', description: 'Write user and technical docs', estimate: '1d' },
+    { id: '009', title: 'Deployment Setup', description: 'Configure deployment pipeline', estimate: '1d' }
+  ],
+  'devops': [
+    { id: '001', title: 'Infrastructure Design', description: 'Design infrastructure architecture', estimate: '1d' },
+    { id: '002', title: 'CI/CD Pipeline', description: 'Set up CI/CD pipeline', estimate: '2d' },
+    { id: '003', title: 'Environment Setup', description: 'Configure dev/staging/prod environments', estimate: '2d' },
+    { id: '004', title: 'Monitoring', description: 'Set up monitoring and alerting', estimate: '1d' },
+    { id: '005', title: 'Security Hardening', description: 'Implement security best practices', estimate: '1d' },
+    { id: '006', title: 'Backup Strategy', description: 'Implement backup and recovery', estimate: '1d' },
+    { id: '007', title: 'Documentation', description: 'Document infrastructure and processes', estimate: '1d' }
+  ]
+};
 
-Break epic into concrete, actionable tasks.
+// Task file template
+const TASK_FILE_TEMPLATE = `---
+id: $ID
+title: $TITLE
+description: $DESCRIPTION
+status: todo
+estimate: $ESTIMATE
+assignee: unassigned
+dependencies: []
+created: $DATE
+---
 
-## Usage
-\`\`\`
-/pm:epic-decompose <feature_name>
-\`\`\`
-
-## Required Rules
-
-**IMPORTANT:** Before executing this command, read and follow:
-- \`.claude/rules/datetime.md\` - For getting real current date/time
-
-## Preflight Checklist
-
-Before proceeding, complete these validation steps.
-Do not bother the user with preflight checks progress ("I'm not going to ..."). Just do them and move on.
-
-1. **Verify epic exists:**
-   - Check if \`.claude/epics/$ARGUMENTS/epic.md\` exists
-   - If not found, tell user: "❌ Epic not found: $ARGUMENTS. First create it with: /pm:prd-parse $ARGUMENTS"
-   - Stop execution if epic doesn't exist
-
-2. **Check for existing tasks:**
-   - Check if any numbered task files (001.md, 002.md, etc.) already exist in \`.claude/epics/$ARGUMENTS/\`
-   - If tasks exist, list them and ask: "⚠️ Found {count} existing tasks. Delete and recreate all tasks? (yes/no)"
-   - Only proceed with explicit 'yes' confirmation
-   - If user says no, suggest: "View existing tasks with: /pm:epic-show $ARGUMENTS"
-
-3. **Validate epic frontmatter:**
-   - Verify epic has valid frontmatter with: name, status, created, prd
-   - If invalid, tell user: "❌ Invalid epic frontmatter. Please check: .claude/epics/$ARGUMENTS/epic.md"
-
-4. **Check epic status:**
-   - If epic status is already "completed", warn user: "⚠️ Epic is marked as completed. Are you sure you want to decompose it again?"
-
-## Instructions
-
-You are decomposing an epic into specific, actionable tasks for: **$ARGUMENTS**
-
-### 1. Read the Epic
-- Load the epic from \`.claude/epics/$ARGUMENTS/epic.md\`
-- Understand the technical approach and requirements
-- Review the task breakdown preview
-
-### 2. Analyze for Parallel Creation
-
-Determine if tasks can be created in parallel:
-- If tasks are mostly independent: Create in parallel using Task agents
-- If tasks have complex dependencies: Create sequentially
-- For best results: Group independent tasks for parallel creation
-
-### 3. Parallel Task Creation (When Possible)
-
-If tasks can be created in parallel, spawn sub-agents:
-
-\`\`\`yaml
-Task:
-  description: "Create task files batch {X}"
-  subagent_type: "general-purpose"
-  prompt: |
-    Create task files for epic: $ARGUMENTS
-
-    Tasks to create:
-    - {list of 3-4 tasks for this batch}
-
-    For each task:
-    1. Create file: .claude/epics/$ARGUMENTS/{number}.md
-    2. Use exact format with frontmatter and all sections
-    3. Follow task breakdown from epic
-    4. Set parallel/depends_on fields appropriately
-    5. Number sequentially (001.md, 002.md, etc.)
-
-    Return: List of files created
-\`\`\`
-
-### 4. Task File Format with Frontmatter
-For each task, create a file with this exact structure:
-
-\`\`\`markdown
-
-# Task: [Task Title]
+# Task $ID: $TITLE
 
 ## Description
-Clear, concise description of what needs to be done
+$DESCRIPTION
 
 ## Acceptance Criteria
-- [ ] Specific criterion 1
-- [ ] Specific criterion 2
-- [ ] Specific criterion 3
+- [ ] [Define specific acceptance criteria]
+- [ ] [Add measurable outcomes]
+- [ ] [Include testing requirements]
 
 ## Technical Details
-- Implementation approach
-- Key considerations
-- Code locations/files affected
+[Add implementation details, approach, and considerations]
 
 ## Dependencies
-- [ ] Task/Issue dependencies
-- [ ] External dependencies
+- None identified yet
 
-## Effort Estimate
-- Size: XS/S/M/L/XL
-- Hours: estimated hours
-- Parallel: true/false (can run in parallel with other tasks)
-
-## Definition of Done
-- [ ] Code implemented
-- [ ] Tests written and passing
-- [ ] Documentation updated
-- [ ] Code reviewed
-- [ ] Deployed to staging
-\`\`\`
-
-### 3. Task Naming Convention
-Save tasks as: \`.claude/epics/$ARGUMENTS/{task_number}.md\`
-- Use sequential numbering: 001.md, 002.md, etc.
-- Keep task titles short but descriptive
-
-### 4. Frontmatter Guidelines
-- **name**: Use a descriptive task title (without "Task:" prefix)
-- **status**: Always start with "open" for new tasks
-- **created**: Get REAL current datetime by running: \`date -u +"%Y-%m-%dT%H:%M:%SZ"\`
-- **updated**: Use the same real datetime as created for new tasks
-- **github**: Leave placeholder text - will be updated during sync
-- **depends_on**: List task numbers that must complete before this can start (e.g., [001, 002])
-- **parallel**: Set to true if this can run alongside other tasks without conflicts
-- **conflicts_with**: List task numbers that modify the same files (helps coordination)
-
-### 5. Task Types to Consider
-- **Setup tasks**: Environment, dependencies, scaffolding
-- **Data tasks**: Models, schemas, migrations
-- **API tasks**: Endpoints, services, integration
-- **UI tasks**: Components, pages, styling
-- **Testing tasks**: Unit tests, integration tests
-- **Documentation tasks**: README, API docs
-- **Deployment tasks**: CI/CD, infrastructure
-
-### 6. Parallelization
-Mark tasks with \`parallel: true\` if they can be worked on simultaneously without conflicts.
-
-### 7. Execution Strategy
-
-Choose based on task count and complexity:
-
-**Small Epic (< 5 tasks)**: Create sequentially for simplicity
-
-**Medium Epic (5-10 tasks)**:
-- Batch into 2-3 groups
-- Spawn agents for each batch
-- Consolidate results
-
-**Large Epic (> 10 tasks)**:
-- Analyze dependencies first
-- Group independent tasks
-- Launch parallel agents (max 5 concurrent)
-- Create dependent tasks after prerequisites
-
-Example for parallel execution:
-\`\`\`markdown
-Spawning 3 agents for parallel task creation:
-- Agent 1: Creating tasks 001-003 (Database layer)
-- Agent 2: Creating tasks 004-006 (API layer)
-- Agent 3: Creating tasks 007-009 (UI layer)
-\`\`\`
-
-### 8. Task Dependency Validation
-
-When creating tasks with dependencies:
-- Ensure referenced dependencies exist (e.g., if Task 003 depends on Task 002, verify 002 was created)
-- Check for circular dependencies (Task A → Task B → Task A)
-- If dependency issues found, warn but continue: "⚠️ Task dependency warning: {details}"
-
-### 9. Update Epic with Task Summary
-After creating all tasks, update the epic file by adding this section:
-\`\`\`markdown
-## Tasks Created
-- [ ] 001.md - {Task Title} (parallel: true/false)
-- [ ] 002.md - {Task Title} (parallel: true/false)
-- etc.
-
-Total tasks: {count}
-Parallel tasks: {parallel_count}
-Sequential tasks: {sequential_count}
-Estimated total effort: {sum of hours}
-\`\`\`
-
-Also update the epic's frontmatter progress if needed (still 0% until tasks actually start).
-
-### 9. Quality Validation
-
-Before finalizing tasks, verify:
-- [ ] All tasks have clear acceptance criteria
-- [ ] Task sizes are reasonable (1-3 days each)
-- [ ] Dependencies are logical and achievable
-- [ ] Parallel tasks don't conflict with each other
-- [ ] Combined tasks cover all epic requirements
-
-### 10. Post-Decomposition
-
-After successfully creating tasks:
-1. Confirm: "✅ Created {count} tasks for epic: $ARGUMENTS"
-2. Show summary:
-   - Total tasks created
-   - Parallel vs sequential breakdown
-   - Total estimated effort
-3. Suggest next step: "Ready to sync to GitHub? Run: /pm:epic-sync $ARGUMENTS"
-
-## Error Recovery
-
-If any step fails:
-- If task creation partially completes, list which tasks were created
-- Provide option to clean up partial tasks
-- Never leave the epic in an inconsistent state
-
-Aim for tasks that can be completed in 1-3 days each. Break down larger tasks into smaller, manageable pieces for the "$ARGUMENTS" epic.
+## Notes
+- Created from template
+- Review and refine before starting work
 `;
 
-// --- Command Definition ---
-exports.command = 'pm:epic-decompose';
-exports.describe = 'Epic Decompose';
+// Command Definition
+exports.command = 'pm:epic-decompose <feature_name>';
+exports.describe = 'Break down epic into tasks (template-based or AI-powered)';
 
 exports.builder = (yargs) => {
   return yargs
-    .option('verbose', {
-      describe: 'Verbose output',
-      type: 'boolean',
-      alias: 'v'
+    .positional('feature_name', {
+      describe: 'Name of the epic to decompose',
+      type: 'string',
+      demandOption: true
     })
-    .option('dry-run', {
-      describe: 'Simulate without making changes',
+    .option('template', {
+      describe: 'Use template for task generation',
+      type: 'string',
+      alias: 't',
+      choices: ['backend', 'frontend', 'fullstack', 'devops'],
+      default: null
+    })
+    .option('force', {
+      describe: 'Overwrite existing tasks',
       type: 'boolean',
+      alias: 'f',
       default: false
-    });
+    })
+    .example('$0 pm:epic-decompose user-auth --template backend', 'Backend tasks template')
+    .example('$0 pm:epic-decompose payment -t fullstack', 'Fullstack tasks template')
+    .example('/pm:epic-decompose user-auth', 'AI-powered decomposition in Claude Code');
 };
 
 exports.handler = async (argv) => {
-  const spinner = createSpinner('Executing pm:epic-decompose...');
+  const spinner = createSpinner('Processing epic...');
 
   try {
-    spinner.start();
-
-    // Load environment if needed
-    loadEnvironment();
-
-    // Validate input if needed
-    
-
-    // Prepare context
-    const context = {
-      
-      verbose: isVerbose(argv),
-      dryRun: argv.dryRun
-    };
-
-    if (isVerbose(argv)) {
-      printInfo('Executing with context:');
-      console.log(JSON.stringify(context, null, 2));
-    }
-
-    // Execute agent
-    const agentType = 'pm-specialist';
-
-    const result = await agentExecutor.run(agentType, AGENT_PROMPT, context);
-
-    if (result.status === 'success') {
-      spinner.succeed();
-      printSuccess('Command executed successfully!');
-    } else {
+    // Check if epic exists
+    const epicPath = path.join(process.cwd(), '.claude', 'epics', `${argv.feature_name}.md`);
+    if (!await fs.pathExists(epicPath)) {
       spinner.fail();
-      printError(`Command failed: ${result.message || 'Unknown error'}`);
+      printError(`❌ Epic not found: ${argv.feature_name}`);
+      printInfo(`First create it with: autopm pm:prd-parse ${argv.feature_name}`);
       process.exit(1);
     }
 
+    // Create tasks directory
+    const tasksDir = path.join(process.cwd(), '.claude', 'epics', argv.feature_name);
+    await fs.ensureDir(tasksDir);
+
+    // Check for existing tasks
+    const existingTasks = await fs.readdir(tasksDir);
+    const taskFiles = existingTasks.filter(f => /^\d{3}\.md$/.test(f));
+
+    if (taskFiles.length > 0 && !argv.force) {
+      spinner.fail();
+      printError(`⚠️ Found ${taskFiles.length} existing tasks in epic`);
+      printInfo('Options:');
+      printInfo('  • Use --force to overwrite');
+      printInfo(`  • Run: autopm pm:epic-show ${argv.feature_name} to view existing tasks`);
+      process.exit(1);
+    }
+
+    // TEMPLATE MODE - Deterministic task generation
+    if (argv.template) {
+      spinner.text = `Creating ${argv.template} tasks from template...`;
+
+      const template = TASK_TEMPLATES[argv.template];
+      if (!template) {
+        spinner.fail();
+        printError(`Unknown template: ${argv.template}`);
+        printInfo('Available templates: backend, frontend, fullstack, devops');
+        process.exit(1);
+      }
+
+      // Clear existing tasks if force flag is set
+      if (argv.force && taskFiles.length > 0) {
+        for (const file of taskFiles) {
+          await fs.remove(path.join(tasksDir, file));
+        }
+      }
+
+      // Create task files from template
+      const now = new Date().toISOString();
+      for (const task of template) {
+        const taskContent = TASK_FILE_TEMPLATE
+          .replace(/\$ID/g, task.id)
+          .replace(/\$TITLE/g, task.title)
+          .replace(/\$DESCRIPTION/g, task.description)
+          .replace(/\$ESTIMATE/g, task.estimate)
+          .replace(/\$DATE/g, now);
+
+        const taskPath = path.join(tasksDir, `${task.id}.md`);
+        await fs.writeFile(taskPath, taskContent);
+      }
+
+      // Update epic metadata
+      const epicContent = await fs.readFile(epicPath, 'utf-8');
+      const updatedContent = epicContent.replace(
+        /tasks: \[\]/,
+        `tasks: [${template.map(t => `"${t.id}"`).join(', ')}]`
+      );
+      await fs.writeFile(epicPath, updatedContent);
+
+      spinner.succeed();
+      printSuccess(`✅ Created ${template.length} tasks from ${argv.template} template`);
+      console.log();
+      printInfo('Tasks created:');
+      template.forEach(task => {
+        console.log(`  ${task.id}: ${task.title} (${task.estimate})`);
+      });
+      console.log();
+      printInfo('Next steps:');
+      printInfo('1. Review and refine task details');
+      printInfo(`2. Run: autopm pm:epic-show ${argv.feature_name} to view all tasks`);
+      printInfo(`3. Run: autopm pm:epic-sync ${argv.feature_name} to push to GitHub/Azure`);
+      return;
+    }
+
+    // AI MODE - Redirect to Claude Code
+    spinner.stop();
+    console.log();
+    console.log('╔════════════════════════════════════════════════╗');
+    console.log('║  🤖 AI-Powered Task Decomposition Required    ║');
+    console.log('╚════════════════════════════════════════════════╝');
+    console.log();
+    printWarning('This command requires Claude Code for intelligent task breakdown');
+    console.log();
+
+    printInfo('📍 To decompose epic with AI:');
+    console.log(`   In Claude Code, run: \`/pm:epic-decompose ${argv.feature_name}\``);
+    console.log();
+
+    printInfo('💡 AI mode provides:');
+    console.log('   • Context-aware task breakdown');
+    console.log('   • Dependency identification');
+    console.log('   • Accurate effort estimation');
+    console.log('   • Risk assessment per task');
+    console.log('   • Optimal task sequencing');
+    console.log();
+
+    printInfo('📝 Or use a template now:');
+    console.log(`   autopm pm:epic-decompose ${argv.feature_name} --template backend`);
+    console.log(`   autopm pm:epic-decompose ${argv.feature_name} --template frontend`);
+    console.log(`   autopm pm:epic-decompose ${argv.feature_name} --template fullstack`);
+    console.log(`   autopm pm:epic-decompose ${argv.feature_name} --template devops`);
+    console.log();
+
+    printInfo('📄 AI command definition:');
+    console.log('   .claude/commands/pm/epic-decompose.md');
+
   } catch (error) {
     spinner.fail();
-    printError(`Error: ${error.message}`, error);
+    printError(`Error: ${error.message}`);
     process.exit(1);
   }
 };
