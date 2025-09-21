@@ -44,3 +44,7 @@ Use appropriate agents for traditional development:
 - Traditional VM deployments
 - Managed services configuration
 - Infrastructure setup (not containerized)
+
+---
+
+**📋 Full Agent Details**: For complete agent descriptions, parameters, tools, and file locations, see `.claude/agents/AGENT-REGISTRY.md`

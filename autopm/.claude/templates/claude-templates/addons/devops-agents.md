@@ -87,3 +87,7 @@ Use specialized agents for Docker + Kubernetes workflows:
 - SAST/DAST in pipelines
 - Policy as code
 - Compliance validation
+
+---
+
+**📋 Full Agent Details**: For complete agent descriptions, parameters, tools, and file locations, see `.claude/agents/AGENT-REGISTRY.md`
