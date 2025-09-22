@@ -92,7 +92,7 @@ $DESCRIPTION
 
 // Command Definition
 exports.command = 'pm:epic-decompose <feature_name>';
-exports.describe = 'Break down epic into tasks (template-based or AI-powered)';
+exports.describe = 'Break down epic into tasks (template-based or AI-powered) in current project';
 
 exports.builder = (yargs) => {
   return yargs
@@ -105,8 +105,7 @@ exports.builder = (yargs) => {
       describe: 'Use template for task generation',
       type: 'string',
       alias: 't',
-      choices: ['backend', 'frontend', 'fullstack', 'devops'],
-      default: null
+      choices: ['backend', 'frontend', 'fullstack', 'devops']
     })
     .option('force', {
       describe: 'Overwrite existing tasks',
@@ -123,12 +122,28 @@ exports.handler = async (argv) => {
   const spinner = createSpinner('Processing epic...');
 
   try {
+    // Check if we're in a project with Claude AutoPM structure
+    const claudeDir = path.join(process.cwd(), '.claude');
+    if (!await fs.pathExists(claudeDir)) {
+      spinner.fail();
+      printError('❌ Not in a ClaudeAutoPM project directory');
+      printInfo('Make sure you are in a project directory that has been initialized with AutoPM');
+      printInfo('Or run: autopm pm:init to initialize this directory');
+      process.exit(1);
+    }
     // Check if epic exists
     const epicPath = path.join(process.cwd(), '.claude', 'epics', `${argv.feature_name}.md`);
     if (!await fs.pathExists(epicPath)) {
       spinner.fail();
       printError(`❌ Epic not found: ${argv.feature_name}`);
-      printInfo(`First create it with: autopm pm:prd-parse ${argv.feature_name}`);
+      printInfo('Epic must exist in current project before decomposing');
+      console.log();
+      printInfo('Create epic first:');
+      printInfo(`  1. Create PRD: autopm pm:prd-new-skeleton ${argv.feature_name}`);
+      printInfo(`  2. Convert to epic: autopm pm:prd-parse ${argv.feature_name} --basic`);
+      printInfo(`  3. Then decompose: autopm pm:epic-decompose ${argv.feature_name} --template <type>`);
+      console.log();
+      printWarning('Make sure you are in the correct project directory!');
       process.exit(1);
     }
 
