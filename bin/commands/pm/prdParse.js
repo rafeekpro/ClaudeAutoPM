@@ -95,7 +95,7 @@ $OBJECTIVES
 
 // Command Definition
 exports.command = 'pm:prd-parse <feature_name>';
-exports.describe = 'Convert PRD to implementation epic (basic or AI-powered)';
+exports.describe = 'Convert PRD to implementation epic (basic or AI-powered) in current project';
 
 exports.builder = (yargs) => {
   return yargs
@@ -155,17 +155,41 @@ exports.handler = async (argv) => {
   const spinner = createSpinner('Processing PRD...');
 
   try {
+    // Check if we're in a project with Claude AutoPM structure
+    const claudeDir = path.join(process.cwd(), '.claude');
+    if (!await fs.pathExists(claudeDir)) {
+      spinner.fail();
+      printError('❌ Not in a ClaudeAutoPM project directory');
+      printInfo('Make sure you are in a project directory that has been initialized with AutoPM');
+      printInfo('Or run: autopm pm:init to initialize this directory');
+      process.exit(1);
+    }
     // Check if PRD exists
-    const prdPath = path.join(process.cwd(), '.claude', 'prds', `${argv.feature_name}.md`);
-    if (!await fs.pathExists(prdPath)) {
+    const prdPath = path.join(process.cwd(), '.claude', 'prds', 'drafts', `${argv.feature_name}.md`);
+    const oldPrdPath = path.join(process.cwd(), '.claude', 'prds', `${argv.feature_name}.md`);
+
+    let actualPrdPath = null;
+    if (await fs.pathExists(prdPath)) {
+      actualPrdPath = prdPath; // New Section-Command system
+    } else if (await fs.pathExists(oldPrdPath)) {
+      actualPrdPath = oldPrdPath; // Legacy system
+    }
+
+    if (!actualPrdPath) {
       spinner.fail();
       printError(`❌ PRD not found: ${argv.feature_name}`);
-      printInfo(`First create it with: autopm pm:prd-new ${argv.feature_name}`);
+      printInfo('PRD must exist in current project before parsing');
+      console.log();
+      printInfo('Create PRD first:');
+      printInfo(`  New system: autopm pm:prd-new-skeleton ${argv.feature_name}`);
+      printInfo(`  Legacy: autopm pm:prd-new ${argv.feature_name} --template`);
+      console.log();
+      printWarning('Make sure you are in the correct project directory!');
       process.exit(1);
     }
 
     // Read PRD content
-    const prdContent = await fs.readFile(prdPath, 'utf-8');
+    const prdContent = await fs.readFile(actualPrdPath, 'utf-8');
 
     // Parse PRD frontmatter
     const frontmatterMatch = prdContent.match(/^---\n([\s\S]*?)\n---/);
