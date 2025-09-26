@@ -1,0 +1,12 @@
+{
+  "execution_strategy": "adaptive",
+  "tools": {
+    "docker": {
+      "enabled": true,
+      "first": true
+    },
+    "kubernetes": {
+      "enabled": true
+    }
+  }
+}
