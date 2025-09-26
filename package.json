@@ -4,10 +4,7 @@
   "description": "Autonomous Project Management Framework for Claude Code - Advanced AI-powered development automation",
   "main": "bin/autopm.js",
   "bin": {
-    "autopm": "./bin/autopm.js",
-    "autopm-install": "./bin/node/install.js",
-    "autopm-merge": "./bin/node/merge-claude.js",
-    "autopm-setup-env": "./bin/node/setup-env.js"
+    "autopm": "./bin/autopm.js"
   },
   "scripts": {
     "postinstall": "echo '🎉 ClaudeAutoPM installed! Run: autopm --help'",
@@ -103,7 +100,6 @@
   "files": [
     "bin/",
     "lib/",
-    "src/",
     "autopm/",
     ".github/",
     "scripts/",
