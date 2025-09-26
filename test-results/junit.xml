@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="20" failures="20" errors="0" time="0.291">
-  <testsuite name="install-hooks migration tests" errors="0" failures="10" skipped="0" timestamp="2025-09-26T18:58:30" time="0.165" tests="10">
-    <testcase classname="install-hooks migration tests behavioral tests should execute install_hook function correctly" name="install-hooks migration tests behavioral tests should execute install_hook function correctly" time="0.002">
+<testsuites name="jest tests" tests="186" failures="126" errors="0" time="1.85">
+  <testsuite name="install-hooks migration tests" errors="0" failures="10" skipped="0" timestamp="2025-09-26T20:53:52" time="0.222" tests="10">
+    <testcase classname="install-hooks migration tests behavioral tests should execute install_hook function correctly" name="install-hooks migration tests behavioral tests should execute install_hook function correctly" time="0.006">
       <failure>TypeError: Cannot read properties of undefined (reading &apos;runBashVersion&apos;)
     at runBashVersion (/Users/rla/Projects/AUTOPM/test/migration/jest-migration-helper.js:186:25)
     at Object.runScript (/Users/rla/Projects/AUTOPM/test/migration/behavioral/install-hooks.test.js:24:28)
@@ -20,80 +20,1200 @@
     at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
     at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
     </testcase>
-    <testcase classname="install-hooks migration tests behavioral tests should execute check_git_repo function correctly" name="install-hooks migration tests behavioral tests should execute check_git_repo function correctly" time="0">
-      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-HU7LI6&apos;</failure>
+    <testcase classname="install-hooks migration tests behavioral tests should execute check_git_repo function correctly" name="install-hooks migration tests behavioral tests should execute check_git_repo function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-uwp90k&apos;</failure>
     </testcase>
-    <testcase classname="install-hooks migration tests behavioral tests should execute ensure_hooks_dir function correctly" name="install-hooks migration tests behavioral tests should execute ensure_hooks_dir function correctly" time="0">
-      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-hMAm8g&apos;</failure>
-    </testcase>
-    <testcase classname="install-hooks migration tests behavioral tests should execute main function correctly" name="install-hooks migration tests behavioral tests should execute main function correctly" time="0.001">
-      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-xfCYqT&apos;</failure>
-    </testcase>
-    <testcase classname="install-hooks migration tests command tests should handle git commands" name="install-hooks migration tests command tests should handle git commands" time="0">
-      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-VX0iqw&apos;</failure>
-    </testcase>
-    <testcase classname="install-hooks migration tests command tests should handle docker commands" name="install-hooks migration tests command tests should handle docker commands" time="0.001">
-      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-z9Wxwa&apos;</failure>
-    </testcase>
-    <testcase classname="install-hooks migration tests command tests should handle echo commands" name="install-hooks migration tests command tests should handle echo commands" time="0">
-      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-3gDfpk&apos;</failure>
-    </testcase>
-    <testcase classname="install-hooks migration tests parity tests should match bash output for standard input" name="install-hooks migration tests parity tests should match bash output for standard input" time="0">
-      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-Ofz1iT&apos;</failure>
-    </testcase>
-    <testcase classname="install-hooks migration tests error handling should handle missing arguments gracefully" name="install-hooks migration tests error handling should handle missing arguments gracefully" time="0">
-      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-suAFcY&apos;</failure>
-    </testcase>
-    <testcase classname="install-hooks migration tests error handling should handle invalid input" name="install-hooks migration tests error handling should handle invalid input" time="0">
-      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-GUXxwW&apos;</failure>
-    </testcase>
-  </testsuite>
-  <testsuite name="install-hooks migration tests" errors="0" failures="10" skipped="0" timestamp="2025-09-26T18:58:30" time="0.183" tests="10">
-    <testcase classname="install-hooks migration tests behavioral tests should execute install_hook function correctly" name="install-hooks migration tests behavioral tests should execute install_hook function correctly" time="0.002">
-      <failure>TypeError: Cannot read properties of undefined (reading &apos;runBashVersion&apos;)
-    at runBashVersion (/Users/rla/Projects/AUTOPM/test/migration/jest-migration-helper.js:186:25)
-    at Object.runScript (/Users/rla/Projects/AUTOPM/test/migration/behavioral/install-hooks.test.js:24:28)
-    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
-    at new Promise (&lt;anonymous&gt;)
-    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
-    at _callCircusTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1006:40)
-    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:946:3)
-    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
-    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
-    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
-    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
-    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
-    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
-    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
-    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
-    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
-    </testcase>
-    <testcase classname="install-hooks migration tests behavioral tests should execute check_git_repo function correctly" name="install-hooks migration tests behavioral tests should execute check_git_repo function correctly" time="0">
-      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-gU3tV4&apos;</failure>
-    </testcase>
-    <testcase classname="install-hooks migration tests behavioral tests should execute ensure_hooks_dir function correctly" name="install-hooks migration tests behavioral tests should execute ensure_hooks_dir function correctly" time="0">
-      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-UkDUPC&apos;</failure>
+    <testcase classname="install-hooks migration tests behavioral tests should execute ensure_hooks_dir function correctly" name="install-hooks migration tests behavioral tests should execute ensure_hooks_dir function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-JV6nil&apos;</failure>
     </testcase>
     <testcase classname="install-hooks migration tests behavioral tests should execute main function correctly" name="install-hooks migration tests behavioral tests should execute main function correctly" time="0.001">
-      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-NkFxs0&apos;</failure>
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-UBL7RK&apos;</failure>
     </testcase>
     <testcase classname="install-hooks migration tests command tests should handle git commands" name="install-hooks migration tests command tests should handle git commands" time="0">
-      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-VtkXNe&apos;</failure>
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-iELDcI&apos;</failure>
     </testcase>
     <testcase classname="install-hooks migration tests command tests should handle docker commands" name="install-hooks migration tests command tests should handle docker commands" time="0">
-      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-WqCxL2&apos;</failure>
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-wL65cA&apos;</failure>
     </testcase>
-    <testcase classname="install-hooks migration tests command tests should handle echo commands" name="install-hooks migration tests command tests should handle echo commands" time="0">
-      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-ZLIFZV&apos;</failure>
+    <testcase classname="install-hooks migration tests command tests should handle echo commands" name="install-hooks migration tests command tests should handle echo commands" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-6NICf1&apos;</failure>
     </testcase>
     <testcase classname="install-hooks migration tests parity tests should match bash output for standard input" name="install-hooks migration tests parity tests should match bash output for standard input" time="0">
-      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-9cj6Zm&apos;</failure>
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-g0VUnv&apos;</failure>
     </testcase>
-    <testcase classname="install-hooks migration tests error handling should handle missing arguments gracefully" name="install-hooks migration tests error handling should handle missing arguments gracefully" time="0.001">
-      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-dF5Fj9&apos;</failure>
+    <testcase classname="install-hooks migration tests error handling should handle missing arguments gracefully" name="install-hooks migration tests error handling should handle missing arguments gracefully" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-ImM9UF&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests error handling should handle invalid input" name="install-hooks migration tests error handling should handle invalid input" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-B9EdtZ&apos;</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="docker-toggle migration tests" errors="0" failures="13" skipped="0" timestamp="2025-09-26T20:53:52" time="0.224" tests="13">
+    <testcase classname="docker-toggle migration tests behavioral tests should execute check_jq function correctly" name="docker-toggle migration tests behavioral tests should execute check_jq function correctly" time="0.012">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;runBashVersion&apos;)
+    at runBashVersion (/Users/rla/Projects/AUTOPM/test/migration/jest-migration-helper.js:186:25)
+    at Object.runScript (/Users/rla/Projects/AUTOPM/test/migration/behavioral/docker-toggle.test.js:24:28)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1006:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:946:3)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests behavioral tests should execute create_config_if_missing function correctly" name="docker-toggle migration tests behavioral tests should execute create_config_if_missing function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-5Ygtom&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests behavioral tests should execute show_status function correctly" name="docker-toggle migration tests behavioral tests should execute show_status function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-ZdrFdP&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests behavioral tests should execute enable_docker_first function correctly" name="docker-toggle migration tests behavioral tests should execute enable_docker_first function correctly" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-PYGOC3&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests behavioral tests should execute disable_docker_first function correctly" name="docker-toggle migration tests behavioral tests should execute disable_docker_first function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-YwYWdn&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests behavioral tests should execute show_help function correctly" name="docker-toggle migration tests behavioral tests should execute show_help function correctly" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-V8AnA7&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests behavioral tests should execute main function correctly" name="docker-toggle migration tests behavioral tests should execute main function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-yppfWj&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests command tests should handle git commands" name="docker-toggle migration tests command tests should handle git commands" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-ThaEN7&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests command tests should handle docker commands" name="docker-toggle migration tests command tests should handle docker commands" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-cOgPtU&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests command tests should handle echo commands" name="docker-toggle migration tests command tests should handle echo commands" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-hCWDPK&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests parity tests should match bash output for standard input" name="docker-toggle migration tests parity tests should match bash output for standard input" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-eO4ZlM&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests error handling should handle missing arguments gracefully" name="docker-toggle migration tests error handling should handle missing arguments gracefully" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-02SRfF&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests error handling should handle invalid input" name="docker-toggle migration tests error handling should handle invalid input" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-wEgnSr&apos;</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="install-hooks migration tests" errors="0" failures="10" skipped="0" timestamp="2025-09-26T20:53:52" time="0.221" tests="10">
+    <testcase classname="install-hooks migration tests behavioral tests should execute install_hook function correctly" name="install-hooks migration tests behavioral tests should execute install_hook function correctly" time="0.011">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;runBashVersion&apos;)
+    at runBashVersion (/Users/rla/Projects/AUTOPM/test/migration/jest-migration-helper.js:186:25)
+    at Object.runScript (/Users/rla/Projects/AUTOPM/test/migration/behavioral/install-hooks.test.js:24:28)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1006:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:946:3)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests behavioral tests should execute check_git_repo function correctly" name="install-hooks migration tests behavioral tests should execute check_git_repo function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-J1eEvC&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests behavioral tests should execute ensure_hooks_dir function correctly" name="install-hooks migration tests behavioral tests should execute ensure_hooks_dir function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-R1mpXs&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests behavioral tests should execute main function correctly" name="install-hooks migration tests behavioral tests should execute main function correctly" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-PMEZGj&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests command tests should handle git commands" name="install-hooks migration tests command tests should handle git commands" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-vVk7Xj&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests command tests should handle docker commands" name="install-hooks migration tests command tests should handle docker commands" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-ZMfpuc&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests command tests should handle echo commands" name="install-hooks migration tests command tests should handle echo commands" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-Bhtbtv&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests parity tests should match bash output for standard input" name="install-hooks migration tests parity tests should match bash output for standard input" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-Y3InAA&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests error handling should handle missing arguments gracefully" name="install-hooks migration tests error handling should handle missing arguments gracefully" time="0.002">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-X2GT0m&apos;</failure>
     </testcase>
     <testcase classname="install-hooks migration tests error handling should handle invalid input" name="install-hooks migration tests error handling should handle invalid input" time="0">
-      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-l9HTQ1&apos;</failure>
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-HooHx0&apos;</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="docker-toggle migration tests" errors="0" failures="13" skipped="0" timestamp="2025-09-26T20:53:52" time="0.242" tests="13">
+    <testcase classname="docker-toggle migration tests behavioral tests should execute check_jq function correctly" name="docker-toggle migration tests behavioral tests should execute check_jq function correctly" time="0.007">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;runBashVersion&apos;)
+    at runBashVersion (/Users/rla/Projects/AUTOPM/test/migration/jest-migration-helper.js:186:25)
+    at Object.runScript (/Users/rla/Projects/AUTOPM/test/migration/behavioral/docker-toggle.test.js:24:28)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1006:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:946:3)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests behavioral tests should execute create_config_if_missing function correctly" name="docker-toggle migration tests behavioral tests should execute create_config_if_missing function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-Z0KYHM&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests behavioral tests should execute show_status function correctly" name="docker-toggle migration tests behavioral tests should execute show_status function correctly" time="0.003">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-cQ51VM&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests behavioral tests should execute enable_docker_first function correctly" name="docker-toggle migration tests behavioral tests should execute enable_docker_first function correctly" time="0.002">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-DixYHY&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests behavioral tests should execute disable_docker_first function correctly" name="docker-toggle migration tests behavioral tests should execute disable_docker_first function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-uU6yKq&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests behavioral tests should execute show_help function correctly" name="docker-toggle migration tests behavioral tests should execute show_help function correctly" time="0.003">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-egXsbt&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests behavioral tests should execute main function correctly" name="docker-toggle migration tests behavioral tests should execute main function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-MU392a&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests command tests should handle git commands" name="docker-toggle migration tests command tests should handle git commands" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-yRjh6W&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests command tests should handle docker commands" name="docker-toggle migration tests command tests should handle docker commands" time="0.003">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-Fy8qTj&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests command tests should handle echo commands" name="docker-toggle migration tests command tests should handle echo commands" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-ScUCJY&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests parity tests should match bash output for standard input" name="docker-toggle migration tests parity tests should match bash output for standard input" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-J6B2wX&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests error handling should handle missing arguments gracefully" name="docker-toggle migration tests error handling should handle missing arguments gracefully" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-53yKN6&apos;</failure>
+    </testcase>
+    <testcase classname="docker-toggle migration tests error handling should handle invalid input" name="docker-toggle migration tests error handling should handle invalid input" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-JHMY2c&apos;</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="docker-dev-setup migration tests" errors="0" failures="13" skipped="0" timestamp="2025-09-26T20:53:52" time="0.286" tests="13">
+    <testcase classname="docker-dev-setup migration tests behavioral tests should execute detect_project_type function correctly" name="docker-dev-setup migration tests behavioral tests should execute detect_project_type function correctly" time="0.004">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;runBashVersion&apos;)
+    at runBashVersion (/Users/rla/Projects/AUTOPM/test/migration/jest-migration-helper.js:186:25)
+    at Object.runScript (/Users/rla/Projects/AUTOPM/test/migration/behavioral/docker-dev-setup.test.js:24:28)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1006:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:946:3)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests behavioral tests should execute create_nodejs_docker function correctly" name="docker-dev-setup migration tests behavioral tests should execute create_nodejs_docker function correctly" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-d6rVqH&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests behavioral tests should execute create_python_docker function correctly" name="docker-dev-setup migration tests behavioral tests should execute create_python_docker function correctly" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-NAa0cW&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests behavioral tests should execute create_golang_docker function correctly" name="docker-dev-setup migration tests behavioral tests should execute create_golang_docker function correctly" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-Xff3fn&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests behavioral tests should execute create_dockerignore function correctly" name="docker-dev-setup migration tests behavioral tests should execute create_dockerignore function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-dKig11&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests behavioral tests should execute create_makefile function correctly" name="docker-dev-setup migration tests behavioral tests should execute create_makefile function correctly" time="0.004">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-LiprVG&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests behavioral tests should execute main function correctly" name="docker-dev-setup migration tests behavioral tests should execute main function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-z7Lw23&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests command tests should handle git commands" name="docker-dev-setup migration tests command tests should handle git commands" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-B1CD5O&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests command tests should handle npm commands" name="docker-dev-setup migration tests command tests should handle npm commands" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-fO92Sy&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests command tests should handle docker commands" name="docker-dev-setup migration tests command tests should handle docker commands" time="0.002">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-lpbnVZ&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests parity tests should match bash output for standard input" name="docker-dev-setup migration tests parity tests should match bash output for standard input" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-TFjFJz&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests error handling should handle missing arguments gracefully" name="docker-dev-setup migration tests error handling should handle missing arguments gracefully" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-99qZpa&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests error handling should handle invalid input" name="docker-dev-setup migration tests error handling should handle invalid input" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-oCyaO5&apos;</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="pr-validation migration tests" errors="0" failures="14" skipped="0" timestamp="2025-09-26T20:53:52" time="0.277" tests="14">
+    <testcase classname="pr-validation migration tests behavioral tests should execute is_docker_first_enabled function correctly" name="pr-validation migration tests behavioral tests should execute is_docker_first_enabled function correctly" time="0.006">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;runBashVersion&apos;)
+    at runBashVersion (/Users/rla/Projects/AUTOPM/test/migration/jest-migration-helper.js:186:25)
+    at Object.runScript (/Users/rla/Projects/AUTOPM/test/migration/behavioral/pr-validation.test.js:24:28)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1006:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:946:3)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests behavioral tests should execute check_git_status function correctly" name="pr-validation migration tests behavioral tests should execute check_git_status function correctly" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-XvNWiu&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests behavioral tests should execute check_docker_prerequisites function correctly" name="pr-validation migration tests behavioral tests should execute check_docker_prerequisites function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-4M9QY9&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests behavioral tests should execute run_comprehensive_tests function correctly" name="pr-validation migration tests behavioral tests should execute run_comprehensive_tests function correctly" time="0.002">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-n7i41V&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests behavioral tests should execute run_security_scan function correctly" name="pr-validation migration tests behavioral tests should execute run_security_scan function correctly" time="0.002">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-KRsEuc&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests behavioral tests should execute validate_cicd_config function correctly" name="pr-validation migration tests behavioral tests should execute validate_cicd_config function correctly" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-8kfAWn&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests behavioral tests should execute generate_pr_summary function correctly" name="pr-validation migration tests behavioral tests should execute generate_pr_summary function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-OYZU3d&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests behavioral tests should execute main function correctly" name="pr-validation migration tests behavioral tests should execute main function correctly" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-mSjVXi&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests command tests should handle git commands" name="pr-validation migration tests command tests should handle git commands" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-skIi8v&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests command tests should handle npm commands" name="pr-validation migration tests command tests should handle npm commands" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-KHQ5OW&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests command tests should handle docker commands" name="pr-validation migration tests command tests should handle docker commands" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-0aTe5O&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests parity tests should match bash output for standard input" name="pr-validation migration tests parity tests should match bash output for standard input" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-A9juWJ&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests error handling should handle missing arguments gracefully" name="pr-validation migration tests error handling should handle missing arguments gracefully" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-ye4HxQ&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests error handling should handle invalid input" name="pr-validation migration tests error handling should handle invalid input" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-O26NV7&apos;</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="docker-dev-setup migration tests" errors="0" failures="13" skipped="0" timestamp="2025-09-26T20:53:52" time="0.289" tests="13">
+    <testcase classname="docker-dev-setup migration tests behavioral tests should execute detect_project_type function correctly" name="docker-dev-setup migration tests behavioral tests should execute detect_project_type function correctly" time="0.005">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;runBashVersion&apos;)
+    at runBashVersion (/Users/rla/Projects/AUTOPM/test/migration/jest-migration-helper.js:186:25)
+    at Object.runScript (/Users/rla/Projects/AUTOPM/test/migration/behavioral/docker-dev-setup.test.js:24:28)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1006:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:946:3)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests behavioral tests should execute create_nodejs_docker function correctly" name="docker-dev-setup migration tests behavioral tests should execute create_nodejs_docker function correctly" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-SWiNth&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests behavioral tests should execute create_python_docker function correctly" name="docker-dev-setup migration tests behavioral tests should execute create_python_docker function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-i2JeDu&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests behavioral tests should execute create_golang_docker function correctly" name="docker-dev-setup migration tests behavioral tests should execute create_golang_docker function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-q7JmB2&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests behavioral tests should execute create_dockerignore function correctly" name="docker-dev-setup migration tests behavioral tests should execute create_dockerignore function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-xn2UzU&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests behavioral tests should execute create_makefile function correctly" name="docker-dev-setup migration tests behavioral tests should execute create_makefile function correctly" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-AtJTi9&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests behavioral tests should execute main function correctly" name="docker-dev-setup migration tests behavioral tests should execute main function correctly" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-4DFfL7&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests command tests should handle git commands" name="docker-dev-setup migration tests command tests should handle git commands" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-DGdIQh&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests command tests should handle npm commands" name="docker-dev-setup migration tests command tests should handle npm commands" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-FtErFo&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests command tests should handle docker commands" name="docker-dev-setup migration tests command tests should handle docker commands" time="0.002">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-aMNwCC&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests parity tests should match bash output for standard input" name="docker-dev-setup migration tests parity tests should match bash output for standard input" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-0Tr7eU&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests error handling should handle missing arguments gracefully" name="docker-dev-setup migration tests error handling should handle missing arguments gracefully" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-Uj089s&apos;</failure>
+    </testcase>
+    <testcase classname="docker-dev-setup migration tests error handling should handle invalid input" name="docker-dev-setup migration tests error handling should handle invalid input" time="0.002">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-B8yuCo&apos;</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="pr-validation migration tests" errors="0" failures="14" skipped="0" timestamp="2025-09-26T20:53:52" time="0.298" tests="14">
+    <testcase classname="pr-validation migration tests behavioral tests should execute is_docker_first_enabled function correctly" name="pr-validation migration tests behavioral tests should execute is_docker_first_enabled function correctly" time="0.003">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;runBashVersion&apos;)
+    at runBashVersion (/Users/rla/Projects/AUTOPM/test/migration/jest-migration-helper.js:186:25)
+    at Object.runScript (/Users/rla/Projects/AUTOPM/test/migration/behavioral/pr-validation.test.js:24:28)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1006:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:946:3)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests behavioral tests should execute check_git_status function correctly" name="pr-validation migration tests behavioral tests should execute check_git_status function correctly" time="0.004">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-o0IXU7&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests behavioral tests should execute check_docker_prerequisites function correctly" name="pr-validation migration tests behavioral tests should execute check_docker_prerequisites function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-9jHCeC&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests behavioral tests should execute run_comprehensive_tests function correctly" name="pr-validation migration tests behavioral tests should execute run_comprehensive_tests function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-YCAGwS&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests behavioral tests should execute run_security_scan function correctly" name="pr-validation migration tests behavioral tests should execute run_security_scan function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-JFp5HG&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests behavioral tests should execute validate_cicd_config function correctly" name="pr-validation migration tests behavioral tests should execute validate_cicd_config function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-PG5riA&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests behavioral tests should execute generate_pr_summary function correctly" name="pr-validation migration tests behavioral tests should execute generate_pr_summary function correctly" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-9nY1lM&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests behavioral tests should execute main function correctly" name="pr-validation migration tests behavioral tests should execute main function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-ck6KTZ&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests command tests should handle git commands" name="pr-validation migration tests command tests should handle git commands" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-vOfQ9S&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests command tests should handle npm commands" name="pr-validation migration tests command tests should handle npm commands" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-GENpFx&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests command tests should handle docker commands" name="pr-validation migration tests command tests should handle docker commands" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-bna3J2&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests parity tests should match bash output for standard input" name="pr-validation migration tests parity tests should match bash output for standard input" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-Qhoog0&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests error handling should handle missing arguments gracefully" name="pr-validation migration tests error handling should handle missing arguments gracefully" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-hueSgx&apos;</failure>
+    </testcase>
+    <testcase classname="pr-validation migration tests error handling should handle invalid input" name="pr-validation migration tests error handling should handle invalid input" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-2Nb9Y5&apos;</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="setup-context7 migration tests" errors="0" failures="6" skipped="0" timestamp="2025-09-26T20:53:52" time="0.082" tests="6">
+    <testcase classname="setup-context7 migration tests command tests should handle npm commands" name="setup-context7 migration tests command tests should handle npm commands" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-7mlDRO&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/setup-context7.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="setup-context7 migration tests command tests should handle echo commands" name="setup-context7 migration tests command tests should handle echo commands" time="0.003">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-qlyqLN&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/setup-context7.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="setup-context7 migration tests command tests should handle grep commands" name="setup-context7 migration tests command tests should handle grep commands" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-aErNLX&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/setup-context7.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="setup-context7 migration tests parity tests should match bash output for standard input" name="setup-context7 migration tests parity tests should match bash output for standard input" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-eS79MB&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/setup-context7.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="setup-context7 migration tests error handling should handle missing arguments gracefully" name="setup-context7 migration tests error handling should handle missing arguments gracefully" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-vlwDQz&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/setup-context7.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="setup-context7 migration tests error handling should handle invalid input" name="setup-context7 migration tests error handling should handle invalid input" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-UVjjLf&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/setup-context7.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="test-and-log migration tests" errors="0" failures="5" skipped="0" timestamp="2025-09-26T20:53:52" time="0.083" tests="5">
+    <testcase classname="test-and-log migration tests command tests should handle echo commands" name="test-and-log migration tests command tests should handle echo commands" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-LkRuWT&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/test-and-log.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="test-and-log migration tests command tests should handle test commands" name="test-and-log migration tests command tests should handle test commands" time="0.002">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-oFvIzu&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/test-and-log.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="test-and-log migration tests parity tests should match bash output for standard input" name="test-and-log migration tests parity tests should match bash output for standard input" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-bsbvwT&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/test-and-log.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="test-and-log migration tests error handling should handle missing arguments gracefully" name="test-and-log migration tests error handling should handle missing arguments gracefully" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-bbpzgU&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/test-and-log.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="test-and-log migration tests error handling should handle invalid input" name="test-and-log migration tests error handling should handle invalid input" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-qcFVqi&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/test-and-log.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="setup-context7 migration tests" errors="0" failures="6" skipped="0" timestamp="2025-09-26T20:53:52" time="0.085" tests="6">
+    <testcase classname="setup-context7 migration tests command tests should handle npm commands" name="setup-context7 migration tests command tests should handle npm commands" time="0.002">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-fkl66P&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/setup-context7.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="setup-context7 migration tests command tests should handle echo commands" name="setup-context7 migration tests command tests should handle echo commands" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-q2DUiE&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/setup-context7.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="setup-context7 migration tests command tests should handle grep commands" name="setup-context7 migration tests command tests should handle grep commands" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-WmYgRL&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/setup-context7.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="setup-context7 migration tests parity tests should match bash output for standard input" name="setup-context7 migration tests parity tests should match bash output for standard input" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-2O3ZIy&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/setup-context7.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="setup-context7 migration tests error handling should handle missing arguments gracefully" name="setup-context7 migration tests error handling should handle missing arguments gracefully" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-0RVOBz&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/setup-context7.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="setup-context7 migration tests error handling should handle invalid input" name="setup-context7 migration tests error handling should handle invalid input" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-PnxQYR&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/setup-context7.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="test-and-log migration tests" errors="0" failures="5" skipped="0" timestamp="2025-09-26T20:53:52" time="0.082" tests="5">
+    <testcase classname="test-and-log migration tests command tests should handle echo commands" name="test-and-log migration tests command tests should handle echo commands" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-Cd381n&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/test-and-log.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="test-and-log migration tests command tests should handle test commands" name="test-and-log migration tests command tests should handle test commands" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-Rkt5R4&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/test-and-log.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="test-and-log migration tests parity tests should match bash output for standard input" name="test-and-log migration tests parity tests should match bash output for standard input" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-pxnauB&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/test-and-log.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="test-and-log migration tests error handling should handle missing arguments gracefully" name="test-and-log migration tests error handling should handle missing arguments gracefully" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-FYojW9&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/test-and-log.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="test-and-log migration tests error handling should handle invalid input" name="test-and-log migration tests error handling should handle invalid input" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-o9a9Kk&apos;</failure>
+      <failure>TypeError: The &quot;path&quot; argument must be of type string. Received undefined
+    at Object.dirname (node:path:1409:5)
+    at Object.dirname (/Users/rla/Projects/AUTOPM/test/migration/behavioral/test-and-log.test.js:16:24)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusHook (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:975:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:948:5)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="merge-claude.js migration" errors="0" failures="0" skipped="0" timestamp="2025-09-26T20:53:52" time="0.542" tests="10">
+    <testcase classname="merge-claude.js migration Core functionality should display help when --help is passed" name="merge-claude.js migration Core functionality should display help when --help is passed" time="0.044">
+    </testcase>
+    <testcase classname="merge-claude.js migration Core functionality should validate required files" name="merge-claude.js migration Core functionality should validate required files" time="0.04">
+    </testcase>
+    <testcase classname="merge-claude.js migration Merge operations should generate merge prompt" name="merge-claude.js migration Merge operations should generate merge prompt" time="0.043">
+    </testcase>
+    <testcase classname="merge-claude.js migration Merge operations should perform simple merge" name="merge-claude.js migration Merge operations should perform simple merge" time="0.04">
+    </testcase>
+    <testcase classname="merge-claude.js migration Merge operations should preserve user customizations" name="merge-claude.js migration Merge operations should preserve user customizations" time="0.035">
+    </testcase>
+    <testcase classname="merge-claude.js migration Merge operations should handle conflicts intelligently" name="merge-claude.js migration Merge operations should handle conflicts intelligently" time="0.035">
+    </testcase>
+    <testcase classname="merge-claude.js migration Backup and safety should create backup of existing file" name="merge-claude.js migration Backup and safety should create backup of existing file" time="0.036">
+    </testcase>
+    <testcase classname="merge-claude.js migration Backup and safety should validate markdown syntax" name="merge-claude.js migration Backup and safety should validate markdown syntax" time="0.033">
+    </testcase>
+    <testcase classname="merge-claude.js migration Interactive mode should show diff preview" name="merge-claude.js migration Interactive mode should show diff preview" time="0.034">
+    </testcase>
+    <testcase classname="merge-claude.js migration Backward compatibility should support same command-line options as bash version" name="merge-claude.js migration Backward compatibility should support same command-line options as bash version" time="0.028">
+    </testcase>
+  </testsuite>
+  <testsuite name="setup-env.js migration" errors="0" failures="1" skipped="0" timestamp="2025-09-26T20:53:52" time="0.556" tests="9">
+    <testcase classname="setup-env.js migration Core functionality should display help when --help is passed" name="setup-env.js migration Core functionality should display help when --help is passed" time="0.059">
+    </testcase>
+    <testcase classname="setup-env.js migration Core functionality should validate ClaudeAutoPM installation" name="setup-env.js migration Core functionality should validate ClaudeAutoPM installation" time="0.05">
+    </testcase>
+    <testcase classname="setup-env.js migration Environment file creation should create .env file with default values" name="setup-env.js migration Environment file creation should create .env file with default values" time="0.047">
+    </testcase>
+    <testcase classname="setup-env.js migration Environment file creation should backup existing .env file" name="setup-env.js migration Environment file creation should backup existing .env file" time="0.035">
+    </testcase>
+    <testcase classname="setup-env.js migration Environment file creation should set secure permissions on .env file" name="setup-env.js migration Environment file creation should set secure permissions on .env file" time="0.035">
+    </testcase>
+    <testcase classname="setup-env.js migration Configuration options should accept configuration via command line" name="setup-env.js migration Configuration options should accept configuration via command line" time="0.036">
+    </testcase>
+    <testcase classname="setup-env.js migration Configuration options should validate input formats" name="setup-env.js migration Configuration options should validate input formats" time="0.032">
+    </testcase>
+    <testcase classname="setup-env.js migration Template processing should use .env.example as template" name="setup-env.js migration Template processing should use .env.example as template" time="0.036">
+      <failure>Error: expect(received).toContain(expected) // indexOf
+
+Expected substring: &quot;CUSTOM_VAR=&quot;
+Received string:    &quot;# ============================================
+# MCP (Model Context Protocol) Configuration
+# Generated on 2025-09-26T20:53:53.134Z
+# Target: /var/folders/6r/nlf3scq92x36d174267fqbb00000gn/T/setup-env-test-rRVv5Q
+# ============================================·
+# Context7 MCP Server Configuration
+# ------------------------------------------
+CONTEXT7_API_KEY=
+CONTEXT7_MCP_URL=mcp.context7.com/mcp
+CONTEXT7_API_URL=context7.com/api/v1
+CONTEXT7_WORKSPACE=
+CONTEXT7_MODE=documentation
+CONTEXT7_CACHE_TTL=3600·
+# GitHub MCP Server Configuration
+# ============================================
+GITHUB_TOKEN=
+GITHUB_API_URL=https://api.github.com·
+# Playwright MCP Server Configuration
+# ============================================
+PLAYWRIGHT_BROWSER=chromium
+PLAYWRIGHT_HEADLESS=true·
+# Azure DevOps Configuration (Skipped)
+# ============================================
+# AZURE_DEVOPS_PAT=your-azure-devops-pat
+# AZURE_DEVOPS_ORG=your-organization
+# AZURE_DEVOPS_PROJECT=your-project·
+# ============================================
+# MCP Context Pool Settings
+# ============================================·
+# Maximum context pool size for shared contexts
+MCP_CONTEXT_POOL_MAX_SIZE=100MB·
+# Context retention period (e.g., 7d, 24h, 1w)
+MCP_CONTEXT_RETENTION=7d·
+# Context refresh interval (daily, hourly, on-change)
+MCP_CONTEXT_REFRESH=daily·
+# ============================================
+# Development &amp; Testing
+# ============================================·
+# Enable MCP debug logging (true/false)
+MCP_DEBUG=false·
+# MCP log level (error, warn, info, debug, trace)
+MCP_LOG_LEVEL=info·
+# ============================================
+# IMPORTANT SECURITY NOTES
+# ============================================
+# 1. NEVER commit this file to version control
+# 2. This file is already in .gitignore
+# 3. Keep this file secure with proper permissions (600)
+# 4. Rotate API keys regularly
+# 5. Use environment-specific .env files for different environments
+# 6. Consider using a secrets management service for production
+# ============================================
+&quot;
+    at Object.toContain (/Users/rla/Projects/AUTOPM/test/migration/behavioral/setup-env.test.js:133:23)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1006:40)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:946:3)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="setup-env.js migration Backward compatibility should support same command-line interface as bash version" name="setup-env.js migration Backward compatibility should support same command-line interface as bash version" time="0.033">
+    </testcase>
+  </testsuite>
+  <testsuite name="setup-env.js migration" errors="0" failures="1" skipped="0" timestamp="2025-09-26T20:53:52" time="0.549" tests="9">
+    <testcase classname="setup-env.js migration Core functionality should display help when --help is passed" name="setup-env.js migration Core functionality should display help when --help is passed" time="0.068">
+    </testcase>
+    <testcase classname="setup-env.js migration Core functionality should validate ClaudeAutoPM installation" name="setup-env.js migration Core functionality should validate ClaudeAutoPM installation" time="0.046">
+    </testcase>
+    <testcase classname="setup-env.js migration Environment file creation should create .env file with default values" name="setup-env.js migration Environment file creation should create .env file with default values" time="0.046">
+    </testcase>
+    <testcase classname="setup-env.js migration Environment file creation should backup existing .env file" name="setup-env.js migration Environment file creation should backup existing .env file" time="0.035">
+    </testcase>
+    <testcase classname="setup-env.js migration Environment file creation should set secure permissions on .env file" name="setup-env.js migration Environment file creation should set secure permissions on .env file" time="0.035">
+    </testcase>
+    <testcase classname="setup-env.js migration Configuration options should accept configuration via command line" name="setup-env.js migration Configuration options should accept configuration via command line" time="0.034">
+    </testcase>
+    <testcase classname="setup-env.js migration Configuration options should validate input formats" name="setup-env.js migration Configuration options should validate input formats" time="0.034">
+    </testcase>
+    <testcase classname="setup-env.js migration Template processing should use .env.example as template" name="setup-env.js migration Template processing should use .env.example as template" time="0.036">
+      <failure>Error: expect(received).toContain(expected) // indexOf
+
+Expected substring: &quot;CUSTOM_VAR=&quot;
+Received string:    &quot;# ============================================
+# MCP (Model Context Protocol) Configuration
+# Generated on 2025-09-26T20:53:53.134Z
+# Target: /var/folders/6r/nlf3scq92x36d174267fqbb00000gn/T/setup-env-test-qyuAaD
+# ============================================·
+# Context7 MCP Server Configuration
+# ------------------------------------------
+CONTEXT7_API_KEY=
+CONTEXT7_MCP_URL=mcp.context7.com/mcp
+CONTEXT7_API_URL=context7.com/api/v1
+CONTEXT7_WORKSPACE=
+CONTEXT7_MODE=documentation
+CONTEXT7_CACHE_TTL=3600·
+# GitHub MCP Server Configuration
+# ============================================
+GITHUB_TOKEN=
+GITHUB_API_URL=https://api.github.com·
+# Playwright MCP Server Configuration
+# ============================================
+PLAYWRIGHT_BROWSER=chromium
+PLAYWRIGHT_HEADLESS=true·
+# Azure DevOps Configuration (Skipped)
+# ============================================
+# AZURE_DEVOPS_PAT=your-azure-devops-pat
+# AZURE_DEVOPS_ORG=your-organization
+# AZURE_DEVOPS_PROJECT=your-project·
+# ============================================
+# MCP Context Pool Settings
+# ============================================·
+# Maximum context pool size for shared contexts
+MCP_CONTEXT_POOL_MAX_SIZE=100MB·
+# Context retention period (e.g., 7d, 24h, 1w)
+MCP_CONTEXT_RETENTION=7d·
+# Context refresh interval (daily, hourly, on-change)
+MCP_CONTEXT_REFRESH=daily·
+# ============================================
+# Development &amp; Testing
+# ============================================·
+# Enable MCP debug logging (true/false)
+MCP_DEBUG=false·
+# MCP log level (error, warn, info, debug, trace)
+MCP_LOG_LEVEL=info·
+# ============================================
+# IMPORTANT SECURITY NOTES
+# ============================================
+# 1. NEVER commit this file to version control
+# 2. This file is already in .gitignore
+# 3. Keep this file secure with proper permissions (600)
+# 4. Rotate API keys regularly
+# 5. Use environment-specific .env files for different environments
+# 6. Consider using a secrets management service for production
+# ============================================
+&quot;
+    at Object.toContain (/Users/rla/Projects/AUTOPM/test/migration/behavioral/setup-env.test.js:133:23)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1006:40)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:946:3)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="setup-env.js migration Backward compatibility should support same command-line interface as bash version" name="setup-env.js migration Backward compatibility should support same command-line interface as bash version" time="0.034">
+    </testcase>
+  </testsuite>
+  <testsuite name="merge-claude.js migration" errors="0" failures="0" skipped="0" timestamp="2025-09-26T20:53:52" time="0.355" tests="10">
+    <testcase classname="merge-claude.js migration Core functionality should display help when --help is passed" name="merge-claude.js migration Core functionality should display help when --help is passed" time="0.034">
+    </testcase>
+    <testcase classname="merge-claude.js migration Core functionality should validate required files" name="merge-claude.js migration Core functionality should validate required files" time="0.035">
+    </testcase>
+    <testcase classname="merge-claude.js migration Merge operations should generate merge prompt" name="merge-claude.js migration Merge operations should generate merge prompt" time="0.035">
+    </testcase>
+    <testcase classname="merge-claude.js migration Merge operations should perform simple merge" name="merge-claude.js migration Merge operations should perform simple merge" time="0.036">
+    </testcase>
+    <testcase classname="merge-claude.js migration Merge operations should preserve user customizations" name="merge-claude.js migration Merge operations should preserve user customizations" time="0.043">
+    </testcase>
+    <testcase classname="merge-claude.js migration Merge operations should handle conflicts intelligently" name="merge-claude.js migration Merge operations should handle conflicts intelligently" time="0.029">
+    </testcase>
+    <testcase classname="merge-claude.js migration Backup and safety should create backup of existing file" name="merge-claude.js migration Backup and safety should create backup of existing file" time="0.034">
+    </testcase>
+    <testcase classname="merge-claude.js migration Backup and safety should validate markdown syntax" name="merge-claude.js migration Backup and safety should validate markdown syntax" time="0.028">
+    </testcase>
+    <testcase classname="merge-claude.js migration Interactive mode should show diff preview" name="merge-claude.js migration Interactive mode should show diff preview" time="0.029">
+    </testcase>
+    <testcase classname="merge-claude.js migration Backward compatibility should support same command-line options as bash version" name="merge-claude.js migration Backward compatibility should support same command-line options as bash version" time="0.029">
+    </testcase>
+  </testsuite>
+  <testsuite name="install.js migration" errors="0" failures="1" skipped="0" timestamp="2025-09-26T20:53:52" time="1.712" tests="13">
+    <testcase classname="install.js migration Core functionality should display help when --help is passed" name="install.js migration Core functionality should display help when --help is passed" time="0.06">
+    </testcase>
+    <testcase classname="install.js migration Core functionality should display version when --version is passed" name="install.js migration Core functionality should display version when --version is passed" time="0.042">
+    </testcase>
+    <testcase classname="install.js migration Core functionality should validate target directory" name="install.js migration Core functionality should validate target directory" time="0.033">
+    </testcase>
+    <testcase classname="install.js migration Installation modes should support minimal installation" name="install.js migration Installation modes should support minimal installation" time="0.139">
+    </testcase>
+    <testcase classname="install.js migration Installation modes should support docker installation" name="install.js migration Installation modes should support docker installation" time="0.103">
+    </testcase>
+    <testcase classname="install.js migration File operations should copy .claude directory structure" name="install.js migration File operations should copy .claude directory structure" time="0.1">
+    </testcase>
+    <testcase classname="install.js migration File operations should create backup of existing files" name="install.js migration File operations should create backup of existing files" time="0.097">
+    </testcase>
+    <testcase classname="install.js migration CLAUDE.md handling should merge existing CLAUDE.md with template" name="install.js migration CLAUDE.md handling should merge existing CLAUDE.md with template" time="0.097">
+    </testcase>
+    <testcase classname="install.js migration Script installation should install safe-commit.sh script" name="install.js migration Script installation should install safe-commit.sh script" time="0.095">
+    </testcase>
+    <testcase classname="install.js migration Git hooks setup should setup git hooks when requested" name="install.js migration Git hooks setup should setup git hooks when requested" time="0.143">
+      <failure>Error: expect(received).toBe(expected) // Object.is equality
+
+Expected: true
+Received: false
+    at Object.toBe (/Users/rla/Projects/AUTOPM/test/migration/behavioral/install.test.js:182:39)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1006:40)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:946:3)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="install.js migration Environment validation should check for required tools" name="install.js migration Environment validation should check for required tools" time="0.271">
+    </testcase>
+    <testcase classname="install.js migration Backward compatibility should maintain same exit codes as bash version" name="install.js migration Backward compatibility should maintain same exit codes as bash version" time="0.038">
+    </testcase>
+    <testcase classname="install.js migration Backward compatibility should support same command-line options as bash version" name="install.js migration Backward compatibility should support same command-line options as bash version" time="0.302">
+    </testcase>
+  </testsuite>
+  <testsuite name="install.js migration" errors="0" failures="1" skipped="0" timestamp="2025-09-26T20:53:52" time="1.715" tests="13">
+    <testcase classname="install.js migration Core functionality should display help when --help is passed" name="install.js migration Core functionality should display help when --help is passed" time="0.066">
+    </testcase>
+    <testcase classname="install.js migration Core functionality should display version when --version is passed" name="install.js migration Core functionality should display version when --version is passed" time="0.044">
+    </testcase>
+    <testcase classname="install.js migration Core functionality should validate target directory" name="install.js migration Core functionality should validate target directory" time="0.033">
+    </testcase>
+    <testcase classname="install.js migration Installation modes should support minimal installation" name="install.js migration Installation modes should support minimal installation" time="0.139">
+    </testcase>
+    <testcase classname="install.js migration Installation modes should support docker installation" name="install.js migration Installation modes should support docker installation" time="0.103">
+    </testcase>
+    <testcase classname="install.js migration File operations should copy .claude directory structure" name="install.js migration File operations should copy .claude directory structure" time="0.1">
+    </testcase>
+    <testcase classname="install.js migration File operations should create backup of existing files" name="install.js migration File operations should create backup of existing files" time="0.097">
+    </testcase>
+    <testcase classname="install.js migration CLAUDE.md handling should merge existing CLAUDE.md with template" name="install.js migration CLAUDE.md handling should merge existing CLAUDE.md with template" time="0.097">
+    </testcase>
+    <testcase classname="install.js migration Script installation should install safe-commit.sh script" name="install.js migration Script installation should install safe-commit.sh script" time="0.095">
+    </testcase>
+    <testcase classname="install.js migration Git hooks setup should setup git hooks when requested" name="install.js migration Git hooks setup should setup git hooks when requested" time="0.143">
+      <failure>Error: expect(received).toBe(expected) // Object.is equality
+
+Expected: true
+Received: false
+    at Object.toBe (/Users/rla/Projects/AUTOPM/test/migration/behavioral/install.test.js:182:39)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1006:40)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:946:3)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="install.js migration Environment validation should check for required tools" name="install.js migration Environment validation should check for required tools" time="0.271">
+    </testcase>
+    <testcase classname="install.js migration Backward compatibility should maintain same exit codes as bash version" name="install.js migration Backward compatibility should maintain same exit codes as bash version" time="0.038">
+    </testcase>
+    <testcase classname="install.js migration Backward compatibility should support same command-line options as bash version" name="install.js migration Backward compatibility should support same command-line options as bash version" time="0.303">
     </testcase>
   </testsuite>
 </testsuites>
