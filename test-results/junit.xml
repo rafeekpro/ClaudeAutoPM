@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="20" failures="20" errors="0" time="0.291">
+  <testsuite name="install-hooks migration tests" errors="0" failures="10" skipped="0" timestamp="2025-09-26T18:58:30" time="0.165" tests="10">
+    <testcase classname="install-hooks migration tests behavioral tests should execute install_hook function correctly" name="install-hooks migration tests behavioral tests should execute install_hook function correctly" time="0.002">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;runBashVersion&apos;)
+    at runBashVersion (/Users/rla/Projects/AUTOPM/test/migration/jest-migration-helper.js:186:25)
+    at Object.runScript (/Users/rla/Projects/AUTOPM/test/migration/behavioral/install-hooks.test.js:24:28)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1006:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:946:3)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests behavioral tests should execute check_git_repo function correctly" name="install-hooks migration tests behavioral tests should execute check_git_repo function correctly" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-HU7LI6&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests behavioral tests should execute ensure_hooks_dir function correctly" name="install-hooks migration tests behavioral tests should execute ensure_hooks_dir function correctly" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-hMAm8g&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests behavioral tests should execute main function correctly" name="install-hooks migration tests behavioral tests should execute main function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-xfCYqT&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests command tests should handle git commands" name="install-hooks migration tests command tests should handle git commands" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-VX0iqw&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests command tests should handle docker commands" name="install-hooks migration tests command tests should handle docker commands" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-z9Wxwa&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests command tests should handle echo commands" name="install-hooks migration tests command tests should handle echo commands" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-3gDfpk&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests parity tests should match bash output for standard input" name="install-hooks migration tests parity tests should match bash output for standard input" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-Ofz1iT&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests error handling should handle missing arguments gracefully" name="install-hooks migration tests error handling should handle missing arguments gracefully" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-suAFcY&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests error handling should handle invalid input" name="install-hooks migration tests error handling should handle invalid input" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-GUXxwW&apos;</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="install-hooks migration tests" errors="0" failures="10" skipped="0" timestamp="2025-09-26T18:58:30" time="0.183" tests="10">
+    <testcase classname="install-hooks migration tests behavioral tests should execute install_hook function correctly" name="install-hooks migration tests behavioral tests should execute install_hook function correctly" time="0.002">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;runBashVersion&apos;)
+    at runBashVersion (/Users/rla/Projects/AUTOPM/test/migration/jest-migration-helper.js:186:25)
+    at Object.runScript (/Users/rla/Projects/AUTOPM/test/migration/behavioral/install-hooks.test.js:24:28)
+    at Promise.finally.completed (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1556:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1496:10)
+    at _callCircusTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1006:40)
+    at _runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:946:3)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/jestAdapterInit.js:1917:21)
+    at jestAdapter (/Users/rla/Projects/AUTOPM/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:275:16)
+    at runTest (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:343:7)
+    at Object.worker (/Users/rla/Projects/AUTOPM/node_modules/jest-runner/build/testWorker.js:497:12)</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests behavioral tests should execute check_git_repo function correctly" name="install-hooks migration tests behavioral tests should execute check_git_repo function correctly" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-gU3tV4&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests behavioral tests should execute ensure_hooks_dir function correctly" name="install-hooks migration tests behavioral tests should execute ensure_hooks_dir function correctly" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-UkDUPC&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests behavioral tests should execute main function correctly" name="install-hooks migration tests behavioral tests should execute main function correctly" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-NkFxs0&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests command tests should handle git commands" name="install-hooks migration tests command tests should handle git commands" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-VtkXNe&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests command tests should handle docker commands" name="install-hooks migration tests command tests should handle docker commands" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-WqCxL2&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests command tests should handle echo commands" name="install-hooks migration tests command tests should handle echo commands" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-ZLIFZV&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests parity tests should match bash output for standard input" name="install-hooks migration tests parity tests should match bash output for standard input" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-9cj6Zm&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests error handling should handle missing arguments gracefully" name="install-hooks migration tests error handling should handle missing arguments gracefully" time="0.001">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-dF5Fj9&apos;</failure>
+    </testcase>
+    <testcase classname="install-hooks migration tests error handling should handle invalid input" name="install-hooks migration tests error handling should handle invalid input" time="0">
+      <failure>Error: ENOENT: no such file or directory, mkdtemp &apos;/Users/rla/Projects/AUTOPM/test/test/tmp-l9HTQ1&apos;</failure>
+    </testcase>
+  </testsuite>
+</testsuites>
