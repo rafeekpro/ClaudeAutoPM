@@ -1,19 +1,5 @@
 {
   "mcpServers": {
-    "context7-docs": {
-      "command": "npx",
-      "args": [
-        "@context7/mcp-server"
-      ],
-      "env": {
-        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY:-}",
-        "CONTEXT7_MCP_URL": "${CONTEXT7_MCP_URL:-mcp.context7.com/mcp}",
-        "CONTEXT7_API_URL": "${CONTEXT7_API_URL:-context7.com/api/v1}",
-        "CONTEXT7_WORKSPACE": "${CONTEXT7_WORKSPACE:-}",
-        "CONTEXT7_MODE": "documentation"
-      },
-      "envFile": ".claude/.env"
-    },
     "github-mcp": {
       "command": "npx",
       "args": [
