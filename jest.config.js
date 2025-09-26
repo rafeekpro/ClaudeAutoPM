@@ -46,6 +46,11 @@ module.exports = {
       testMatch: ['<rootDir>/test/unit/**/*.test.js']
     },
     {
+      displayName: 'scripts',
+      testMatch: ['<rootDir>/test/scripts/**/*.test.js'],
+      testTimeout: 10000
+    },
+    {
       displayName: 'migration',
       testMatch: ['<rootDir>/test/migration/**/*.test.js'],
       testTimeout: 15000

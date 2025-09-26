@@ -2,7 +2,7 @@
 allowed-tools: Bash, Read, Write, LS
 ---
 
-# Issue Sync
+# Issue Sync - Modular Version
 
 Push local updates as GitHub issue comments for transparent audit trail.
 
@@ -11,282 +11,384 @@ Push local updates as GitHub issue comments for transparent audit trail.
 /pm:issue-sync <issue_number>
 ```
 
-## Required Rules
+## Quick Check
 
-**IMPORTANT:** Before executing this command, read and follow:
-- `.claude/rules/datetime.md` - For getting real current date/time
+```bash
+# Verify issue updates exist
+test -d .claude/epics/*/updates/$ARGUMENTS || echo "❌ No updates for issue #$ARGUMENTS. Run: /pm:issue-start $ARGUMENTS"
 
-## Preflight Checklist
+# Check progress file
+find .claude/epics/*/updates/$ARGUMENTS -name progress.md 2>/dev/null | head -1
+```
 
-Before proceeding, complete these validation steps.
-Do not bother the user with preflight checks progress ("I'm not going to ..."). Just do them and move on.
-
-0. **Repository Protection Check:**
-   Follow `/rules/github-operations.md` - check remote origin:
-   ```bash
-   remote_url=$(git remote get-url origin 2>/dev/null || echo "")
-   if [[ "$remote_url" == *"rlagowski/autopm"* ]]; then
-     echo "❌ ERROR: Cannot sync to AutoPM template repository!"
-     echo "Update your remote: git remote set-url origin https://github.com/YOUR_USERNAME/YOUR_REPO.git"
-     exit 1
-   fi
-   ```
-
-1. **GitHub Authentication:**
-   - Run: `gh auth status`
-   - If not authenticated, tell user: "❌ GitHub CLI not authenticated. Run: gh auth login"
-
-2. **Issue Validation:**
-   - Run: `gh issue view $ARGUMENTS --json state`
-   - If issue doesn't exist, tell user: "❌ Issue #$ARGUMENTS not found"
-   - If issue is closed and completion < 100%, warn: "⚠️ Issue is closed but work incomplete"
-
-3. **Local Updates Check:**
-   - Check if `.claude/epics/*/updates/$ARGUMENTS/` directory exists
-   - If not found, tell user: "❌ No local updates found for issue #$ARGUMENTS. Run: /pm:issue-start $ARGUMENTS"
-   - Check if progress.md exists
-   - If not, tell user: "❌ No progress tracking found. Initialize with: /pm:issue-start $ARGUMENTS"
-
-4. **Check Last Sync:**
-   - Read `last_sync` from progress.md frontmatter
-   - If synced recently (< 5 minutes), ask: "⚠️ Recently synced. Force sync anyway? (yes/no)"
-   - Calculate what's new since last sync
-
-5. **Verify Changes:**
-   - Check if there are actual updates to sync
-   - If no changes, tell user: "ℹ️ No new updates to sync since {last_sync}"
-   - Exit gracefully if nothing to sync
+If no progress.md found: "❌ No progress tracking. Initialize with: /pm:issue-start $ARGUMENTS"
 
 ## Instructions
 
-You are synchronizing local development progress to GitHub as issue comments for: **Issue #$ARGUMENTS**
+The issue sync process is now modularized into 5 specialized scripts that handle different aspects of synchronization. Each script is designed for reliability, testability, and maintainability.
 
-### 1. Gather Local Updates
-Collect all local updates for the issue:
-- Read from `.claude/epics/{epic_name}/updates/$ARGUMENTS/`
-- Check for new content in:
-  - `progress.md` - Development progress
-  - `notes.md` - Technical notes and decisions
-  - `commits.md` - Recent commits and changes
-  - Any other update files
+### 1. Preflight Validation
 
-### 2. Update Progress Tracking Frontmatter
-Get current datetime: `date -u +"%Y-%m-%dT%H:%M:%SZ"`
+Run comprehensive validation checks before syncing:
 
-Update the progress.md file frontmatter:
-```yaml
----
-issue: $ARGUMENTS
-started: [preserve existing date]
-last_sync: [Use REAL datetime from command above]
-completion: [calculated percentage 0-100%]
----
-```
-
-### 3. Determine What's New
-Compare against previous sync to identify new content:
-- Look for sync timestamp markers
-- Identify new sections or updates
-- Gather only incremental changes since last sync
-
-### 4. Format Update Comment
-Create comprehensive update comment:
-
-```markdown
-## 🔄 Progress Update - {current_date}
-
-### ✅ Completed Work
-{list_completed_items}
-
-### 🔄 In Progress
-{current_work_items}
-
-### 📝 Technical Notes
-{key_technical_decisions}
-
-### 📊 Acceptance Criteria Status
-- ✅ {completed_criterion}
-- 🔄 {in_progress_criterion}
-- ⏸️ {blocked_criterion}
-- □ {pending_criterion}
-
-### 🚀 Next Steps
-{planned_next_actions}
-
-### ⚠️ Blockers
-{any_current_blockers}
-
-### 💻 Recent Commits
-{commit_summaries}
-
----
-*Progress: {completion}% | Synced from local updates at {timestamp}*
-```
-
-### 5. Post to GitHub
-Use GitHub CLI to add comment:
 ```bash
-gh issue comment #$ARGUMENTS --body-file {temp_comment_file}
+# Run preflight validation
+bash autopm/.claude/scripts/pm/issue-sync/preflight-validation.sh "$ARGUMENTS"
+
+if [[ $? -ne 0 ]]; then
+    echo "❌ Preflight validation failed"
+    exit 1
+fi
+
+# Extract validated paths from preflight output
+epic_name=$(bash autopm/.claude/scripts/pm/issue-sync/preflight-validation.sh "$ARGUMENTS" | grep "Epic:" | cut -d: -f2- | xargs)
+updates_dir=$(bash autopm/.claude/scripts/pm/issue-sync/preflight-validation.sh "$ARGUMENTS" | grep "Updates Directory:" | cut -d: -f2- | xargs)
+progress_file=$(bash autopm/.claude/scripts/pm/issue-sync/preflight-validation.sh "$ARGUMENTS" | grep "Progress File:" | cut -d: -f2- | xargs)
+
+echo "✅ Preflight checks passed"
 ```
 
-### 6. Update Local Task File
-Get current datetime: `date -u +"%Y-%m-%dT%H:%M:%SZ"`
+This script handles:
+- ✅ Repository protection checks (prevents syncing to template repos)
+- ✅ GitHub CLI authentication validation
+- ✅ Issue existence and state verification
+- ✅ Local updates directory validation
+- ✅ Sync timing checks (prevents too frequent syncs)
+- ✅ Changes verification (ensures there's something to sync)
 
-Update the task file frontmatter with sync information:
-```yaml
----
-name: [Task Title]
-status: open
-created: [preserve existing date]
-updated: [Use REAL datetime from command above]
-github: https://github.com/{org}/{repo}/issues/$ARGUMENTS
----
+### 2. Gather Updates
+
+Collect all local development updates:
+
+```bash
+# Get last sync timestamp from progress file
+last_sync=$(grep '^last_sync:' "$progress_file" | sed 's/^last_sync: *//')
+
+# Gather all updates since last sync
+consolidated_updates=$(bash autopm/.claude/scripts/pm/issue-sync/gather-updates.sh \
+    "$ARGUMENTS" \
+    "$updates_dir" \
+    "$last_sync")
+
+echo "✅ Updates gathered: $consolidated_updates"
 ```
 
-### 7. Handle Completion
-If task is complete, update all relevant frontmatter:
+This script handles:
+- ✅ Progress updates extraction from progress.md
+- ✅ Technical notes gathering from notes.md
+- ✅ Commit references collection (manual or automatic)
+- ✅ Acceptance criteria status tracking
+- ✅ Next steps and blockers compilation
+- ✅ Incremental update detection based on last sync
+- ✅ Consolidation into single update file
 
-**Task file frontmatter**:
-```yaml
----
-name: [Task Title]
-status: closed
-created: [existing date]
-updated: [current date/time]
-github: https://github.com/{org}/{repo}/issues/$ARGUMENTS
----
+### 3. Format Comment
+
+Format consolidated updates into a GitHub-ready comment:
+
+```bash
+# Check if task is complete
+completion=$(grep '^completion:' "$progress_file" | sed 's/^completion: *//' | tr -d '%')
+is_completion="false"
+if [[ "$completion" == "100" ]]; then
+    is_completion="true"
+fi
+
+# Format the comment
+formatted_comment=$(bash autopm/.claude/scripts/pm/issue-sync/format-comment.sh \
+    "$ARGUMENTS" \
+    "$consolidated_updates" \
+    "$progress_file" \
+    "$is_completion")
+
+echo "✅ Comment formatted: $formatted_comment"
 ```
 
-**Progress file frontmatter**:
-```yaml
----
-issue: $ARGUMENTS
-started: [existing date]
-last_sync: [current date/time]
-completion: 100%
----
+This script handles:
+- ✅ Progress update formatting with sections
+- ✅ Completion comment formatting for finished tasks
+- ✅ Acceptance criteria status formatting
+- ✅ Recent commits formatting
+- ✅ Comment size validation (65,536 character limit)
+- ✅ Automatic truncation with notice if needed
+- ✅ Testing and documentation status formatting
+
+### 4. Post Comment
+
+Post the formatted comment to GitHub:
+
+```bash
+# Post comment to GitHub issue
+comment_url=$(bash autopm/.claude/scripts/pm/issue-sync/post-comment.sh \
+    "$ARGUMENTS" \
+    "$formatted_comment" \
+    "$is_completion")
+
+if [[ $? -eq 0 ]]; then
+    echo "✅ Comment posted: $comment_url"
+else
+    echo "❌ Failed to post comment"
+    exit 1
+fi
 ```
 
-**Epic progress update**: Recalculate epic progress based on completed tasks and update epic frontmatter:
-```yaml
----
-name: [Epic Name]
-status: in-progress
-created: [existing date]
-progress: [calculated percentage based on completed tasks]%
-prd: [existing path]
-github: [existing URL]
----
+This script handles:
+- ✅ GitHub issue comment posting
+- ✅ Closed issue handling with confirmation
+- ✅ Dry run mode support (AUTOPM_DRY_RUN=true)
+- ✅ Comment verification after posting
+- ✅ Error recovery suggestions
+- ✅ URL extraction for tracking
+
+### 5. Update Frontmatter
+
+Update local metadata after successful sync:
+
+```bash
+# Update progress.md frontmatter with sync information
+bash autopm/.claude/scripts/pm/issue-sync/update-frontmatter.sh \
+    "$ARGUMENTS" \
+    "$progress_file" \
+    "$comment_url" \
+    "$is_completion"
+
+echo "✅ Frontmatter updated"
 ```
 
-### 8. Completion Comment
-If task is complete:
-```markdown
-## ✅ Task Completed - {current_date}
+This script handles:
+- ✅ Last sync timestamp update
+- ✅ Comment URL tracking
+- ✅ Completion status update (if applicable)
+- ✅ Issue state synchronization from GitHub
+- ✅ Automatic backup before modification
+- ✅ Verification and rollback on failure
+- ✅ Old backup cleanup (keeps last 5)
 
-### 🎯 All Acceptance Criteria Met
-- ✅ {criterion_1}
-- ✅ {criterion_2}
-- ✅ {criterion_3}
+## Complete Workflow Example
 
-### 📦 Deliverables
-- {deliverable_1}
-- {deliverable_2}
+Here's the complete modular issue sync workflow:
 
-### 🧪 Testing
-- Unit tests: ✅ Passing
-- Integration tests: ✅ Passing
-- Manual testing: ✅ Complete
+```bash
+#!/bin/bash
+# Complete issue sync using modular scripts
 
-### 📚 Documentation
-- Code documentation: ✅ Updated
-- README updates: ✅ Complete
+ISSUE_NUMBER="$ARGUMENTS"
 
-This task is ready for review and can be closed.
+echo "🚀 Starting modular issue sync for: #$ISSUE_NUMBER"
 
----
-*Task completed: 100% | Synced at {timestamp}*
+# Step 1: Preflight validation
+echo "🔍 Running preflight validation..."
+if ! bash autopm/.claude/scripts/pm/issue-sync/preflight-validation.sh "$ISSUE_NUMBER"; then
+    echo "❌ Preflight validation failed"
+    exit 1
+fi
+
+# Extract paths from a single preflight run
+preflight_output=$(bash autopm/.claude/scripts/pm/issue-sync/preflight-validation.sh "$ISSUE_NUMBER")
+epic_name=$(echo "$preflight_output" | grep "Epic:" | cut -d: -f2- | xargs)
+updates_dir=$(echo "$preflight_output" | grep "Updates Directory:" | cut -d: -f2- | xargs)
+progress_file=$(echo "$preflight_output" | grep "Progress File:" | cut -d: -f2- | xargs)
+
+echo "✅ Validation passed"
+echo "  Epic: $epic_name"
+echo "  Updates: $updates_dir"
+
+# Step 2: Gather updates
+echo "📝 Gathering local updates..."
+last_sync=$(grep '^last_sync:' "$progress_file" 2>/dev/null | sed 's/^last_sync: *//' || echo "")
+consolidated_updates=$(bash autopm/.claude/scripts/pm/issue-sync/gather-updates.sh \
+    "$ISSUE_NUMBER" \
+    "$updates_dir" \
+    "$last_sync")
+
+if [[ ! -f "$consolidated_updates" ]]; then
+    echo "❌ Failed to gather updates"
+    exit 1
+fi
+
+echo "✅ Updates gathered"
+
+# Step 3: Format comment
+echo "📋 Formatting GitHub comment..."
+completion=$(grep '^completion:' "$progress_file" 2>/dev/null | sed 's/^completion: *//' | tr -d '%' || echo "0")
+is_completion="false"
+if [[ "$completion" == "100" ]]; then
+    is_completion="true"
+    echo "  Task is complete - formatting completion comment"
+fi
+
+formatted_comment=$(bash autopm/.claude/scripts/pm/issue-sync/format-comment.sh \
+    "$ISSUE_NUMBER" \
+    "$consolidated_updates" \
+    "$progress_file" \
+    "$is_completion")
+
+if [[ ! -f "$formatted_comment" ]]; then
+    echo "❌ Failed to format comment"
+    exit 1
+fi
+
+echo "✅ Comment formatted"
+
+# Step 4: Post to GitHub
+echo "☁️ Posting to GitHub..."
+comment_url=$(bash autopm/.claude/scripts/pm/issue-sync/post-comment.sh \
+    "$ISSUE_NUMBER" \
+    "$formatted_comment" \
+    "$is_completion")
+
+if [[ $? -ne 0 ]]; then
+    echo "❌ Failed to post comment"
+    echo "💡 You can manually post with: gh issue comment $ISSUE_NUMBER --body-file $formatted_comment"
+    exit 1
+fi
+
+echo "✅ Comment posted successfully"
+
+# Step 5: Update frontmatter
+echo "📝 Updating local metadata..."
+bash autopm/.claude/scripts/pm/issue-sync/update-frontmatter.sh \
+    "$ISSUE_NUMBER" \
+    "$progress_file" \
+    "$comment_url" \
+    "$is_completion"
+
+echo "✅ Frontmatter updated"
+
+# Get repository info for final output
+repo=$(gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null || echo "")
+
+# Final output
+echo ""
+echo "🎉 Issue sync completed successfully!"
+echo ""
+echo "📊 Summary:"
+echo "  Issue: #$ISSUE_NUMBER"
+echo "  Epic: $epic_name"
+echo "  Completion: ${completion}%"
+if [[ "$is_completion" == "true" ]]; then
+    echo "  Status: ✅ COMPLETED"
+fi
+echo ""
+echo "🔗 Links:"
+if [[ -n "$comment_url" ]]; then
+    echo "  Comment: $comment_url"
+fi
+if [[ -n "$repo" ]]; then
+    echo "  Issue: https://github.com/$repo/issues/$ISSUE_NUMBER"
+fi
+echo ""
+echo "📋 Next steps:"
+if [[ "$is_completion" == "true" ]]; then
+    echo "  - Close the issue on GitHub if not already closed"
+    echo "  - Start next task: /pm:issue-start <next_issue_number>"
+else
+    echo "  - Continue development on issue #$ISSUE_NUMBER"
+    echo "  - Next sync: /pm:issue-sync $ISSUE_NUMBER"
+fi
+echo ""
 ```
 
-### 9. Output Summary
+## Benefits of Modular Approach
+
+### ✅ **Reliability**
+- Each script handles one specific responsibility
+- Comprehensive error handling and validation
+- Atomic operations with proper rollback
+
+### ✅ **Maintainability**
+- Modular scripts are easier to test and debug
+- Shared libraries ensure consistency
+- Clear separation of concerns
+
+### ✅ **Flexibility**
+- Scripts can be used independently
+- Easy to extend or modify individual components
+- Environment-based configuration
+
+### ✅ **Auditability**
+- Transparent sync history with timestamps
+- Comment URL tracking
+- Backup preservation for rollback
+
+## Environment Variables
+
+```bash
+# Dry run mode - preview without posting
+export AUTOPM_DRY_RUN=true
+
+# Force sync even if recent
+export AUTOPM_FORCE_SYNC=true
+
+# Logging level (0=DEBUG, 1=INFO, 2=WARNING, 3=ERROR)
+export AUTOPM_LOG_LEVEL=1
 ```
-☁️ Synced updates to GitHub Issue #$ARGUMENTS
 
-📝 Update summary:
-   Progress items: {progress_count}
-   Technical notes: {notes_count}
-   Commits referenced: {commit_count}
+## Error Handling
 
-📊 Current status:
-   Task completion: {task_completion}%
-   Epic progress: {epic_progress}%
-   Completed criteria: {completed}/{total}
+Each modular script includes comprehensive error handling:
 
-🔗 View update: gh issue view #$ARGUMENTS --comments
-```
+- **Validation**: Input validation before processing
+- **Authentication**: GitHub CLI authentication checks
+- **Repository Protection**: Automatic template repository detection
+- **Network Errors**: Graceful handling with recovery suggestions
+- **Rate Limits**: Clear messaging about GitHub API limits
+- **Backup/Restore**: Automatic backup and rollback for frontmatter updates
 
-### 10. Frontmatter Maintenance
-- Always update task file frontmatter with current timestamp
-- Track completion percentages in progress files
-- Update epic progress when tasks complete
-- Maintain sync timestamps for audit trail
+## Troubleshooting
 
-### 11. Incremental Sync Detection
+### Common Issues
 
-**Prevent Duplicate Comments:**
-1. Add sync markers to local files after each sync:
-   ```markdown
-   <!-- SYNCED: 2024-01-15T10:30:00Z -->
+1. **"No updates for issue"**
+   ```bash
+   # Initialize issue tracking first
+   /pm:issue-start $ARGUMENTS
    ```
-2. Only sync content added after the last marker
-3. If no new content, skip sync with message: "No updates since last sync"
 
-### 12. Comment Size Management
+2. **"GitHub CLI not authenticated"**
+   ```bash
+   gh auth login
+   ```
 
-**Handle GitHub's Comment Limits:**
-- Max comment size: 65,536 characters
-- If update exceeds limit:
-  1. Split into multiple comments
-  2. Or summarize with link to full details
-  3. Warn user: "⚠️ Update truncated due to size. Full details in local files."
+3. **"Template repository detected"**
+   ```bash
+   git remote set-url origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
+   ```
 
-### 13. Error Handling
+4. **"Recent sync detected"**
+   ```bash
+   # Force sync if needed
+   AUTOPM_FORCE_SYNC=true /pm:issue-sync $ARGUMENTS
+   ```
 
-**Common Issues and Recovery:**
+5. **"Comment posting failed"**
+   ```bash
+   # Check GitHub status
+   gh auth status
 
-1. **Network Error:**
-   - Message: "❌ Failed to post comment: network error"
-   - Solution: "Check internet connection and retry"
-   - Keep local updates intact for retry
+   # Manual fallback
+   gh issue comment $ISSUE_NUMBER --body-file /tmp/formatted-comment.md
+   ```
 
-2. **Rate Limit:**
-   - Message: "❌ GitHub rate limit exceeded"
-   - Solution: "Wait {minutes} minutes or use different token"
-   - Save comment locally for later sync
+### Script Debugging
 
-3. **Permission Denied:**
-   - Message: "❌ Cannot comment on issue (permission denied)"
-   - Solution: "Check repository access permissions"
+Enable debug logging for detailed troubleshooting:
 
-4. **Issue Locked:**
-   - Message: "⚠️ Issue is locked for comments"
-   - Solution: "Contact repository admin to unlock"
+```bash
+export AUTOPM_LOG_LEVEL=0  # Enable debug logging
+bash autopm/.claude/scripts/pm/issue-sync/preflight-validation.sh "$ISSUE_NUMBER"
+```
 
-### 14. Epic Progress Calculation
+## Migration from Legacy Issue Sync
 
-When updating epic progress:
-1. Count total tasks in epic directory
-2. Count tasks with `status: closed` in frontmatter
-3. Calculate: `progress = (closed_tasks / total_tasks) * 100`
-4. Round to nearest integer
-5. Update epic frontmatter only if percentage changed
+The modular version is fully backward compatible. To migrate:
 
-### 15. Post-Sync Validation
+1. **No changes required** - existing commands work unchanged
+2. **Optional**: Use individual scripts for fine-grained control
+3. **Optional**: Configure environment variables for customization
 
-After successful sync:
-- [ ] Verify comment posted on GitHub
-- [ ] Confirm frontmatter updated with sync timestamp
-- [ ] Check epic progress updated if task completed
-- [ ] Validate no data corruption in local files
+Legacy workflows continue to work, but benefit from improved reliability and error handling.
 
-This creates a transparent audit trail of development progress that stakeholders can follow in real-time for Issue #$ARGUMENTS, while maintaining accurate frontmatter across all project files.
+---
+
+*This modular implementation provides the same functionality as the original issue-sync with improved reliability, testability, and maintainability.*
