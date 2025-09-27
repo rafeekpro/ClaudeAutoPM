@@ -449,12 +449,21 @@ ${prdSections.metrics || '- All functional requirements met\n- Performance targe
   }
 
   parseEffort(effort) {
+    if (!effort || typeof effort !== 'string') {
+      return 8; // Default to 1 day
+    }
+
+    const numericValue = parseInt(effort);
+    if (isNaN(numericValue)) {
+      return 8; // Default to 1 day for invalid input
+    }
+
     if (effort.includes('d')) {
-      return parseInt(effort) * 8;
+      return numericValue * 8;
     } else if (effort.includes('h')) {
-      return parseInt(effort);
+      return numericValue;
     } else if (effort.includes('w')) {
-      return parseInt(effort) * 40;
+      return numericValue * 40;
     }
     return 8; // Default to 1 day
   }
