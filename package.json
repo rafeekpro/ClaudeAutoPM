@@ -151,9 +151,6 @@
     "@modelcontextprotocol/server-github": "^1.0.0",
     "@playwright/mcp-server": "^1.0.0"
   },
-  "peerDependencies": {
-    "git": "*"
-  },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"

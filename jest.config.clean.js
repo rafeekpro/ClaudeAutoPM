@@ -5,7 +5,8 @@ module.exports = {
   // Test our Jest test files and unit tests
   testMatch: [
     '**/test/jest-tests/*-jest.test.js',
-    '**/test/unit/*-jest.test.js'
+    '**/test/unit/*-jest.test.js',
+    '**/test/integration/*-jest.test.js'
   ],
 
   // Ignore problematic tests and duplicates

@@ -441,10 +441,53 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
     this.printStep('Setting up CLAUDE.md...');
 
     const targetPath = path.join(this.targetDir, 'CLAUDE.md');
-    const templatePath = path.join(this.autopmDir, '.claude', 'templates', 'claude-templates', 'CLAUDE-FULL.md');
 
-    // Create a basic template if the full template doesn't exist
-    const basicTemplate = `# ClaudeAutoPM Configuration
+    try {
+      // Generate CLAUDE.md from templates based on configuration
+      const claudeContent = this.generateClaudeFromTemplates();
+
+      if (fs.existsSync(targetPath)) {
+        if (this.options.merge) {
+          // Use merge script for intelligent merging
+          const mergeScript = path.join(this.scriptDir, 'merge-claude.sh');
+          if (fs.existsSync(mergeScript)) {
+            // Create temporary file with new content
+            const tempFile = path.join(this.targetDir, 'CLAUDE.md.new');
+            fs.writeFileSync(tempFile, claudeContent);
+
+            try {
+              execSync(`bash "${mergeScript}" "${targetPath}" "${tempFile}"`, { stdio: 'inherit' });
+              // Clean up temp file
+              fs.unlinkSync(tempFile);
+              this.printSuccess('CLAUDE.md merged successfully');
+            } catch (error) {
+              fs.unlinkSync(tempFile);
+              this.printError('Failed to merge CLAUDE.md, using backup method');
+              // Fallback: backup and replace
+              this.backupExisting(targetPath);
+              fs.writeFileSync(targetPath, claudeContent);
+              this.printSuccess('CLAUDE.md replaced (original backed up)');
+            }
+          } else {
+            // No merge script, append new content
+            const existing = fs.readFileSync(targetPath, 'utf-8');
+            fs.writeFileSync(targetPath, existing + '\n\n<!-- NEW CLAUDE.md CONTENT -->\n\n' + claudeContent);
+            this.printSuccess('CLAUDE.md content appended');
+          }
+        } else {
+          this.backupExisting(targetPath);
+          fs.writeFileSync(targetPath, claudeContent);
+          this.printSuccess('CLAUDE.md updated from templates');
+        }
+      } else {
+        fs.writeFileSync(targetPath, claudeContent);
+        this.printSuccess('CLAUDE.md created from templates');
+      }
+    } catch (error) {
+      this.printError(`Failed to generate CLAUDE.md: ${error.message}`);
+
+      // Fallback to basic template
+      const basicTemplate = `# ClaudeAutoPM Configuration
 
 This project is configured with ClaudeAutoPM for autonomous project management.
 
@@ -461,47 +504,122 @@ This project is configured with ClaudeAutoPM for autonomous project management.
 See: https://github.com/rafeekpro/ClaudeAutoPM
 `;
 
-    if (!fs.existsSync(templatePath)) {
-      // Use basic template if full template not found
-      if (fs.existsSync(targetPath)) {
-        if (this.options.merge) {
-          // Append to existing
-          const existing = fs.readFileSync(targetPath, 'utf-8');
-          fs.writeFileSync(targetPath, existing + '\n\n' + basicTemplate);
-          this.printSuccess('CLAUDE.md merged with basic template');
-        } else {
-          this.backupExisting(targetPath);
-          fs.writeFileSync(targetPath, basicTemplate);
-          this.printSuccess('CLAUDE.md created with basic template');
-        }
-      } else {
+      if (!fs.existsSync(targetPath)) {
         fs.writeFileSync(targetPath, basicTemplate);
-        this.printSuccess('CLAUDE.md created with basic template');
+        this.printSuccess('CLAUDE.md created with fallback template');
       }
-      return;
+    }
+  }
+
+  generateClaudeFromTemplates() {
+    const templatesDir = path.join(this.autopmDir, '.claude', 'templates', 'claude-templates');
+    const basePath = path.join(templatesDir, 'base.md');
+    const addonsDir = path.join(templatesDir, 'addons');
+
+    if (!fs.existsSync(basePath)) {
+      throw new Error('Base template not found');
     }
 
-    if (fs.existsSync(targetPath)) {
-      if (this.options.merge) {
-        // Use merge script
-        const mergeScript = path.join(this.scriptDir, 'merge-claude.sh');
-        if (fs.existsSync(mergeScript)) {
-          try {
-            execSync(`bash "${mergeScript}" "${targetPath}" "${templatePath}"`, { stdio: 'inherit' });
-            this.printSuccess('CLAUDE.md merged successfully');
-          } catch (error) {
-            this.printError('Failed to merge CLAUDE.md');
-          }
-        }
+    // Start with base template
+    let content = fs.readFileSync(basePath, 'utf-8');
+
+    // Determine which addons to include based on configuration
+    const addons = this.getRequiredAddons();
+
+    // Replace placeholder sections with addon content
+    for (const addon of addons) {
+      const addonPath = path.join(addonsDir, `${addon}.md`);
+      if (fs.existsSync(addonPath)) {
+        const addonContent = fs.readFileSync(addonPath, 'utf-8');
+        content = this.mergeAddonContent(content, addon, addonContent);
+      }
+    }
+
+    // Process variable substitutions
+    content = this.processTemplateVariables(content);
+
+    return content;
+  }
+
+  getRequiredAddons() {
+    const addons = [];
+
+    // Based on scenario/configuration, determine required addons
+    if (this.currentConfig) {
+      if (this.currentConfig.tools?.docker?.enabled) {
+        addons.push('docker-agents', 'docker-workflow');
+      }
+
+      if (this.currentConfig.execution_strategy === 'sequential' || this.currentConfig.execution?.strategy === 'minimal') {
+        addons.push('minimal-agents', 'minimal-workflow');
       } else {
-        this.backupExisting(targetPath);
-        fs.copyFileSync(templatePath, targetPath);
-        this.printSuccess('CLAUDE.md installed');
+        addons.push('devops-agents', 'devops-workflow');
+      }
+
+      if (this.currentConfig.cicd?.provider === 'github') {
+        addons.push('github-actions');
+      } else if (this.currentConfig.cicd?.provider === 'azure') {
+        addons.push('azure-devops');
+      } else if (this.currentConfig.cicd?.provider === 'gitlab') {
+        addons.push('gitlab-ci');
+      } else {
+        addons.push('no-cicd');
+      }
+
+      if (this.currentConfig.git?.safety) {
+        addons.push('git-safety');
       }
     } else {
-      fs.copyFileSync(templatePath, targetPath);
-      this.printSuccess('CLAUDE.md created');
+      // Default addons for fallback
+      addons.push('devops-agents', 'devops-workflow', 'github-actions');
     }
+
+    return addons;
+  }
+
+  mergeAddonContent(baseContent, addonName, addonContent) {
+    // Define section mapping for different addons
+    const sectionMap = {
+      'docker-agents': 'AGENT_SELECTION_SECTION',
+      'devops-agents': 'AGENT_SELECTION_SECTION',
+      'minimal-agents': 'AGENT_SELECTION_SECTION',
+      'docker-workflow': 'WORKFLOW_SECTION',
+      'devops-workflow': 'WORKFLOW_SECTION',
+      'minimal-workflow': 'WORKFLOW_SECTION',
+      'github-actions': 'CICD_SECTION',
+      'azure-devops': 'CICD_SECTION',
+      'gitlab-ci': 'CICD_SECTION',
+      'no-cicd': 'CICD_SECTION',
+      'git-safety': 'WORKFLOW_SECTION'
+    };
+
+    const placeholder = sectionMap[addonName];
+    if (placeholder && baseContent.includes(`<!-- ${placeholder} -->`)) {
+      return baseContent.replace(`<!-- ${placeholder} -->`, addonContent);
+    }
+
+    // If no placeholder found, append to end
+    return baseContent + '\n\n' + addonContent;
+  }
+
+  processTemplateVariables(content) {
+    // Replace template variables with actual values
+    const variables = {
+      PROJECT_NAME: path.basename(this.targetDir),
+      EXECUTION_STRATEGY: this.currentScenario || 'adaptive',
+      DOCKER_ENABLED: this.currentConfig?.tools?.docker?.enabled ? 'true' : 'false',
+      PROVIDER: this.currentConfig?.provider || 'local',
+      DATE: new Date().toISOString().split('T')[0]
+    };
+
+    let processedContent = content;
+
+    for (const [key, value] of Object.entries(variables)) {
+      const regex = new RegExp(`{{${key}}}`, 'g');
+      processedContent = processedContent.replace(regex, value);
+    }
+
+    return processedContent;
   }
 
   async setupGitHooks() {
