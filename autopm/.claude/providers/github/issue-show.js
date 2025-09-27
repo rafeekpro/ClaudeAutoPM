@@ -148,4 +148,12 @@ class GitHubIssueShow {
   }
 }
 
-module.exports = new GitHubIssueShow();
+// Export class and instance for testing
+module.exports = {
+  GitHubIssueShow,
+  execute: (options, settings) => new GitHubIssueShow().execute(options, settings),
+  detectRepository: () => new GitHubIssueShow().detectRepository(),
+  parseComments: (output) => new GitHubIssueShow().parseComments(output),
+  getRelatedPRs: (repository, issueId) => new GitHubIssueShow().getRelatedPRs(repository, issueId),
+  mockShowIssue: (options) => new GitHubIssueShow().mockShowIssue(options)
+};

@@ -175,7 +175,7 @@ function formatSearchResults(query, results) {
 }
 
 // CommonJS export for testing
-module.exports = searchContent;
+module.exports = { searchContent, formatSearchResults };
 
 // CLI execution
 if (require.main === module) {

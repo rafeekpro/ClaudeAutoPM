@@ -508,4 +508,17 @@ if (require.main === module) {
     });
 }
 
-module.exports = AzureActiveWork;
+// Export class and helper functions for testing
+module.exports = {
+  AzureActiveWork,
+  parseArguments: AzureActiveWork.parseArguments,
+  getStateColor: (state) => new AzureActiveWork().getStateColor(state),
+  getMockActiveWork: () => new AzureActiveWork().getMockActiveWork(),
+  processWorkItems: (workItems, currentSprint) => new AzureActiveWork().processWorkItems(workItems, currentSprint),
+  displayTable: (data) => new AzureActiveWork().displayTable(data),
+  displayByAssignee: (byAssignee) => new AzureActiveWork().displayByAssignee(byAssignee),
+  displayByState: (byState, byAssignee) => new AzureActiveWork().displayByState(byState, byAssignee),
+  displayByType: (byType) => new AzureActiveWork().displayByType(byType),
+  displayByPriority: (byPriority) => new AzureActiveWork().displayByPriority(byPriority),
+  displayCSV: (data) => new AzureActiveWork().displayCSV(data)
+};

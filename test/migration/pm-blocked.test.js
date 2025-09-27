@@ -33,13 +33,13 @@ describe('PM Blocked Script Migration', () => {
   describe('Node.js Implementation Tests (blocked.js)', () => {
     test('should export a function that returns blocked tasks data', () => {
       // This test will fail until we implement blocked.js
-      const blockedModule = require('../../autopm/.claude/scripts/pm/blocked.js');
-      assert.strictEqual(typeof blockedModule, 'function');
+      const getBlockedTasks = require('../../autopm/.claude/scripts/pm/blocked.js');
+      assert.strictEqual(typeof getBlockedTasks, 'function');
     });
 
     test('should return structured data with blocked tasks', () => {
-      const blockedModule = require('../../autopm/.claude/scripts/pm/blocked.js');
-      const result = blockedModule();
+      const getBlockedTasks = require('../../autopm/.claude/scripts/pm/blocked.js');
+      const result = getBlockedTasks();
 
       assert.ok(typeof result === 'object', 'Should return an object');
       assert.ok(result.hasOwnProperty('blockedTasks'), 'Should have blockedTasks array');
@@ -54,8 +54,8 @@ describe('PM Blocked Script Migration', () => {
       fs.writeFileSync('.claude/epics/test-epic/2.md',
         'name: Dependent task\nstatus: open\ndepends_on: [1]');
 
-      const blockedModule = require('../../autopm/.claude/scripts/pm/blocked.js');
-      const result = blockedModule();
+      const getBlockedTasks = require('../../autopm/.claude/scripts/pm/blocked.js');
+      const result = getBlockedTasks();
 
       // Task 2 should not be blocked since task 1 is completed
       assert.strictEqual(result.blockedTasks.length, 0, 'Should not find blocked tasks when dependencies are met');
@@ -68,8 +68,8 @@ describe('PM Blocked Script Migration', () => {
       fs.writeFileSync('.claude/epics/test-epic/2.md',
         'name: Dependent task\nstatus: open\ndepends_on: [1]');
 
-      const blockedModule = require('../../autopm/.claude/scripts/pm/blocked.js');
-      const result = blockedModule();
+      const getBlockedTasks = require('../../autopm/.claude/scripts/pm/blocked.js');
+      const result = getBlockedTasks();
 
       assert.ok(result.blockedTasks.length > 0, 'Should find blocked tasks');
       assert.strictEqual(result.blockedTasks[0].taskNum, '2', 'Should identify correct task number');
@@ -84,8 +84,8 @@ describe('PM Blocked Script Migration', () => {
       fs.writeFileSync('.claude/epics/test-epic/3.md',
         'name: Multi-dependent task\nstatus: open\ndepends_on: [1, 2]');
 
-      const blockedModule = require('../../autopm/.claude/scripts/pm/blocked.js');
-      const result = blockedModule();
+      const getBlockedTasks = require('../../autopm/.claude/scripts/pm/blocked.js');
+      const result = getBlockedTasks();
 
       assert.ok(result.blockedTasks.length > 0, 'Should find blocked task');
       assert.ok(Array.isArray(result.blockedTasks[0].dependencies), 'Should parse dependencies as array');
@@ -100,8 +100,8 @@ describe('PM Blocked Script Migration', () => {
       fs.writeFileSync('.claude/epics/test-epic/3.md',
         'name: Multi-dependent task\nstatus: open\ndepends_on: [1, 2]');
 
-      const blockedModule = require('../../autopm/.claude/scripts/pm/blocked.js');
-      const result = blockedModule();
+      const getBlockedTasks = require('../../autopm/.claude/scripts/pm/blocked.js');
+      const result = getBlockedTasks();
 
       assert.ok(result.blockedTasks.length > 0, 'Should find blocked task');
       assert.ok(Array.isArray(result.blockedTasks[0].openDependencies), 'Should identify open dependencies');
@@ -114,8 +114,8 @@ describe('PM Blocked Script Migration', () => {
       fs.writeFileSync('.claude/epics/test-epic/1.md',
         'name: Independent task\nstatus: open');
 
-      const blockedModule = require('../../autopm/.claude/scripts/pm/blocked.js');
-      const result = blockedModule();
+      const getBlockedTasks = require('../../autopm/.claude/scripts/pm/blocked.js');
+      const result = getBlockedTasks();
 
       assert.strictEqual(result.blockedTasks.length, 0, 'Should skip tasks without dependencies');
     });
@@ -126,8 +126,8 @@ describe('PM Blocked Script Migration', () => {
       fs.writeFileSync('.claude/epics/test-epic/2.md',
         'name: Completed dependent task\nstatus: completed\ndepends_on: [1]');
 
-      const blockedModule = require('../../autopm/.claude/scripts/pm/blocked.js');
-      const result = blockedModule();
+      const getBlockedTasks = require('../../autopm/.claude/scripts/pm/blocked.js');
+      const result = getBlockedTasks();
 
       assert.strictEqual(result.blockedTasks.length, 0, 'Should skip completed tasks even with dependencies');
     });
@@ -137,8 +137,8 @@ describe('PM Blocked Script Migration', () => {
       fs.writeFileSync('.claude/epics/test-epic/1.md',
         'name: Malformed deps\nstatus: open\ndepends_on: invalid_format');
 
-      const blockedModule = require('../../autopm/.claude/scripts/pm/blocked.js');
-      const result = blockedModule();
+      const getBlockedTasks = require('../../autopm/.claude/scripts/pm/blocked.js');
+      const result = getBlockedTasks();
 
       // Should handle gracefully and not crash
       assert.strictEqual(result.blockedTasks.length, 0, 'Should handle malformed dependencies gracefully');
@@ -153,8 +153,8 @@ describe('PM Blocked Script Migration', () => {
       fs.writeFileSync('.claude/epics/epic2/1.md', 'name: Task 1\nstatus: open');
       fs.writeFileSync('.claude/epics/epic2/2.md', 'name: Task 2\nstatus: open\ndepends_on: [1]');
 
-      const blockedModule = require('../../autopm/.claude/scripts/pm/blocked.js');
-      const result = blockedModule();
+      const getBlockedTasks = require('../../autopm/.claude/scripts/pm/blocked.js');
+      const result = getBlockedTasks();
 
       assert.strictEqual(result.totalBlocked, 2, 'Should count blocked tasks from multiple epics');
     });
@@ -164,8 +164,8 @@ describe('PM Blocked Script Migration', () => {
       fs.writeFileSync('.claude/epics/test-epic/2.md',
         'name: Orphaned dependency\nstatus: open\ndepends_on: [999]');
 
-      const blockedModule = require('../../autopm/.claude/scripts/pm/blocked.js');
-      const result = blockedModule();
+      const getBlockedTasks = require('../../autopm/.claude/scripts/pm/blocked.js');
+      const result = getBlockedTasks();
 
       // Should still identify as blocked even if dependency file doesn't exist
       assert.ok(result.blockedTasks.length > 0, 'Should handle non-existent dependency references');
@@ -174,8 +174,8 @@ describe('PM Blocked Script Migration', () => {
 
   describe('Edge Cases', () => {
     test('should handle missing .claude/epics directory', () => {
-      const blockedModule = require('../../autopm/.claude/scripts/pm/blocked.js');
-      const result = blockedModule();
+      const getBlockedTasks = require('../../autopm/.claude/scripts/pm/blocked.js');
+      const result = getBlockedTasks();
 
       assert.strictEqual(result.totalBlocked, 0, 'Should handle missing epics directory');
       assert.strictEqual(result.blockedTasks.length, 0, 'Should return empty blocked tasks');
@@ -184,8 +184,8 @@ describe('PM Blocked Script Migration', () => {
     test('should handle empty epics directories', () => {
       fs.mkdirSync('.claude/epics/empty-epic', { recursive: true });
 
-      const blockedModule = require('../../autopm/.claude/scripts/pm/blocked.js');
-      const result = blockedModule();
+      const getBlockedTasks = require('../../autopm/.claude/scripts/pm/blocked.js');
+      const result = getBlockedTasks();
 
       assert.strictEqual(result.totalBlocked, 0, 'Should handle empty epic directories');
     });
@@ -194,8 +194,8 @@ describe('PM Blocked Script Migration', () => {
       fs.mkdirSync('.claude/epics/test-epic', { recursive: true });
       fs.writeFileSync('.claude/epics/test-epic/1.md', 'invalid yaml content');
 
-      const blockedModule = require('../../autopm/.claude/scripts/pm/blocked.js');
-      const result = blockedModule();
+      const getBlockedTasks = require('../../autopm/.claude/scripts/pm/blocked.js');
+      const result = getBlockedTasks();
 
       // Should not crash on malformed files
       assert.strictEqual(result.totalBlocked, 0, 'Should handle malformed task files');
@@ -211,8 +211,8 @@ describe('PM Blocked Script Migration', () => {
       fs.writeFileSync('.claude/epics/test-epic/3.md',
         'name: Format 2\nstatus: open\ndepends_on: [ 1, 2 ]');
 
-      const blockedModule = require('../../autopm/.claude/scripts/pm/blocked.js');
-      const result = blockedModule();
+      const getBlockedTasks = require('../../autopm/.claude/scripts/pm/blocked.js');
+      const result = getBlockedTasks();
 
       assert.ok(result.blockedTasks.length >= 2, 'Should handle various dependency formats');
     });

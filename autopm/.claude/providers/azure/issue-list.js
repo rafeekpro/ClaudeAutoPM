@@ -297,4 +297,15 @@ class AzureIssueList {
   }
 }
 
-module.exports = AzureIssueList;
+// Export class and instance for testing
+module.exports = {
+  AzureIssueList,
+  execute: (args) => new AzureIssueList().execute(args),
+  buildQuery: (filters) => new AzureIssueList({ client: { project: 'test-project' } }).buildQuery(filters),
+  transformWorkItem: (workItem) => new AzureIssueList({ organization: 'test-org', project: 'test-project' }).transformWorkItem(workItem),
+  formatResults: (workItems, format) => new AzureIssueList().formatResults(workItems, format),
+  formatAsList: (workItems) => new AzureIssueList().formatAsList(workItems),
+  formatAsTable: (workItems) => new AzureIssueList().formatAsTable(workItems),
+  formatDetailed: (workItems) => new AzureIssueList().formatDetailed(workItems),
+  formatAsBoard: (workItems) => new AzureIssueList().formatAsBoard(workItems)
+};

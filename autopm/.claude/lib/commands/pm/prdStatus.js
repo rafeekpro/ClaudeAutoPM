@@ -212,3 +212,7 @@ async function showAllPRDsStatus(draftsDir, metaDir, verbose, summary) {
   console.log('   pm:prd-edit <feature_name> -s <section>  - Edit section');
   console.log('   pm:prd-new-skeleton <feature_name>       - Create new PRD');
 }
+
+// Export helper functions for testing
+exports.showSinglePRDStatus = showSinglePRDStatus;
+exports.showAllPRDsStatus = showAllPRDsStatus;

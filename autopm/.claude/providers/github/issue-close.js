@@ -122,4 +122,10 @@ class GitHubIssueClose {
   }
 }
 
-module.exports = new GitHubIssueClose();
+// Export class and instance for testing
+module.exports = {
+  GitHubIssueClose,
+  execute: (options, settings) => new GitHubIssueClose().execute(options, settings),
+  detectRepository: () => new GitHubIssueClose().detectRepository(),
+  mockCloseIssue: (options, repository) => new GitHubIssueClose().mockCloseIssue(options, repository)
+};

@@ -222,13 +222,18 @@ function formatPRDList(data) {
 }
 
 // CommonJS export for testing
-module.exports = listPRDs;
+module.exports = {
+  listPRDs,
+  parseMetadata,
+  categorizeStatus,
+  formatPRDList
+};
 
 // CLI execution
 if (require.main === module) {
   try {
-    const data = listPRDs();
-    console.log(formatPRDList(data));
+    const data = module.exports.listPRDs();
+    console.log(module.exports.formatPRDList(data));
     process.exit(0);
   } catch (error) {
     console.error('❌ Error listing PRDs:', error.message);

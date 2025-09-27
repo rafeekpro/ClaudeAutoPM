@@ -210,4 +210,9 @@ class AzureEpicShow {
   }
 }
 
-module.exports = new AzureEpicShow();
+// Export class and instance for testing
+module.exports = {
+  AzureEpicShow,
+  execute: (options, settings) => new AzureEpicShow(settings).execute(options, settings),
+  formatEpicDetails: (workItem, children) => new AzureEpicShow().formatEpicDetails(workItem, children)
+};
