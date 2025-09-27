@@ -287,5 +287,18 @@ class GitHubIssueStart {
   }
 }
 
-// Export singleton instance
-module.exports = new GitHubIssueStart();
+// Export class and instance for testing
+module.exports = {
+  GitHubIssueStart,
+  execute: (options, settings) => new GitHubIssueStart().execute(options, settings),
+  detectRepository: () => new GitHubIssueStart().detectRepository(),
+  getIssue: (repository, issueId) => new GitHubIssueStart().getIssue(repository, issueId),
+  branchExists: (branchName) => new GitHubIssueStart().branchExists(branchName),
+  createBranch: (branchName) => new GitHubIssueStart().createBranch(branchName),
+  getCurrentUser: () => new GitHubIssueStart().getCurrentUser(),
+  assignIssue: (repository, issueId, username) => new GitHubIssueStart().assignIssue(repository, issueId, username),
+  addLabel: (repository, issueId, label) => new GitHubIssueStart().addLabel(repository, issueId, label),
+  addComment: (repository, issueId, comment) => new GitHubIssueStart().addComment(repository, issueId, comment),
+  moveToProjectColumn: (repository, issueId, columnName) => new GitHubIssueStart().moveToProjectColumn(repository, issueId, columnName),
+  mockStartIssue: (options, repository) => new GitHubIssueStart().mockStartIssue(options, repository)
+};
