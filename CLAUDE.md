@@ -3,6 +3,50 @@
 > This is the development repository for ClaudeAutoPM framework.
 > **IMPORTANT**: This project uses its own framework capabilities for self-maintenance.
 
+## 🚀 Development Methodology
+
+### Test-Driven Development (TDD) is MANDATORY
+
+**IMPORTANT**: This project follows strict TDD methodology. ALL code changes MUST:
+1. **Write tests FIRST** - Before implementing any functionality
+2. **Use Jest framework** - All tests are written in Jest
+3. **Achieve 100% coverage** - For new code
+4. **Run tests before commit** - `npm test` must pass
+
+### Node.js Migration Status
+
+**✅ MIGRATION COMPLETE: 96% Coverage (49/51 scripts)**
+- Successfully migrated 49 bash scripts to Node.js
+- 100% backward compatibility maintained through wrapper pattern
+- Original bash scripts backed up to `.sh.backup` files
+- Total: ~12,000+ lines of Node.js code with comprehensive tests
+- Cross-platform compatibility dramatically improved
+- External dependencies (jq, specific bash versions) removed
+- See MIGRATION_REPORT.md for full details
+
+### Testing Requirements
+
+- **Framework**: Jest (configured in `package.json`)
+- **Test location**: Tests mirror source structure in `test/` directory
+- **Test files**: Use `.test.js` suffix
+- **Run tests**: `npm test` or `npm run test:all`
+- **Coverage**: `npm run test:coverage`
+
+### TDD Workflow for New Features
+
+```bash
+# 1. Write failing test first
+npm test -- --watch path/to/new.test.js
+
+# 2. Implement minimal code to pass
+# 3. Refactor while keeping tests green
+# 4. Ensure all tests pass
+npm test
+
+# 5. Check coverage
+npm run test:coverage
+```
+
 ## Project Structure
 
 ```
@@ -18,7 +62,7 @@ AUTOPM/                    # Development project root
 │   ├── .claude-code/     # Claude Code settings
 │   └── scripts/          # Utility scripts
 ├── install/              # Installation scripts
-├── test/                 # Test suites
+├── test/                 # Test suites (Jest)
 │   ├── security/         # Security tests
 │   ├── regression/       # Regression tests
 │   └── installation/     # Installation tests

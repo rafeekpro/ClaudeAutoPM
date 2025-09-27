@@ -17,6 +17,11 @@ class IssueDecomposer {
   async analyzeIssue(issueTitle, issueDescription) {
     const templates = this.loadTemplates();
 
+    // If no templates found, return default
+    if (templates.length === 0) {
+      return this.loadTemplate('default.yaml');
+    }
+
     // Score each template based on pattern matching
     const scores = templates.map(template => ({
       template,
@@ -57,7 +62,7 @@ class IssueDecomposer {
   /**
    * Decompose issue into parallel work streams
    */
-  async decomposeIssue(issueNumber, issueTitle, issueDescription) {
+  async decomposeIssue(issueNumber, issueTitle, issueDescription = '') {
     console.log(`\n🔍 Analyzing issue #${issueNumber}: ${issueTitle}`);
 
     // Find matching template
@@ -325,29 +330,29 @@ Update stream status in the stream file header when state changes.
   }
 }
 
+// Export for testing and CLI usage
 module.exports = IssueDecomposer;
 
-// CLI interface
+// If this module is executed directly, handle CLI args
 if (require.main === module) {
   const args = process.argv.slice(2);
 
   if (args.length < 2) {
-    console.log('Usage: decompose-issue.js <issue-number> <title> [description]');
-    console.log('');
-    console.log('Examples:');
-    console.log('  decompose-issue.js 123 "Add user authentication"');
-    console.log('  decompose-issue.js 124 "Create CRUD for products" "Need full CRUD operations"');
+    console.error('Usage: node decompose-issue.js <issue_number> <issue_title> [issue_description]');
     process.exit(1);
   }
 
+  const [issueNumber, issueTitle, ...descriptionParts] = args;
+  const issueDescription = descriptionParts.join(' ') || '';
+
   const decomposer = new IssueDecomposer();
-  decomposer.decomposeIssue(args[0], args[1], args[2] || '')
+  decomposer.decomposeIssue(parseInt(issueNumber), issueTitle, issueDescription)
     .then(result => {
-      console.log('\n📁 Files created in:', result.issuePath);
-      console.log('🚀 Ready to start parallel execution!');
+      console.log(`\n📁 Issue files created in: ${result.issuePath}`);
+      console.log(`🚀 Ready to start work streams`);
     })
     .catch(err => {
-      console.error('❌ Error:', err.message);
+      console.error('Error:', err.message);
       process.exit(1);
     });
 }

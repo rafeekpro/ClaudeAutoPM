@@ -16,10 +16,14 @@ yarn-error.log*
 *~
 
 # Testing
+test/
 coverage/
 .nyc_output/
 test-results/
 .coverage/
+jest.config.clean.js
+TEST_*.md
+TESTING_*.md
 
 # Build artifacts
 dist/

@@ -292,5 +292,18 @@ class AzureEpicList {
   }
 }
 
-// Export singleton instance
-module.exports = new AzureEpicList();
+// Export class and instance for testing
+module.exports = {
+  AzureEpicList,
+  execute: (options, settings) => new AzureEpicList().execute(options, settings),
+  buildQuery: (organization, project, options) => new AzureEpicList().buildQuery(organization, project, options),
+  executeAzureCLI: (query) => new AzureEpicList().executeAzureCLI(query),
+  transformResults: (azureWorkItems) => new AzureEpicList().transformResults(azureWorkItems),
+  mapStatus: (state) => new AzureEpicList().mapStatus(state),
+  extractAssignee: (assignedTo) => new AzureEpicList().extractAssignee(assignedTo),
+  extractTags: (tags) => new AzureEpicList().extractTags(tags),
+  countChildren: (item) => new AzureEpicList().countChildren(item),
+  countCompleted: (item) => new AzureEpicList().countCompleted(item),
+  buildWorkItemUrl: (id) => new AzureEpicList().buildWorkItemUrl(id),
+  getMockData: (options) => new AzureEpicList().getMockData(options)
+};

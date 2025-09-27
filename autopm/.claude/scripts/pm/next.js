@@ -151,11 +151,14 @@ async function findAvailableTasks() {
 }
 
 // Export for use as module
-module.exports = next;
+module.exports = {
+  next,
+  findAvailableTasks
+};
 
 // CLI execution
 if (require.main === module) {
-  next().then(() => {
+  module.exports.next().then(() => {
     process.exit(0);
   }).catch(err => {
     console.error('Next tasks failed:', err.message);

@@ -192,6 +192,76 @@ autopm azure:sprint-status
 autopm context:create
 ```
 
+### New in v1.9.0: Complete PM Command Suite
+
+The latest release includes 17 new PM commands providing comprehensive project management capabilities:
+
+#### **PRD & Epic Management**
+```bash
+# Create new Product Requirements Document
+autopm pm:prd-new user-authentication --description "OAuth 2.0 integration"
+
+# Parse PRD into executable epic with tasks
+autopm pm:prd-parse user-authentication --overwrite
+
+# Close completed epic
+autopm pm:epic-close user-auth "All authentication features complete"
+```
+
+#### **Issue Lifecycle**
+```bash
+# Start working on an issue
+autopm pm:issue-start ISSUE-123
+
+# Show issue details and progress
+autopm pm:issue-show ISSUE-123
+
+# Edit issue details
+autopm pm:issue-edit ISSUE-123 --title "Updated: Fix authentication bug"
+
+# Close completed issue
+autopm pm:issue-close ISSUE-123 "Fixed OAuth redirect issue"
+```
+
+#### **Pull Request Workflow**
+```bash
+# Create PR with auto-generated description
+autopm pm:pr-create "feat: implement OAuth authentication"
+
+# List all open PRs
+autopm pm:pr-list --status open
+
+# Create draft PR for work in progress
+autopm pm:pr-create "wip: user dashboard" --draft
+```
+
+#### **Context Management**
+```bash
+# Create development context for feature
+autopm pm:context-create user-authentication
+
+# Update context with current progress
+autopm pm:context-update user-authentication
+
+# Prime context for AI assistance
+autopm pm:context-prime user-authentication
+```
+
+#### **Project Maintenance**
+```bash
+# Optimize project structure and reduce context size
+autopm pm:optimize --apply
+
+# Clean archived work and free up space
+autopm pm:clean --archive-old
+
+# Sync work state across team
+autopm pm:sync --push-remote
+
+# Create versioned release
+autopm pm:release minor --tag "v1.2.0"
+```
+
 📖 [Full CLI Documentation](docs/wiki/CLI-YARGS-MIGRATION.md)
 
 ### Popular Topics

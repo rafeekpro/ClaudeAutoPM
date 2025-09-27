@@ -127,4 +127,10 @@ class AzureIssueClose {
   }
 }
 
-module.exports = new AzureIssueClose();
+// Export class and instance for testing
+module.exports = {
+  AzureIssueClose,
+  execute: (options, settings) => new AzureIssueClose().execute(options, settings),
+  mapResolution: (resolution) => new AzureIssueClose().mapResolution(resolution),
+  mockCloseWorkItem: (options, organization, project) => new AzureIssueClose().mockCloseWorkItem(options, organization, project)
+};
