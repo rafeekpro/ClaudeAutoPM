@@ -5,6 +5,142 @@ All notable changes to the ClaudeAutoPM framework will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.2] - 2025-09-27
+
+### 🔒 Security
+- **Fixed autopm guide security vulnerability** - Guide command was executing installation without user consent
+- Added comprehensive security tests to prevent regression
+
+### 🛠️ Fixed
+- **CLAUDE.md template generation** - Fixed broken template system during installation
+- Template system now uses intelligent addon composition based on configuration
+- Resolved issue where short fallback templates were used instead of rich content
+
+### 📚 Enhanced
+- **Dependency updates** - Updated execa from 8.0.1 to 9.6.0 for better compatibility
+- Improved template system with scenario-based addon selection
+
+## [1.9.1] - 2025-09-27
+
+### 🔒 Security
+- **Removed vulnerable 'git' package** - Resolved 2 high severity vulnerabilities
+- Cleaned up unnecessary dependencies from peerDependencies
+
+### 🚀 Performance
+- Updated dependencies for better security and compatibility
+
+## [1.9.0] - 2025-09-27
+
+### 🎯 Major Feature Release - Complete PM Command Suite
+
+This release represents a massive expansion of project management capabilities, bringing ClaudeAutoPM to feature parity with industry-leading PM tools.
+
+### ✨ Added - 17 New PM Commands
+
+#### **PRD & Epic Management**
+- **`pm:prd-new`** - Create new Product Requirements Documents with intelligent wizard
+- **`pm:prd-parse`** - Convert PRDs into executable epics with technical breakdown
+- **`pm:epic-close`** - Close completed epics with automatic task completion
+- **`pm:epic-edit`** - Edit epic details with interactive prompts
+
+#### **Issue Lifecycle Management**
+- **`pm:issue-start`** - Start work on issues with automatic branch creation
+- **`pm:issue-show`** - Display detailed issue information and progress
+- **`pm:issue-close`** - Close completed issues with completion tracking
+- **`pm:issue-edit`** - Edit issue details interactively
+
+#### **Pull Request Workflow**
+- **`pm:pr-create`** - Create PRs with auto-generated descriptions from work items
+- **`pm:pr-list`** - List and filter pull requests with advanced options
+
+#### **Context Management**
+- **`pm:context-create`** - Create development context files for features
+- **`pm:context-update`** - Update context with progress and findings
+- **`pm:context-prime`** - Load context for AI assistance sessions
+
+#### **Project Maintenance**
+- **`pm:optimize`** - Analyze and optimize project structure for efficiency
+- **`pm:clean`** - Archive completed work and clean project workspace
+- **`pm:sync`** - Comprehensive synchronization across GitHub/Azure DevOps
+- **`pm:release`** - Create versioned releases with automated changelog generation
+
+### 🏗️ Architecture Improvements
+
+#### **Node.js Migration Complete (96% Coverage)**
+- Successfully migrated 49 bash scripts to Node.js (12,000+ lines of code)
+- 100% backward compatibility maintained through wrapper pattern
+- Dramatically improved cross-platform compatibility
+- Removed external dependencies (jq, specific bash versions)
+
+#### **Comprehensive Testing Suite**
+- **94 new tests** covering all new PM commands
+- Unit tests for individual command components
+- Integration tests for complete PM workflows
+- Security tests preventing regression of vulnerabilities
+- Test coverage improved while adding thousands of lines of new code
+
+### 🔧 Enhanced CLI System
+
+#### **Professional Command Structure**
+- All commands follow consistent `resource-action` pattern
+- Comprehensive help system with examples
+- Support for both CLI and AI assistant usage patterns
+- Advanced option parsing with validation
+
+#### **Provider Integration**
+- Automatic detection of GitHub vs Azure DevOps projects
+- Provider-specific optimizations and workflows
+- Unified API across different project management backends
+
+### 📚 Documentation Overhaul
+
+#### **Complete Command Documentation**
+- **COMMANDS.md** - Comprehensive reference for all 96+ commands
+- Detailed usage examples and option descriptions
+- Workflow guides for common development patterns
+- Integration instructions for different providers
+
+#### **Updated Project Documentation**
+- Refreshed README.md with current capabilities
+- Updated CONTRIBUTING.md with TDD methodology requirements
+- Comprehensive changelog with migration guidance
+
+### 🚀 Performance & Quality
+
+#### **Code Quality Improvements**
+- Followed strict TDD methodology for all new features
+- Comprehensive error handling and user feedback
+- Consistent coding patterns across all commands
+- Modular architecture for maintainability
+
+#### **Developer Experience**
+- Rich command-line interfaces with progress indicators
+- Intelligent defaults and validation
+- Clear error messages with actionable guidance
+- Support for both interactive and non-interactive usage
+
+### 🔍 Command Analysis & Optimization
+
+Based on comprehensive analysis of existing PM tools, this release addresses:
+- **24 missing commands** identified through industry comparison
+- **Command reference validation** - all referenced commands now implemented
+- **Workflow gaps** - complete PM lifecycle now supported
+- **Integration points** - seamless provider synchronization
+
+### 📊 Statistics
+- **17 new PM commands** added
+- **94 new tests** written
+- **12,000+ lines** of Node.js code
+- **96% bash-to-Node.js migration** complete
+- **100% feature parity** maintained
+- **Zero breaking changes** for existing users
+
+### 🎯 Migration Notes
+- All existing workflows continue to work unchanged
+- New commands available immediately after update
+- Enhanced functionality available through both CLI and AI assistant
+- Comprehensive testing ensures stability and reliability
+
 ## [1.5.15] - 2025-09-19
 
 ### Added
