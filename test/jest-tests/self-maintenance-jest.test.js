@@ -32,6 +32,12 @@ describe('Self-Maintenance Script - Full Coverage Tests', () => {
     fs.mkdirSync('autopm/.claude/agents', { recursive: true });
     fs.mkdirSync('test', { recursive: true });
 
+    // Create package.json for tests that need it
+    fs.writeFileSync('package.json', JSON.stringify({
+      name: 'test-project',
+      version: '1.0.0'
+    }));
+
     // Import and create instance
     const SelfMaintenanceModule = require('../../scripts/self-maintenance.js');
     SelfMaintenance = SelfMaintenanceModule;
@@ -359,17 +365,23 @@ category: testing
 
   describe('Error Handling', () => {
     test('should handle file system errors gracefully', () => {
-      // Test with permission issues
+      // Mock fs.readdirSync to throw an error
+      const originalReaddirSync = fs.readdirSync;
+      fs.readdirSync = jest.fn().mockImplementation((dir) => {
+        if (dir.includes('restricted')) {
+          throw new Error('EACCES: permission denied');
+        }
+        return originalReaddirSync(dir);
+      });
+
       const restrictedDir = path.join(tempDir, 'restricted');
-      fs.mkdirSync(restrictedDir);
-      fs.chmodSync(restrictedDir, 0o000);
 
       expect(() => {
         maintenance.countFiles(restrictedDir, '.md');
       }).not.toThrow();
 
-      // Restore permissions for cleanup
-      fs.chmodSync(restrictedDir, 0o755);
+      // Restore original function
+      fs.readdirSync = originalReaddirSync;
     });
 
     test('should handle malformed files gracefully', () => {
