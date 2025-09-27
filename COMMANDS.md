@@ -447,4 +447,4 @@ To add new commands:
 ---
 
 *Last updated: 2025-09-27*
-*Version: 1.8.0*
+*Version: 1.9.2*

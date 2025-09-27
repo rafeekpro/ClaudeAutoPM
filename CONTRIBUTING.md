@@ -118,27 +118,34 @@ We use **Conventional Commits** for all contributions:
 
 ## 🧪 Testing
 
-Before submitting any contribution:
+This project follows **strict TDD methodology**. Before submitting any contribution:
 
-1. **Run unit tests**
+1. **Run all tests**
    ```bash
-   npm test
+   npm test                    # Jest unit tests
+   npm run test:node          # Node.js native tests
+   npm run test:security      # Security validation
+   npm run test:regression    # Regression tests
    ```
 
 2. **Run linting**
    ```bash
    npm run lint
+   npm run lint:fix
    ```
 
-3. **Test installation**
+3. **Test installation scenarios**
    ```bash
-   npm run test:install
+   npm run test:install       # Installation validation
+   npm run test:install:scenarios
    ```
 
-4. **For new features, add tests**
-   - Create test files in `test/`
-   - Follow existing patterns
-   - Ensure coverage
+4. **For new features - TDD approach REQUIRED**
+   - **Write failing tests FIRST** - Before implementing any code
+   - Create test files in `test/` directory
+   - Use Jest framework for new tests
+   - Follow existing patterns in `test/unit/` and `test/integration/`
+   - Ensure 100% coverage for new code
 
 ## 🏗️ Project Structure
 
@@ -193,22 +200,25 @@ autopm install
 ## 🎯 Areas for Contribution
 
 ### High Priority
-- [ ] Additional CI/CD platform support
+- [ ] Additional CI/CD platform support (GitLab CI, Jenkins)
 - [ ] Windows compatibility improvements
 - [ ] More language-specific templates
 - [ ] Performance optimizations
+- [ ] Agent registry expansion (currently 50+ agents)
 
 ### Good First Issues
 - [ ] Documentation improvements
-- [ ] Add more examples
-- [ ] Improve error messages
-- [ ] Add unit tests
+- [ ] Add more examples to `autopm/.claude/examples/`
+- [ ] Improve error messages in commands
+- [ ] Add unit tests for existing commands
+- [ ] Update agent documentation
 
 ### Feature Ideas
 - [ ] Web UI for configuration
-- [ ] Plugin system
-- [ ] More agent types
-- [ ] Integration with more tools
+- [ ] Plugin system for custom commands
+- [ ] More specialized AI agents
+- [ ] Integration with more project management tools
+- [ ] Context optimization features
 
 ## 🤝 Code of Conduct
 

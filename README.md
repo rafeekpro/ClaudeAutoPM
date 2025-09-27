@@ -33,7 +33,7 @@ ClaudeAutoPM uses a **hybrid approach** combining deterministic operations with 
 | **Hybrid** | Both modes available | Flexible workflows | `pm:prd-new --template` or `/pm:prd-new` |
 
 ### Core Capabilities
-- **96 Professional CLI Commands** - Full yargs-based CLI with auto-generated help
+- **96+ Professional CLI Commands** - Full yargs-based CLI with comprehensive PM commands
 - **Hybrid Execution** - Choose between templates (deterministic) or AI assistance
 - **AI Agent Integration** - Parallel execution with specialized agents (in Claude Code)
 - **Azure DevOps & GitHub** - Complete project management integration
@@ -192,7 +192,7 @@ autopm azure:sprint-status
 autopm context:create
 ```
 
-### New in v1.9.0: Complete PM Command Suite
+### New in v1.9.x: Complete PM Command Suite
 
 The latest release includes 17 new PM commands providing comprehensive project management capabilities:
 
