@@ -239,8 +239,15 @@ class ProviderRouter {
   }
 }
 
-// Export for use as module
-module.exports = new ProviderRouter();
+// Export class and instance for testing
+module.exports = {
+  ProviderRouter,
+  router: new ProviderRouter(),
+  // For compatibility with existing code
+  execute: (command, args) => new ProviderRouter().execute(command, args),
+  loadConfig: () => new ProviderRouter().loadConfig(),
+  getActiveProvider: () => new ProviderRouter().getActiveProvider()
+};
 
 // CLI interface
 if (require.main === module) {

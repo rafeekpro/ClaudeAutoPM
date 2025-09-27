@@ -19,17 +19,7 @@ function main() {
   const cli = yargs(hideBin(process.argv));
 
   cli
-    // Load commands from both legacy and new directories
-    .commandDir(path.join(__dirname, 'commands'), {
-      recurse: true,
-      extensions: ['js']
-    })
-    // Load new migrated commands from src/commands
-    .commandDir(path.join(__dirname, '../src/commands'), {
-      recurse: true,
-      extensions: ['js']
-    })
-    // Legacy commands (temporarily keep for backwards compatibility)
+    // Main commands
     .command('install [preset]', 'Install ClaudeAutoPM in current directory',
       (yargs) => {
         return yargs
@@ -39,29 +29,30 @@ function main() {
           });
       },
       (argv) => {
-        // Delegate to the existing install script
-        const installScript = require('./node/install.js');
-        installScript.run(argv.preset);
-      }
-    )
-    .command('merge [file]', 'Merge Claude instructions into CLAUDE.md',
-      (yargs) => {
-        return yargs
-          .positional('file', {
-            describe: 'File to merge',
-            type: 'string'
+        // Delegate to the install script
+        const { execSync } = require('child_process');
+        const installPath = path.join(__dirname, '..', 'install', 'install.sh');
+        try {
+          execSync(`bash ${installPath}`, {
+            stdio: 'inherit',
+            env: { ...process.env, AUTOPM_PRESET: argv.preset || '' }
           });
-      },
-      (argv) => {
-        // Delegate to the existing merge script
-        const mergeScript = require('./node/merge-claude.js');
-        mergeScript.run(argv.file);
+        } catch (error) {
+          console.error('Installation failed:', error.message);
+          process.exit(1);
+        }
       }
     )
-    .command('setup-env', 'Setup environment variables', {}, (argv) => {
-      // Delegate to the existing setup-env script
-      const setupEnvScript = require('./node/setup-env.js');
-      setupEnvScript.run();
+    .command('guide', 'Show interactive installation guide', {}, () => {
+      // Run install in guide mode
+      const { execSync } = require('child_process');
+      const installPath = path.join(__dirname, '..', 'install', 'install.sh');
+      try {
+        execSync(`bash ${installPath}`, { stdio: 'inherit' });
+      } catch (error) {
+        console.error('Guide failed:', error.message);
+        process.exit(1);
+      }
     })
     // Global options
     .option('verbose', {

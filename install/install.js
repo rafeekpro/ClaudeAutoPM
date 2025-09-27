@@ -314,7 +314,13 @@ ${this.colors.BOLD}Examples:${this.colors.NC}
       fs.mkdirSync(scriptsDir, { recursive: true });
     }
 
-    const scripts = ['safe-commit.sh', 'setup-hooks.sh'];
+    // Install both .sh wrappers and .js implementations
+    const scripts = [
+      'safe-commit.sh',
+      'safe-commit.js',
+      'setup-hooks.sh',
+      'setup-hooks.js'
+    ];
 
     for (const script of scripts) {
       const sourcePath = path.join(this.autopmDir, 'scripts', script);
@@ -322,7 +328,10 @@ ${this.colors.BOLD}Examples:${this.colors.NC}
 
       if (fs.existsSync(sourcePath)) {
         fs.copyFileSync(sourcePath, targetPath);
-        fs.chmodSync(targetPath, 0o755);
+        // Make .sh files executable
+        if (script.endsWith('.sh')) {
+          fs.chmodSync(targetPath, 0o755);
+        }
         this.printSuccess(`Installed ${script}`);
       }
     }

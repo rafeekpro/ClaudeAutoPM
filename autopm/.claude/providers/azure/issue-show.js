@@ -134,6 +134,7 @@ class AzureIssueShow {
   }
 
   extractIdFromUrl(url) {
+    if (!url) return null;
     const match = url.match(/workItems\/(\d+)/);
     return match ? parseInt(match[1]) : null;
   }
@@ -192,4 +193,12 @@ class AzureIssueShow {
   }
 }
 
-module.exports = AzureIssueShow;
+// Export class and instance for testing
+module.exports = {
+  AzureIssueShow,
+  execute: (args) => new AzureIssueShow({ organization: 'test-org', project: 'test-project' }).execute(args),
+  formatWorkItem: (workItem) => new AzureIssueShow({ organization: 'test-org', project: 'test-project' }).formatWorkItem(workItem),
+  mapState: (azureState) => new AzureIssueShow({ organization: 'test-org', project: 'test-project' }).mapState(azureState),
+  extractIdFromUrl: (url) => new AzureIssueShow({ organization: 'test-org', project: 'test-project' }).extractIdFromUrl(url),
+  formatForDisplay: (item) => new AzureIssueShow({ organization: 'test-org', project: 'test-project' }).formatForDisplay(item)
+};

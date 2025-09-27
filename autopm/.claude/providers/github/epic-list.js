@@ -226,5 +226,16 @@ class GitHubEpicList {
   }
 }
 
-// Export singleton instance
-module.exports = new GitHubEpicList();
+// Export class and instance for testing
+module.exports = {
+  GitHubEpicList,
+  execute: (options, settings) => new GitHubEpicList().execute(options, settings),
+  detectRepository: () => new GitHubEpicList().detectRepository(),
+  buildQuery: (repository, options) => new GitHubEpicList().buildQuery(repository, options),
+  executeGitHubCLI: (query) => new GitHubEpicList().executeGitHubCLI(query),
+  transformResults: (githubIssues) => new GitHubEpicList().transformResults(githubIssues),
+  mapStatus: (state) => new GitHubEpicList().mapStatus(state),
+  countChildren: (issue) => new GitHubEpicList().countChildren(issue),
+  countCompleted: (issue) => new GitHubEpicList().countCompleted(issue),
+  getMockData: (options) => new GitHubEpicList().getMockData(options)
+};

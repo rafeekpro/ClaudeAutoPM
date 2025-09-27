@@ -343,11 +343,17 @@ async function calculateTaskStats() {
 }
 
 // Export for use as module
-module.exports = standup;
+module.exports = {
+  standup,
+  findRecentFiles,
+  findInProgressTasks,
+  findAvailableTasks,
+  calculateTaskStats
+};
 
 // CLI execution
 if (require.main === module) {
-  standup().then(result => {
+  module.exports.standup().then(result => {
     process.exit(0);
   }).catch(err => {
     console.error('Standup failed:', err.message);

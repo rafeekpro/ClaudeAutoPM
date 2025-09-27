@@ -46,18 +46,9 @@ module.exports = {
       testMatch: ['<rootDir>/test/unit/**/*.test.js']
     },
     {
-      displayName: 'migration',
-      testMatch: ['<rootDir>/test/migration/**/*.test.js'],
+      displayName: 'jest-tests',
+      testMatch: ['<rootDir>/test/jest-tests/**/*.test.js'],
       testTimeout: 15000
-    },
-    {
-      displayName: 'parity',
-      testMatch: ['<rootDir>/test/migration/parity/**/*.test.js'],
-      testTimeout: 20000
-    },
-    {
-      displayName: 'behavioral',
-      testMatch: ['<rootDir>/test/migration/behavioral/**/*.test.js']
     },
     {
       displayName: 'e2e',

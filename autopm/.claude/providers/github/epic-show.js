@@ -172,4 +172,9 @@ class GitHubEpicShow {
   }
 }
 
-module.exports = new GitHubEpicShow();
+// Export class and instance for testing
+module.exports = {
+  GitHubEpicShow,
+  execute: (options, settings) => new GitHubEpicShow().execute(options, settings),
+  formatEpicDetails: (issue, children) => new GitHubEpicShow().formatEpicDetails(issue, children)
+};

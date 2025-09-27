@@ -1,42 +1,20 @@
 #!/bin/bash
-# Azure DevOps Sprint Report Generator (Backward Compatible Wrapper)
-# Usage: ./sprint-report.sh [sprint-name] [options]
-#
-# This script now delegates to the Node.js implementation for better performance
-# and maintainability while preserving the original interface.
 
-set -e
+# Azure Script - Wrapper for Node.js implementation
+# This wrapper maintains backward compatibility while delegating to the Node.js version
 
-# Detect script directory
+# Get the directory of this script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
+SCRIPT_NAME="$(basename "$0" .sh)"
 
-# Check if Node.js implementation exists
-NODE_SCRIPT="$PROJECT_ROOT/bin/node/azure-sprint-report.js"
-
-if [ ! -f "$NODE_SCRIPT" ]; then
-    echo "Error: Node.js version not found at $NODE_SCRIPT"
-    echo "Please ensure the migration is complete."
-    exit 1
+# Check if Node.js is available and the .js file exists
+if command -v node >/dev/null 2>&1 && [ -f "$SCRIPT_DIR/$SCRIPT_NAME.js" ]; then
+  # Use the Node.js implementation
+  node "$SCRIPT_DIR/$SCRIPT_NAME.js" "$@"
+  exit $?
+else
+  # Fallback message
+  echo "⚠️ Node.js not found or $SCRIPT_NAME.js missing"
+  echo "Please ensure Node.js is installed and all files are present"
+  exit 1
 fi
-
-# Check if node is available
-if ! command -v node &> /dev/null; then
-    echo "Error: Node.js is not installed or not in PATH"
-    echo "Please install Node.js to use the migrated Azure DevOps scripts"
-    exit 1
-fi
-
-# Handle legacy first argument as sprint name
-ARGS=()
-if [ $# -gt 0 ] && [[ "$1" != --* ]]; then
-    # First argument is not a flag, treat it as sprint name
-    ARGS+=("--sprint" "$1")
-    shift
-fi
-
-# Pass remaining arguments
-ARGS+=("$@")
-
-# Execute the Node.js version with converted arguments
-exec node "$NODE_SCRIPT" "${ARGS[@]}"

@@ -317,4 +317,14 @@ class AzureIssueEdit {
   }
 }
 
-module.exports = AzureIssueEdit;
+// Export class and instance for testing
+module.exports = {
+  AzureIssueEdit,
+  execute: (args) => new AzureIssueEdit().execute(args),
+  mapUpdates: (updates, currentItem) => new AzureIssueEdit().mapUpdates(updates, currentItem),
+  mapStateToAzure: (unifiedState, workItemType) => new AzureIssueEdit().mapStateToAzure(unifiedState, workItemType),
+  convertMarkdownToHtml: (markdown) => new AzureIssueEdit().convertMarkdownToHtml(markdown),
+  transformWorkItem: (workItem) => new AzureIssueEdit().transformWorkItem(workItem),
+  getChanges: (beforeItem, afterItem) => new AzureIssueEdit().getChanges(beforeItem, afterItem),
+  formatResult: (beforeItem, afterItem, requestedUpdates) => new AzureIssueEdit({}).formatResult(beforeItem, afterItem, requestedUpdates)
+};

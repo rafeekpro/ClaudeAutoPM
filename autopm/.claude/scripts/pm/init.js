@@ -299,15 +299,19 @@ function formatInitOutput(data) {
 }
 
 // CommonJS export for testing
-module.exports = initializeSystem;
+module.exports = {
+  initializeSystem,
+  displayBanner,
+  formatInitOutput
+};
 
 // CLI execution
 if (require.main === module) {
   const dryRun = process.argv.includes('--dry-run');
 
-  initializeSystem({ dryRun })
+  module.exports.initializeSystem({ dryRun })
     .then(result => {
-      console.log(formatInitOutput(result));
+      console.log(module.exports.formatInitOutput(result));
       process.exit(0);
     })
     .catch(error => {

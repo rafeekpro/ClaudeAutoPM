@@ -7,6 +7,7 @@
 .DS_Store
 Thumbs.db
 desktop.ini
+.claude/
 
 # Environment & Secrets
 # --------------------
@@ -40,6 +41,9 @@ repomix-output.xml
 coverage/
 .nyc_output/
 test-dir/
+test-results/
+test-output.*
+validation-report.json
 tmp/
 temp/
 test/regression/__snapshots__/
@@ -96,6 +100,9 @@ docs-site/docs/.vitepress/cache/
 # ----------------
 ZADANIA1709.md
 PROJECT_STRUCTURE_ANALYSIS.md
+DIRECTORY_ANALYSIS.md
+MIGRATION*.md
+test-mcp-setup.js
 
 # Shell Completions Cache
 # -----------------------

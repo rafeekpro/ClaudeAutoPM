@@ -339,5 +339,15 @@ class AzureIssueStart {
   }
 }
 
-// Export singleton instance
-module.exports = new AzureIssueStart();
+// Export class and instance for testing
+module.exports = {
+  AzureIssueStart,
+  execute: (options, settings) => new AzureIssueStart().execute(options, settings),
+  getWorkItem: (organization, project, workItemId) => new AzureIssueStart().getWorkItem(organization, project, workItemId),
+  updateWorkItemState: (organization, project, workItemId, state) => new AzureIssueStart().updateWorkItemState(organization, project, workItemId, state),
+  branchExists: (branchName) => new AzureIssueStart().branchExists(branchName),
+  createBranch: (branchName) => new AzureIssueStart().createBranch(branchName),
+  getCurrentUser: (organization) => new AzureIssueStart().getCurrentUser(organization),
+  getWorkItemUrl: (organization, project, workItemId) => new AzureIssueStart().getWorkItemUrl(organization, project, workItemId),
+  mockStartWorkItem: (options, organization, project) => new AzureIssueStart().mockStartWorkItem(options, organization, project)
+};
