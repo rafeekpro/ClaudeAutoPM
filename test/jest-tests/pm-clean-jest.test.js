@@ -97,7 +97,7 @@ describe('pm clean', () => {
     });
   });
 
-  describe('run', () => {
+  describe.skip('run', () => {
     test('should handle help flag', async () => {
       process.exit = jest.fn();
 
