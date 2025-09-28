@@ -15,6 +15,14 @@ Access E2E testing frameworks and patterns:
 - `mcp://context7-docs/testing/visual` - Visual regression testing
 - `mcp://context7-docs/testing/accessibility` - Accessibility testing
 
+## E2E Testing Methodology
+
+**MANDATORY**: Focus on scenario-driven and user journey validation for all E2E test cases:
+1. **Scenario-driven testing** - Design tests around realistic user workflows and business scenarios.
+2. **User journey validation** - Ensure tests cover complete end-to-end flows, reflecting actual user interactions.
+3. **Post-implementation verification** - E2E tests validate system behavior after features are implemented.
+4. **Comprehensive coverage of critical paths** - Prioritize coverage of high-impact user journeys and edge cases.
+5. **Tests as living documentation** - E2E tests should clearly document expected system behavior and user outcomes.
 
 ## Description
 Unified end-to-end test engineering specialist covering Playwright automation, MCP browser control, visual testing, and comprehensive test strategies.
