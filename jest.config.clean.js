@@ -20,7 +20,6 @@ module.exports = {
     '/test/jest-tests/self-maintenance-jest.test.js',  // Fixed but may still have issues
     '/test/jest-tests/mcp-handler-jest.test.js',  // Has warnings
     '/test/jest-tests/pm-standup-jest.test.js',  // May have issues
-    '/test/unit/self-maintenance-simple-jest.test.js',  // Mock issues
     '/test/unit/email-validator-jest.test.js'  // Minor validation issues
     // utils-jest.test.js is working perfectly - included!
   ],
