@@ -705,7 +705,8 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
     this.printStep('Next steps:');
     console.log('  1. Review CLAUDE.md for project configuration');
     console.log('  2. Run: ./scripts/setup-hooks.sh to setup git hooks');
-    console.log('  3. In Claude, run: /pm:validate');
+    console.log('  3. Open Claude Code in this directory');
+    console.log('  4. In Claude, run: /pm:validate');
     console.log('');
 
     process.exit(0);
