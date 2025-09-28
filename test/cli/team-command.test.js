@@ -140,18 +140,22 @@ describe('Team Command CLI', () => {
     test('should handle missing teams.json gracefully', () => {
       // Temporarily rename teams.json
       const tempPath = teamsConfigPath + '.temp';
+      let renamed = false;
       if (fs.existsSync(teamsConfigPath)) {
         fs.renameSync(teamsConfigPath, tempPath);
+        renamed = true;
       }
 
-      const result = runCommand('team list');
+      try {
+        const result = runCommand('team list');
 
-      expect(result.success).toBe(false);
-      expect(result.output.toLowerCase()).toMatch(/not found|missing|error/i);
-
-      // Restore teams.json
-      if (fs.existsSync(tempPath)) {
-        fs.renameSync(tempPath, teamsConfigPath);
+        expect(result.success).toBe(false);
+        expect(result.output.toLowerCase()).toMatch(/not found|missing|error/i);
+      } finally {
+        // Restore teams.json
+        if (renamed && fs.existsSync(tempPath)) {
+          fs.renameSync(tempPath, teamsConfigPath);
+        }
       }
     });
   });
