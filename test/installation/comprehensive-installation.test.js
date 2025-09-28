@@ -335,7 +335,7 @@ describe('Comprehensive Installation Testing', () => {
           env: { ...process.env, AUTOPM_TEST_MODE: '1' }
         });
         // Should not reach here
-        expect(true).toBe(false);
+        fail();
       } catch (error) {
         expect(error.status).not.toBe(0);
         expect(error.stdout || error.stderr).toContain('git');
