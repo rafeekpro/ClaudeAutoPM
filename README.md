@@ -54,9 +54,12 @@ autopm guide
 
 The interactive guide will walk you through:
 - ✅ System requirements verification
-- ⚙️ Provider configuration (GitHub/Azure)
-- 📝 Creating your first task
-- 📚 Learning essential commands
+- 📦 Installation with preset selection
+- ⚙️ Provider configuration (GitHub/Azure DevOps/Local)
+- 🤖 Agent team management and automatic switching
+- 📝 Creating your first PRD and project workflow
+- 🆘 Troubleshooting and diagnostics
+- 📚 Complete documentation and resources
 
 ### Manual Setup
 
