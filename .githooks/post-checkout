@@ -1,0 +1,110 @@
+#!/bin/bash
+
+# Git post-checkout hook for automatic team switching based on branch name
+# Arguments: $1 = previous HEAD, $2 = new HEAD, $3 = flag (1 for branch checkout, 0 for file checkout)
+
+# Only proceed if this is a branch checkout (not file checkout)
+if [ "$3" != "1" ]; then
+  exit 0
+fi
+
+# Check if 'autopm' command is available
+# First try local installation (most common case)
+if [ -f "./bin/autopm.js" ]; then
+  # Use local autopm
+  AUTOPM_CMD="node ./bin/autopm.js"
+elif command -v autopm &> /dev/null; then
+  # Use global autopm if available
+  AUTOPM_CMD="autopm"
+else
+  echo "ClaudeAutoPM: 'autopm' command not found. Skipping team switch."
+  exit 0
+fi
+
+# Get the new branch name
+new_branch=$(git rev-parse --abbrev-ref HEAD)
+
+# Extract keyword from branch name using naming convention
+# Supported patterns:
+# - feature/team-name/description
+# - fix/team-name/description
+# - feat/team-name/description
+# - chore/team-name/description
+keyword=""
+
+# First try exact pattern: type/keyword/description
+if [[ "$new_branch" =~ ^(feature|fix|feat|chore)/([a-zA-Z0-9_-]+)(/.*)?$ ]]; then
+  keyword="${BASH_REMATCH[2]}"
+fi
+
+# If no keyword found, try alternative patterns
+if [ -z "$keyword" ]; then
+  # Try pattern: team-name-* (e.g., devops-pipeline, frontend-ui)
+  if [[ "$new_branch" =~ ^([a-zA-Z]+)-(devops|frontend|backend|python_backend|fullstack) ]]; then
+    keyword="${BASH_REMATCH[2]}"
+  elif [[ "$new_branch" =~ ^(devops|frontend|backend|python_backend|fullstack)- ]]; then
+    keyword="${BASH_REMATCH[1]}"
+  fi
+fi
+
+# Exit if no keyword found
+if [ -z "$keyword" ]; then
+  exit 0
+fi
+
+# Check if teams.json exists
+if [ ! -f ".claude/teams.json" ]; then
+  echo "ClaudeAutoPM: teams.json not found. Skipping team switch."
+  exit 0
+fi
+
+# Map common keywords to actual team names
+case "$keyword" in
+  backend)
+    keyword="python_backend"
+    ;;
+  python)
+    keyword="python_backend"
+    ;;
+  react|vue|angular|ui|ux)
+    keyword="frontend"
+    ;;
+  docker|k8s|kubernetes|ci|cd|cicd|pipeline)
+    keyword="devops"
+    ;;
+  full|complete)
+    keyword="fullstack"
+    ;;
+esac
+
+# Check if team exists in teams.json using grep (more portable than jq)
+if ! grep -q "\"$keyword\":" .claude/teams.json 2>/dev/null; then
+  # If exact match not found, exit silently
+  exit 0
+fi
+
+# Get current active team
+active_team_file=".claude/active_team.txt"
+current_team=""
+if [ -f "$active_team_file" ]; then
+  current_team=$(cat "$active_team_file" 2>/dev/null || echo "")
+fi
+
+# Switch team if different from current
+if [ "$keyword" != "$current_team" ]; then
+  echo ""
+  echo "🔄 ClaudeAutoPM: Branch context detected - '$keyword'"
+  echo "   Switching agent team..."
+
+  # Execute team switch
+  $AUTOPM_CMD team load "$keyword"
+
+  if [ $? -eq 0 ]; then
+    echo "✅ ClaudeAutoPM: Team successfully switched to '$keyword'"
+  else
+    echo "⚠️  ClaudeAutoPM: Failed to switch team to '$keyword'"
+  fi
+  echo ""
+fi
+
+exit 0
