@@ -2,6 +2,27 @@
 
 This document provides the official registry of all agents for inclusion in the system prompt.
 
+## 🎯 Agent Selection Rules
+
+### Quick Decision Guide
+1. **Architecture vs Implementation**
+   - Planning/designing? → Use "expert" or "architect" agents
+   - Building/coding? → Use "engineer" agents
+
+2. **Scope Rules**
+   - New project setup → "expert" agents
+   - Day-to-day development → "engineer" agents
+   - Platform-specific → cloud "architect" agents
+   - Multi-platform/IaC → "terraform-infrastructure-expert"
+
+3. **Component vs Application**
+   - UI components only → "react-ui-expert"
+   - Full application → "react-frontend-engineer"
+
+4. **Local vs Production**
+   - Development environment → "docker-containerization-expert"
+   - Production deployment → "kubernetes-orchestrator"
+
 ## 🚀 Optimization Update (v1.1.0)
 
 ### Summary of Changes
@@ -67,10 +88,12 @@ Deprecated agents have been removed. Use the consolidated versions with appropri
 
 ## Framework Agents
 
-### react-ui-expert (NEW - Consolidated)
+### react-ui-expert
 
 **Location**: `.claude/agents/frameworks/react-ui-expert.md`
-**Description**: Unified React UI component development specialist supporting MUI, Chakra, Ant Design, Bootstrap, and headless UI libraries. Use parameters to specify framework.
+**Description**: Use this agent for UI component architecture, design systems, component library selection (MUI, Chakra, Ant Design), styling strategies, and accessibility patterns.
+**Scope**: Component libraries, design systems, styling, accessibility, component documentation
+**NOT for**: Full app architecture, routing, state management (use react-frontend-engineer)
 **Parameters**: `framework: [mui|chakra|antd|bootstrap|headless]`, `style_system: [css-in-js|tailwind|css-modules]`
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
 **Status**: Active
@@ -80,7 +103,9 @@ Deprecated agents have been removed. Use the consolidated versions with appropri
 ### react-frontend-engineer
 
 **Location**: `.claude/agents/frameworks/react-frontend-engineer.md`
-**Description**: Use this agent for React frontend development, refactoring, or optimization using modern tooling and frameworks.
+**Description**: Use this agent for complete React application development including routing, state management, API integration, and application architecture.
+**Scope**: Full app architecture, Redux/Context/Zustand, routing, API integration, build config
+**NOT for**: Pure UI component work, design systems (use react-ui-expert)
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
 **Status**: Active
 
@@ -119,10 +144,12 @@ Deprecated agents have been removed. Use the consolidated versions with appropri
 
 ## Language Agents
 
-### python-backend-expert (ENHANCED)
+### python-backend-expert
 
 **Location**: `.claude/agents/languages/python-backend-expert.md`
-**Description**: Comprehensive Python backend specialist supporting FastAPI, Flask, Django, and pure Python. Handles all Python backend development needs.
+**Description**: Use this agent for Python backend architecture, new project setup, framework selection, database design, and strategic decisions. Expert in design patterns and best practices.
+**Scope**: Architecture, framework selection, database schema design, API patterns, performance architecture
+**NOT for**: Day-to-day coding, bug fixes, minor features (use python-backend-engineer)
 **Parameters**: `framework: [fastapi|flask|django|none]`, `async_support: boolean`, `database: [postgresql|mongodb|redis]`
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
 **Status**: Active
@@ -152,10 +179,11 @@ Deprecated agents have been removed. Use the consolidated versions with appropri
 ### python-backend-engineer
 
 **Location**: `.claude/agents/languages/python-backend-engineer.md`
-**Description**: Use this agent when you need to develop, refactor, or optimize Python backend systems using modern tooling. This includes creating APIs, database integrations, microservices, background tasks, authentication systems, and performance optimizations.
+**Description**: Use this agent for day-to-day Python feature implementation, bug fixes, refactoring existing code, and writing tests. Focuses on hands-on development in established projects.
+**Scope**: Feature development, debugging, code optimization, test writing
+**NOT for**: Architecture decisions, framework selection, major redesigns (use python-backend-expert)
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
 **Status**: Active
-**Note**: Similar to python-backend-expert but with different focus and tooling approach
 
 ## Cloud Agents
 
@@ -190,7 +218,9 @@ Deprecated agents have been removed. Use the consolidated versions with appropri
 ### terraform-infrastructure-expert
 
 **Location**: `.claude/agents/cloud/terraform-infrastructure-expert.md`
-**Description**: Use this agent for Terraform infrastructure as code including module development, state management, and multi-cloud deployments.
+**Description**: Use this agent for Infrastructure as Code architecture, complex Terraform modules, multi-cloud strategies, state management, and GitOps workflows.
+**Scope**: IaC architecture, Terraform modules, multi-cloud, state management, GitOps
+**NOT for**: Platform-specific services, console operations (use specific cloud architects)
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
 **Status**: Active
 
