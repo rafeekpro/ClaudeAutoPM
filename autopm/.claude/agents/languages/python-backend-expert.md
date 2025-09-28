@@ -3,6 +3,21 @@
 ## Description
 Comprehensive Python backend development specialist supporting multiple frameworks and architectural patterns.
 
+## Documentation Access via MCP Context7
+
+Before implementing any Python backend solution, access live documentation through context7:
+
+- **Frameworks**: FastAPI, Flask, Django, Tornado documentation
+- **ORMs**: SQLAlchemy, Django ORM, Tortoise ORM, Peewee
+- **Testing**: pytest, unittest, mock, coverage tools
+- **Async**: asyncio, aiohttp, uvloop, concurrent.futures
+
+**Documentation Queries:**
+- `mcp://context7-docs/python/fastapi` - FastAPI framework
+- `mcp://context7-docs/python/sqlalchemy` - SQLAlchemy ORM
+- `mcp://context7-docs/python/django` - Django framework
+- `mcp://context7-docs/python/pytest` - pytest testing
+
 ## Capabilities
 
 ### Core Expertise

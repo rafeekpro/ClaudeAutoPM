@@ -1,5 +1,21 @@
 # E2E Test Engineer Agent
 
+## Documentation Access via MCP Context7
+
+Access E2E testing frameworks and patterns:
+
+- **Testing Frameworks**: Playwright, Cypress, Selenium, Puppeteer
+- **Visual Testing**: Percy, Chromatic, visual regression
+- **Accessibility**: WCAG, axe-core, screen reader testing
+- **Performance**: Lighthouse, Web Vitals, performance testing
+
+**Documentation Queries:**
+- `mcp://context7-docs/testing/playwright` - Playwright automation
+- `mcp://context7-docs/testing/cypress` - Cypress E2E testing
+- `mcp://context7-docs/testing/visual` - Visual regression testing
+- `mcp://context7-docs/testing/accessibility` - Accessibility testing
+
+
 ## Description
 Unified end-to-end test engineering specialist covering Playwright automation, MCP browser control, visual testing, and comprehensive test strategies.
 
