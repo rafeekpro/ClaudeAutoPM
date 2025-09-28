@@ -204,17 +204,84 @@ function main() {
    /pm:search keyword               # Search across PRDs and epics
    /pm:help                         # Show all PM commands
 
-🚀 Complete Workflow Example:
+🚀 Complete Workflows:
+
+   === GITHUB WORKFLOW (PRD → Epic → Issues) ===
    1. autopm install               # Setup project framework
-   2. node install/setup-env.js    # Configure GitHub/Azure tokens
+   2. node install/setup-env.js    # Configure GitHub token
    3. autopm team load fullstack   # Load appropriate agents
    4. claude --bypass-permissions . # Open Claude Code
-   5. /pm:validate                 # Verify configuration
-   6. /pm:prd-new user-auth        # Create feature PRD
-   7. /pm:epic-decompose user-auth # Break into tasks
-   8. /pm:epic-sync user-auth      # Sync with GitHub/Azure
-   9. /pm:next                     # Get first task
-   10. /pm:issue-start TASK-123    # Start development
+   5. /pm:validate                 # Verify GitHub integration
+
+   6. /pm:prd-new user-auth        # Create Product Requirements Document
+   7. /pm:prd-parse user-auth      # Parse PRD into structured format
+   8. /pm:epic-decompose user-auth # Break PRD into Epic with Issues
+   9. /pm:epic-sync user-auth      # Create GitHub Epic + Issues
+   10. /pm:next                    # Get next priority issue
+   11. /pm:issue-start ISSUE-123   # Start working on specific issue
+   12. # ... development work ...
+   13. /pm:issue-close ISSUE-123   # Close completed issue
+   14. /pm:standup                 # Generate progress summary
+
+   === AZURE DEVOPS WORKFLOW (PRD → User Stories → Tasks) ===
+   1. autopm install               # Setup project framework
+   2. node install/setup-env.js    # Configure Azure DevOps PAT
+      # Set AZURE_DEVOPS_PAT, ORG, PROJECT
+   3. autopm team load fullstack   # Load appropriate agents
+   4. claude --bypass-permissions . # Open Claude Code
+   5. /pm:validate                 # Verify Azure DevOps integration
+
+   6. /pm:prd-new user-auth        # Create Product Requirements Document
+   7. /pm:prd-parse user-auth      # Parse PRD into structured format
+   8. /pm:epic-decompose user-auth # Break PRD into User Stories + Tasks
+   9. /pm:epic-sync user-auth      # Create Azure Epic + User Stories + Tasks
+   10. /pm:next                    # Get next priority task
+   11. /pm:issue-start TASK-123    # Start working on specific task
+   12. # ... development work ...
+   13. /pm:issue-close TASK-123    # Close completed task
+   14. /pm:standup                 # Generate sprint summary
+
+📋 Detailed Step-by-Step Examples:
+
+   STEP 6 - Creating PRD:
+   /pm:prd-new user-authentication
+   → Creates: .claude/prds/user-authentication.md
+   → Contains: Problem statement, user stories, acceptance criteria
+
+   STEP 7 - Parsing PRD:
+   /pm:prd-parse user-authentication
+   → Analyzes PRD content and structure
+   → Prepares for epic decomposition
+
+   STEP 8 - Epic Decomposition:
+   /pm:epic-decompose user-authentication
+   → GitHub: Creates Epic with linked Issues
+   → Azure: Creates Epic with User Stories and child Tasks
+   → File: .claude/epics/user-authentication.md
+
+   STEP 9 - Sync with Provider:
+   /pm:epic-sync user-authentication
+   → GitHub: Creates Epic + Issues in repository
+   → Azure: Creates Epic + User Stories + Tasks in project
+   → Links local files with remote work items
+
+   STEP 10 - Get Next Work:
+   /pm:next
+   → Returns highest priority unassigned item
+   → GitHub: Next issue to work on
+   → Azure: Next task to work on
+
+   STEP 11 - Start Development:
+   /pm:issue-start USER-AUTH-001
+   → Assigns work item to you
+   → Updates status to "In Progress"
+   → Creates development branch (if configured)
+
+   STEP 13 - Complete Work:
+   /pm:issue-close USER-AUTH-001
+   → Updates status to "Done/Closed"
+   → Links commits and PR (if available)
+   → Updates epic progress tracking
 
 🛠️  Troubleshooting:
    # Check installation
