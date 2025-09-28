@@ -1,4 +1,7 @@
 {
+  "execution_strategy": {
+    "mode": "adaptive"
+  },
   "features": {
     "docker_first_development": true,
     "enforce_docker_tests": true,
