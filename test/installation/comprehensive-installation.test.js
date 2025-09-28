@@ -30,7 +30,7 @@ describe('Comprehensive Installation Testing', () => {
   afterEach(() => {
     // Clean up test directory
     try {
-      process.chdir('/tmp');
+      process.chdir(os.tmpdir());
       fs.rmSync(testDir, { recursive: true, force: true });
     } catch (error) {
       console.warn(`Failed to clean up test directory: ${error.message}`);
