@@ -368,7 +368,7 @@ describe('Comprehensive Installation Testing', () => {
       const result = execSync(`node ${autopmPath} team load devops`, { encoding: 'utf8' });
 
       // Should load successfully with warnings for missing files
-      expect(result).toContain('loaded successfully') || expect(result).toContain('Warning');
+      expect(result).toMatch(/loaded successfully|Warning/);
     });
   });
 
