@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+const { resolveAgents } = require('../../bin/commands/team');
 
 describe('Team Command CLI', () => {
   const projectRoot = path.join(__dirname, '../..');
@@ -159,31 +160,6 @@ describe('Team Command CLI', () => {
     test('should resolve all agents including inherited ones', () => {
       const teamsConfig = JSON.parse(fs.readFileSync(teamsConfigPath, 'utf8'));
 
-      // Simulate agent resolution logic
-      const resolveAgents = (teamName, config, resolved = new Set()) => {
-        const team = config[teamName];
-        if (!team) return [];
-
-        const agents = new Set();
-
-        // Add direct agents
-        if (team.agents) {
-          team.agents.forEach(a => agents.add(a));
-        }
-
-        // Add inherited agents
-        if (team.inherits) {
-          team.inherits.forEach(parent => {
-            if (!resolved.has(parent)) {
-              resolved.add(parent);
-              resolveAgents(parent, config, resolved).forEach(a => agents.add(a));
-            }
-          });
-        }
-
-        return Array.from(agents);
-      };
-
       // Test base team
       const baseAgents = resolveAgents('base', teamsConfig);
       expect(baseAgents).toContain('code-analyzer.md');
@@ -202,6 +178,28 @@ describe('Team Command CLI', () => {
       expect(fullstackAgents).toContain('react-ui-expert.md'); // from frontend
       expect(fullstackAgents).toContain('python-backend-expert.md'); // from python_backend
       expect(fullstackAgents).toContain('code-analyzer.md'); // from base
+    });
+
+    test('should throw error for non-existent team', () => {
+      const teamsConfig = JSON.parse(fs.readFileSync(teamsConfigPath, 'utf8'));
+
+      expect(() => {
+        resolveAgents('nonexistent', teamsConfig);
+      }).toThrow("Team 'nonexistent' not found in configuration");
+    });
+
+    test('should throw error for invalid inheritance', () => {
+      const teamsConfig = {
+        'broken_team': {
+          'description': 'Team with invalid inheritance',
+          'inherits': ['nonexistent_parent'],
+          'agents': ['test.md']
+        }
+      };
+
+      expect(() => {
+        resolveAgents('broken_team', teamsConfig);
+      }).toThrow("Team 'broken_team' inherits from non-existent team 'nonexistent_parent'");
     });
   });
 });
