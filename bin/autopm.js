@@ -159,30 +159,84 @@ function main() {
    autopm team load frontend         # Load React/UI development agents
    claude --bypass-permissions .     # Open Claude Code
 
-🔧 Configuration & Teams:
-   autopm guide config              # Setup Azure DevOps or GitHub integration
-   autopm team list                 # See all available agent teams
-   autopm team current              # Check currently active team
-   autopm guide                     # Interactive setup guide
+🔧 Configuration Setup:
+   # Interactive configuration (recommended)
+   node install/setup-env.js         # Interactive token & provider setup
 
-💡 After installation, use Claude Code for PM commands:
+   # Non-interactive setup
+   node install/setup-env.js --non-interactive \\
+     --github-token=ghp_xxx --email=you@email.com
+
+   # Manual .claude/.env file
+   GITHUB_TOKEN=ghp_your_token_here
+   AZURE_DEVOPS_PAT=your_azure_pat
+   AZURE_DEVOPS_ORG=your-organization
+   AZURE_DEVOPS_PROJECT=your-project
+
+🔑 Token Setup:
+   # GitHub PAT (Settings → Developer settings → Personal access tokens)
+   Scopes: repo, workflow, admin:repo_hook
+
+   # Azure DevOps PAT (User settings → Personal access tokens)
+   Scopes: Work Items (read/write), Code (read/write)
+
+🤖 Team Management:
+   autopm team list                 # See all available agent teams
+   autopm team load frontend        # Load React/UI agents
+   autopm team load backend         # Load Python/Node.js agents
+   autopm team load fullstack       # Load complete development stack
+   autopm team load devops          # Load Docker/K8s/CI-CD agents
+   autopm team current              # Check currently active team
+   autopm team reset                # Reset to default team
+
+💡 Claude Code PM Commands:
    /pm:status                       # Project overview and health
-   /pm:prd-new my-feature           # Create new Product Requirements Document
-   /pm:epic-decompose my-feature    # Break PRD into actionable tasks
+   /pm:validate                     # Validate configuration
+   /pm:prd-new feature-name         # Create new Product Requirements Document
+   /pm:prd-parse feature-name       # Parse PRD into epic structure
+   /pm:epic-decompose feature-name  # Break PRD into actionable tasks
+   /pm:epic-sync feature-name       # Sync epic with provider (GitHub/Azure)
    /pm:next                         # Get next priority task to work on
    /pm:issue-start TASK-123         # Start working on specific task
+   /pm:issue-show TASK-123          # View task details
+   /pm:issue-close TASK-123         # Close completed task
    /pm:standup                      # Generate daily standup summary
+   /pm:search keyword               # Search across PRDs and epics
+   /pm:help                         # Show all PM commands
 
-🚀 Example Workflow:
-   1. autopm install               # Setup project
-   2. autopm team load fullstack   # Load appropriate agents
-   3. claude --bypass-permissions . # Open Claude
-   4. /pm:prd-new user-auth        # Create feature PRD
-   5. /pm:epic-decompose user-auth # Break into tasks
-   6. /pm:next                     # Start working
+🚀 Complete Workflow Example:
+   1. autopm install               # Setup project framework
+   2. node install/setup-env.js    # Configure GitHub/Azure tokens
+   3. autopm team load fullstack   # Load appropriate agents
+   4. claude --bypass-permissions . # Open Claude Code
+   5. /pm:validate                 # Verify configuration
+   6. /pm:prd-new user-auth        # Create feature PRD
+   7. /pm:epic-decompose user-auth # Break into tasks
+   8. /pm:epic-sync user-auth      # Sync with GitHub/Azure
+   9. /pm:next                     # Get first task
+   10. /pm:issue-start TASK-123    # Start development
 
-📚 Documentation: https://github.com/rafeekpro/ClaudeAutoPM
-🐛 Report Issues: https://github.com/rafeekpro/ClaudeAutoPM/issues
+🛠️  Troubleshooting:
+   # Check installation
+   ls -la .claude/                  # Should show: agents/, commands/, config.json
+
+   # Verify configuration
+   /pm:validate                     # In Claude Code
+   autopm team current              # Check active team
+
+   # Reset if needed
+   autopm install --force           # Reinstall framework
+   autopm team reset                # Reset to default agents
+
+📋 Documentation Generation:
+   autopm guide config              # Generate configuration docs
+   autopm guide tutorial            # Create tutorials
+   autopm guide examples            # Generate code examples
+
+📚 Resources:
+   Documentation: https://github.com/rafeekpro/ClaudeAutoPM
+   Report Issues: https://github.com/rafeekpro/ClaudeAutoPM/issues
+   Agent Registry: autopm/.claude/agents/AGENT-REGISTRY.md
 `)
     .fail((msg, err, yargs) => {
       if (err) {
