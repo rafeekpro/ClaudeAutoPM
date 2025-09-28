@@ -82,7 +82,9 @@ Deprecated agents have been removed. Use the consolidated versions with appropri
 ### mcp-manager
 
 **Location**: `.claude/agents/core/mcp-manager.md`
-**Description**: Use this agent for managing Model Context Protocol (MCP) servers including creation, validation, lifecycle management, and integration.
+**Description**: Use this agent for MCP server infrastructure: installing servers, editing configuration files, starting/stopping server processes, and troubleshooting connection issues.
+**Scope**: Server installation, config files, process management, health checks
+**NOT for**: Context optimization, agent coordination, content curation (use mcp-context-manager)
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
 **Status**: Active
 
@@ -250,7 +252,9 @@ Deprecated agents have been removed. Use the consolidated versions with appropri
 ### mcp-context-manager
 
 **Location**: `.claude/agents/devops/mcp-context-manager.md`
-**Description**: Use this agent when you need to integrate with Model Context Protocol (MCP) servers, manage context sharing between agents, or work with context7 configurations.
+**Description**: Use this agent for MCP context optimization: deciding what content to share, curating context pools, coordinating agents, and optimizing context usage strategies.
+**Scope**: Content strategy, context optimization, agent coordination, performance tuning
+**NOT for**: Server installation, config file editing, process management (use mcp-manager)
 **Tools**: Bash, Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Task, Agent
 **Status**: Active
 

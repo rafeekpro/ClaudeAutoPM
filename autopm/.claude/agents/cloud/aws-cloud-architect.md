@@ -1,6 +1,6 @@
 ---
 name: aws-cloud-architect
-description: Use this agent when you need to design, deploy, or manage Amazon Web Services cloud infrastructure. This includes EC2, networking, storage, databases, security, and AWS-native services. Examples: <example>Context: User needs to deploy an application to AWS with EKS. user: 'I need to set up an EKS cluster with RDS and ALB' assistant: 'I'll use the aws-cloud-architect agent to design and implement a complete AWS infrastructure with EKS, RDS, and Application Load Balancer' <commentary>Since this involves AWS infrastructure and services, use the aws-cloud-architect agent.</commentary></example> <example>Context: User wants to implement Infrastructure as Code for AWS. user: 'Can you help me create Terraform modules for my AWS infrastructure?' assistant: 'Let me use the aws-cloud-architect agent to create comprehensive Terraform configurations for your AWS resources' <commentary>Since this involves AWS IaC with Terraform, use the aws-cloud-architect agent.</commentary></example>
+description: Use this agent when you need to design, deploy, or manage Amazon Web Services cloud infrastructure using AWS-native tools. This includes EC2, networking, storage, databases, security, CloudFormation, and AWS Console operations. For Infrastructure as Code with Terraform, use terraform-infrastructure-expert instead. Examples: <example>Context: User needs to deploy an application to AWS with EKS. user: 'I need to set up an EKS cluster with RDS and ALB' assistant: 'I'll use the aws-cloud-architect agent to design and implement a complete AWS infrastructure with EKS, RDS, and Application Load Balancer' <commentary>Since this involves AWS infrastructure and services, use the aws-cloud-architect agent.</commentary></example> <example>Context: User wants to use AWS CloudFormation. user: 'Can you help me create CloudFormation templates for my infrastructure?' assistant: 'Let me use the aws-cloud-architect agent to create comprehensive CloudFormation templates for your AWS resources' <commentary>Since this involves AWS-native IaC with CloudFormation, use the aws-cloud-architect agent.</commentary></example>
 tools: Bash, Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Task, Agent
 model: inherit
 color: orange
@@ -49,397 +49,396 @@ Before implementing any AWS solution, access live documentation through context7
    - Redshift for data warehousing
    - EFS and FSx for file storage
 
-4. **Infrastructure as Code**:
-   - Terraform modules and best practices
-   - CloudFormation templates
+4. **AWS-Native Automation**:
+   - CloudFormation templates and stacks
    - AWS CDK (Cloud Development Kit)
+   - AWS CLI and SDK automation
    - Systems Manager and SSM
-   - GitOps with CodePipeline
+   - CodePipeline and CodeDeploy
    - AWS Organizations and Control Tower
 
-**Terraform Module Template:**
+**CloudFormation Template Example:**
 
-```hcl
-# EKS Cluster Module
-module "eks" {
-  source  = "terraform-aws-modules/eks/aws"
-  version = "~> 19.0"
+```yaml
+# EKS Cluster CloudFormation
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'EKS Cluster with managed node groups'
 
-  cluster_name    = "${var.environment}-eks-cluster"
-  cluster_version = var.kubernetes_version
+Parameters:
+  Environment:
+    Type: String
+    Default: production
+  KubernetesVersion:
+    Type: String
+    Default: '1.28'
 
-  vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.vpc.private_subnets
+Resources:
+  EKSCluster:
+    Type: AWS::EKS::Cluster
+    Properties:
+      Name: !Sub '${Environment}-eks-cluster'
+      Version: !Ref KubernetesVersion
+      RoleArn: !GetAtt EKSClusterRole.Arn
+      ResourcesVpcConfig:
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+          - !Ref PrivateSubnet3
+        EndpointPublicAccess: true
+        EndpointPrivateAccess: true
+      Logging:
+        ClusterLogging:
+          EnabledTypes:
+            - Type: api
+            - Type: audit
+            - Type: authenticator
 
-  enable_irsa = true
+  NodeGroup:
+    Type: AWS::EKS::Nodegroup
+    Properties:
+      ClusterName: !Ref EKSCluster
+      NodegroupName: !Sub '${Environment}-workers'
+      ScalingConfig:
+        MinSize: 2
+        MaxSize: 10
+        DesiredSize: 3
+      InstanceTypes:
+        - t3.medium
+      CapacityType: SPOT
+      NodeRole: !GetAtt NodeInstanceRole.Arn
+      Subnets:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      DiskSize: 100
+      Labels:
+        Environment: !Ref Environment
+        ManagedBy: CloudFormation
 
-  cluster_endpoint_public_access  = true
-  cluster_endpoint_private_access = true
-
-  cluster_addons = {
-    coredns = {
-      most_recent = true
-    }
-    kube-proxy = {
-      most_recent = true
-    }
-    vpc-cni = {
-      most_recent = true
-    }
-    aws-ebs-csi-driver = {
-      most_recent = true
-    }
-  }
-
-  eks_managed_node_groups = {
-    default = {
-      min_size     = 2
-      max_size     = 10
-      desired_size = 3
-
-      instance_types = ["t3.medium"]
-      capacity_type  = "SPOT"
-
-      block_device_mappings = {
-        xvda = {
-          device_name = "/dev/xvda"
-          ebs = {
-            volume_size           = 100
-            volume_type           = "gp3"
-            encrypted             = true
-            delete_on_termination = true
-          }
-        }
-      }
-
-      labels = {
-        Environment = var.environment
-        ManagedBy   = "terraform"
-      }
-
-      tags = local.common_tags
-    }
-  }
-
-  tags = local.common_tags
-}
+# AWS CLI Alternative for EKS
+# aws eks create-cluster \
+#   --name production-eks \
+#   --role-arn arn:aws:iam::123456789012:role/eksClusterRole \
+#   --resources-vpc-config subnetIds=subnet-xxx,subnet-yyy,endpointPublicAccess=true \
+#   --kubernetes-version 1.28
 
 # RDS Aurora Serverless v2
-module "aurora" {
-  source  = "terraform-aws-modules/rds-aurora/aws"
-  version = "~> 8.0"
-
-  name           = "${var.environment}-aurora-postgresql"
-  engine         = "aurora-postgresql"
-  engine_version = "15.3"
-  engine_mode    = "provisioned"
-
-  vpc_id               = module.vpc.vpc_id
-  subnets              = module.vpc.database_subnets
-  create_security_group = true
-  allowed_cidr_blocks  = module.vpc.private_subnets_cidr_blocks
-
-  master_username = var.db_master_username
-  master_password = random_password.master.result
-
-  serverlessv2_scaling_configuration = {
-    max_capacity = 16
-    min_capacity = 0.5
-  }
-
-  instance_class = "db.serverless"
-  instances = {
-    one = {}
-    two = {}
-  }
-
-  storage_encrypted   = true
-  kms_key_id         = aws_kms_key.rds.arn
-
-  backup_retention_period = 30
-  preferred_backup_window = "03:00-06:00"
-  
-  enabled_cloudwatch_logs_exports = ["postgresql"]
-  
-  tags = local.common_tags
-}
+AuroraDBCluster:
+  Type: AWS::RDS::DBCluster
+  Properties:
+    Engine: aurora-postgresql
+    EngineVersion: '15.3'
+    EngineMode: provisioned
+    DatabaseName: !Ref DBName
+    MasterUsername: !Ref MasterUsername
+    MasterUserPassword: !Ref MasterUserPassword
+    ServerlessV2ScalingConfiguration:
+      MaxCapacity: 16
+      MinCapacity: 0.5
+    DBSubnetGroupName: !Ref DBSubnetGroup
+    VpcSecurityGroupIds:
+      - !Ref DatabaseSecurityGroup
+    StorageEncrypted: true
+    KmsKeyId: !Ref KMSKey
+    BackupRetentionPeriod: 30
+    PreferredBackupWindow: '03:00-06:00'
+    EnableCloudwatchLogsExports:
+      - postgresql
 ```
 
 **Security Best Practices:**
 
-```hcl
-# IAM Role with least privilege
-resource "aws_iam_role" "app" {
-  name = "${var.environment}-app-role"
+```bash
+# IAM Role with least privilege using AWS CLI
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRoleWithWebIdentity"
-        Effect = "Allow"
-        Principal = {
-          Federated = module.eks.oidc_provider_arn
-        }
-        Condition = {
-          StringEquals = {
-            "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:sub" = "system:serviceaccount:${var.namespace}:${var.service_account}"
-          }
+# Create trust policy for EKS IRSA
+cat > trust-policy.json << EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::123456789012:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/EXAMPLE"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "oidc.eks.us-east-1.amazonaws.com/id/EXAMPLE:sub": "system:serviceaccount:default:my-service-account"
         }
       }
-    ]
-  })
-
-  tags = local.common_tags
+    }
+  ]
 }
+EOF
 
-resource "aws_iam_role_policy_attachment" "app" {
-  for_each = toset([
-    "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess",
-    "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
-  ])
+# Create IAM role
+aws iam create-role \
+  --role-name production-app-role \
+  --assume-role-policy-document file://trust-policy.json \
+  --tags Key=Environment,Value=production
 
-  role       = aws_iam_role.app.name
-  policy_arn = each.value
-}
+# Attach policies
+aws iam attach-role-policy \
+  --role-name production-app-role \
+  --policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
 
-# KMS Key for encryption
-resource "aws_kms_key" "main" {
-  description             = "${var.environment} encryption key"
-  deletion_window_in_days = 30
-  enable_key_rotation     = true
+aws iam attach-role-policy \
+  --role-name production-app-role \
+  --policy-arn arn:aws:iam::aws:policy/SecretsManagerReadWrite
 
-  tags = local.common_tags
-}
+# Create KMS key for encryption
+aws kms create-key \
+  --description "Production encryption key" \
+  --key-policy file://key-policy.json \
+  --tags TagKey=Environment,TagValue=production
 
-resource "aws_kms_alias" "main" {
-  name          = "alias/${var.environment}"
-  target_key_id = aws_kms_key.main.key_id
-}
+# Create KMS alias
+aws kms create-alias \
+  --alias-name alias/production \
+  --target-key-id 1234abcd-12ab-34cd-56ef-1234567890ab
+
+# Enable key rotation
+aws kms enable-key-rotation --key-id 1234abcd-12ab-34cd-56ef-1234567890ab
 ```
 
 **Networking Architecture:**
 
-```hcl
-# VPC with public and private subnets
-module "vpc" {
-  source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 5.0"
+```bash
+# VPC with public and private subnets using AWS CLI
 
-  name = "${var.environment}-vpc"
-  cidr = "10.0.0.0/16"
+# Create VPC
+aws ec2 create-vpc \
+  --cidr-block 10.0.0.0/16 \
+  --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=production-vpc}]'
 
-  azs              = data.aws_availability_zones.available.names
-  private_subnets  = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  public_subnets   = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
-  database_subnets = ["10.0.201.0/24", "10.0.202.0/24", "10.0.203.0/24"]
+# Enable DNS hostnames and support
+aws ec2 modify-vpc-attribute --vpc-id vpc-xxx --enable-dns-hostnames
+aws ec2 modify-vpc-attribute --vpc-id vpc-xxx --enable-dns-support
 
-  enable_nat_gateway = true
-  single_nat_gateway = false
-  enable_dns_hostnames = true
-  enable_dns_support   = true
+# Create Internet Gateway
+aws ec2 create-internet-gateway \
+  --tag-specifications 'ResourceType=internet-gateway,Tags=[{Key=Name,Value=production-igw}]'
 
-  enable_flow_log                      = true
-  create_flow_log_cloudwatch_iam_role = true
-  create_flow_log_cloudwatch_log_group = true
+aws ec2 attach-internet-gateway --vpc-id vpc-xxx --internet-gateway-id igw-xxx
 
-  public_subnet_tags = {
-    "kubernetes.io/role/elb" = 1
-  }
+# Create subnets
+aws ec2 create-subnet \
+  --vpc-id vpc-xxx \
+  --cidr-block 10.0.1.0/24 \
+  --availability-zone us-east-1a \
+  --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=production-private-1a},{Key=kubernetes.io/role/internal-elb,Value=1}]'
 
-  private_subnet_tags = {
-    "kubernetes.io/role/internal-elb" = 1
-  }
+aws ec2 create-subnet \
+  --vpc-id vpc-xxx \
+  --cidr-block 10.0.101.0/24 \
+  --availability-zone us-east-1a \
+  --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=production-public-1a},{Key=kubernetes.io/role/elb,Value=1}]'
 
-  tags = local.common_tags
-}
+# Create NAT Gateway
+aws ec2 allocate-address --domain vpc
+aws ec2 create-nat-gateway \
+  --subnet-id subnet-public-xxx \
+  --allocation-id eipalloc-xxx
 
-# Application Load Balancer
-module "alb" {
-  source  = "terraform-aws-modules/alb/aws"
-  version = "~> 8.0"
+# Create and configure route tables
+aws ec2 create-route-table --vpc-id vpc-xxx
+aws ec2 create-route \
+  --route-table-id rtb-xxx \
+  --destination-cidr-block 0.0.0.0/0 \
+  --gateway-id igw-xxx
 
-  name = "${var.environment}-alb"
+# Associate subnets with route tables
+aws ec2 associate-route-table \
+  --subnet-id subnet-xxx \
+  --route-table-id rtb-xxx
 
-  load_balancer_type = "application"
+# Enable VPC Flow Logs
+aws ec2 create-flow-logs \
+  --resource-type VPC \
+  --resource-ids vpc-xxx \
+  --traffic-type ALL \
+  --log-destination-type cloud-watch-logs \
+  --log-group-name /aws/vpc/flowlogs
 
-  vpc_id          = module.vpc.vpc_id
-  subnets         = module.vpc.public_subnets
-  security_groups = [aws_security_group.alb.id]
+# Create Application Load Balancer
+aws elbv2 create-load-balancer \
+  --name production-alb \
+  --subnets subnet-12345 subnet-67890 \
+  --security-groups sg-12345 \
+  --scheme internet-facing \
+  --type application \
+  --ip-address-type ipv4
 
-  enable_deletion_protection = false
-  enable_http2              = true
-  enable_waf_fail_open     = false
+# Create target group
+aws elbv2 create-target-group \
+  --name production-targets \
+  --protocol HTTP \
+  --port 80 \
+  --vpc-id vpc-xxx \
+  --target-type ip \
+  --health-check-path /health \
+  --health-check-interval-seconds 30 \
+  --healthy-threshold-count 2 \
+  --unhealthy-threshold-count 2
 
-  access_logs = {
-    bucket = module.s3_bucket_logs.s3_bucket_id
-    prefix = "alb"
-  }
+# Create HTTPS listener
+aws elbv2 create-listener \
+  --load-balancer-arn arn:aws:elasticloadbalancing:region:account:loadbalancer/app/production-alb/xxx \
+  --protocol HTTPS \
+  --port 443 \
+  --certificates CertificateArn=arn:aws:acm:region:account:certificate/xxx \
+  --default-actions Type=forward,TargetGroupArn=arn:aws:elasticloadbalancing:region:account:targetgroup/production-targets/xxx
 
-  target_groups = [
-    {
-      name_prefix      = "app-"
-      backend_protocol = "HTTP"
-      backend_port     = 80
-      target_type      = "ip"
-
-      health_check = {
-        enabled             = true
-        interval            = 30
-        path                = "/health"
-        port                = "traffic-port"
-        healthy_threshold   = 2
-        unhealthy_threshold = 2
-        timeout             = 5
-        protocol            = "HTTP"
-        matcher             = "200"
-      }
-    }
-  ]
-
-  https_listeners = [
-    {
-      port               = 443
-      protocol           = "HTTPS"
-      certificate_arn    = aws_acm_certificate.main.arn
-      target_group_index = 0
-    }
-  ]
-
-  http_tcp_listeners = [
-    {
-      port        = 80
-      protocol    = "HTTP"
-      action_type = "redirect"
-      redirect = {
-        port        = "443"
-        protocol    = "HTTPS"
-        status_code = "HTTP_301"
-      }
-    }
-  ]
-
-  tags = local.common_tags
-}
+# Create HTTP to HTTPS redirect
+aws elbv2 create-listener \
+  --load-balancer-arn arn:aws:elasticloadbalancing:region:account:loadbalancer/app/production-alb/xxx \
+  --protocol HTTP \
+  --port 80 \
+  --default-actions Type=redirect,RedirectConfig='{Protocol=HTTPS,Port=443,StatusCode=HTTP_301}'
 ```
 
 **Cost Optimization:**
 
-```hcl
-# Savings Plans
-resource "aws_ce_savings_plan" "compute" {
-  savings_plan_type = "Compute"
-  payment_option    = "All_Upfront"
-  term_in_years     = 1
-  
-  usage_type = "EC2"
-  region     = var.region
-  
-  commitment = 1000  # $1000/month commitment
-}
+```bash
+# Cost Optimization using AWS CLI
 
-# Auto Scaling with mixed instances
-resource "aws_autoscaling_group" "app" {
-  name               = "${var.environment}-asg"
-  vpc_zone_identifier = module.vpc.private_subnets
-  target_group_arns  = module.alb.target_group_arns
-  health_check_type  = "ELB"
-  min_size           = 2
-  max_size           = 10
-  desired_capacity   = 3
+# Purchase Savings Plan
+aws savingsplans purchase-savings-plan \
+  --savings-plan-offering-id xxx \
+  --commitment 1000 \
+  --purchase-time $(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-  mixed_instances_policy {
-    launch_template {
-      launch_template_specification {
-        launch_template_id = aws_launch_template.app.id
-        version            = "$Latest"
-      }
+# Create Launch Template for Auto Scaling
+aws ec2 create-launch-template \
+  --launch-template-name production-template \
+  --version-description "Production launch template" \
+  --launch-template-data '{
+    "ImageId": "ami-12345",
+    "InstanceType": "t3.medium",
+    "SecurityGroupIds": ["sg-12345"],
+    "IamInstanceProfile": {"Name": "production-profile"},
+    "UserData": "base64-encoded-script",
+    "TagSpecifications": [{
+      "ResourceType": "instance",
+      "Tags": [{"Key": "Environment", "Value": "production"}]
+    }]
+  }'
 
-      override {
-        instance_type     = "t3.medium"
-        weighted_capacity = "1"
-      }
-
-      override {
-        instance_type     = "t3a.medium"
-        weighted_capacity = "1"
-      }
+# Create Auto Scaling Group with mixed instances
+aws autoscaling create-auto-scaling-group \
+  --auto-scaling-group-name production-asg \
+  --min-size 2 \
+  --max-size 10 \
+  --desired-capacity 3 \
+  --vpc-zone-identifier "subnet-12345,subnet-67890" \
+  --target-group-arns arn:aws:elasticloadbalancing:region:account:targetgroup/production/xxx \
+  --health-check-type ELB \
+  --health-check-grace-period 300 \
+  --mixed-instances-policy '{
+    "LaunchTemplate": {
+      "LaunchTemplateSpecification": {
+        "LaunchTemplateId": "lt-12345",
+        "Version": "$Latest"
+      },
+      "Overrides": [
+        {"InstanceType": "t3.medium"},
+        {"InstanceType": "t3a.medium"},
+        {"InstanceType": "t3.large"}
+      ]
+    },
+    "InstancesDistribution": {
+      "OnDemandPercentageAboveBaseCapacity": 25,
+      "SpotAllocationStrategy": "lowest-price",
+      "SpotInstancePools": 2
     }
+  }'
 
-    instances_distribution {
-      on_demand_percentage_above_base_capacity = 25
-      spot_allocation_strategy                 = "lowest-price"
-      spot_instance_pools                      = 2
-    }
-  }
-
-  tag {
-    key                 = "Environment"
-    value               = var.environment
-    propagate_at_launch = true
-  }
-}
+# Set up Auto Scaling policies
+aws autoscaling put-scaling-policy \
+  --auto-scaling-group-name production-asg \
+  --policy-name scale-up-policy \
+  --policy-type TargetTrackingScaling \
+  --target-tracking-configuration '{
+    "PredefinedMetricSpecification": {
+      "PredefinedMetricType": "ASGAverageCPUUtilization"
+    },
+    "TargetValue": 70.0
+  }'
 ```
 
 **Monitoring & Observability:**
 
-```hcl
-# CloudWatch Dashboard
-resource "aws_cloudwatch_dashboard" "main" {
-  dashboard_name = "${var.environment}-dashboard"
+```bash
+# CloudWatch Dashboard using AWS CLI
 
-  dashboard_body = jsonencode({
-    widgets = [
+# Create dashboard with metrics
+aws cloudwatch put-dashboard \
+  --dashboard-name production-dashboard \
+  --dashboard-body '{
+    "widgets": [
       {
-        type = "metric"
-        properties = {
-          metrics = [
-            ["AWS/EC2", "CPUUtilization", { stat = "Average" }],
-            [".", "NetworkIn", { stat = "Sum" }],
-            [".", "NetworkOut", { stat = "Sum" }]
-          ]
-          period = 300
-          stat   = "Average"
-          region = var.region
-          title  = "EC2 Metrics"
+        "type": "metric",
+        "properties": {
+          "metrics": [
+            ["AWS/EC2", "CPUUtilization", {"stat": "Average"}],
+            [".", "NetworkIn", {"stat": "Sum"}],
+            [".", "NetworkOut", {"stat": "Sum"}]
+          ],
+          "period": 300,
+          "stat": "Average",
+          "region": "us-east-1",
+          "title": "EC2 Metrics"
         }
       },
       {
-        type = "metric"
-        properties = {
-          metrics = [
+        "type": "metric",
+        "properties": {
+          "metrics": [
             ["AWS/RDS", "DatabaseConnections"],
             [".", "CPUUtilization"],
             [".", "ReadLatency"],
             [".", "WriteLatency"]
-          ]
-          period = 300
-          stat   = "Average"
-          region = var.region
-          title  = "RDS Metrics"
+          ],
+          "period": 300,
+          "stat": "Average",
+          "region": "us-east-1",
+          "title": "RDS Metrics"
         }
       }
     ]
-  })
-}
+  }'
 
-# CloudWatch Alarms
-resource "aws_cloudwatch_metric_alarm" "high_cpu" {
-  alarm_name          = "${var.environment}-high-cpu"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "2"
-  metric_name         = "CPUUtilization"
-  namespace           = "AWS/EC2"
-  period              = "300"
-  statistic           = "Average"
-  threshold           = "80"
-  alarm_description   = "This metric monitors ec2 cpu utilization"
-  alarm_actions       = [aws_sns_topic.alerts.arn]
+# Create CloudWatch Alarms
+aws cloudwatch put-metric-alarm \
+  --alarm-name production-high-cpu \
+  --alarm-description "Alert when CPU exceeds 80%" \
+  --metric-name CPUUtilization \
+  --namespace AWS/EC2 \
+  --statistic Average \
+  --period 300 \
+  --threshold 80 \
+  --comparison-operator GreaterThanThreshold \
+  --evaluation-periods 2 \
+  --dimensions Name=AutoScalingGroupName,Value=production-asg \
+  --alarm-actions arn:aws:sns:us-east-1:123456789012:production-alerts
 
-  dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.app.name
-  }
-}
+# Create SNS topic for alerts
+aws sns create-topic --name production-alerts
+
+# Subscribe email to SNS topic
+aws sns subscribe \
+  --topic-arn arn:aws:sns:us-east-1:123456789012:production-alerts \
+  --protocol email \
+  --notification-endpoint ops-team@example.com
+
+# Enable detailed monitoring
+aws ec2 monitor-instances --instance-ids i-12345 i-67890
+
+# Create log group for application logs
+aws logs create-log-group --log-group-name /aws/application/production
+aws logs put-retention-policy \
+  --log-group-name /aws/application/production \
+  --retention-in-days 30
 ```
 
 **Output Format:**
@@ -460,9 +459,9 @@ When implementing AWS solutions:
 - [Multi-AZ strategy]
 - [Disaster recovery plan]
 
-🔧 INFRASTRUCTURE AS CODE:
-- [Terraform modules created]
-- [State management configured]
+🔧 AWS AUTOMATION:
+- [CloudFormation templates created]
+- [Stack management configured]
 - [CodePipeline CI/CD integrated]
 
 🔒 SECURITY IMPLEMENTATION:
