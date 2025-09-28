@@ -1,5 +1,20 @@
 # ClaudeAutoPM Development Project
 
+
+## Active Team Agents
+
+<!-- AGENTS_START -->
+- @include .claude/agents/agent-manager.md
+- @include .claude/agents/azure-devops-specialist.md
+- @include .claude/agents/code-analyzer.md
+- @include .claude/agents/docker-containerization-expert.md
+- @include .claude/agents/file-analyzer.md
+- @include .claude/agents/github-operations-specialist.md
+- @include .claude/agents/kubernetes-orchestrator.md
+- @include .claude/agents/terraform-infrastructure-expert.md
+- @include .claude/agents/test-runner.md
+<!-- AGENTS_END -->
+
 > This is the development repository for ClaudeAutoPM framework.
 > **IMPORTANT**: This project uses its own framework capabilities for self-maintenance.
 

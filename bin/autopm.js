@@ -130,6 +130,8 @@ function main() {
         }
       }
     )
+    // Team management command
+    .command(require('./commands/team'))
     // Global options
     .option('verbose', {
       type: 'boolean',

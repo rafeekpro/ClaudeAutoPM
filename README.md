@@ -36,6 +36,7 @@ ClaudeAutoPM uses a **hybrid approach** combining deterministic operations with 
 - **96+ Professional CLI Commands** - Full yargs-based CLI with comprehensive PM commands
 - **Hybrid Execution** - Choose between templates (deterministic) or AI assistance
 - **AI Agent Integration** - Parallel execution with specialized agents (in Claude Code)
+- **Dynamic Agent Teams** - Switch between specialized agent teams based on context (DevOps, Frontend, Backend, Fullstack)
 - **Azure DevOps & GitHub** - Complete project management integration
 - **Smart Context Management** - Never lose track of your work
 - **Automated Workflows** - From PRD to production deployment
@@ -162,6 +163,33 @@ autopm pm:epic-sync user-auth
 - **Parallel Execution** - Multiple agents working simultaneously
 - **Cross-Platform** - GitHub, Azure DevOps, GitLab (coming soon)
 - **MCP Integration** - Context management and browser automation
+
+### 🤖 Dynamic Agent Teams
+
+ClaudeAutoPM now supports **dynamic agent teams** that can be switched based on your current context:
+
+```bash
+# List available teams
+autopm team list
+
+# Load a specialized team
+autopm team load devops        # CI/CD and infrastructure agents
+autopm team load frontend      # React, JavaScript, UX agents
+autopm team load python_backend # Python, FastAPI, Flask agents
+autopm team load fullstack     # Combined frontend + backend
+
+# Check current team
+autopm team current
+```
+
+**Available Teams:**
+- **base** - Core agents for general tasks
+- **devops** - Docker, Kubernetes, GitHub Operations, Terraform
+- **frontend** - React, JavaScript, E2E testing, UX design
+- **python_backend** - FastAPI, Flask, PostgreSQL, MongoDB
+- **fullstack** - Inherits from both frontend and python_backend
+
+Teams support inheritance, so specialized teams automatically include base agents. The active team configuration is saved in your project and persists across sessions.
 
 ## 📚 Full Documentation
 

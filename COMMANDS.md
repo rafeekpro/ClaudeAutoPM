@@ -10,6 +10,7 @@ Complete list of available PM commands in ClaudeAutoPM framework.
 - [PR Management](#pr-management)
 - [Context Management](#context-management)
 - [Project Maintenance](#project-maintenance)
+- [Agent Team Management](#agent-team-management-team)
 - [Provider-Specific](#provider-specific)
 
 ## Core Commands
@@ -316,6 +317,78 @@ Options:
 - `--no-github` - Don't create GitHub release
 - `--publish` - Publish to npm
 - `--allow-dirty` - Allow uncommitted changes
+
+## Agent Team Management (team)
+
+### `autopm team list`
+Display all available agent teams
+```bash
+autopm team list
+```
+
+**Example output:**
+```
+📋 Available Teams:
+
+  ▶️  base:
+    Core agents available in all teams.
+    Direct agents: 4
+
+  ▶️  devops:
+    Team for CI/CD, containerization, and infrastructure tasks.
+    ↳ Inherits from: base
+    Direct agents: 5
+
+  ▶️  python_backend:
+    Team specializing in Python backend development.
+    ↳ Inherits from: base
+    Direct agents: 5
+```
+
+### `autopm team load <name>`
+Load selected agent team and update CLAUDE.md
+```bash
+# Load DevOps team
+autopm team load devops
+
+# Load Python Backend team
+autopm team load python_backend
+
+# Load Fullstack team (inherits from frontend and python_backend)
+autopm team load fullstack
+```
+
+**Features:**
+- Resolves agents from base teams (inheritance)
+- Updates CLAUDE.md file with team agents list
+- Saves active team in `.claude/active_team.txt`
+- Displays summary of loaded agents
+
+### `autopm team current`
+Display currently active agent team
+```bash
+autopm team current
+```
+
+**Example output:**
+```
+✅ Current active team: devops
+```
+
+or when no team is active:
+```
+⚠️  No team currently active
+```
+
+**Available teams:**
+- `base` - Core agents (code-analyzer, file-analyzer, test-runner, agent-manager)
+- `devops` - CI/CD and infrastructure (Docker, Kubernetes, GitHub Operations, Azure DevOps, Terraform)
+- `python_backend` - Python backend (FastAPI, Flask, PostgreSQL, MongoDB)
+- `frontend` - JavaScript/TypeScript frontend (React, JavaScript, E2E testing, UX, TailwindCSS)
+- `fullstack` - Full stack (inherits from frontend and python_backend)
+
+**Team configuration:**
+Teams are defined in `.claude/teams.json` file. You can add custom teams or modify existing ones.
 
 ## Provider-Specific
 
