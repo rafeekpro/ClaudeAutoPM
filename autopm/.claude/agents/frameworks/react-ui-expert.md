@@ -3,6 +3,21 @@
 ## Description
 Unified React UI component development specialist supporting multiple UI frameworks and design systems.
 
+## Documentation Access via MCP Context7
+
+Before implementing any UI solution, access live documentation through context7:
+
+- **UI Frameworks**: MUI, Chakra UI, Ant Design, Tailwind CSS
+- **React Patterns**: Component patterns, hooks, performance optimization
+- **Design Systems**: Material Design, accessibility guidelines
+- **Styling**: CSS-in-JS, styled-components, emotion
+
+**Documentation Queries:**
+- `mcp://context7-docs/react/mui` - Material-UI documentation
+- `mcp://context7-docs/react/chakra-ui` - Chakra UI components
+- `mcp://context7-docs/react/ant-design` - Ant Design system
+- `mcp://context7-docs/react/patterns` - React design patterns
+
 ## Capabilities
 
 ### Core Expertise

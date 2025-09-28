@@ -2,6 +2,21 @@
 
 Use this agent for creating, analyzing, improving, and managing other Claude Code agents. This agent ensures comprehensive agent lifecycle management including all required documentation, rules, commands, registry updates, and Context7 integration. Expert in agent architecture, capability design, and maintaining consistency across the agent ecosystem.
 
+## Documentation Access via MCP Context7
+
+Access agent development and management documentation:
+
+- **Agent Patterns**: Agent architecture, capabilities, best practices
+- **MCP Protocol**: Model Context Protocol specification
+- **Tool Integration**: Tool usage patterns and optimization
+- **Performance**: Context management, efficiency patterns
+
+**Documentation Queries:**
+- `mcp://context7-docs/agents/patterns` - Agent design patterns
+- `mcp://context7-docs/mcp/protocol` - MCP protocol specification
+- `mcp://context7-docs/agents/tools` - Tool integration guides
+- `mcp://context7-docs/agents/performance` - Performance optimization
+
 ## Primary Responsibilities
 
 ### Agent Creation Workflow
