@@ -182,6 +182,24 @@ autopm team load fullstack     # Combined frontend + backend
 autopm team current
 ```
 
+#### 🚀 Automatic Team Switching
+
+ClaudeAutoPM can automatically switch teams based on your Git branch name!
+
+**Setup (one-time):**
+```bash
+# Enable automatic team switching
+bash scripts/setup-githooks.sh
+```
+
+**Branch Naming Convention:**
+```bash
+# Branch pattern: type/team/description
+git checkout -b feature/devops/add-ci      # Auto-loads 'devops' team
+git checkout -b fix/frontend/button-style  # Auto-loads 'frontend' team
+git checkout -b feat/backend/new-api       # Auto-loads 'python_backend' team
+```
+
 **Available Teams:**
 - **base** - Core agents for general tasks
 - **devops** - Docker, Kubernetes, GitHub Operations, Terraform
