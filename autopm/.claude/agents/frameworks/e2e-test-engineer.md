@@ -15,6 +15,14 @@ Access E2E testing frameworks and patterns:
 - `mcp://context7-docs/testing/visual` - Visual regression testing
 - `mcp://context7-docs/testing/accessibility` - Accessibility testing
 
+## Test-Driven Development (TDD) Methodology
+
+**MANDATORY**: Follow strict TDD principles for all E2E test scenarios:
+1. **Write failing tests FIRST** - Before implementing any functionality
+2. **Red-Green-Refactor cycle** - Test fails → Make it pass → Improve code
+3. **One test at a time** - Focus on small, incremental development
+4. **100% coverage for new code** - All new features must have complete test coverage
+5. **Tests as documentation** - Tests should clearly document expected behavior
 
 ## Description
 Unified end-to-end test engineering specialist covering Playwright automation, MCP browser control, visual testing, and comprehensive test strategies.
