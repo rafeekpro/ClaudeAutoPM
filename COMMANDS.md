@@ -10,6 +10,7 @@ Complete list of available PM commands in ClaudeAutoPM framework.
 - [PR Management](#pr-management)
 - [Context Management](#context-management)
 - [Project Maintenance](#project-maintenance)
+- [Zarządzanie Zespołami Agentów](#zarządzanie-zespołami-agentów-team)
 - [Provider-Specific](#provider-specific)
 
 ## Core Commands
@@ -316,6 +317,78 @@ Options:
 - `--no-github` - Don't create GitHub release
 - `--publish` - Publish to npm
 - `--allow-dirty` - Allow uncommitted changes
+
+## Zarządzanie Zespołami Agentów (team)
+
+### `autopm team list`
+Wyświetla listę wszystkich dostępnych zespołów agentów
+```bash
+autopm team list
+```
+
+**Przykład wyjścia:**
+```
+📋 Available Teams:
+
+  ▶️  base:
+    Podstawowi agenci dostępni we wszystkich zespołach.
+    Direct agents: 4
+
+  ▶️  devops:
+    Zespół do zadań związanych z CI/CD, konteneryzacją i infrastrukturą.
+    ↳ Inherits from: base
+    Direct agents: 5
+
+  ▶️  python_backend:
+    Zespół specjalizujący się w tworzeniu backendu w Pythonie.
+    ↳ Inherits from: base
+    Direct agents: 5
+```
+
+### `autopm team load <name>`
+Ładuje wybrany zespół agentów i aktualizuje CLAUDE.md
+```bash
+# Załaduj zespół DevOps
+autopm team load devops
+
+# Załaduj zespół Python Backend
+autopm team load python_backend
+
+# Załaduj zespół Fullstack (dziedziczy z frontend i python_backend)
+autopm team load fullstack
+```
+
+**Funkcjonalność:**
+- Rozwiązuje agentów z zespołów bazowych (dziedziczenie)
+- Aktualizuje plik CLAUDE.md z listą agentów zespołu
+- Zapisuje aktywny zespół w `.claude/active_team.txt`
+- Wyświetla podsumowanie załadowanych agentów
+
+### `autopm team current`
+Wyświetla obecnie aktywny zespół agentów
+```bash
+autopm team current
+```
+
+**Przykład wyjścia:**
+```
+✅ Current active team: devops
+```
+
+lub gdy żaden zespół nie jest aktywny:
+```
+⚠️  No team currently active
+```
+
+**Dostępne zespoły:**
+- `base` - Podstawowi agenci (code-analyzer, file-analyzer, test-runner, agent-manager)
+- `devops` - CI/CD i infrastruktura (Docker, Kubernetes, GitHub Operations, Azure DevOps, Terraform)
+- `python_backend` - Backend Python (FastAPI, Flask, PostgreSQL, MongoDB)
+- `frontend` - Frontend JavaScript/TypeScript (React, JavaScript, E2E testing, UX, TailwindCSS)
+- `fullstack` - Pełny stack (dziedziczy z frontend i python_backend)
+
+**Konfiguracja zespołów:**
+Zespoły są zdefiniowane w pliku `.claude/teams.json`. Można dodawać własne zespoły lub modyfikować istniejące.
 
 ## Provider-Specific
 

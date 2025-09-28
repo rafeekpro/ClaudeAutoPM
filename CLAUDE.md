@@ -1,5 +1,20 @@
 # ClaudeAutoPM Development Project
 
+
+## Active Team Agents
+
+<!-- AGENTS_START -->
+- @include .claude/agents/agent-manager.md
+- @include .claude/agents/code-analyzer.md
+- @include .claude/agents/fastapi-backend-engineer.md
+- @include .claude/agents/file-analyzer.md
+- @include .claude/agents/flask-backend-engineer.md
+- @include .claude/agents/mongodb-expert.md
+- @include .claude/agents/postgresql-expert.md
+- @include .claude/agents/python-backend-expert.md
+- @include .claude/agents/test-runner.md
+<!-- AGENTS_END -->
+
 > This is the development repository for ClaudeAutoPM framework.
 > **IMPORTANT**: This project uses its own framework capabilities for self-maintenance.
 
