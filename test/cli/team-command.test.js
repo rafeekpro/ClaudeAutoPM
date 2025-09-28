@@ -57,9 +57,9 @@ describe('Team Command CLI', () => {
       const result = runCommand('team list');
 
       expect(result.success).toBe(true);
-      expect(result.output).toContain('Podstawowi agenci dostępni we wszystkich zespołach');
-      expect(result.output).toContain('Zespół do zadań związanych z CI/CD');
-      expect(result.output).toContain('Zespół specjalizujący się w tworzeniu backendu');
+      expect(result.output).toContain('Core agents available in all teams');
+      expect(result.output).toContain('Team for CI/CD, containerization');
+      expect(result.output).toContain('Team specializing in Python backend');
     });
   });
 

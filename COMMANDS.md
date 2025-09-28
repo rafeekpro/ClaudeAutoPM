@@ -10,7 +10,7 @@ Complete list of available PM commands in ClaudeAutoPM framework.
 - [PR Management](#pr-management)
 - [Context Management](#context-management)
 - [Project Maintenance](#project-maintenance)
-- [Zarządzanie Zespołami Agentów](#zarządzanie-zespołami-agentów-team)
+- [Agent Team Management](#agent-team-management-team)
 - [Provider-Specific](#provider-specific)
 
 ## Core Commands
@@ -318,77 +318,77 @@ Options:
 - `--publish` - Publish to npm
 - `--allow-dirty` - Allow uncommitted changes
 
-## Zarządzanie Zespołami Agentów (team)
+## Agent Team Management (team)
 
 ### `autopm team list`
-Wyświetla listę wszystkich dostępnych zespołów agentów
+Display all available agent teams
 ```bash
 autopm team list
 ```
 
-**Przykład wyjścia:**
+**Example output:**
 ```
 📋 Available Teams:
 
   ▶️  base:
-    Podstawowi agenci dostępni we wszystkich zespołach.
+    Core agents available in all teams.
     Direct agents: 4
 
   ▶️  devops:
-    Zespół do zadań związanych z CI/CD, konteneryzacją i infrastrukturą.
+    Team for CI/CD, containerization, and infrastructure tasks.
     ↳ Inherits from: base
     Direct agents: 5
 
   ▶️  python_backend:
-    Zespół specjalizujący się w tworzeniu backendu w Pythonie.
+    Team specializing in Python backend development.
     ↳ Inherits from: base
     Direct agents: 5
 ```
 
 ### `autopm team load <name>`
-Ładuje wybrany zespół agentów i aktualizuje CLAUDE.md
+Load selected agent team and update CLAUDE.md
 ```bash
-# Załaduj zespół DevOps
+# Load DevOps team
 autopm team load devops
 
-# Załaduj zespół Python Backend
+# Load Python Backend team
 autopm team load python_backend
 
-# Załaduj zespół Fullstack (dziedziczy z frontend i python_backend)
+# Load Fullstack team (inherits from frontend and python_backend)
 autopm team load fullstack
 ```
 
-**Funkcjonalność:**
-- Rozwiązuje agentów z zespołów bazowych (dziedziczenie)
-- Aktualizuje plik CLAUDE.md z listą agentów zespołu
-- Zapisuje aktywny zespół w `.claude/active_team.txt`
-- Wyświetla podsumowanie załadowanych agentów
+**Features:**
+- Resolves agents from base teams (inheritance)
+- Updates CLAUDE.md file with team agents list
+- Saves active team in `.claude/active_team.txt`
+- Displays summary of loaded agents
 
 ### `autopm team current`
-Wyświetla obecnie aktywny zespół agentów
+Display currently active agent team
 ```bash
 autopm team current
 ```
 
-**Przykład wyjścia:**
+**Example output:**
 ```
 ✅ Current active team: devops
 ```
 
-lub gdy żaden zespół nie jest aktywny:
+or when no team is active:
 ```
 ⚠️  No team currently active
 ```
 
-**Dostępne zespoły:**
-- `base` - Podstawowi agenci (code-analyzer, file-analyzer, test-runner, agent-manager)
-- `devops` - CI/CD i infrastruktura (Docker, Kubernetes, GitHub Operations, Azure DevOps, Terraform)
-- `python_backend` - Backend Python (FastAPI, Flask, PostgreSQL, MongoDB)
-- `frontend` - Frontend JavaScript/TypeScript (React, JavaScript, E2E testing, UX, TailwindCSS)
-- `fullstack` - Pełny stack (dziedziczy z frontend i python_backend)
+**Available teams:**
+- `base` - Core agents (code-analyzer, file-analyzer, test-runner, agent-manager)
+- `devops` - CI/CD and infrastructure (Docker, Kubernetes, GitHub Operations, Azure DevOps, Terraform)
+- `python_backend` - Python backend (FastAPI, Flask, PostgreSQL, MongoDB)
+- `frontend` - JavaScript/TypeScript frontend (React, JavaScript, E2E testing, UX, TailwindCSS)
+- `fullstack` - Full stack (inherits from frontend and python_backend)
 
-**Konfiguracja zespołów:**
-Zespoły są zdefiniowane w pliku `.claude/teams.json`. Można dodawać własne zespoły lub modyfikować istniejące.
+**Team configuration:**
+Teams are defined in `.claude/teams.json` file. You can add custom teams or modify existing ones.
 
 ## Provider-Specific
 
