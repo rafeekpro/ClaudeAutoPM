@@ -6,7 +6,9 @@ module.exports = {
   testMatch: [
     '**/test/jest-tests/*-jest.test.js',
     '**/test/unit/*-jest.test.js',
-    '**/test/integration/*-jest.test.js'
+    '**/test/integration/*-jest.test.js',
+    '**/test/teams/*.test.js',
+    '**/test/cli/*.test.js'
   ],
 
   // Ignore problematic tests and duplicates
