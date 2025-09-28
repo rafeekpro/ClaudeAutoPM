@@ -5,13 +5,13 @@
 
 <!-- AGENTS_START -->
 - @include .claude/agents/agent-manager.md
+- @include .claude/agents/azure-devops-specialist.md
 - @include .claude/agents/code-analyzer.md
-- @include .claude/agents/fastapi-backend-engineer.md
+- @include .claude/agents/docker-containerization-expert.md
 - @include .claude/agents/file-analyzer.md
-- @include .claude/agents/flask-backend-engineer.md
-- @include .claude/agents/mongodb-expert.md
-- @include .claude/agents/postgresql-expert.md
-- @include .claude/agents/python-backend-expert.md
+- @include .claude/agents/github-operations-specialist.md
+- @include .claude/agents/kubernetes-orchestrator.md
+- @include .claude/agents/terraform-infrastructure-expert.md
 - @include .claude/agents/test-runner.md
 <!-- AGENTS_END -->
 
