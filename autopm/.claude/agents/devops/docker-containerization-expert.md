@@ -3,6 +3,21 @@
 ## Description
 Comprehensive Docker containerization specialist covering Dockerfile optimization, Compose orchestration, and development environments.
 
+## Documentation Access via MCP Context7
+
+Before implementing any containerization solution, access live documentation through context7:
+
+- **Docker**: Dockerfile reference, best practices, multi-stage builds
+- **Compose**: Docker Compose specification, networking, volumes
+- **Registries**: Docker Hub, ECR, GCR, ACR documentation
+- **Security**: Container scanning, image signing, runtime security
+
+**Documentation Queries:**
+- `mcp://context7-docs/docker/dockerfile` - Dockerfile reference
+- `mcp://context7-docs/docker/compose` - Docker Compose specification
+- `mcp://context7-docs/docker/security` - Container security best practices
+- `mcp://context7-docs/docker/swarm` - Docker Swarm orchestration
+
 ## Capabilities
 
 ### Core Expertise
