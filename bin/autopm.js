@@ -43,11 +43,11 @@ function main() {
         }
       }
     )
-    .command('guide [action]', 'Interactive setup guide and documentation generator',
+    .command('guide [action]', 'Interactive setup guide and documentation generator (deprecated: use --help)',
       (yargs) => {
         return yargs
           .positional('action', {
-            describe: 'Guide action (default: interactive guide)',
+            describe: 'Guide action (default: show enhanced help)',
             type: 'string',
             choices: ['quickstart', 'install', 'config', 'tutorial', 'examples', 'faq'],
             default: 'quickstart'
@@ -62,9 +62,9 @@ function main() {
             describe: 'Tutorial topic',
             type: 'string'
           })
-          .example('autopm guide', 'Start interactive setup guide')
-          .example('autopm guide install --platform docker', 'Generate Docker installation guide')
-          .example('autopm guide tutorial --topic basics', 'Create basics tutorial');
+          .example('autopm --help', 'Show comprehensive usage guide (recommended)')
+          .example('autopm guide', 'Show enhanced help (same as --help)')
+          .example('autopm guide config', 'Generate configuration documentation');
       },
       async (argv) => {
         try {
@@ -113,10 +113,17 @@ function main() {
                 console.log('❌ Unknown guide action. Use: autopm guide --help');
             }
           } else {
-            // New interactive guide (default)
-            const InteractiveGuide = require('../lib/guide/interactive-guide');
-            const guide = new InteractiveGuide();
-            await guide.start();
+            // Backward compatibility: redirect to enhanced help
+            console.log('💡 The interactive guide has been replaced with enhanced help.\n');
+            console.log('📖 For comprehensive usage information, use: autopm --help\n');
+            console.log('🔧 For specific documentation generation, use:');
+            console.log('   autopm guide config    # Generate configuration docs');
+            console.log('   autopm guide tutorial  # Create tutorials');
+            console.log('   autopm guide examples  # Generate examples\n');
+
+            // Show the enhanced help
+            process.argv = ['node', 'autopm', '--help'];
+            cli.showHelp();
           }
         } catch (error) {
           console.error(`❌ Guide error: ${error.message}`);
