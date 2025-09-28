@@ -20,6 +20,7 @@ describe('Teams Configuration', () => {
     // Check base team
     expect(teams.base).toBeDefined();
     expect(teams.base.description).toBeDefined();
+    expect(teams.base.description).toContain('Core agents');
     expect(Array.isArray(teams.base.agents)).toBe(true);
     expect(teams.base.agents.length).toBeGreaterThan(0);
   });
