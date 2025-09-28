@@ -2,23 +2,45 @@
 
 This document provides the official registry of all agents for inclusion in the system prompt.
 
+## 🎯 Agent Selection Rules
+
+### Quick Decision Guide
+1. **Architecture vs Implementation**
+   - Planning/designing? → Use "expert" or "architect" agents
+   - Building/coding? → Use "engineer" agents
+
+2. **Scope Rules**
+   - New project setup → "expert" agents
+   - Day-to-day development → "engineer" agents
+   - Platform-specific → cloud "architect" agents
+   - Multi-platform/IaC → "terraform-infrastructure-expert"
+
+3. **Component vs Application**
+   - UI components only → "react-ui-expert"
+   - Full application → "react-frontend-engineer"
+
+4. **Local vs Production**
+   - Development environment → "docker-containerization-expert"
+   - Production deployment → "kubernetes-orchestrator"
+
 ## 🚀 Optimization Update (v1.1.0)
 
 ### Summary of Changes
-- **Reduced agent count from 50+ to ~35** (Phase 1 complete)
+
+- **Reduced agent count from 50+ to 39** (Consolidation complete)
 - **Consolidated similar agents** into parameterized versions
 - **Unified coordination rules** for better efficiency
 - **Maintained all functionality** through parameters
+- **Removed deprecated agent files** to avoid confusion
 
-### Key Consolidations
-1. **UI Frameworks**: 4 agents → 1 `react-ui-expert`
-2. **Python Backend**: 3 agents → 1 `python-backend-expert`
-3. **Docker**: 3 agents → 1 `docker-containerization-expert`
-4. **E2E Testing**: 2 agents → 1 `e2e-test-engineer`
+### Key Consolidations (Completed)
+1. **UI Frameworks**: mui-react-expert, chakra-ui-expert, antd-react-expert, bootstrap-ui-expert → `react-ui-expert`
+2. **Python Backend**: fastapi-backend-engineer, flask-backend-engineer → `python-backend-expert`
+3. **Docker**: docker-expert, docker-compose-expert, docker-development-orchestrator → `docker-containerization-expert`
+4. **E2E Testing**: playwright-test-engineer, playwright-mcp-frontend-tester → `e2e-test-engineer`
 
-### Migration Guide
-Legacy agent names will continue to work with deprecation warnings.
-Parameters are automatically inferred from legacy agent names.
+### Migration Note
+Deprecated agents have been removed. Use the consolidated versions with appropriate parameters.
 
 ## Core Agents
 
@@ -66,31 +88,24 @@ Parameters are automatically inferred from legacy agent names.
 
 ## Framework Agents
 
-### react-ui-expert (NEW - Consolidated)
+### react-ui-expert
 
 **Location**: `.claude/agents/frameworks/react-ui-expert.md`
-**Description**: Unified React UI component development specialist supporting MUI, Chakra, Ant Design, Bootstrap, and headless UI libraries. Use parameters to specify framework.
+**Description**: Use this agent for UI component architecture, design systems, component library selection (MUI, Chakra, Ant Design), styling strategies, and accessibility patterns.
+**Scope**: Component libraries, design systems, styling, accessibility, component documentation
+**NOT for**: Full app architecture, routing, state management (use react-frontend-engineer)
 **Parameters**: `framework: [mui|chakra|antd|bootstrap|headless]`, `style_system: [css-in-js|tailwind|css-modules]`
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
 **Status**: Active
 **Replaces**: mui-react-expert, chakra-ui-expert, antd-react-expert, bootstrap-ui-expert
 
-### mui-react-expert (DEPRECATED)
-
-**Status**: Deprecated - Use `react-ui-expert` with `framework: mui`
-
-### chakra-ui-expert (DEPRECATED)
-
-**Status**: Deprecated - Use `react-ui-expert` with `framework: chakra`
-
-### antd-react-expert (DEPRECATED)
-
-**Status**: Deprecated - Use `react-ui-expert` with `framework: antd`
 
 ### react-frontend-engineer
 
 **Location**: `.claude/agents/frameworks/react-frontend-engineer.md`
-**Description**: Use this agent for React frontend development, refactoring, or optimization using modern tooling and frameworks.
+**Description**: Use this agent for complete React application development including routing, state management, API integration, and application architecture.
+**Scope**: Full app architecture, Redux/Context/Zustand, routing, API integration, build config
+**NOT for**: Pure UI component work, design systems (use react-ui-expert)
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
 **Status**: Active
 
@@ -101,9 +116,6 @@ Parameters are automatically inferred from legacy agent names.
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
 **Status**: Active
 
-### bootstrap-ui-expert (DEPRECATED)
-
-**Status**: Deprecated - Use `react-ui-expert` with `framework: bootstrap`
 
 ### tailwindcss-expert
 
@@ -112,13 +124,6 @@ Parameters are automatically inferred from legacy agent names.
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
 **Status**: Active
 
-### fastapi-backend-engineer (DEPRECATED)
-
-**Status**: Deprecated - Use `python-backend-expert` with `framework: fastapi`
-
-### flask-backend-engineer (DEPRECATED)
-
-**Status**: Deprecated - Use `python-backend-expert` with `framework: flask`
 
 ### e2e-test-engineer (NEW - Consolidated)
 
@@ -129,13 +134,6 @@ Parameters are automatically inferred from legacy agent names.
 **Status**: Active
 **Replaces**: playwright-test-engineer, playwright-mcp-frontend-tester
 
-### playwright-test-engineer (DEPRECATED)
-
-**Status**: Deprecated - Use `e2e-test-engineer` with `test_framework: playwright`
-
-### playwright-mcp-frontend-tester (DEPRECATED)
-
-**Status**: Deprecated - Use `e2e-test-engineer` with `browser_control: mcp-enhanced`
 
 ### nats-messaging-expert
 
@@ -146,10 +144,12 @@ Parameters are automatically inferred from legacy agent names.
 
 ## Language Agents
 
-### python-backend-expert (ENHANCED)
+### python-backend-expert
 
 **Location**: `.claude/agents/languages/python-backend-expert.md`
-**Description**: Comprehensive Python backend specialist supporting FastAPI, Flask, Django, and pure Python. Handles all Python backend development needs.
+**Description**: Use this agent for Python backend architecture, new project setup, framework selection, database design, and strategic decisions. Expert in design patterns and best practices.
+**Scope**: Architecture, framework selection, database schema design, API patterns, performance architecture
+**NOT for**: Day-to-day coding, bug fixes, minor features (use python-backend-engineer)
 **Parameters**: `framework: [fastapi|flask|django|none]`, `async_support: boolean`, `database: [postgresql|mongodb|redis]`
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
 **Status**: Active
@@ -173,6 +173,15 @@ Parameters are automatically inferred from legacy agent names.
 
 **Location**: `.claude/agents/languages/bash-scripting-expert.md`
 **Description**: Use this agent for Bash scripting including shell automation, system administration, CI/CD scripts, and complex pipelines.
+**Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
+**Status**: Active
+
+### python-backend-engineer
+
+**Location**: `.claude/agents/languages/python-backend-engineer.md`
+**Description**: Use this agent for day-to-day Python feature implementation, bug fixes, refactoring existing code, and writing tests. Focuses on hands-on development in established projects.
+**Scope**: Feature development, debugging, code optimization, test writing
+**NOT for**: Architecture decisions, framework selection, major redesigns (use python-backend-expert)
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
 **Status**: Active
 
@@ -209,7 +218,9 @@ Parameters are automatically inferred from legacy agent names.
 ### terraform-infrastructure-expert
 
 **Location**: `.claude/agents/cloud/terraform-infrastructure-expert.md`
-**Description**: Use this agent for Terraform infrastructure as code including module development, state management, and multi-cloud deployments.
+**Description**: Use this agent for Infrastructure as Code architecture, complex Terraform modules, multi-cloud strategies, state management, and GitOps workflows.
+**Scope**: IaC architecture, Terraform modules, multi-cloud, state management, GitOps
+**NOT for**: Platform-specific services, console operations (use specific cloud architects)
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
 **Status**: Active
 
@@ -252,17 +263,6 @@ Parameters are automatically inferred from legacy agent names.
 **Status**: Active
 **Replaces**: docker-expert, docker-compose-expert, docker-development-orchestrator
 
-### docker-expert (DEPRECATED)
-
-**Status**: Deprecated - Use `docker-containerization-expert`
-
-### docker-compose-expert (DEPRECATED)
-
-**Status**: Deprecated - Use `docker-containerization-expert` with focus on compose
-
-### docker-development-orchestrator (DEPRECATED)
-
-**Status**: Deprecated - Use `docker-containerization-expert` with `use_case: development`
 
 ### traefik-proxy-expert
 
@@ -354,6 +354,29 @@ Parameters are automatically inferred from legacy agent names.
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
 **Status**: Active
 
+## Decision Matrices (Not Agents)
+
+### ui-framework-selection
+
+**Location**: `.claude/agents/decision-matrices/ui-framework-selection.md`
+**Description**: Decision matrix tool for selecting appropriate UI frameworks based on project requirements. Not a callable agent.
+**Purpose**: Helps evaluate UI framework choices based on criteria like performance, ecosystem, learning curve, and project type.
+**Status**: Tool/Reference
+
+### python-backend-selection
+
+**Location**: `.claude/agents/decision-matrices/python-backend-selection.md`
+**Description**: Decision matrix tool for selecting Python backend frameworks and architectures. Not a callable agent.
+**Purpose**: Helps evaluate Python backend framework choices (FastAPI, Flask, Django) based on project requirements.
+**Status**: Tool/Reference
+
+### playwright-testing-selection
+
+**Location**: `.claude/agents/decision-matrices/playwright-testing-selection.md`
+**Description**: Decision matrix tool for selecting testing strategies with Playwright. Not a callable agent.
+**Purpose**: Helps determine testing approaches, coverage levels, and implementation patterns.
+**Status**: Tool/Reference
+
 ## Registry Format for System Prompt
 
 When adding agents to the main system prompt, use this format:
@@ -361,6 +384,21 @@ When adding agents to the main system prompt, use this format:
 ```
 - agent-name: Use this agent for [primary purpose]. Expert in [key technologies]. Specializes in [specializations]. (Tools: [tool-list])
 ```
+
+## Agent Count Summary
+
+### Active Agents by Category
+- **Core**: 6 agents (agent-manager, file-analyzer, code-analyzer, test-runner, parallel-worker, mcp-manager)
+- **Frameworks**: 5 agents (react-ui-expert, react-frontend-engineer, ux-design-expert, tailwindcss-expert, e2e-test-engineer, nats-messaging-expert)
+- **Languages**: 5 agents (python-backend-expert, python-backend-engineer, javascript-frontend-engineer, nodejs-backend-engineer, bash-scripting-expert)
+- **Cloud**: 7 agents (AWS, Azure, GCP, Kubernetes, Terraform, Cloud Functions, AI/API)
+- **DevOps**: 6 agents (github-operations-specialist, azure-devops-specialist, mcp-context-manager, docker-containerization-expert, traefik-proxy-expert, ssh-operations-expert)
+- **Databases**: 5 agents (PostgreSQL, MongoDB, BigQuery, CosmosDB, Redis)
+- **Data Engineering**: 3 agents (Airflow, Kedro, LangGraph)
+- **AI/API**: 2 agents (Gemini, OpenAI)
+
+**Total Active**: 39 agents (verified after cleanup)
+**Decision Matrices**: 3 tools (not agents)
 
 ## Adding New Agents
 
