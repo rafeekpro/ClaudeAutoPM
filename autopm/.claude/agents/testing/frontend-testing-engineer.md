@@ -50,6 +50,8 @@ describe('UserProfile Component', () => {
     expect(screen.getByText('john@example.com')).toBeInTheDocument();
   });
 
+  // Define mockUser for subsequent tests
+  const mockUser = { id: 2, name: 'Jane Smith', email: 'jane@example.com' };
   it('should handle edit mode toggle', async () => {
     const user = userEvent.setup();
     render(<UserProfile user={mockUser} />);
