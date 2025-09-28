@@ -422,7 +422,7 @@ describe('Comprehensive Installation Testing', () => {
 
       teams.forEach(team => {
         const result = execSync(`node ${autopmPath} team load ${team}`, { encoding: 'utf8' });
-        expect(result).toContain('loaded successfully') || expect(result).toContain('Warning');
+        expect(result).toMatch(/loaded successfully|Warning/);
 
         const activeTeam = fs.readFileSync('.claude/active_team.txt', 'utf8').trim();
         expect(activeTeam).toBe(team);
