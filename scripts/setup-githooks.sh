@@ -32,12 +32,19 @@ if [ $? -eq 0 ]; then
   echo "🎯 Active hooks:"
 
   # List available hooks
+  hook_found=false
   for hook in .githooks/*; do
+    # Check if pattern expansion actually matches files
     if [ -f "$hook" ] && [ -x "$hook" ]; then
       hook_name=$(basename "$hook")
       echo "   - $hook_name"
+      hook_found=true
     fi
   done
+
+  if [ "$hook_found" = false ]; then
+    echo "   (No executable hooks found in .githooks directory)"
+  fi
 
   echo ""
   echo "📌 Auto-switching feature enabled!"

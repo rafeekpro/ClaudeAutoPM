@@ -5,6 +5,8 @@
 
 set -e
 
+# Save original directory for reliable path handling
+PROJECT_ROOT=$(pwd)
 WIKI_REPO="https://github.com/rafeekpro/ClaudeAutoPM.wiki.git"
 WIKI_DIR="/tmp/ClaudeAutoPM-wiki"
 DOCS_DIR="docs/wiki"
@@ -24,7 +26,7 @@ fi
 
 # Copy documentation files
 echo "Copying documentation files..."
-cp "$OLDPWD/$DOCS_DIR"/*.md . 2>/dev/null || true
+cp "$PROJECT_ROOT/$DOCS_DIR"/*.md . 2>/dev/null || true
 
 # Check for changes
 if git status --porcelain | grep -q .; then
@@ -44,7 +46,7 @@ else
     echo "ℹ️ No changes to update"
 fi
 
-cd "$OLDPWD"
+cd "$PROJECT_ROOT"
 echo "🎉 Wiki update complete!"
 echo ""
 echo "View the wiki at: https://github.com/rafeekpro/ClaudeAutoPM/wiki"
