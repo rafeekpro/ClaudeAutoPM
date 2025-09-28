@@ -496,9 +496,9 @@ This project is configured with ClaudeAutoPM for autonomous project management.
 - Docker Support: ${this.currentConfig?.tools?.docker?.enabled ? 'Enabled' : 'Disabled'}
 
 ## Available Commands
-- \`pm validate\` - Validate project configuration
-- \`pm optimize\` - Analyze optimization opportunities
-- \`pm release\` - Prepare and execute releases
+- \`/pm:validate\` - Validate project configuration
+- \`/pm:status\` - Check project status
+- \`/pm:help\` - Show available PM commands
 
 ## Documentation
 See: https://github.com/rafeekpro/ClaudeAutoPM
@@ -705,7 +705,7 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
     this.printStep('Next steps:');
     console.log('  1. Review CLAUDE.md for project configuration');
     console.log('  2. Run: ./scripts/setup-hooks.sh to setup git hooks');
-    console.log('  3. Test with: pm validate');
+    console.log('  3. In Claude, run: /pm:validate');
     console.log('');
 
     process.exit(0);
