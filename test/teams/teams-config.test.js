@@ -105,4 +105,18 @@ describe('Teams Configuration', () => {
     // This test can be enabled later when all agents are in place
     expect(allAgents.size).toBeGreaterThan(0);
   });
+
+  test('validateAgentFiles should detect missing agents', () => {
+    // Import the validation function
+    const { validateAgentFiles } = require('../../bin/commands/team');
+
+    const testAgents = ['existing-agent.md', 'non-existent-agent.md'];
+    const projectRoot = path.join(__dirname, '../..');
+
+    // Since we don't have all agent files, this will return missing agents
+    const missingAgents = validateAgentFiles(testAgents, projectRoot);
+
+    // We expect at least the non-existent agent to be reported as missing
+    expect(missingAgents).toContain('non-existent-agent.md');
+  });
 });

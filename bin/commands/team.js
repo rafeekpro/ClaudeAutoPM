@@ -13,7 +13,9 @@ const claudeTemplatePath = path.join(projectRoot, '.claude', 'templates', 'claud
 // Helper function to resolve all agents for a team (including inherited)
 function resolveAgents(teamName, teamsConfig, resolved = new Set()) {
   const team = teamsConfig[teamName];
-  if (!team) return [];
+  if (!team) {
+    throw new Error(`Team '${teamName}' not found in configuration`);
+  }
 
   const agents = new Set();
 
@@ -22,6 +24,10 @@ function resolveAgents(teamName, teamsConfig, resolved = new Set()) {
     team.inherits.forEach(parent => {
       if (!resolved.has(parent)) {
         resolved.add(parent);
+        // Check if parent team exists
+        if (!teamsConfig[parent]) {
+          throw new Error(`Team '${teamName}' inherits from non-existent team '${parent}'`);
+        }
         resolveAgents(parent, teamsConfig, resolved).forEach(a => agents.add(a));
       }
     });
@@ -33,6 +39,33 @@ function resolveAgents(teamName, teamsConfig, resolved = new Set()) {
   }
 
   return Array.from(agents);
+}
+
+// Helper function to validate that agent files exist
+function validateAgentFiles(agents, projectRoot) {
+  const missingAgents = [];
+  const agentsDir = path.join(projectRoot, '.claude', 'agents');
+
+  // Check if agents directory exists
+  if (!fs.existsSync(agentsDir)) {
+    // If in framework development, check autopm directory
+    const autopmAgentsDir = path.join(projectRoot, 'autopm', '.claude', 'agents');
+    if (!fs.existsSync(autopmAgentsDir)) {
+      console.warn('⚠️  Warning: Agents directory not found');
+      return missingAgents; // Return empty array to continue
+    }
+  }
+
+  agents.forEach(agent => {
+    const agentPath = path.join(agentsDir, agent);
+    const autopmAgentPath = path.join(projectRoot, 'autopm', '.claude', 'agents', agent);
+
+    if (!fs.existsSync(agentPath) && !fs.existsSync(autopmAgentPath)) {
+      missingAgents.push(agent);
+    }
+  });
+
+  return missingAgents;
 }
 
 // Helper function to generate agent include list in Markdown format
@@ -163,10 +196,25 @@ const commands = {
       }
 
       // Resolve all agents including inherited ones
-      const agents = resolveAgents(teamName, teamsConfig);
+      let agents;
+      try {
+        agents = resolveAgents(teamName, teamsConfig);
+      } catch (error) {
+        console.error(`❌ Error resolving team: ${error.message}`);
+        process.exit(1);
+      }
 
       console.log(`🔄 Loading team '${teamName}'...`);
       console.log(`   Resolved ${agents.length} agents (including inherited)`);
+
+      // Validate that agent files exist
+      const missingAgents = validateAgentFiles(agents, projectRoot);
+      if (missingAgents.length > 0) {
+        console.warn(`⚠️  Warning: The following agent files were not found:`);
+        missingAgents.forEach(agent => {
+          console.warn(`   - ${agent}`);
+        });
+      }
 
       // Update CLAUDE.md with the new agent list
       updateClaudeMd(agents);
@@ -191,7 +239,7 @@ const commands = {
   }
 };
 
-// Export for use with yargs
+// Export for use with yargs and testing
 module.exports = {
   command: 'team <action> [name]',
   describe: 'Manage agent teams',
@@ -222,7 +270,11 @@ module.exports = {
       console.error(`❌ Unknown action: ${action}`);
       process.exit(1);
     }
-  }
+  },
+  // Export utility functions for testing
+  resolveAgents,
+  validateAgentFiles,
+  generateAgentIncludes
 };
 
 // If run directly (not imported)
