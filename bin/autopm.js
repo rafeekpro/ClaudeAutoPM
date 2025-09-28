@@ -20,7 +20,7 @@ function main() {
 
   cli
     // Main commands
-    .command('install [preset]', 'Install ClaudeAutoPM in current directory',
+    .command('install [preset]', 'Install ClaudeAutoPM framework in current project directory',
       (yargs) => {
         return yargs
           .positional('preset', {
@@ -43,7 +43,7 @@ function main() {
         }
       }
     )
-    .command('guide [action]', 'Interactive ClaudeAutoPM setup and usage guide',
+    .command('guide [action]', 'Interactive setup guide and documentation generator',
       (yargs) => {
         return yargs
           .positional('action', {
@@ -145,8 +145,38 @@ function main() {
     .recommendCommands()
     .strictCommands()
     .wrap(cli.terminalWidth())
-    // Custom epilogue
-    .epilogue('For more information, visit: https://github.com/rafeekpro/ClaudeAutoPM')
+    // Enhanced help epilogue
+    .epilogue(`
+📖 Quick Start:
+   autopm install                    # Install ClaudeAutoPM in current directory
+   autopm team load frontend         # Load React/UI development agents
+   claude --bypass-permissions .     # Open Claude Code
+
+🔧 Configuration & Teams:
+   autopm guide config              # Setup Azure DevOps or GitHub integration
+   autopm team list                 # See all available agent teams
+   autopm team current              # Check currently active team
+   autopm guide                     # Interactive setup guide
+
+💡 After installation, use Claude Code for PM commands:
+   /pm:status                       # Project overview and health
+   /pm:prd-new my-feature           # Create new Product Requirements Document
+   /pm:epic-decompose my-feature    # Break PRD into actionable tasks
+   /pm:next                         # Get next priority task to work on
+   /pm:issue-start TASK-123         # Start working on specific task
+   /pm:standup                      # Generate daily standup summary
+
+🚀 Example Workflow:
+   1. autopm install               # Setup project
+   2. autopm team load fullstack   # Load appropriate agents
+   3. claude --bypass-permissions . # Open Claude
+   4. /pm:prd-new user-auth        # Create feature PRD
+   5. /pm:epic-decompose user-auth # Break into tasks
+   6. /pm:next                     # Start working
+
+📚 Documentation: https://github.com/rafeekpro/ClaudeAutoPM
+🐛 Report Issues: https://github.com/rafeekpro/ClaudeAutoPM/issues
+`)
     .fail((msg, err, yargs) => {
       if (err) {
         console.error('Error:', err.message);
