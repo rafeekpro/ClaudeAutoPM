@@ -8,7 +8,8 @@ module.exports = {
     '**/test/unit/*-jest.test.js',
     '**/test/integration/*-jest.test.js',
     '**/test/teams/*.test.js',
-    '**/test/cli/*.test.js'
+    '**/test/cli/*.test.js',
+    '**/test/installation/*.test.js'
   ],
 
   // Ignore problematic tests and duplicates
