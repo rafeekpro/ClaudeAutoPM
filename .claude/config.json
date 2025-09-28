@@ -1,94 +1,64 @@
 {
-  "project": {
-    "name": "ClaudeAutoPM",
-    "type": "framework-development",
-    "version": "1.0.7",
-    "description": "Self-maintaining AI project management framework"
+  "execution_strategy": {
+    "mode": "adaptive"
   },
   "features": {
-    "self_maintenance": true,
-    "auto_optimization": true,
-    "continuous_improvement": true,
-    "dogfooding": true
+    "docker_first_development": true,
+    "enforce_docker_tests": true,
+    "block_local_execution": true,
+    "auto_create_dockerfile": true,
+    "sync_with_ci": true,
+    "kubernetes_devops_testing": true,
+    "github_actions_k8s": true,
+    "integration_tests": true
   },
-  "agents": {
-    "source": "autopm/.claude/agents/",
-    "auto_invoke": true,
-    "use_framework_agents": true,
-    "preferred": [
-      "agent-manager",
-      "code-analyzer",
-      "test-runner",
-      "file-analyzer",
-      "github-operations-specialist"
-    ],
-    "triggers": ".claude/agent-triggers.md"
-  },
-  "maintenance": {
-    "agents": {
-      "registry_manager": true,
-      "installer_tester": true,
-      "optimization_analyzer": true,
-      "use_framework_agents": true
+  "docker": {
+    "default_base_images": {
+      "python": "python:3.11-slim",
+      "node": "node:20-alpine",
+      "go": "golang:1.21-alpine"
     },
-    "automation": {
-      "daily_validation": true,
-      "weekly_optimization": true,
-      "auto_consolidation": false,
-      "auto_release": false
+    "volume_mounts": {
+      "source_code": true,
+      "node_modules": false,
+      "python_venv": false
     },
-    "thresholds": {
-      "max_agents": 40,
-      "min_coverage": 90,
-      "min_efficiency": 50,
-      "max_context": 70
+    "development": {
+      "hot_reload": true,
+      "debug_ports": true,
+      "local_db": true
     }
   },
-  "development": {
-    "test_on_commit": true,
-    "validate_on_push": true,
-    "optimize_on_schedule": true
-  },
-  "metrics": {
-    "current": {
-      "total_agents": 35,
-      "active_agents": 30,
-      "deprecated_agents": 12,
-      "context_efficiency": 60,
-      "test_coverage": 95,
-      "installation_success": 98
+  "kubernetes": {
+    "enabled": true,
+    "testing": {
+      "integration_tests": true,
+      "helm_chart_tests": true,
+      "kubectl_smoke_tests": true
     },
-    "targets": {
-      "total_agents": 25,
-      "context_efficiency": 70,
-      "test_coverage": 95,
-      "installation_success": 99
+    "environments": {
+      "minikube": true,
+      "kind": true,
+      "k3d": false
+    },
+    "manifests": {
+      "auto_generate": true,
+      "validate_yaml": true,
+      "security_policies": true
     }
   },
-  "commands": {
-    "validate": "pm validate",
-    "optimize": "pm optimize",
-    "release": "pm release",
-    "test": "npm test",
-    "health": "npm run pm:health"
+  "github_actions": {
+    "kubernetes_tests": true,
+    "docker_integration": true,
+    "matrix_testing": true,
+    "cache_optimization": true
   },
-  "mcp": {
-    "activeServers": [
-      "context7-docs",
-      "github-mcp",
-      "filesystem-mcp"
+  "exceptions": {
+    "allow_local_commands": [
+      "git",
+      "docker",
+      "docker compose",
+      "make"
     ]
-  },
-  "projectManagement": {
-    "provider": "github",
-    "settings": {
-      "github": {
-        "repository": "<owner>/<repo>"
-      },
-      "azure": {
-        "organization": "<organization>",
-        "project": "<project>"
-      }
-    }
   }
 }
