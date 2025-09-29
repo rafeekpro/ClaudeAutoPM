@@ -99,7 +99,29 @@ During installation, you'll be asked to:
 | **Azure DevOps** | Azure Boards & Pipelines | Enterprise, Agile teams |
 | **Skip for now** | Local files only | Evaluation, offline work |
 
-#### 3. Initialize PM System (1 minute)
+#### 3. Update Existing Installation
+
+```bash
+# Update to latest framework version
+autopm update
+
+# Or force update with options
+autopm update --force --no-backup
+```
+
+**Update features:**
+- 🔄 **Smart Updates** - Preserves your configuration and project data
+- 📦 **Automatic Backup** - Creates backup before updating (can be disabled)
+- ⚙️ **Config Preservation** - Keeps your settings, teams, and provider config
+- 📁 **Data Protection** - Preserves epics, PRDs, and all project files
+- 🔧 **Version Detection** - Only updates when necessary
+
+**Update options:**
+- `--force` - Force update even if versions match
+- `--no-backup` - Skip backup creation
+- `--no-preserve-config` - Don't preserve configuration files
+
+#### 4. Initialize PM System (1 minute)
 
 ```bash
 # In Claude Code, run:
@@ -109,7 +131,7 @@ During installation, you'll be asked to:
 /init include rules from .claude/CLAUDE.md
 ```
 
-#### 3.5 Provider Configuration (NEW)
+#### 4.5 Provider Configuration (NEW)
 
 ```bash
 # View current configuration

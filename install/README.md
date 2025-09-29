@@ -7,6 +7,7 @@ This directory contains installation and configuration scripts for the **ClaudeA
 | File | Description |
 |------|-------------|
 | `install.sh` | Main installation script for ClaudeAutoPM framework |
+| `update.sh` | Update existing installation to latest framework version |
 | `merge-claude.sh` | Helper script for merging CLAUDE.md configurations |
 | `README.md` | This documentation file |
 
@@ -25,11 +26,22 @@ cd ClaudeAutoPM
 
 ### Update Existing Installation
 
+**Recommended method (via CLI):**
 ```bash
-# Run installer in project with existing ClaudeAutoPM:
-./install/install.sh
+# Update to latest framework version (recommended)
+autopm update
 
-# It will automatically detect existing installation and offer update
+# Force update with options
+autopm update --force --no-backup
+```
+
+**Manual method (direct script):**
+```bash
+# Run update script directly
+./install/update.sh
+
+# Or use installer (legacy method)
+./install/install.sh
 ```
 
 ## 📋 Installation Script (`install.sh`)
@@ -85,6 +97,68 @@ cd ClaudeAutoPM
 - Creates automatic backup
 - Updates only changed files
 - Offers merge assistance for `CLAUDE.md`
+
+## 🔄 Update Script (`update.sh`)
+
+### What It Does
+
+**Smart Framework Updates** that preserve your work:
+
+✅ **Version Management:**
+- Detects current and new framework versions
+- Only updates when necessary (unless forced)
+- Shows clear before/after version information
+
+✅ **Data Protection:**
+- Creates automatic backup before updating
+- Preserves all configuration files (`config.json`, `.env.local`, etc.)
+- Protects project data (`epics/`, `prds/` directories)
+- Maintains custom settings and team configurations
+
+✅ **Framework Updates:**
+- Updates all framework components (`agents/`, `commands/`, `rules/`, etc.)
+- Installs new features and capabilities
+- Fixes bugs and security issues
+- Updates documentation and examples
+
+### Usage
+
+```bash
+# Standard update (recommended)
+autopm update
+
+# Force update regardless of version
+autopm update --force
+
+# Update without backup (not recommended)
+autopm update --no-backup
+
+# Update without preserving config (fresh start)
+autopm update --no-preserve-config
+```
+
+### Safety Features
+
+🛡️ **Automatic Backup** - Creates timestamped backup before any changes
+🔒 **Config Preservation** - Keeps your settings and customizations
+📁 **Data Protection** - Never touches your epics, PRDs, or project files
+⚡ **Quick Rollback** - Easy to restore from backup if needed
+
+### What Gets Updated
+
+**Framework Components (Updated):**
+- `agents/` - Latest agent definitions and capabilities
+- `commands/` - New PM commands and improvements
+- `scripts/` - Bug fixes and performance improvements
+- `rules/` - Updated development patterns
+- `templates/` - New project templates
+
+**Your Data (Preserved):**
+- `config.json` - Your provider and settings
+- `epics/` - All your epic files and tasks
+- `prds/` - All your product requirements
+- `teams.json` - Your team configurations
+- `.env.local` - Your environment variables
 
 ## 🤖 Merge Helper (`merge-claude.sh`)
 
