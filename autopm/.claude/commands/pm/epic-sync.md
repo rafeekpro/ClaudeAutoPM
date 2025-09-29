@@ -14,11 +14,18 @@ Push epic and tasks to GitHub as issues using modular scripts.
 ## Quick Check
 
 ```bash
-# Verify epic exists
-test -f .claude/epics/$ARGUMENTS/epic.md || echo "❌ Epic not found. Run: /pm:prd-parse $ARGUMENTS"
-
-# Count task files
-ls .claude/epics/$ARGUMENTS/*.md 2>/dev/null | grep -v epic.md | wc -l
+# Check for single epic or multi-epic structure
+if [ -f ".claude/epics/$ARGUMENTS/epic.md" ]; then
+    echo "Single epic mode detected"
+    # Count task files
+    ls .claude/epics/$ARGUMENTS/*.md 2>/dev/null | grep -v epic.md | wc -l
+elif [ -d ".claude/epics/$ARGUMENTS" ] && ls .claude/epics/$ARGUMENTS/*/epic.md 2>/dev/null | head -1; then
+    echo "Multi-epic mode detected (from epic-split)"
+    # Count task files in all subdirectories
+    find .claude/epics/$ARGUMENTS -name "*.md" ! -name "epic.md" ! -name "meta.yaml" | wc -l
+else
+    echo "❌ Epic not found. Run: /pm:prd-parse $ARGUMENTS or /pm:epic-split $ARGUMENTS"
+fi
 ```
 
 If no tasks found: "❌ No tasks to sync. Run: /pm:epic-decompose $ARGUMENTS"
@@ -26,6 +33,18 @@ If no tasks found: "❌ No tasks to sync. Run: /pm:epic-decompose $ARGUMENTS"
 ## Instructions
 
 The epic sync process is now modularized into 4 specialized scripts that handle different aspects of the synchronization. Each script is designed for reliability, testability, and maintainability.
+
+### Processing Mode Detection
+
+**Single Epic Mode:**
+- Process `.claude/epics/$ARGUMENTS/epic.md` and its tasks
+- Create one epic issue with all tasks linked
+
+**Multi-Epic Mode (from epic-split):**
+- Process each subdirectory separately
+- Create separate epic issues for each subdirectory
+- Maintain epic dependencies as specified in meta.yaml
+- Show progress for each epic being synced
 
 ### 1. Repository Protection Check
 
@@ -137,9 +156,11 @@ git push -u origin epic/$ARGUMENTS
 echo "✅ Created branch: epic/$ARGUMENTS"
 ```
 
-## Complete Workflow Example
+## Complete Workflow Examples
 
-Here's the complete modular epic sync workflow:
+### Single Epic Workflow
+
+Here's the complete modular epic sync workflow for a single epic:
 
 ```bash
 #!/bin/bash
@@ -212,6 +233,100 @@ echo ""
 echo "📋 Next steps:"
 echo "  - Start parallel execution: /pm:epic-start $EPIC_NAME"
 echo "  - Or work on single issue: /pm:issue-start <issue_number>"
+echo ""
+```
+
+### Multi-Epic Workflow (from epic-split)
+
+Here's the workflow for syncing multiple epics created by epic-split:
+
+```bash
+#!/bin/bash
+# Sync multiple epics from split structure
+
+FEATURE_NAME="$ARGUMENTS"
+EPICS_DIR=".claude/epics/$FEATURE_NAME"
+
+echo "🚀 Starting multi-epic sync for: $FEATURE_NAME"
+
+# Find all epic subdirectories
+epic_dirs=$(find "$EPICS_DIR" -maxdepth 1 -type d -name "[0-9]*-*" | sort)
+epic_count=$(echo "$epic_dirs" | wc -l)
+
+echo "📦 Found $epic_count epics to sync"
+
+# Track all created epic issues
+all_epic_numbers=""
+total_tasks=0
+
+# Process each epic
+for epic_dir in $epic_dirs; do
+    epic_name=$(basename "$epic_dir")
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "📂 Processing: $epic_name"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+    # Step 1: Create epic issue
+    echo "📝 Creating epic issue..."
+    epic_number=$(bash autopm/.claude/scripts/pm/epic-sync/create-epic-issue.sh "$FEATURE_NAME/$epic_name")
+
+    if [[ -z "$epic_number" ]]; then
+        echo "⚠️  Failed to create epic issue for $epic_name"
+        continue
+    fi
+
+    all_epic_numbers="$all_epic_numbers $epic_number"
+    echo "✅ Epic issue created: #$epic_number"
+
+    # Step 2: Create task issues for this epic
+    echo "📋 Creating task issues..."
+    task_mapping_file=$(bash autopm/.claude/scripts/pm/epic-sync/create-task-issues.sh "$FEATURE_NAME/$epic_name" "$epic_number")
+
+    if [[ -f "$task_mapping_file" ]]; then
+        task_count=$(wc -l < "$task_mapping_file")
+        total_tasks=$((total_tasks + task_count))
+        echo "✅ Created $task_count task issues"
+
+        # Step 3: Update references
+        echo "🔗 Updating task references..."
+        bash autopm/.claude/scripts/pm/epic-sync/update-references.sh "$FEATURE_NAME/$epic_name" "$task_mapping_file"
+
+        # Step 4: Update epic file
+        bash autopm/.claude/scripts/pm/epic-sync/update-epic-file.sh "$FEATURE_NAME/$epic_name" "$epic_number"
+    fi
+done
+
+# Create meta-branch for all epics
+echo ""
+echo "🌿 Creating meta-branch for feature..."
+git checkout main
+git pull origin main
+git checkout -b feature/$FEATURE_NAME
+git push -u origin feature/$FEATURE_NAME
+
+# Final summary
+repo=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+
+echo ""
+echo "🎉 Multi-epic sync completed!"
+echo ""
+echo "📊 Summary:"
+echo "  Feature: $FEATURE_NAME"
+echo "  Epics created: $epic_count"
+echo "  Epic issues:$all_epic_numbers"
+echo "  Total tasks: $total_tasks"
+echo "  Branch: feature/$FEATURE_NAME"
+echo ""
+echo "🔗 Links:"
+for epic_num in $all_epic_numbers; do
+    echo "  Epic #$epic_num: https://github.com/$repo/issues/$epic_num"
+done
+echo "  Branch: https://github.com/$repo/tree/feature/$FEATURE_NAME"
+echo ""
+echo "📋 Next steps:"
+echo "  - Work on P0 epics first (infrastructure, auth backend)"
+echo "  - Start specific epic: /pm:issue-start <issue_number>"
 echo ""
 ```
 
