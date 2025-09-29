@@ -22,29 +22,53 @@ Before proceeding, complete these validation steps.
 Do not bother the user with preflight checks progress ("I'm not going to ..."). Just do them and move on.
 
 1. **Verify epic exists:**
-   - Check if `.claude/epics/$ARGUMENTS/epic.md` exists
-   - If not found, tell user: "❌ Epic not found: $ARGUMENTS. First create it with: /pm:prd-parse $ARGUMENTS"
-   - Stop execution if epic doesn't exist
+   - Check if `.claude/epics/$ARGUMENTS` directory exists
+   - Check for either:
+     a) Single epic: `.claude/epics/$ARGUMENTS/epic.md` exists
+     b) Multiple epics: Subdirectories like `.claude/epics/$ARGUMENTS/01-infrastructure/epic.md`
+   - If neither found, tell user: "❌ Epic not found: $ARGUMENTS. First create it with: /pm:prd-parse $ARGUMENTS or /pm:epic-split $ARGUMENTS"
+   - Stop execution if no epics found
 
-2. **Check for existing tasks:**
-   - Check if any numbered task files (001.md, 002.md, etc.) already exist in `.claude/epics/$ARGUMENTS/`
+2. **Detect epic structure:**
+   - If `.claude/epics/$ARGUMENTS/epic.md` exists → Single epic mode
+   - If subdirectories with epic.md files exist → Multi-epic mode
+   - Store the mode for later processing
+
+3. **Check for existing tasks:**
+   - For single epic: Check `.claude/epics/$ARGUMENTS/` for numbered task files
+   - For multi-epic: Check each subdirectory for numbered task files
    - If tasks exist, list them and ask: "⚠️ Found {count} existing tasks. Delete and recreate all tasks? (yes/no)"
    - Only proceed with explicit 'yes' confirmation
    - If user says no, suggest: "View existing tasks with: /pm:epic-show $ARGUMENTS"
 
-3. **Validate epic frontmatter:**
-   - Verify epic has valid frontmatter with: name, status, created, prd
-   - If invalid, tell user: "❌ Invalid epic frontmatter. Please check: .claude/epics/$ARGUMENTS/epic.md"
+4. **Validate epic frontmatter:**
+   - For single epic: Verify `.claude/epics/$ARGUMENTS/epic.md` has valid frontmatter
+   - For multi-epic: Verify each subdirectory's epic.md has valid frontmatter
+   - If invalid, tell user which epic file has invalid frontmatter
 
-4. **Check epic status:**
-   - If epic status is already "completed", warn user: "⚠️ Epic is marked as completed. Are you sure you want to decompose it again?"
+5. **Check epic status:**
+   - For each epic, check if status is already "completed"
+   - If any epic is completed, warn user: "⚠️ Epic(s) marked as completed. Are you sure you want to decompose again?"
 
 ## Instructions
 
-You are decomposing an epic into specific, actionable tasks for: **$ARGUMENTS**
+You are decomposing epic(s) into specific, actionable tasks for: **$ARGUMENTS**
 
-### 1. Read the Epic
-- Load the epic from `.claude/epics/$ARGUMENTS/epic.md`
+### 1. Determine Processing Mode
+
+**Single Epic Mode:**
+- Process `.claude/epics/$ARGUMENTS/epic.md`
+- Create tasks in `.claude/epics/$ARGUMENTS/`
+
+**Multi-Epic Mode (from epic-split):**
+- Find all subdirectories in `.claude/epics/$ARGUMENTS/`
+- Process each subdirectory's epic.md file separately
+- Create tasks in each respective subdirectory
+- Show progress for each epic being processed
+
+### 2. Read the Epic(s)
+- For single epic: Load from `.claude/epics/$ARGUMENTS/epic.md`
+- For multi-epic: Load each `.claude/epics/$ARGUMENTS/*/epic.md`
 - Understand the technical approach and requirements
 - Review the task breakdown preview
 
@@ -127,9 +151,17 @@ Clear, concise description of what needs to be done
 ```
 
 ### 3. Task Naming Convention
+
+**For Single Epic:**
 Save tasks as: `.claude/epics/$ARGUMENTS/{task_number}.md`
+
+**For Multi-Epic:**
+Save tasks as: `.claude/epics/$ARGUMENTS/{epic_folder}/{task_number}.md`
+Example: `.claude/epics/ecommerce/01-infrastructure/001.md`
+
 - Use sequential numbering: 001.md, 002.md, etc.
 - Keep task titles short but descriptive
+- Each epic gets its own task number sequence
 
 ### 4. Frontmatter Guidelines
 - **name**: Use a descriptive task title (without "Task:" prefix)
@@ -178,6 +210,23 @@ Spawning 3 agents for parallel task creation:
 - Agent 3: Creating tasks 007-009 (UI layer)
 ```
 
+**Multi-Epic Processing Example:**
+```markdown
+Processing multiple epics from split:
+
+📂 01-infrastructure/epic.md
+   Creating 8 tasks...
+   ✅ Done
+
+📂 02-auth-backend/epic.md
+   Creating 12 tasks...
+   ✅ Done
+
+📂 03-frontend/epic.md
+   Creating 10 tasks...
+   ✅ Done
+```
+
 ### 8. Task Dependency Validation
 
 When creating tasks with dependencies:
@@ -212,6 +261,7 @@ Before finalizing tasks, verify:
 
 ### 10. Post-Decomposition
 
+**For Single Epic:**
 After successfully creating tasks:
 1. Confirm: "✅ Created {count} tasks for epic: $ARGUMENTS"
 2. Show summary:
@@ -219,6 +269,24 @@ After successfully creating tasks:
    - Parallel vs sequential breakdown
    - Total estimated effort
 3. Suggest next step: "Ready to sync to GitHub? Run: /pm:epic-sync $ARGUMENTS"
+
+**For Multi-Epic:**
+After processing all epics:
+1. Show per-epic summary:
+   ```
+   ✅ Epic Decomposition Complete
+
+   📂 01-infrastructure: 8 tasks created
+   📂 02-auth-backend: 12 tasks created
+   📂 03-frontend: 10 tasks created
+
+   Total: 30 tasks across 3 epics
+   ```
+2. Show combined statistics:
+   - Total tasks across all epics
+   - Total estimated effort
+   - Breakdown by epic
+3. Suggest next step: "Ready to sync all epics? Run: /pm:epic-sync $ARGUMENTS"
 
 ## Error Recovery
 
