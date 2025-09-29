@@ -5,8 +5,8 @@
 ### Daily Development Workflow
 1. **Morning Setup**
    ```bash
-   pm validate
-   pm standup
+   /pm:validate
+   /pm:standup
    ```
 
 2. **Before Coding**
@@ -18,7 +18,7 @@
 3. **After Changes**
    ```bash
    npm run test:affected
-   pm validate
+   /pm:validate
    ```
 
 4. **Before Commit**
@@ -52,10 +52,10 @@ git checkout feature/team-branch # Auto-switch via git hook
 
 #### PM Commands
 ```bash
-pm validate    # Validate configuration
-pm optimize    # Find optimization opportunities
-pm standup     # Daily standup
-pm help        # Get help
+/pm:validate    # Validate configuration
+/pm:optimize    # Find optimization opportunities
+/pm:standup     # Daily standup
+/pm:help        # Get help
 ```
 
 ### Troubleshooting
@@ -125,7 +125,7 @@ autopm install
 #### Debug Mode
 ```bash
 DEBUG=* npm test  # Verbose test output
-AUTOPM_DEBUG=1 pm validate  # Debug PM commands
+AUTOPM_DEBUG=1 /pm:validate  # Debug PM commands
 ```
 
 ### Contact & Support

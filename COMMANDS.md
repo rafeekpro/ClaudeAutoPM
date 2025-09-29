@@ -1,6 +1,6 @@
-# PM Commands Documentation
+# /pm: Commands Documentation
 
-Complete list of available PM commands in ClaudeAutoPM framework.
+Complete list of available /pm: commands in ClaudeAutoPM framework.
 
 ## Table of Contents
 - [Core Commands](#core-commands)
@@ -15,168 +15,168 @@ Complete list of available PM commands in ClaudeAutoPM framework.
 
 ## Core Commands
 
-### `pm init`
+### `/pm:init`
 Initialize project with PM system
 ```bash
-pm init
+/pm:init
 ```
 
-### `pm status`
+### `/pm:status`
 Show comprehensive project status dashboard
 ```bash
-pm status
+/pm:status
 ```
 
-### `pm next`
+### `/pm:next`
 Show next priority work item with context
 ```bash
-pm next
+/pm:next
 ```
 
-### `pm standup`
+### `/pm:standup`
 Generate daily standup report
 ```bash
-pm standup
+/pm:standup
 ```
 
-### `pm help`
+### `/pm:help`
 Display help and available commands
 ```bash
-pm help
+/pm:help
 ```
 
 ## Issue Management
 
-### `pm issue-start <issue-id>`
+### `/pm:issue-start <issue-id>`
 Start work on an issue
 ```bash
-pm issue-start ISSUE-123
+/pm:issue-start ISSUE-123
 ```
 
-### `pm issue-show <issue-id>`
+### `/pm:issue-show <issue-id>`
 Display detailed issue information
 ```bash
-pm issue-show ISSUE-123
+/pm:issue-show ISSUE-123
 ```
 
-### `pm issue-close <issue-id>`
+### `/pm:issue-close <issue-id>`
 Close/complete an issue
 ```bash
-pm issue-close ISSUE-123
+/pm:issue-close ISSUE-123
 pm issue-close ISSUE-123 --complete-tasks
 ```
 
-### `pm issue-edit <issue-id>`
+### `/pm:issue-edit <issue-id>`
 Edit issue details interactively
 ```bash
-pm issue-edit ISSUE-123
+/pm:issue-edit ISSUE-123
 ```
 
-### `pm issue-sync`
+### `/pm:issue-sync`
 Sync issue updates to GitHub/Azure
 ```bash
-pm issue-sync ISSUE-123
+/pm:issue-sync ISSUE-123
 ```
 
-### `pm in-progress`
+### `/pm:in-progress`
 List all work in progress
 ```bash
-pm in-progress
+/pm:in-progress
 ```
 
-### `pm blocked`
+### `/pm:blocked`
 Show all blocked issues
 ```bash
-pm blocked
+/pm:blocked
 ```
 
 ## Epic Management
 
-### `pm epic-list`
+### `/pm:epic-list`
 List all epics with status
 ```bash
-pm epic-list
+/pm:epic-list
 pm epic-list --status=active
 ```
 
-### `pm epic-show <epic-name>`
+### `/pm:epic-show <epic-name>`
 Display epic details and progress
 ```bash
-pm epic-show feature-auth
+/pm:epic-show feature-auth
 ```
 
-### `pm epic-status`
+### `/pm:epic-status`
 Show status of all epics
 ```bash
-pm epic-status
+/pm:epic-status
 ```
 
-### `pm epic-close <epic-name>`
+### `/pm:epic-close <epic-name>`
 Close/complete an epic
 ```bash
-pm epic-close feature-auth
+/pm:epic-close feature-auth
 pm epic-close feature-auth --force
 pm epic-close feature-auth --complete-all
 ```
 
-### `pm epic-edit <epic-name>`
+### `/pm:epic-edit <epic-name>`
 Edit epic details
 ```bash
-pm epic-edit feature-auth
+/pm:epic-edit feature-auth
 ```
 
-### `pm epic-decompose <epic-name>`
+### `/pm:epic-decompose <epic-name>`
 Break epic into task files
 ```bash
-pm epic-decompose feature-auth
+/pm:epic-decompose feature-auth
 ```
 
-### `pm epic-sync <epic-name>`
+### `/pm:epic-sync <epic-name>`
 Push epic and tasks to GitHub
 ```bash
-pm epic-sync feature-auth
+/pm:epic-sync feature-auth
 ```
 
-### `pm epic-start <epic-name>`
+### `/pm:epic-start <epic-name>`
 Start work on epic (creates worktree)
 ```bash
-pm epic-start feature-auth
+/pm:epic-start feature-auth
 ```
 
 ## PRD Management
 
-### `pm prd-new [prd-name]`
+### `/pm:prd-new [prd-name]`
 Create new PRD with brainstorming wizard
 ```bash
-pm prd-new
+/pm:prd-new
 pm prd-new feature-auth
 ```
 
-### `pm prd-list`
+### `/pm:prd-list`
 List all PRDs
 ```bash
-pm prd-list
+/pm:prd-list
 ```
 
-### `pm prd-status`
+### `/pm:prd-status`
 Show PRD implementation status
 ```bash
-pm prd-status
+/pm:prd-status
 ```
 
-### `pm prd-parse <prd-name>`
+### `/pm:prd-parse <prd-name>`
 Convert PRD to technical implementation epic
 ```bash
-pm prd-parse feature-auth
+/pm:prd-parse feature-auth
 pm prd-parse feature-auth --overwrite
 ```
 
 ## PR Management
 
-### `pm pr-create <title>`
+### `/pm:pr-create <title>`
 Create pull request with auto-generated description
 ```bash
-pm pr-create "Add authentication feature"
+/pm:pr-create "Add authentication feature"
 pm pr-create "Fix bug" --draft
 pm pr-create "Update docs" --base develop --reviewer teammate
 ```
@@ -189,10 +189,10 @@ Options:
 - `-l, --label <label>` - Add label
 - `-m, --description <text>` - PR description
 
-### `pm pr-list`
+### `/pm:pr-list`
 List pull requests with filtering
 ```bash
-pm pr-list
+/pm:pr-list
 pm pr-list --state open
 pm pr-list --mine
 pm pr-list --author @username
@@ -209,17 +209,17 @@ Options:
 
 ## Context Management
 
-### `pm context-create <name>`
+### `/pm:context-create <name>`
 Create new context file
 ```bash
-pm context-create feature-auth
+/pm:context-create feature-auth
 pm context-create feature-auth --type feature --description "Auth context"
 ```
 
-### `pm context-update <name>`
+### `/pm:context-update <name>`
 Update existing context
 ```bash
-pm context-update feature-auth --file notes.md
+/pm:context-update feature-auth --file notes.md
 pm context-update feature-auth --content "New info"
 pm context-update feature-auth --stdin < data.txt
 ```
@@ -230,34 +230,34 @@ Options:
 - `--stdin` - Read from stdin
 - `--mode <mode>` - Update mode (append|replace|merge)
 
-### `pm context-prime <name>`
+### `/pm:context-prime <name>`
 Load context for current work session
 ```bash
-pm context-prime feature-auth
+/pm:context-prime feature-auth
 pm context-prime --list
 pm context-prime feature-auth --dry-run
 ```
 
 ## Project Maintenance
 
-### `pm validate`
+### `/pm:validate`
 Validate system integrity
 ```bash
-pm validate
+/pm:validate
 pm validate registry
 ```
 
-### `pm search <query>`
+### `/pm:search <query>`
 Search across all project content
 ```bash
-pm search "authentication"
+/pm:search "authentication"
 pm search TODO
 ```
 
-### `pm sync`
+### `/pm:sync`
 Comprehensive project synchronization
 ```bash
-pm sync              # Sync everything
+/pm:sync              # Sync everything
 pm sync git          # Sync only git
 pm sync issues       # Sync only issues
 pm sync epics        # Sync only epics
@@ -271,18 +271,18 @@ Options:
 - `--skip-deps` - Skip dependencies check
 - `--provider=NAME` - Use specific provider
 
-### `pm optimize`
+### `/pm:optimize`
 Analyze and optimize project structure
 ```bash
-pm optimize              # Analyze only
+/pm:optimize              # Analyze only
 pm optimize --apply      # Apply optimizations
 pm optimize --skip-duplicates
 ```
 
-### `pm clean`
+### `/pm:clean`
 Archive completed work and clean project
 ```bash
-pm clean                 # Clean with defaults
+/pm:clean                 # Clean with defaults
 pm clean --days=7        # Archive items older than 7 days
 pm clean --skip-logs     # Skip log cleanup
 pm clean --dry-run       # Preview cleanup
@@ -298,10 +298,10 @@ Options:
 - `--dry-run` - Preview without changes
 - `--force` - Clean without confirmation
 
-### `pm release`
+### `/pm:release`
 Create and manage releases
 ```bash
-pm release                    # Patch release (1.0.0 -> 1.0.1)
+/pm:release                    # Patch release (1.0.0 -> 1.0.1)
 pm release minor              # Minor release (1.0.0 -> 1.1.0)
 pm release major              # Major release (1.0.0 -> 2.0.0)
 pm release --version 2.0.0    # Specific version
@@ -479,7 +479,7 @@ pm pr-create "Release v1.9.0"
 
 1. **Use tab completion** - Most commands support bash completion
 2. **Chain commands** - Many commands work well together
-3. **Check status regularly** - `pm status` gives full overview
+3. **Check status regularly** - `/pm:status` gives full overview
 4. **Use dry-run** - Test commands safely with `--dry-run`
 5. **Leverage providers** - Commands auto-detect Azure/GitHub
 
