@@ -2,7 +2,7 @@
 allowed-tools: Bash
 ---
 
-Run `bash .claude/scripts/pm/epic-status.sh $ARGUMENTS` using the bash tool and show me the complete stdout printed to the console.
+Run `node .claude/scripts/pm/epic-status.js $ARGUMENTS` using the Bash tool and show me the complete output.
 
 - DO NOT truncate.
 - DO NOT collapse.

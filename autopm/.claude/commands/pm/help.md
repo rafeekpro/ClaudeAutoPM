@@ -2,7 +2,7 @@
 allowed-tools: Bash
 ---
 
-Run `bash .claude/scripts/pm/help.sh` using a sub-agent and show me the complete output.
+Run `node .claude/scripts/pm/help.js` using the Bash tool and show me the complete output.
 
 - DO NOT truncate.
 - DO NOT collapse.
