@@ -1,0 +1,52 @@
+{
+  "base": {
+    "description": "Core agents available in all teams.",
+    "agents": [
+      "code-analyzer.md",
+      "file-analyzer.md",
+      "test-runner.md",
+      "agent-manager.md"
+    ]
+  },
+  "devops": {
+    "description": "Team for CI/CD, containerization, and infrastructure tasks.",
+    "inherits": ["base"],
+    "agents": [
+      "docker-containerization-expert.md",
+      "kubernetes-orchestrator.md",
+      "github-operations-specialist.md",
+      "azure-devops-specialist.md",
+      "terraform-infrastructure-expert.md"
+    ]
+  },
+  "python_backend": {
+    "description": "Team specializing in Python backend development.",
+    "inherits": ["base"],
+    "agents": [
+      "python-backend-expert.md",
+      "fastapi-backend-engineer.md",
+      "flask-backend-engineer.md",
+      "postgresql-expert.md",
+      "mongodb-expert.md"
+    ]
+  },
+  "frontend": {
+    "description": "Team for JavaScript/TypeScript UI development.",
+    "inherits": ["base"],
+    "agents": [
+      "react-ui-expert.md",
+      "javascript-frontend-engineer.md",
+      "e2e-test-engineer.md",
+      "ux-design-expert.md",
+      "tailwindcss-expert.md"
+    ]
+  },
+  "fullstack": {
+    "description": "Complete team combining frontend and backend capabilities.",
+    "inherits": [
+      "frontend",
+      "python_backend"
+    ],
+    "agents": []
+  }
+}

@@ -42,6 +42,7 @@ class Installer {
       '.claude/strategies',
       '.claude/mcp',
       '.claude/.env.example',
+      '.claude/teams.json',
       '.claude-code'
     ];
 
