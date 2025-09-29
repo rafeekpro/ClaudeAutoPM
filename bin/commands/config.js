@@ -79,30 +79,46 @@ class ConfigCommand {
 
     console.log('│                                         │');
 
-    // Features
-    if (config.features) {
-      const dockerStatus = config.features.dockerFirst ? '✅ Enabled' : '❌ Disabled';
-      console.log(`│ Docker First:    ${this.padRight(dockerStatus, 22)} │`);
+    // Features - always show them
+    const dockerStatus = config.features?.dockerFirst ? '✅ Enabled' : '❌ Disabled';
+    console.log(`│ Docker First:    ${this.padRight(dockerStatus, 22)} │`);
 
-      const k8sStatus = config.features.kubernetes ? '✅ Enabled' : '❌ Disabled';
-      console.log(`│ Kubernetes:      ${this.padRight(k8sStatus, 22)} │`);
+    const k8sStatus = config.features?.kubernetes ? '✅ Enabled' : '❌ Disabled';
+    console.log(`│ Kubernetes:      ${this.padRight(k8sStatus, 22)} │`);
 
-      if (config.features.cicd) {
-        console.log(`│ CI/CD:           ${this.padRight(config.features.cicd, 22)} │`);
-      }
-    }
+    const mcpStatus = config.features?.mcp ? '✅ Enabled' : '❌ Disabled';
+    console.log(`│ MCP:             ${this.padRight(mcpStatus, 22)} │`);
+
+    const autoCommit = config.features?.autoCommit ? '✅ Enabled' : '❌ Disabled';
+    console.log(`│ Auto Commit:     ${this.padRight(autoCommit, 22)} │`);
+
+    // CI/CD
+    const cicdPlatform = config.features?.cicd || 'not configured';
+    console.log(`│ CI/CD:           ${this.padRight(cicdPlatform, 22)} │`);
+
+    console.log('│                                         │');
 
     // Execution strategy
-    if (config.execution?.strategy) {
-      console.log(`│ Execution:       ${this.padRight(config.execution.strategy, 22)} │`);
-    }
+    const executionStrategy = config.execution?.strategy || 'adaptive';
+    console.log(`│ Execution:       ${this.padRight(executionStrategy, 22)} │`);
 
     // Current team
-    if (config.teams?.current) {
-      console.log(`│ Team:            ${this.padRight(config.teams.current, 22)} │`);
-    }
+    const currentTeam = config.teams?.current || 'base';
+    console.log(`│ Team:            ${this.padRight(currentTeam, 22)} │`);
+
+    // Environment
+    const environment = config.environment || 'development';
+    console.log(`│ Environment:     ${this.padRight(environment, 22)} │`)
 
     console.log('└─────────────────────────────────────────┘\n');
+
+    // Show available commands hint
+    console.log('💡 Available commands:');
+    console.log('  autopm config set <key> <value>  - Set configuration value');
+    console.log('  autopm config toggle <feature>   - Toggle feature on/off');
+    console.log('  autopm config switch <provider>  - Switch to different provider');
+    console.log('  autopm config validate           - Validate configuration');
+    console.log('  autopm config --help             - Show all options\n');
   }
 
   /**
