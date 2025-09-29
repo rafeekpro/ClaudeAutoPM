@@ -159,7 +159,7 @@ function main() {
 📖 Quick Start:
    autopm install                    # Install ClaudeAutoPM in current directory
    autopm team load frontend         # Load React/UI development agents
-   claude --bypass-permissions .     # Open Claude Code
+   claude --dangerously-skip-permissions .     # Open Claude Code
 
 🔧 Configuration Setup:
    # View current configuration
@@ -224,7 +224,7 @@ function main() {
       autopm config set github.repo <repository>
       export GITHUB_TOKEN=<your-token>
    3. autopm team load fullstack   # Load appropriate agents
-   4. claude --bypass-permissions . # Open Claude Code
+   4. claude --dangerously-skip-permissions . # Open Claude Code
    5. /pm:validate                 # Verify GitHub integration
 
    6. /pm:prd-new user-auth        # Create Product Requirements Document
@@ -244,7 +244,7 @@ function main() {
       autopm config set azure.project <project>
       export AZURE_DEVOPS_PAT=<your-pat>
    3. autopm team load fullstack   # Load appropriate agents
-   4. claude --bypass-permissions . # Open Claude Code
+   4. claude --dangerously-skip-permissions . # Open Claude Code
    5. /pm:validate                 # Verify Azure DevOps integration
 
    6. /pm:prd-new user-auth        # Create Product Requirements Document
