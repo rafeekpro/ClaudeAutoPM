@@ -5,6 +5,29 @@ All notable changes to the ClaudeAutoPM framework will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### ✨ Added
+- **Full Azure DevOps Hierarchy Support** - Complete Epic → User Story → Task implementation
+  - Automatic parent-child work item linking
+  - Provider abstraction layer for GitHub/Azure DevOps parity
+  - `config` command for provider management and switching
+  - Intelligent epic decomposition based on provider (3-level for Azure, 2-level for GitHub)
+
+### 🛠️ Enhanced
+- **Provider Configuration Management**
+  - `autopm config show` - Display current provider configuration
+  - `autopm config set <key> <value>` - Configure provider settings
+  - `autopm config switch <provider>` - Quick switch between GitHub and Azure DevOps
+  - `autopm config validate` - Validate provider configuration
+  - Support for nested configuration (e.g., `azure.organization`, `github.repo`)
+
+### 🏗️ Internal
+- Implemented TDD approach with comprehensive test coverage
+- Created provider abstraction layer for extensibility
+- Added Azure DevOps client wrapper
+- Enhanced epic syncing with provider-specific hierarchy
+
 ## [1.9.2] - 2025-09-27
 
 ### 🔒 Security

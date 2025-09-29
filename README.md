@@ -109,6 +109,32 @@ During installation, you'll be asked to:
 /init include rules from .claude/CLAUDE.md
 ```
 
+#### 3.5 Provider Configuration (NEW)
+
+```bash
+# View current configuration
+autopm config show
+
+# Switch to Azure DevOps
+autopm config set provider azure
+autopm config set azure.organization your-org
+autopm config set azure.project your-project
+export AZURE_DEVOPS_PAT=your-token
+
+# Switch to GitHub
+autopm config set provider github
+autopm config set github.owner your-username
+autopm config set github.repo your-repo
+export GITHUB_TOKEN=your-token
+
+# Quick switch between providers
+autopm config switch azure
+autopm config switch github
+
+# Validate configuration
+autopm config validate
+```
+
 #### 4. Ship Your First Feature (90 seconds)
 
 ##### Option A: Using Templates (Works Everywhere)
@@ -455,11 +481,38 @@ Git hooks install in two phases:
 - Requires: `GITHUB_TOKEN` with repo scope
 - Commands: All `pm:*` plus `github:*` commands
 
-**Azure DevOps**
+**Azure DevOps** ✨ **NEW: Full 3-Level Hierarchy Support**
+- **Epic → User Story → Task** hierarchy (full Azure DevOps model)
 - Integrates with Azure Boards work items
+- Automatic parent-child linking of work items
 - Syncs with Azure Pipelines
 - Requires: `AZURE_DEVOPS_PAT` with Work Items scope
 - Commands: All `pm:*` plus `azure:*` commands
+
+**Azure DevOps Workflow Example:**
+```bash
+# Configure for Azure DevOps
+autopm config set provider azure
+autopm config set azure.organization mycompany
+autopm config set azure.project myproject
+
+# Create and decompose PRD (creates Epic → User Stories → Tasks)
+autopm pm:prd-new payment-gateway
+autopm pm:epic-decompose payment-gateway  # Creates 3-level hierarchy
+
+# Sync to Azure DevOps - creates linked work items
+autopm pm:epic-sync payment-gateway
+# ✅ Created Epic #1234 "Payment Gateway Integration"
+# ✅ Created User Story #1235 "As a user, I want to pay with credit card"
+#    ✅ Created Task #1236 "Implement Stripe API integration"
+#    ✅ Created Task #1237 "Add payment form validation"
+# ✅ Created User Story #1238 "As a user, I want to see payment history"
+#    ✅ Created Task #1239 "Create payment history endpoint"
+#    ✅ Created Task #1240 "Build payment history UI"
+
+# Work items are automatically linked with parent-child relationships
+# View in Azure Boards to see the full hierarchy visualization
+```
 
 **Skip for now**
 - All data stored locally in `.claude/`
