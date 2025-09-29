@@ -43,6 +43,49 @@ function main() {
         }
       }
     )
+    .command('update', 'Update ClaudeAutoPM framework to latest version in current project',
+      (yargs) => {
+        return yargs
+          .option('force', {
+            describe: 'Force update even if project structure differs',
+            type: 'boolean',
+            default: false
+          })
+          .option('backup', {
+            describe: 'Create backup before updating',
+            type: 'boolean',
+            default: true
+          })
+          .option('preserve-config', {
+            describe: 'Preserve existing configuration files',
+            type: 'boolean',
+            default: true
+          })
+          .example('autopm update', 'Update to latest version')
+          .example('autopm update --force', 'Force update ignoring conflicts')
+          .example('autopm update --no-backup', 'Update without creating backup');
+      },
+      (argv) => {
+        // Delegate to the update script
+        const { execSync } = require('child_process');
+        const updatePath = path.join(__dirname, '..', 'install', 'update.sh');
+        try {
+          const env = {
+            ...process.env,
+            AUTOPM_FORCE: argv.force ? '1' : '0',
+            AUTOPM_BACKUP: argv.backup ? '1' : '0',
+            AUTOPM_PRESERVE_CONFIG: argv.preserveConfig ? '1' : '0'
+          };
+          execSync(`bash ${updatePath}`, {
+            stdio: 'inherit',
+            env
+          });
+        } catch (error) {
+          console.error('Update failed:', error.message);
+          process.exit(1);
+        }
+      }
+    )
     .command('guide [action]', 'Interactive setup guide and documentation generator (deprecated: use --help)',
       (yargs) => {
         return yargs
@@ -158,6 +201,7 @@ function main() {
     .epilogue(`
 📖 Quick Start:
    autopm install                    # Install ClaudeAutoPM in current directory
+   autopm update                     # Update to latest framework version
    autopm team load frontend         # Load React/UI development agents
    claude --dangerously-skip-permissions .     # Open Claude Code
 
