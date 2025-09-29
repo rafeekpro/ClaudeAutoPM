@@ -278,21 +278,65 @@ class ReleaseManager {
       console.log('📝 Updating CHANGELOG.md...');
       this.updateChangelog(changelogEntry);
 
+      // Create release branch
+      console.log('🌿 Creating release branch...');
+      const releaseBranch = `release/v${newVersion}`;
+      this.execCommand(`git checkout -b ${releaseBranch}`);
+
       // Commit changes
       console.log('📤 Committing changes...');
       this.execCommand('git add package.json CHANGELOG.md');
       this.execCommand(`git commit -m "chore: release v${newVersion}"`);
 
-      // Create tag
-      console.log('🏷️  Creating tag...');
-      const tagMessage = `Release v${newVersion}\n\n${changelogEntry}`;
-      this.execCommand(`git tag -a v${newVersion} -m "${tagMessage.replace(/"/g, '\\"')}"`);
-
-      // Push if not disabled
+      // Push branch and create PR if not disabled
       if (!options.noPush) {
         console.log('📤 Pushing to remote...');
-        this.execCommand('git push');
-        this.execCommand('git push --tags');
+        this.execCommand(`git push -u origin ${releaseBranch}`);
+
+        // Create PR using gh CLI
+        try {
+          this.execCommand('which gh', { ignoreError: false });
+          console.log('📦 Creating Pull Request...');
+          const prBody = `## Release v${newVersion}\n\n${changelogEntry}`;
+          const prUrl = this.execCommand(
+            `gh pr create --title "chore: release v${newVersion}" --body "${prBody.replace(/"/g, '\\"')}" --base main`
+          );
+          console.log(`✅ Pull Request created: ${prUrl}`);
+
+          // Auto-merge the PR
+          const prNumber = prUrl.split('/').pop();
+          console.log('🔄 Auto-merging PR...');
+          this.execCommand(`gh pr merge ${prNumber} --squash --auto`);
+
+          // Wait for merge and create tag
+          console.log('⏳ Waiting for PR to merge...');
+          let merged = false;
+          for (let i = 0; i < 30; i++) {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            const status = this.execCommand(`gh pr view ${prNumber} --json state -q .state`, { ignoreError: true });
+            if (status === 'MERGED') {
+              merged = true;
+              break;
+            }
+          }
+
+          if (merged) {
+            // Switch back to main and pull
+            console.log('📥 Updating main branch...');
+            this.execCommand('git checkout main');
+            this.execCommand('git pull origin main');
+
+            // Create tag
+            console.log('🏷️  Creating tag...');
+            const tagMessage = `Release v${newVersion}\n\n${changelogEntry}`;
+            this.execCommand(`git tag -a v${newVersion} -m "${tagMessage.replace(/"/g, '\\"')}"`);
+            this.execCommand('git push --tags');
+          } else {
+            console.log('⚠️  PR not merged yet. Please merge manually and create tag.');
+          }
+        } catch {
+          console.log('⚠️  GitHub CLI not available. Please create PR manually.');
+        }
       }
 
       // Create GitHub release if gh CLI is available
