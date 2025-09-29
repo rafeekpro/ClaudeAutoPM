@@ -229,13 +229,14 @@ function main() {
 
    6. /pm:prd-new user-auth        # Create Product Requirements Document
    7. /pm:prd-parse user-auth      # Parse PRD into structured format
-   8. /pm:epic-decompose user-auth # Break PRD into Epic with Issues
-   9. /pm:epic-sync user-auth      # Create GitHub Epic + Issues
-   10. /pm:next                    # Get next priority issue
-   11. /pm:issue-start ISSUE-123   # Start working on specific issue
-   12. # ... development work ...
-   13. /pm:issue-close ISSUE-123   # Close completed issue
-   14. /pm:standup                 # Generate progress summary
+   8. /pm:epic-split user-auth     # [OPTIONAL] Split complex PRD into multiple epics
+   9. /pm:epic-decompose user-auth # Break PRD/Epic into Issues
+   10. /pm:epic-sync user-auth     # Create GitHub Epic + Issues
+   11. /pm:next                    # Get next priority issue
+   12. /pm:issue-start ISSUE-123   # Start working on specific issue
+   13. # ... development work ...
+   14. /pm:issue-close ISSUE-123   # Close completed issue
+   15. /pm:standup                 # Generate progress summary
 
    === AZURE DEVOPS WORKFLOW (PRD → User Stories → Tasks) ===
    1. autopm install               # Setup project framework
@@ -249,13 +250,32 @@ function main() {
 
    6. /pm:prd-new user-auth        # Create Product Requirements Document
    7. /pm:prd-parse user-auth      # Parse PRD into structured format
-   8. /pm:epic-decompose user-auth # Break PRD into User Stories + Tasks
-   9. /pm:epic-sync user-auth      # Create Azure Epic + User Stories + Tasks
-   10. /pm:next                    # Get next priority task
-   11. /pm:issue-start TASK-123    # Start working on specific task
-   12. # ... development work ...
-   13. /pm:issue-close TASK-123    # Close completed task
-   14. /pm:standup                 # Generate sprint summary
+   8. /pm:epic-split user-auth     # [OPTIONAL] Split complex PRD into multiple epics
+   9. /pm:epic-decompose user-auth # Break PRD/Epic into User Stories + Tasks
+   10. /pm:epic-sync user-auth     # Create Azure Epic + User Stories + Tasks
+   11. /pm:next                    # Get next priority task
+   12. /pm:issue-start TASK-123    # Start working on specific task
+   13. # ... development work ...
+   14. /pm:issue-close TASK-123    # Close completed task
+   15. /pm:standup                 # Generate sprint summary
+
+   === COMPLEX PROJECT WORKFLOW (Multi-Epic Split) ===
+   Example: Full-stack e-commerce platform
+
+   6. /pm:prd-new ecommerce-platform
+   7. /pm:prd-parse ecommerce-platform
+   8. /pm:epic-split ecommerce-platform # → Creates 6 epics automatically
+      → Epic 1: Infrastructure Foundation (Docker, DB, monitoring)
+      → Epic 2: Authentication Backend (JWT, users, RBAC)
+      → Epic 3: Product API Services (catalog, inventory, orders)
+      → Epic 4: Frontend Foundation (React setup, state management)
+      → Epic 5: E-commerce UI (product pages, cart, checkout)
+      → Epic 6: Testing & Deployment (CI/CD, quality gates)
+   9. /pm:epic-decompose ecommerce-platform/01-infrastructure # Decompose each epic
+   10. /pm:epic-decompose ecommerce-platform/02-auth-backend
+   11. ... (repeat for each epic)
+   12. /pm:epic-sync ecommerce-platform # Sync all epics to provider
+   13. /pm:next                         # Start with P0 infrastructure epic
 
 📋 Detailed Step-by-Step Examples:
 
@@ -269,25 +289,33 @@ function main() {
    → Analyzes PRD content and structure
    → Prepares for epic decomposition
 
-   STEP 8 - Epic Decomposition:
+   STEP 8 - Epic Split (Optional for Complex Projects):
+   /pm:epic-split user-authentication
+   → Analyzes PRD complexity and identifies logical divisions
+   → Splits into multiple epics: Infrastructure, Backend, Frontend, UI, etc.
+   → Creates structured epic hierarchy with dependencies
+   → Example: 6 epics identified (Infrastructure, Auth Backend, Frontend, etc.)
+   → Use when: Multi-component projects, large teams, parallel work needed
+
+   STEP 9 - Epic Decomposition:
    /pm:epic-decompose user-authentication
    → GitHub: Creates Epic with linked Issues
    → Azure: Creates Epic with User Stories and child Tasks
-   → File: .claude/epics/user-authentication.md
+   → File: .claude/epics/user-authentication.md (or multiple epic folders if split)
 
-   STEP 9 - Sync with Provider:
+   STEP 10 - Sync with Provider:
    /pm:epic-sync user-authentication
    → GitHub: Creates Epic + Issues in repository
    → Azure: Creates Epic + User Stories + Tasks in project
    → Links local files with remote work items
 
-   STEP 10 - Get Next Work:
+   STEP 11 - Get Next Work:
    /pm:next
    → Returns highest priority unassigned item
    → GitHub: Next issue to work on
    → Azure: Next task to work on
 
-   STEP 11 - Start Development:
+   STEP 12 - Start Development:
    /pm:issue-start USER-AUTH-001
    → Assigns work item to you
    → Updates status to "In Progress"
