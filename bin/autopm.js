@@ -133,6 +133,8 @@ function main() {
     )
     // Team management command
     .command(require('./commands/team'))
+    // Config management command
+    .command(require('./commands/config'))
     // Global options
     .option('verbose', {
       type: 'boolean',
@@ -160,18 +162,27 @@ function main() {
    claude --bypass-permissions .     # Open Claude Code
 
 🔧 Configuration Setup:
-   # Interactive configuration (recommended)
-   node install/setup-env.js         # Interactive token & provider setup
+   # View current configuration
+   autopm config show
 
-   # Non-interactive setup
-   node install/setup-env.js --non-interactive \\
-     --github-token=ghp_xxx --email=you@email.com
+   # Configure GitHub provider
+   autopm config set provider github
+   autopm config set github.owner <username>
+   autopm config set github.repo <repository>
+   export GITHUB_TOKEN=ghp_your_token_here
 
-   # Manual .claude/.env file
-   GITHUB_TOKEN=ghp_your_token_here
-   AZURE_DEVOPS_PAT=your_azure_pat
-   AZURE_DEVOPS_ORG=your-organization
-   AZURE_DEVOPS_PROJECT=your-project
+   # Configure Azure DevOps provider
+   autopm config set provider azure
+   autopm config set azure.organization <org>
+   autopm config set azure.project <project>
+   export AZURE_DEVOPS_PAT=your_azure_pat
+
+   # Quick switch between providers
+   autopm config switch github
+   autopm config switch azure
+
+   # Validate configuration
+   autopm config validate
 
 🔑 Token Setup:
    # GitHub PAT (Settings → Developer settings → Personal access tokens)
@@ -208,7 +219,10 @@ function main() {
 
    === GITHUB WORKFLOW (PRD → Epic → Issues) ===
    1. autopm install               # Setup project framework
-   2. node install/setup-env.js    # Configure GitHub token
+   2. autopm config set provider github  # Set provider
+      autopm config set github.owner <username>
+      autopm config set github.repo <repository>
+      export GITHUB_TOKEN=<your-token>
    3. autopm team load fullstack   # Load appropriate agents
    4. claude --bypass-permissions . # Open Claude Code
    5. /pm:validate                 # Verify GitHub integration
@@ -225,8 +239,10 @@ function main() {
 
    === AZURE DEVOPS WORKFLOW (PRD → User Stories → Tasks) ===
    1. autopm install               # Setup project framework
-   2. node install/setup-env.js    # Configure Azure DevOps PAT
-      # Set AZURE_DEVOPS_PAT, ORG, PROJECT
+   2. autopm config set provider azure  # Set provider
+      autopm config set azure.organization <org>
+      autopm config set azure.project <project>
+      export AZURE_DEVOPS_PAT=<your-pat>
    3. autopm team load fullstack   # Load appropriate agents
    4. claude --bypass-permissions . # Open Claude Code
    5. /pm:validate                 # Verify Azure DevOps integration
