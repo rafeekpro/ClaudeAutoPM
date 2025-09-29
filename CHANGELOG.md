@@ -5,6 +5,29 @@ All notable changes to the ClaudeAutoPM framework will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.9] - 2025-09-29
+
+### ✨ Features
+- feat: add autopm update command for framework updates (#138)
+
+### 🐛 Bug Fixes
+- fix: update release script to handle branch protection rules (#129)
+- fix: correct PM command syntax throughout documentation (#127)
+
+### 📚 Documentation
+- docs: add epic-split step to workflow documentation
+
+### 🔧 Maintenance
+- chore: release v1.11.8 (#133)
+- chore: release v1.11.5 (#130)
+
+### Other Changes
+- cleanup: remove outdated project files after update
+- 1.11.6 (#132)
+- 1.11.3 (#128)
+- Merge pull request #126 from rafeekpro/docs/add-epic-split-workflow
+
+
 ## [1.11.8] - 2025-09-29
 
 
