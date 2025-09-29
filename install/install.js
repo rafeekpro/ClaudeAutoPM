@@ -39,6 +39,7 @@ class Installer {
       '.claude/rules',
       '.claude/scripts',
       '.claude/checklists',
+      '.claude/strategies',
       '.claude/mcp',
       '.claude/.env.example',
       '.claude-code'
@@ -345,11 +346,34 @@ ${this.colors.BOLD}Examples:${this.colors.NC}
     console.log(`
 ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
 
-1. ${this.colors.CYAN}Minimal${this.colors.NC} - Sequential execution, no Docker/K8s
-2. ${this.colors.CYAN}Docker-only${this.colors.NC} - Adaptive execution with Docker
-3. ${this.colors.GREEN}Full DevOps${this.colors.NC} - Adaptive execution with all features ${this.colors.BOLD}(RECOMMENDED)${this.colors.NC}
-4. ${this.colors.YELLOW}Performance${this.colors.NC} - Hybrid parallel execution for power users
-5. ${this.colors.CYAN}Custom${this.colors.NC} - Configure manually
+${this.colors.CYAN}1. Minimal${this.colors.NC} - Traditional development workflow
+   • Sequential agent execution (one at a time)
+   • Native tooling: npm, pip, local installs
+   • Best for: Simple projects, learning, debugging
+   • No containers or orchestration
+
+${this.colors.CYAN}2. Docker-only${this.colors.NC} - Containerized local development
+   • Adaptive execution (smart sequential/parallel choice)
+   • Docker containers for development environment
+   • Best for: Microservices, consistent environments
+   • Local Docker only, no Kubernetes
+
+${this.colors.GREEN}3. Full DevOps${this.colors.NC} - Complete CI/CD pipeline ${this.colors.BOLD}(RECOMMENDED)${this.colors.NC}
+   • Adaptive execution with Docker-first priority
+   • Kubernetes manifests and cloud deployment ready
+   • GitHub Actions with KIND clusters and Kaniko builds
+   • Best for: Production applications, enterprise projects
+
+${this.colors.YELLOW}4. Performance${this.colors.NC} - Maximum parallel execution
+   • Hybrid strategy: up to 5 parallel agents
+   • Advanced context isolation and security
+   • Full DevOps capabilities with speed optimization
+   • Best for: Large projects, massive refactoring, power users
+
+${this.colors.CYAN}5. Custom${this.colors.NC} - Manual configuration
+   • Configure execution strategy manually
+   • Choose your own agents and workflows
+   • Advanced users only
 `);
 
     if (process.env.AUTOPM_TEST_MODE === '1') {
