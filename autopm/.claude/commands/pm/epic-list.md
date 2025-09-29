@@ -2,7 +2,7 @@
 allowed-tools: Bash
 ---
 
-Run `bash .claude/scripts/pm/epic-list.sh` using a sub-agent and show me the complete output.
+Run `node .claude/scripts/pm/epic-list.js` using the Bash tool and show me the complete output.
 
 - You MUST display the complete output.
 - DO NOT truncate.
