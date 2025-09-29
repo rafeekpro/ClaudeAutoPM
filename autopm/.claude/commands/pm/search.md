@@ -2,7 +2,7 @@
 allowed-tools: Bash
 ---
 
-Run `bash .claude/scripts/pm/search.sh $ARGUMENTS` using a sub-agent and show me the complete output.
+Run `node .claude/scripts/pm/search.js $ARGUMENTS` using the Bash tool and show me the complete output.
 
 - DO NOT truncate.
 - DO NOT collapse.
