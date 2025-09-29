@@ -144,28 +144,28 @@ AUTOPM/                    # Development project root
 
 ## 📋 Maintenance Commands Using Agents
 
-### pm validate
+### /pm:validate
 ```bash
 # Uses multiple agents for comprehensive validation
-pm validate
+/pm:validate
 # - registry-manager: Validates agent registry
 # - code-analyzer: Checks code quality
 # - test-runner: Executes smoke tests
 ```
 
-### pm optimize
+### /pm:optimize
 ```bash
 # Analyzes optimization opportunities
-pm optimize
+/pm:optimize
 # - optimization-analyzer: Finds redundancies
 # - code-analyzer: Impact analysis
 # - test-runner: Validates changes
 ```
 
-### pm release
+### /pm:release
 ```bash
 # Prepares and executes releases
-pm release
+/pm:release
 # - github-operations-specialist: GitHub release
 # - test-runner: Final validation
 # - installer-tester: Installation verification
@@ -230,7 +230,7 @@ pm release
 ### Daily Maintenance
 ```bash
 # Morning validation using framework agents
-pm validate              # Uses registry-manager, code-analyzer, test-runner
+/pm:validate              # Uses registry-manager, code-analyzer, test-runner
 npm run pm:metrics      # Uses optimization-analyzer
 npm run pm:health       # Comprehensive health check
 ```
@@ -238,7 +238,7 @@ npm run pm:health       # Comprehensive health check
 ### Before Making Changes
 ```bash
 # Ensure clean state
-pm validate registry    # Uses registry-manager
+/pm:validate registry    # Uses registry-manager
 npm test               # Uses test-runner
 git status             # Check for uncommitted changes
 ```
@@ -248,24 +248,24 @@ git status             # Check for uncommitted changes
 # Validate changes
 @code-analyzer review my changes for issues
 @test-runner run affected tests
-pm validate            # Full validation
+/pm:validate            # Full validation
 ```
 
 ### Before Committing
 ```bash
 # Pre-commit validation
 npm test              # Uses test-runner
-pm validate registry  # Uses registry-manager
+/pm:validate registry  # Uses registry-manager
 @code-analyzer check for security issues
 ```
 
 ### Before Release
 ```bash
 # Full release preparation
-pm release --dry-run  # Test release process
+/pm:release --dry-run  # Test release process
 @installer-tester test all scenarios
 @test-runner execute full test suite
-pm release           # Execute release
+/pm:release           # Execute release
 ```
 
 ## Development Guidelines
