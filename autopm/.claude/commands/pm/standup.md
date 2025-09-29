@@ -2,7 +2,7 @@
 allowed-tools: Bash
 ---
 
-Run `bash .claude/scripts/pm/standup.sh` using a sub-agent and show me the complete output.
+Run `node .claude/scripts/pm/standup.js` using the Bash tool and show me the complete output.
 
 - DO NOT truncate.
 - DO NOT collapse.
