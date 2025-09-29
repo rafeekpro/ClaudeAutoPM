@@ -79,13 +79,28 @@ class ConfigCommand {
 
     console.log('│                                         │');
 
-    // Features - always show them
-    const dockerStatus = config.features?.dockerFirst ? '✅ Enabled' : '❌ Disabled';
-    console.log(`│ Docker First:    ${this.padRight(dockerStatus, 22)} │`);
+    // Installation Configuration - check both new and legacy formats
+    const dockerEnabled = config.tools?.docker?.enabled || config.features?.dockerFirst || false;
+    const dockerFirst = config.tools?.docker?.first || false;
+    const dockerStatus = dockerEnabled ? (dockerFirst ? '✅ Enabled (First)' : '✅ Enabled') : '❌ Disabled';
+    console.log(`│ Docker:          ${this.padRight(dockerStatus, 22)} │`);
 
-    const k8sStatus = config.features?.kubernetes ? '✅ Enabled' : '❌ Disabled';
+    const k8sEnabled = config.tools?.kubernetes?.enabled || config.features?.kubernetes || false;
+    const k8sStatus = k8sEnabled ? '✅ Enabled' : '❌ Disabled';
     console.log(`│ Kubernetes:      ${this.padRight(k8sStatus, 22)} │`);
 
+    // Execution strategy - check both formats
+    const executionStrategy = config.execution_strategy || config.execution?.strategy || 'adaptive';
+    console.log(`│ Execution:       ${this.padRight(executionStrategy, 22)} │`);
+
+    // Show parallel limit if hybrid strategy
+    if (executionStrategy === 'hybrid' && config.parallel_limit) {
+      console.log(`│ Parallel Limit:  ${this.padRight(config.parallel_limit.toString(), 22)} │`);
+    }
+
+    console.log('│                                         │');
+
+    // Features - optional/legacy features
     const mcpStatus = config.features?.mcp ? '✅ Enabled' : '❌ Disabled';
     console.log(`│ MCP:             ${this.padRight(mcpStatus, 22)} │`);
 
@@ -95,12 +110,6 @@ class ConfigCommand {
     // CI/CD
     const cicdPlatform = config.features?.cicd || 'not configured';
     console.log(`│ CI/CD:           ${this.padRight(cicdPlatform, 22)} │`);
-
-    console.log('│                                         │');
-
-    // Execution strategy
-    const executionStrategy = config.execution?.strategy || 'adaptive';
-    console.log(`│ Execution:       ${this.padRight(executionStrategy, 22)} │`);
 
     // Current team
     const currentTeam = config.teams?.current || 'base';
