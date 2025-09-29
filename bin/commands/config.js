@@ -281,4 +281,102 @@ class ConfigCommand {
   }
 }
 
-module.exports = ConfigCommand;
+// Export for yargs command structure
+module.exports = {
+  command: 'config <action> [key] [value]',
+  desc: 'Manage ClaudeAutoPM configuration and provider settings',
+  builder: (yargs) => {
+    return yargs
+      .positional('action', {
+        describe: 'Configuration action to perform',
+        type: 'string',
+        choices: ['show', 'set', 'get', 'validate', 'switch', 'toggle', 'init']
+      })
+      .positional('key', {
+        describe: 'Configuration key (for set/get/toggle)',
+        type: 'string'
+      })
+      .positional('value', {
+        describe: 'Configuration value (for set)',
+        type: 'string'
+      })
+      .example('$0 config show', 'Display current configuration')
+      .example('$0 config set provider azure', 'Set provider to Azure DevOps')
+      .example('$0 config set azure.organization myorg', 'Set Azure organization')
+      .example('$0 config switch github', 'Quick switch to GitHub provider')
+      .example('$0 config validate', 'Validate current configuration')
+      .example('$0 config toggle docker-first', 'Toggle Docker-first feature');
+  },
+  handler: async (argv) => {
+    try {
+      const cmd = new ConfigCommand();
+
+      switch (argv.action) {
+        case 'show':
+          await cmd.show();
+          break;
+
+        case 'set':
+          if (!argv.key || argv.value === undefined) {
+            console.error('❌ Both key and value are required for set command');
+            console.error('Usage: autopm config set <key> <value>');
+            process.exit(1);
+          }
+          await cmd.set(argv.key, argv.value);
+          break;
+
+        case 'get':
+          if (!argv.key) {
+            console.error('❌ Key is required for get command');
+            console.error('Usage: autopm config get <key>');
+            process.exit(1);
+          }
+          const config = await cmd.loadConfig();
+          const value = argv.key.split('.').reduce((obj, key) => obj?.[key], config);
+          console.log(value || 'Not set');
+          break;
+
+        case 'validate':
+          const valid = await cmd.validate();
+          process.exit(valid ? 0 : 1);
+          break;
+
+        case 'switch':
+          if (!argv.key) {
+            console.error('❌ Provider name is required for switch command');
+            console.error('Usage: autopm config switch <provider>');
+            process.exit(1);
+          }
+          await cmd.switch(argv.key);
+          break;
+
+        case 'toggle':
+          if (!argv.key) {
+            console.error('❌ Feature name is required for toggle command');
+            console.error('Usage: autopm config toggle <feature>');
+            process.exit(1);
+          }
+          await cmd.toggle(argv.key);
+          break;
+
+        case 'init':
+          await cmd.init();
+          break;
+
+        default:
+          console.error(`❌ Unknown action: ${argv.action}`);
+          console.error('Valid actions: show, set, get, validate, switch, toggle, init');
+          process.exit(1);
+      }
+    } catch (error) {
+      console.error('❌ Error:', error.message);
+      if (process.env.DEBUG) {
+        console.error(error.stack);
+      }
+      process.exit(1);
+    }
+  }
+};
+
+// Export the class for testing
+module.exports.ConfigCommand = ConfigCommand;
