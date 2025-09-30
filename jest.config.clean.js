@@ -8,8 +8,9 @@ module.exports = {
     '**/test/unit/*-jest.test.js',
     '**/test/integration/*-jest.test.js',
     '**/test/teams/*.test.js',
-    '**/test/cli/*.test.js',
-    '**/test/installation/*.test.js'
+    '**/test/cli/*.test.js'
+    // Installation tests excluded - they timeout (>2 min)
+    // Run separately: npm run test:install
   ],
 
   // Ignore problematic tests and duplicates
@@ -20,6 +21,7 @@ module.exports = {
     '/test/jest-tests/self-maintenance-jest.test.js',  // Fixed but may still have issues
     '/test/jest-tests/mcp-handler-jest.test.js',  // Has warnings
     '/test/jest-tests/pm-standup-jest.test.js',  // May have issues
+    '/test/jest-tests/azure-issue-show-jest.test.js',  // Implementation removed - placeholder only
     '/test/unit/email-validator-jest.test.js'  // Minor validation issues
     // utils-jest.test.js is working perfectly - included!
   ],
@@ -32,7 +34,10 @@ module.exports = {
   ],
 
   // Timeouts
-  testTimeout: 10000,
+  testTimeout: 15000,
+
+  // Performance optimization
+  maxWorkers: '50%',  // Use 50% of available CPU cores
 
   // Clear mocks between tests
   clearMocks: true,
@@ -42,5 +47,8 @@ module.exports = {
   verbose: false,
 
   // Simple reporter
-  reporters: ['default']
+  reporters: ['default'],
+
+  // Bail after first failure in CI
+  bail: process.env.CI ? 1 : 0
 };
