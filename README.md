@@ -41,6 +41,28 @@ ClaudeAutoPM uses a **hybrid approach** combining deterministic operations with 
 - **Smart Context Management** - Never lose track of your work
 - **Automated Workflows** - From PRD to production deployment
 
+## 📺 Visual Walkthrough
+
+See ClaudeAutoPM in action - from installation to deployment:
+
+### 1️⃣ Install AutoPM
+![Install AutoPM](Video%201.gif)
+
+### 2️⃣ First Claude Execution
+![First Claude Execution](Video%202.gif)
+
+### 3️⃣ Creation of PRD
+![Create PRD](Video%203.gif)
+
+### 4️⃣ GitHub Sync and Start Working on Issues
+![GitHub Sync](Video%204.gif)
+
+### 5️⃣ Issues Finished
+![Issues Complete](Video%205.gif)
+
+### 6️⃣ Checking the Work Done (Web App + FastAPI)
+![Web App and FastAPI](Video%206.gif)
+
 ## 🚀 Get Started in 5 Minutes
 
 ### 🎯 Quick Start for New Users
