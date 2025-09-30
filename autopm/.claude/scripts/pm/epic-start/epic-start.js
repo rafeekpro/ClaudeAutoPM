@@ -118,7 +118,7 @@ class EpicStarter {
     // Check if epic name provided
     if (!this.epicName) {
       console.error('❌ Error: Epic name required');
-      console.error('Usage: /pm:epic-start <epic-name>');
+      console.error('Usage: /pm:epic-start epic-name');
       process.exit(1);
     }
 
