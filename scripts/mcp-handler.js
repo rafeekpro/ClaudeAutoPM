@@ -1329,7 +1329,7 @@ if (require.main === module) {
           process.exit(1);
         }
       }).catch(error => {
-        console.error(`❌ Error testing server: ${error && error.message ? error.message : error}`);
+        console.error(`❌ Error testing server: ${error?.message || error}`);
         process.exit(1);
       });
       break;
