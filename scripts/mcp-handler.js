@@ -1102,7 +1102,7 @@ This server can be integrated with various agents and context pools.
       checkResult.disabledServers.forEach(server => {
         console.log(`   autopm mcp enable ${server.name}`);
       });
-    if (checkResult.disabledServers.length > 0) {
+    }
     if (checkResult.missingEnvVars.length > 0) {
       console.log(`   autopm mcp setup`);
     }
