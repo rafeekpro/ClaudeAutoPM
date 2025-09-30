@@ -791,7 +791,11 @@ This server can be integrated with various agents and context pools.
 
     console.log('📈 Summary:');
     console.log(`   Total agents: ${analysis.totalAgents}`);
-    console.log(`   Using MCP: ${analysis.agentsWithMCP} (${Math.round(analysis.agentsWithMCP / analysis.totalAgents * 100)}%)`);
+    if (analysis.totalAgents > 0) {
+      console.log(`   Using MCP: ${analysis.agentsWithMCP} (${Math.round(analysis.agentsWithMCP / analysis.totalAgents * 100)}%)`);
+    } else {
+      console.log(`   Using MCP: ${analysis.agentsWithMCP} (N/A%)`);
+    }
     console.log(`   MCP servers in use: ${sorted.length}`);
   }
 
