@@ -514,8 +514,19 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
   }
 
   generateConfig(scenario) {
+    // Get version from package.json
+    let version = 'unknown';
+    try {
+      const packageJson = JSON.parse(fs.readFileSync(path.join(this.baseDir, 'package.json'), 'utf-8'));
+      version = packageJson.version;
+    } catch (error) {
+      // Fallback to unknown if package.json can't be read
+    }
+
     const configs = {
       minimal: {
+        version: version,
+        installed: new Date().toISOString(),
         execution_strategy: 'sequential',
         tools: {
           docker: { enabled: false },
@@ -523,6 +534,8 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
         }
       },
       docker: {
+        version: version,
+        installed: new Date().toISOString(),
         execution_strategy: 'adaptive',
         tools: {
           docker: { enabled: true, first: false },
@@ -530,6 +543,8 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
         }
       },
       full: {
+        version: version,
+        installed: new Date().toISOString(),
         execution_strategy: 'adaptive',
         tools: {
           docker: { enabled: true, first: true },
@@ -537,6 +552,8 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
         }
       },
       performance: {
+        version: version,
+        installed: new Date().toISOString(),
         execution_strategy: 'hybrid',
         parallel_limit: 5,
         tools: {

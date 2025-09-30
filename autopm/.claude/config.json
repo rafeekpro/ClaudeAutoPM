@@ -1,4 +1,6 @@
 {
+  "version": "1.12.2",
+  "installed": "2025-09-30T09:00:00Z",
   "execution_strategy": {
     "mode": "adaptive"
   },
