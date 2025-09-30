@@ -585,8 +585,7 @@ This server can be integrated with various agents and context pools.
           const agentName = nameMatch ? nameMatch[1].trim() : path.basename(entry.name, '.md');
 
           // Extract MCP URIs (mcp://server-name/path)
-          const regex = new RegExp(MCPHandler.MCP_URI_REGEX.source, MCPHandler.MCP_URI_REGEX.flags);
-          const matches = [...content.matchAll(regex)];
+          const matches = [...content.matchAll(MCPHandler.MCP_URI_REGEX)];
 
           if (matches.length > 0) {
             result.agentsWithMCP++;
