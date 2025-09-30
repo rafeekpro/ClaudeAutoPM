@@ -350,8 +350,11 @@ autopm mcp tree
 # Interactive API key setup
 autopm mcp setup
 
+# Quick configuration check
+autopm mcp check                 # Fast validation of required MCP servers
+
 # Run comprehensive MCP diagnostics
-autopm mcp diagnose
+autopm mcp diagnose             # Full diagnostic report
 
 # Test specific MCP server connection
 autopm mcp test context7-docs
@@ -416,14 +419,15 @@ As of the latest version, **39 out of 53 agents (74%)** use MCP servers:
 
 If MCP setup issues persist:
 
-1. **Run diagnostics**: `autopm mcp diagnose`
-2. **Check server status**: `autopm mcp status`
-3. **Test connections**: `autopm mcp test <server-name>`
-4. **Review agent config**: `autopm mcp agent <agent-name>`
-5. Check the [ClaudeAutoPM Issues](https://github.com/rafeekpro/ClaudeAutoPM/issues)
-6. Review agent-specific documentation in `autopm/.claude/agents/`
-7. Enable debug mode and check logs
-8. Contact support with configuration details (exclude API keys!)
+1. **Quick check**: `autopm mcp check` - Fast validation of required servers
+2. **Run diagnostics**: `autopm mcp diagnose` - Full diagnostic report
+3. **Check server status**: `autopm mcp status`
+4. **Test connections**: `autopm mcp test <server-name>`
+5. **Review agent config**: `autopm mcp agent <agent-name>`
+6. Check the [ClaudeAutoPM Issues](https://github.com/rafeekpro/ClaudeAutoPM/issues)
+7. Review agent-specific documentation in `autopm/.claude/agents/`
+8. Enable debug mode and check logs
+9. Contact support with configuration details (exclude API keys!)
 
 ---
 

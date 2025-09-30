@@ -17,7 +17,7 @@ module.exports = {
         type: 'string',
         choices: [
           'list', 'add', 'remove', 'enable', 'disable', 'sync', 'validate', 'info',
-          'agents', 'agent', 'usage', 'setup', 'diagnose', 'test', 'tree', 'status'
+          'agents', 'agent', 'usage', 'setup', 'check', 'diagnose', 'test', 'tree', 'status'
         ]
       })
       .option('server', {
@@ -41,6 +41,7 @@ module.exports = {
       .example('autopm mcp agent react-frontend-engineer', 'Show MCP config for specific agent')
       .example('autopm mcp usage', 'Show MCP usage statistics')
       .example('autopm mcp setup', 'Interactive API key setup')
+      .example('autopm mcp check', 'Quick MCP configuration check')
       .example('autopm mcp diagnose', 'Run MCP diagnostics')
       .example('autopm mcp test context7-docs', 'Test MCP server connection')
       .example('autopm mcp tree', 'Show agent-MCP dependency tree')
@@ -124,6 +125,10 @@ module.exports = {
           await handler.setupWizard();
           break;
 
+        case 'check':
+          handler.check();
+          break;
+
         case 'diagnose':
           handler.diagnose();
           break;
@@ -155,7 +160,7 @@ module.exports = {
           console.error(`❌ Unknown action: ${action}`);
           console.log('\nAvailable actions:');
           console.log('  list, add, remove, enable, disable, sync, validate, info');
-          console.log('  agents, agent, usage, setup, diagnose, test, tree, status');
+          console.log('  agents, agent, usage, setup, check, diagnose, test, tree, status');
           console.log('\nUse "autopm mcp --help" for more information');
           process.exit(1);
       }

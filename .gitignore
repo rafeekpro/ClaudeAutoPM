@@ -104,6 +104,21 @@ DIRECTORY_ANALYSIS.md
 MIGRATION*.md
 test-mcp-setup.js
 
+# Backup Folders
+# --------------
+.claude-backup-*/
+
+# Documentation Assets
+# --------------------
+docs/assets/
+
+# Temporary/Working Documentation
+# --------------------------------
+AGENT_RESPONSIBILITY_MATRIX.md
+BATCH_MCP_UPDATES.md
+SYSTEM_IMPROVEMENTS_PLAN.md
+TOOL_AUDIT_SUMMARY.md
+
 # Shell Completions Cache
 # -----------------------
 completions/*.cache
