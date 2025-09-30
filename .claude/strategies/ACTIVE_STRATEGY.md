@@ -161,5 +161,3 @@ const LIMITS = {
 
 - [Claude Code Documentation](https://docs.anthropic.com/claude-code)
 - [Model Context Protocol](https://github.com/anthropics/mcp)
-- [Security Best Practices](./security/README.md)
-- [Performance Tuning Guide](./performance/README.md)
