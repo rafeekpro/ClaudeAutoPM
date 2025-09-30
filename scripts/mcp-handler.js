@@ -1330,7 +1330,7 @@ if (require.main === module) {
         }
       }).catch(error => {
         console.error(`❌ Error testing server: ${error?.message || error}`);
-        process.exit(1);
+        console.error(`❌ Error testing server: ${error?.message || error}`);
       });
       break;
     case 'tree':
