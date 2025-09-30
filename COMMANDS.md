@@ -517,6 +517,56 @@ autopm mcp setup
 
 Guides you through configuring required environment variables for enabled MCP servers.
 
+### `autopm mcp check`
+Quick MCP configuration check
+```bash
+autopm mcp check
+```
+
+Quickly validates that all MCP servers required by your agents are properly configured. This command:
+- Analyzes which agents are using MCP servers
+- Checks if required servers are enabled
+- Verifies environment variables are configured
+- Provides actionable recommendations
+
+**Example output when configuration is missing:**
+```
+🔍 MCP Configuration Check
+
+📊 Overview:
+   Agents using MCP: 39/53
+   MCP servers in use: 1
+
+⚠️  Configuration Issues:
+
+⚠️  MCP server 'context7-docs' is used by agents but NOT enabled
+
+🔴 Disabled Servers (used by agents):
+
+   • context7-docs
+     Category: documentation
+     Description: Context7 documentation server
+
+💡 Recommendations:
+
+   Run: autopm mcp enable context7-docs
+
+🔧 Quick Fix:
+   autopm mcp enable context7-docs
+   autopm mcp sync
+```
+
+**Example output when everything is configured:**
+```
+🔍 MCP Configuration Check
+
+📊 Overview:
+   Agents using MCP: 39/53
+   MCP servers in use: 1
+
+✅ All required MCP servers are properly configured!
+```
+
 ### `autopm mcp diagnose`
 Run comprehensive MCP diagnostics
 ```bash
@@ -597,11 +647,14 @@ autopm mcp setup
 # 4. Sync configuration
 autopm mcp sync
 
-# 5. Verify setup
+# 5. Quick validation check
+autopm mcp check
+
+# 6. Comprehensive diagnostics (if needed)
 autopm mcp diagnose
 autopm mcp status
 
-# 6. Test connections
+# 7. Test connections
 autopm mcp test context7-docs
 ```
 
