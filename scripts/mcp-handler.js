@@ -950,6 +950,159 @@ This server can be integrated with various agents and context pools.
   // ==========================================
 
   /**
+   * Check if required MCP servers are properly configured
+   * @returns {Object} Configuration check result
+   */
+  checkRequiredServers() {
+    const analysis = this.analyzeAgents();
+    const config = this.loadConfig();
+    const activeServers = config.mcp?.activeServers || [];
+    const envStatus = this.checkEnvVarsStatus();
+
+    const result = {
+      agentsUsingMCP: analysis.agentsWithMCP,
+      totalAgents: analysis.totalAgents,
+      serversInUse: new Set(),
+      missingServers: [],
+      disabledServers: [],
+      missingEnvVars: [],
+      warnings: [],
+      recommendations: []
+    };
+
+    // Collect all MCP servers used by agents
+    Object.values(analysis.mcpUsage).forEach(servers => {
+      servers.forEach(server => result.serversInUse.add(server));
+    });
+
+    // Check each server
+    result.serversInUse.forEach(serverName => {
+      const server = this.getServer(serverName);
+
+      if (!server) {
+        result.missingServers.push({
+          name: serverName,
+          reason: 'Server definition not found in registry'
+        });
+        result.warnings.push(`⚠️  MCP server '${serverName}' is used by agents but not defined in registry`);
+      } else {
+        // Check if server is enabled
+        if (!activeServers.includes(serverName)) {
+          result.disabledServers.push({
+            name: serverName,
+            category: server.metadata.category,
+            description: server.metadata.description
+          });
+          result.warnings.push(`⚠️  MCP server '${serverName}' is used by agents but NOT enabled`);
+          result.recommendations.push(`   Run: autopm mcp enable ${serverName}`);
+        }
+
+        // Check environment variables for this server
+        if (server.metadata.env) {
+          const serverEnvVars = Object.keys(server.metadata.env);
+          serverEnvVars.forEach(envVar => {
+            if (envStatus.missing.includes(envVar)) {
+              result.missingEnvVars.push({
+                server: serverName,
+                variable: envVar
+              });
+            }
+          });
+        }
+      }
+    });
+
+    // Add recommendations for missing env vars
+    if (result.missingEnvVars.length > 0) {
+      const uniqueVars = [...new Set(result.missingEnvVars.map(v => v.variable))];
+      result.warnings.push(`⚠️  Missing ${uniqueVars.length} environment variable(s): ${uniqueVars.join(', ')}`);
+      result.recommendations.push(`   Configure in .claude/.env file`);
+      result.recommendations.push(`   Run: autopm mcp setup`);
+    }
+
+    return result;
+  }
+
+  /**
+   * Display quick configuration check
+   */
+  check() {
+    console.log('🔍 MCP Configuration Check\n');
+
+    const checkResult = this.checkRequiredServers();
+
+    if (checkResult.agentsUsingMCP === 0) {
+      console.log('ℹ️  No agents are using MCP servers\n');
+      console.log('✅ Configuration OK - MCP not required\n');
+      return;
+    }
+
+    console.log(`📊 Overview:`);
+    console.log(`   Agents using MCP: ${checkResult.agentsUsingMCP}/${checkResult.totalAgents}`);
+    console.log(`   MCP servers in use: ${checkResult.serversInUse.size}\n`);
+
+    // Check for issues
+    const hasIssues = checkResult.missingServers.length > 0 ||
+                      checkResult.disabledServers.length > 0 ||
+                      checkResult.missingEnvVars.length > 0;
+
+    if (!hasIssues) {
+      console.log('✅ All required MCP servers are properly configured!\n');
+      return;
+    }
+
+    // Show warnings
+    if (checkResult.warnings.length > 0) {
+      console.log('⚠️  Configuration Issues:\n');
+      checkResult.warnings.forEach(warning => console.log(warning));
+      console.log();
+    }
+
+    // Show disabled servers
+    if (checkResult.disabledServers.length > 0) {
+      console.log('🔴 Disabled Servers (used by agents):\n');
+      checkResult.disabledServers.forEach(server => {
+        console.log(`   • ${server.name}`);
+        console.log(`     Category: ${server.category || 'uncategorized'}`);
+        console.log(`     Description: ${server.description || 'No description'}`);
+      });
+      console.log();
+    }
+
+    // Show missing env vars details
+    if (checkResult.missingEnvVars.length > 0) {
+      console.log('🔑 Missing Environment Variables:\n');
+      const byServer = {};
+      checkResult.missingEnvVars.forEach(({ server, variable }) => {
+        if (!byServer[server]) byServer[server] = [];
+        byServer[server].push(variable);
+      });
+      Object.entries(byServer).forEach(([server, vars]) => {
+        console.log(`   ${server}:`);
+        vars.forEach(v => console.log(`      - ${v}`));
+      });
+      console.log();
+    }
+
+    // Show recommendations
+    if (checkResult.recommendations.length > 0) {
+      console.log('💡 Recommendations:\n');
+      checkResult.recommendations.forEach(rec => console.log(rec));
+      console.log();
+    }
+
+    console.log('🔧 Quick Fix:');
+    if (checkResult.disabledServers.length > 0) {
+      console.log(`   autopm mcp enable ${checkResult.disabledServers[0].name}`);
+    }
+    if (checkResult.missingEnvVars.length > 0) {
+      console.log(`   autopm mcp setup`);
+    }
+    console.log(`   autopm mcp sync`);
+    console.log();
+  }
+
+  /**
    * Run comprehensive MCP diagnostics
    * @returns {Object} Diagnostic results
    */
@@ -1055,6 +1208,42 @@ This server can be integrated with various agents and context pools.
     if (result.warnings.length > 0) {
       console.log('\n⚠️ Warnings:');
       result.warnings.forEach(warn => console.log(`   ${warn}`));
+    }
+
+    // Check for missing/disabled MCP servers
+    console.log('\n🔌 MCP Server Requirements:');
+    const serverCheck = this.checkRequiredServers();
+
+    if (serverCheck.agentsUsingMCP === 0) {
+      console.log('   ℹ️  No agents using MCP servers');
+    } else {
+      console.log(`   Agents using MCP: ${serverCheck.agentsUsingMCP}/${serverCheck.totalAgents}`);
+      console.log(`   MCP servers in use: ${serverCheck.serversInUse.size}`);
+
+      if (serverCheck.disabledServers.length > 0) {
+        console.log(`   ⚠️  ${serverCheck.disabledServers.length} required server(s) are DISABLED`);
+        result.warnings.push(`${serverCheck.disabledServers.length} MCP server(s) used by agents are not enabled`);
+        if (result.status === 'healthy') result.status = 'warning';
+      }
+
+      if (serverCheck.missingServers.length > 0) {
+        console.log(`   ❌ ${serverCheck.missingServers.length} server(s) not found in registry`);
+        result.errors.push(`${serverCheck.missingServers.length} MCP server(s) referenced but not defined`);
+        result.status = 'error';
+      }
+
+      if (serverCheck.missingEnvVars.length > 0) {
+        const uniqueVars = [...new Set(serverCheck.missingEnvVars.map(v => v.variable))];
+        console.log(`   ⚠️  ${uniqueVars.length} environment variable(s) not configured`);
+      }
+
+      if (serverCheck.disabledServers.length === 0 &&
+          serverCheck.missingServers.length === 0 &&
+          serverCheck.missingEnvVars.length === 0) {
+        console.log('   ✅ All required servers properly configured');
+      } else {
+        console.log('\n💡 Run "autopm mcp check" for detailed recommendations');
+      }
     }
 
     console.log(`\n🏥 Overall Health: ${result.status.toUpperCase()}`);
@@ -1313,6 +1502,9 @@ if (require.main === module) {
     case 'setup':
       handler.setupWizard();
       break;
+    case 'check':
+      handler.check();
+      break;
     case 'diagnose':
       handler.diagnose();
       break;
@@ -1357,6 +1549,7 @@ if (require.main === module) {
       console.log('  usage             Show MCP usage statistics');
       console.log('\nConfiguration:');
       console.log('  setup             Interactive API key setup');
+      console.log('  check             Quick MCP configuration check');
       console.log('  diagnose          Run MCP diagnostics');
       console.log('  test <server>     Test MCP server connection');
       console.log('\nVisualization:');
