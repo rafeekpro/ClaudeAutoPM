@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.12.1] - 2025-09-29
 
+### ✨ Added
+- **Hybrid Parallel Execution Strategy** - Enables simultaneous processing of multiple tasks and stories for improved performance.
+- **Azure DevOps Integration** - Enhanced support for Azure DevOps, including improved work item management and synchronization.
 
+### 🗑️ Removed
+- **Self-Maintenance Features** - Deprecated and removed automatic self-updating and maintenance routines for improved stability and security.
+
+### 🛠️ Enhanced
+- Improved provider abstraction to support hybrid execution and Azure DevOps features.
 ## [1.11.8] - 2025-09-29
 
 
