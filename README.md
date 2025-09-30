@@ -46,22 +46,22 @@ ClaudeAutoPM uses a **hybrid approach** combining deterministic operations with 
 See ClaudeAutoPM in action - from installation to deployment:
 
 ### 1️⃣ Install AutoPM
-![Install AutoPM](docs/assets/Video%201.gif)
+![Install AutoPM](docs/assets/video-1.gif)
 
 ### 2️⃣ First Claude Execution
-![First Claude Execution](docs/assets/Video%202.gif)
+![First Claude Execution](docs/assets/video-2.gif)
 
 ### 3️⃣ Creation of PRD
-![Create PRD](docs/assets/Video%203.gif)
+![Create PRD](docs/assets/video-3.gif)
 
 ### 4️⃣ GitHub Sync and Start Working on Issues
-![GitHub Sync](docs/assets/Video%204.gif)
+![GitHub Sync](docs/assets/video-4.gif)
 
 ### 5️⃣ Issues Finished
-![Issues Complete](docs/assets/Video%205.gif)
+![Issues Complete](docs/assets/video-5.gif)
 
 ### 6️⃣ Checking the Work Done (Web App + FastAPI)
-![Web App and FastAPI](docs/assets/Video%206.gif)
+![Web App and FastAPI](docs/assets/video-6.gif)
 
 ## 🚀 Get Started in 5 Minutes
 
