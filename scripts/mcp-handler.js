@@ -1092,7 +1092,7 @@ This server can be integrated with various agents and context pools.
     }
 
     console.log('🔧 Quick Fix:');
-    if (checkResult.disabledServers.length > 0) {
+    if (Array.isArray(checkResult.disabledServers) && checkResult.disabledServers.length > 0) {
       console.log(`   autopm mcp enable ${checkResult.disabledServers[0].name}`);
     }
     if (checkResult.missingEnvVars.length > 0) {
