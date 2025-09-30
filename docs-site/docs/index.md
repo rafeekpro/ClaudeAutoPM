@@ -39,6 +39,27 @@ features:
 
 ---
 
+<style>
+.vp-doc h2 {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+.vp-doc ul {
+  padding-left: 1.25rem;
+}
+
+.vp-doc li {
+  margin: 4px 0;
+}
+
+.vp-doc strong {
+  font-weight: 600;
+  color: var(--vp-c-brand);
+}
+</style>
+
 ## Quick Start
 
 ```bash
