@@ -11,6 +11,7 @@ Complete list of available /pm: commands in ClaudeAutoPM framework.
 - [Context Management](#context-management)
 - [Project Maintenance](#project-maintenance)
 - [Agent Team Management](#agent-team-management-team)
+- [MCP Management](#mcp-management)
 - [Provider-Specific](#provider-specific)
 
 ## Core Commands
@@ -389,6 +390,220 @@ or when no team is active:
 
 **Team configuration:**
 Teams are defined in `.claude/teams.json` file. You can add custom teams or modify existing ones.
+
+## MCP Management
+
+ClaudeAutoPM provides comprehensive MCP (Model Context Protocol) management commands for configuring agent-to-tool integration. These commands help you discover, configure, and monitor MCP servers used by agents.
+
+### `autopm mcp agents`
+List all agents using MCP servers
+```bash
+# List all agents with their MCP servers
+autopm mcp agents
+
+# Group agents by MCP server
+autopm mcp agents --by-server
+```
+
+**Example output:**
+```
+🤖 Agents Using MCP
+
+✅ react-frontend-engineer
+   └─ context7-docs
+
+✅ python-backend-engineer
+   └─ context7-docs
+   └─ sqlite-mcp
+
+📊 Summary:
+   Total agents: 53
+   Using MCP: 39 (74%)
+```
+
+### `autopm mcp agent <name>`
+Show MCP configuration for specific agent
+```bash
+# View MCP servers used by an agent
+autopm mcp agent react-frontend-engineer
+
+# Check agent's required environment variables
+autopm mcp agent python-backend-engineer
+```
+
+**Example output:**
+```
+🤖 Agent: react-frontend-engineer
+==================================================
+
+📡 MCP Servers (1):
+
+✅ Active context7-docs
+    Category: documentation
+    Description: Context7 documentation server
+    Environment Variables:
+      - CONTEXT7_API_KEY
+```
+
+### `autopm mcp usage`
+Display MCP usage statistics
+```bash
+autopm mcp usage
+```
+
+Shows which MCP servers are most used and by which agents.
+
+### `autopm mcp tree`
+Show agent-MCP dependency tree
+```bash
+autopm mcp tree
+```
+
+**Example output:**
+```
+🌳 Agent → MCP Dependency Tree
+
+📁 frontend
+├─ react-frontend-engineer ✅
+│  └─ context7-docs
+└─ vue-frontend-engineer ✅
+   └─ context7-docs
+
+📁 backend
+├─ python-backend-engineer ✅
+│  ├─ context7-docs
+│  └─ sqlite-mcp
+```
+
+### `autopm mcp list`
+List all available MCP servers
+```bash
+autopm mcp list
+```
+
+Shows all MCP servers with their status (active/inactive) and metadata.
+
+### `autopm mcp info <server>`
+Show detailed information about MCP server
+```bash
+autopm mcp info context7-docs
+```
+
+### `autopm mcp enable <server>`
+Enable MCP server in project
+```bash
+autopm mcp enable context7-docs
+```
+
+### `autopm mcp disable <server>`
+Disable MCP server in project
+```bash
+autopm mcp disable context7-docs
+```
+
+### `autopm mcp sync`
+Sync MCP configuration to `.claude/mcp-servers.json`
+```bash
+autopm mcp sync
+```
+
+This command generates the MCP configuration file that Claude Code reads when starting.
+
+### `autopm mcp setup`
+Interactive API key setup wizard
+```bash
+autopm mcp setup
+```
+
+Guides you through configuring required environment variables for enabled MCP servers.
+
+### `autopm mcp diagnose`
+Run comprehensive MCP diagnostics
+```bash
+autopm mcp diagnose
+```
+
+**Checks performed:**
+- ✅ `.claude` directory structure
+- ✅ `config.json` validity
+- ✅ MCP server definitions
+- ✅ Environment variables
+- ✅ `mcp-servers.json` validity
+- ✅ Agents directory
+
+**Example output:**
+```
+🔍 Running MCP Diagnostics...
+
+📋 Diagnostic Results:
+
+✅ .claude directory exists
+✅ config.json exists and is valid
+✅ environment variables configured
+⚠️ Environment variable CONTEXT7_API_KEY not configured
+
+🏥 Overall Health: WARNING
+```
+
+### `autopm mcp test <server>`
+Test MCP server connection
+```bash
+autopm mcp test context7-docs
+```
+
+Validates server configuration and connectivity.
+
+### `autopm mcp status`
+Show status of all MCP servers
+```bash
+autopm mcp status
+```
+
+**Example output:**
+```
+📊 MCP Servers Status
+
+✅ context7-docs
+    Category: documentation
+    Status: Enabled
+    Used by: 39 agents
+    Environment:
+      ✅ CONTEXT7_API_KEY
+
+⚪ github-mcp
+    Category: integration
+    Status: Disabled
+    Used by: 0 agents
+
+📈 Summary:
+   Total servers: 6
+   Enabled: 1
+   Disabled: 5
+```
+
+### MCP Workflow Example
+
+```bash
+# 1. Check which agents use MCP
+autopm mcp agents
+
+# 2. Enable required servers
+autopm mcp enable context7-docs
+autopm mcp enable github-mcp
+
+# 3. Configure API keys
+autopm mcp setup
+
+# 4. Sync configuration
+autopm mcp sync
+
+# 5. Verify setup
+autopm mcp diagnose
+autopm mcp status
+
+# 6. Test connections
+autopm mcp test context7-docs
+```
 
 ## Provider-Specific
 

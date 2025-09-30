@@ -237,7 +237,9 @@ autopm pm:epic-sync user-auth
 - **50+ Specialized AI Agents** - Python, React, K8s, AWS, and more
 - **Parallel Execution** - Multiple agents working simultaneously
 - **Cross-Platform** - GitHub, Azure DevOps, GitLab (coming soon)
-- **MCP Integration** - Context management and browser automation
+- **MCP Integration** - Model Context Protocol for live documentation, codebase analysis, and tool integration
+- **Agent Analysis** - Discover which agents use MCP and their configurations
+- **Interactive Diagnostics** - Comprehensive health checks and connection testing
 
 ### 🤖 Dynamic Agent Teams
 
@@ -283,6 +285,110 @@ git checkout -b feat/backend/new-api       # Auto-loads 'python_backend' team
 - **fullstack** - Inherits from both frontend and python_backend
 
 Teams support inheritance, so specialized teams automatically include base agents. The active team configuration is saved in your project and persists across sessions.
+
+## 🔌 MCP (Model Context Protocol) Management
+
+ClaudeAutoPM provides comprehensive MCP management for agent-to-tool integration. **39 out of 53 agents (74%)** use MCP servers for live documentation and external tool access.
+
+### Quick Start with MCP
+
+```bash
+# List all available MCP servers
+autopm mcp list
+
+# Check which agents use MCP
+autopm mcp agents
+🤖 Agents Using MCP
+
+✅ react-frontend-engineer
+   └─ context7-docs
+
+✅ python-backend-engineer
+   └─ context7-docs
+   └─ sqlite-mcp
+
+📊 Summary:
+   Total agents: 53
+   Using MCP: 39 (74%)
+
+# Enable MCP servers
+autopm mcp enable context7-docs
+autopm mcp enable github-mcp
+
+# Configure API keys interactively
+autopm mcp setup
+
+# Sync configuration
+autopm mcp sync
+```
+
+### MCP Commands
+
+#### **Agent Analysis**
+```bash
+autopm mcp agents              # List agents using MCP
+autopm mcp agents --by-server  # Group by MCP server
+autopm mcp agent <name>        # Show agent MCP config
+autopm mcp usage               # Usage statistics
+autopm mcp tree                # Dependency tree
+```
+
+#### **Configuration & Diagnostics**
+```bash
+autopm mcp setup               # Interactive API key setup
+autopm mcp diagnose            # Run diagnostics
+autopm mcp test <server>       # Test server connection
+autopm mcp status              # Show servers status
+```
+
+#### **Server Management**
+```bash
+autopm mcp list                # List available servers
+autopm mcp info <server>       # Server details
+autopm mcp enable <server>     # Enable server
+autopm mcp disable <server>    # Disable server
+autopm mcp sync                # Sync configuration
+```
+
+### MCP Server Types
+
+- **Documentation** - `context7-docs` for live framework documentation (React, Python, AWS, etc.)
+- **Codebase** - `context7-codebase` for project analysis and navigation
+- **GitHub** - `github-mcp` for repository operations
+- **Databases** - `sqlite-mcp`, `postgresql-mcp`, `mongodb-mcp` for data operations
+- **Browser** - `playwright-mcp` for E2E testing and automation
+
+### Example: Setting Up Context7
+
+```bash
+# 1. Enable context7 documentation server
+autopm mcp enable context7-docs
+
+# 2. Configure API key
+cat > .claude/.env << EOF
+CONTEXT7_API_KEY=your-api-key-here
+CONTEXT7_WORKSPACE=your-workspace-id
+EOF
+
+# 3. Sync configuration
+autopm mcp sync
+
+# 4. Verify setup
+autopm mcp diagnose
+
+# 5. Test connection
+autopm mcp test context7-docs
+```
+
+### MCP Benefits
+
+- ✅ **Live Documentation** - Agents access latest framework docs automatically
+- ✅ **Codebase Context** - Deep understanding of your project structure
+- ✅ **Tool Integration** - GitHub, databases, browsers, and more
+- ✅ **No Hallucinations** - Real-time data instead of outdated training
+- ✅ **Extensible** - Add custom MCP servers for your tools
+
+📖 **Full MCP Setup Guide**: [`MCP_SETUP_GUIDE.md`](./MCP_SETUP_GUIDE.md)
 
 ## 📚 Full Documentation
 
