@@ -640,7 +640,8 @@ This server can be integrated with various agents and context pools.
     result.found = true;
 
     // Extract MCP URIs
-    const matches = [...agentFile.content.matchAll(MCPHandler.MCP_URI_REGEX)];
+    const regex = new RegExp(MCPHandler.MCP_URI_REGEX.source, MCPHandler.MCP_URI_REGEX.flags);
+    const matches = [...agentFile.content.matchAll(regex)];
     result.mcpServers = [...new Set(matches.map(m => m[1]))];
 
     // Get server details
