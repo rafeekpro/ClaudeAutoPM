@@ -40,6 +40,10 @@ try {
 }
 
 class MCPHandler {
+  // Regular expression patterns as class constants
+  static MCP_URI_REGEX = /mcp:\/\/([a-zA-Z0-9_-]+)/g;
+  static ENV_VAR_NAME_REGEX = /^[A-Z_][A-Z0-9_]*$/;
+
   constructor() {
     this.projectRoot = process.cwd();
     this.frameworkRoot = path.join(__dirname, '..');
@@ -567,8 +571,7 @@ This server can be integrated with various agents and context pools.
           const agentName = nameMatch ? nameMatch[1].trim() : path.basename(entry.name, '.md');
 
           // Extract MCP URIs (mcp://server-name/path)
-          const mcpUriRegex = /mcp:\/\/([a-zA-Z0-9_-]+)/g;
-          const matches = [...content.matchAll(mcpUriRegex)];
+          const matches = [...content.matchAll(MCPHandler.MCP_URI_REGEX)];
 
           if (matches.length > 0) {
             result.agentsWithMCP++;
@@ -637,8 +640,7 @@ This server can be integrated with various agents and context pools.
     result.found = true;
 
     // Extract MCP URIs
-    const mcpUriRegex = /mcp:\/\/([a-zA-Z0-9_-]+)/g;
-    const matches = [...agentFile.content.matchAll(mcpUriRegex)];
+    const matches = [...agentFile.content.matchAll(MCPHandler.MCP_URI_REGEX)];
     result.mcpServers = [...new Set(matches.map(m => m[1]))];
 
     // Get server details
@@ -917,7 +919,7 @@ This server can be integrated with various agents and context pools.
    */
   validateEnvVar(name, value) {
     // Name should be uppercase with underscores
-    if (!/^[A-Z_][A-Z0-9_]*$/.test(name)) {
+    if (!MCPHandler.ENV_VAR_NAME_REGEX.test(name)) {
       return false;
     }
 
