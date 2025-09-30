@@ -217,9 +217,9 @@ class EpicCloser {
 
     // Show next steps
     console.log('\n💡 Next Steps:');
-    console.log('  • View completed epics: pm status');
-    console.log('  • Start new epic: pm init <epic-name>');
-    console.log('  • List all epics: pm epic-list');
+    console.log('  • View completed epics: /pm:status');
+    console.log('  • Start new epic: /pm:init <epic-name>');
+    console.log('  • List all epics: /pm:epic-list');
 
     return true;
   }
@@ -309,7 +309,7 @@ class EpicCloser {
 
     if (!epicName) {
       console.error('❌ Error: Epic name required');
-      console.error('Usage: pm epic-close <epic-name> [--force] [--complete-all] [--archive]');
+      console.error('Usage: /pm:epic-close <epic-name> [--force] [--complete-all] [--archive]');
       console.error('\nOptions:');
       console.error('  --force        Close even with incomplete tasks');
       console.error('  --complete-all Mark all tasks as complete');

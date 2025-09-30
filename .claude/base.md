@@ -1,135 +1,238 @@
-# ClaudeAutoPM Development Project
+# CLAUDE.md
 
-This is the development repository for the ClaudeAutoPM framework itself.
+> Think carefully and implement the most concise solution that changes as little code as possible.
 
-## Project Context
+<!-- WORKFLOW_SECTION -->
 
-You are working on ClaudeAutoPM, a framework that helps other projects integrate with Claude. This project uses its own capabilities for self-maintenance.
+## CRITICAL RULE FILES
 
-## Self-Maintenance Mode
+All rule files in `.claude/rules/` define mandatory behaviors and must be followed:
 
-This project is configured to maintain itself using its own agents and tools. When working on this project:
+### Core Development Rules
 
-1. **Use project maintenance agents** from `.claude/agents/project-maintenance/`
-2. **Run maintenance commands** like `pm validate`, `pm optimize`
-3. **Follow self-maintenance rules** in `.claude/rules/self-maintenance.md`
-4. **Apply optimization strategies** from `.claude/strategies/`
+- **Test-Driven Development** - TDD cycle (RED-GREEN-REFACTOR). HIGHEST PRIORITY for all code changes
+- **pipeline-mandatory.md** - Required pipelines for errors, features, bugs, code search, and log analysis
+- **naming-conventions.md** - Naming standards, code quality requirements, and prohibited patterns
+- **context-optimization.md** - Agent usage patterns for context preservation (<20% data return)
+- **development-workflow.md** - Development patterns, search-before-create, and best practices
+- **command-pipelines.md** - Command sequences, prerequisites, and PM system workflows
 
-## Framework Agents for Self-Maintenance
+### Operational Rules
 
-**IMPORTANT**: Use these agents from `autopm/.claude/agents/` for maintenance tasks:
+- **agent-coordination.md** - Multi-agent parallel work with file-level coordination
+- **agent-coordination-extended.md** - Extended coordination patterns for complex workflows
+- **branch-operations.md** - Git branch management, naming conventions, and merge strategies
+- **worktree-operations.md** - Git worktree management for parallel development
+- **datetime.md** - Real datetime requirements using ISO 8601 UTC format (no placeholders)
+- **frontmatter-operations.md** - YAML frontmatter standards for PRDs, epics, and tasks
+- **strip-frontmatter.md** - Metadata removal for GitHub sync and external communication
+- **github-operations.md** - GitHub CLI safety and critical template repository protection
+- **no-pr-workflow.md** - Direct main branch development without PRs
 
-### Core Maintenance Agents
-- **agent-manager** (`autopm/.claude/agents/core/agent-manager.md`) - Create and manage agents
-- **code-analyzer** (`autopm/.claude/agents/core/code-analyzer.md`) - Review code changes for bugs
-- **test-runner** (`autopm/.claude/agents/core/test-runner.md`) - Execute and analyze tests
-- **file-analyzer** (`autopm/.claude/agents/core/file-analyzer.md`) - Summarize large files
+### Technical Rules
 
-### DevOps Agents
-- **github-operations-specialist** (`autopm/.claude/agents/devops/github-operations-specialist.md`) - GitHub Actions, releases
-- **docker-containerization-expert** (`autopm/.claude/agents/devops/docker-containerization-expert.md`) - Container management
+- **test-execution.md** - Testing standards requiring test-runner agent, no mocks, real services only
+- **standard-patterns.md** - Command consistency, fail-fast philosophy, and minimal validation
+- **use-ast-grep.md** - Structural code search using AST over regex for language-aware patterns
+- **database-pipeline.md** - Database migrations, query optimization, and backup procedures
+- **infrastructure-pipeline.md** - IaC deployments, container builds, and cloud operations
 
-### Framework Testing
-- **e2e-test-engineer** (`autopm/.claude/agents/frameworks/e2e-test-engineer.md`) - End-to-end testing
+### Code Formatting & Quality
 
-## Agent Usage Examples
+**MANDATORY**: All code MUST pass autoformatters and linters before commit:
 
-```markdown
-# When adding new agents
-@agent-manager create a new agent for Redis optimization
+- **Python**: Must pass `black` formatter and `ruff` linter
+- **JavaScript/TypeScript**: Must pass `prettier` and `eslint`
+- **Markdown**: Must pass `markdownlint`
+- **Other languages**: Use language-specific standard tools
 
-# When reviewing changes
-@code-analyzer review the recent optimization changes for potential issues
+Always run formatters and linters BEFORE marking any task as complete.
 
-# When running tests
-@test-runner execute all installation tests and analyze failures
+## DOCUMENTATION REFERENCES
 
-# When preparing releases
-@github-operations-specialist prepare release v1.0.8
+### Agent Documentation (`.claude/agents/`)
+
+Agents are organized by category for better maintainability:
+
+- **Core Agents** (`.claude/agents/core/`) - Essential agents for all projects
+- **Language Agents** (`.claude/agents/languages/`) - Language-specific experts
+- **Framework Agents** (`.claude/agents/frameworks/`) - Framework and UI specialists
+- **Cloud Agents** (`.claude/agents/cloud/`) - Cloud platform architects
+- **DevOps Agents** (`.claude/agents/devops/`) - CI/CD and operations
+- **Database Agents** (`.claude/agents/databases/`) - Database specialists
+- **Data Agents** (`.claude/agents/data/`) - Data engineering
+
+### Command Documentation (`.claude/commands/`)
+
+- Custom commands and patterns documented in `.claude/commands/`
+- **Azure DevOps Commands** (`.claude/commands/azure/`) - Complete Azure DevOps integration
+- **PM Commands** (`.claude/commands/pm/`) - Project management workflow
+
+## USE SUB-AGENTS FOR CONTEXT OPTIMIZATION
+
+### Core Agents (Always Available)
+
+#### file-analyzer - File and log analysis
+Always use for reading and summarizing files, especially logs and verbose outputs.
+
+#### code-analyzer - Bug hunting and logic tracing
+Use for code analysis, bug detection, and tracing execution paths.
+
+#### test-runner - Test execution and analysis
+Use for running tests and analyzing results with structured reports.
+
+#### parallel-worker - Multi-stream parallel execution
+Use for coordinating multiple work streams in parallel.
+
+<!-- AGENT_SELECTION_SECTION -->
+
+## Azure DevOps Integration
+
+### Complete Azure DevOps command suite for enterprise project management
+
+The system includes full Azure DevOps integration with 38+ commands mapped from PM system:
+
+#### Quick Start
+```bash
+# Initialize Azure DevOps
+/azure:init
+
+# Daily workflow
+/azure:standup              # Morning standup
+/azure:next-task            # Get AI-recommended task
+/azure:sprint-status        # Sprint dashboard
 ```
 
-## Quick Commands
+## TDD PIPELINE FOR ALL IMPLEMENTATIONS
+
+### Mandatory Test-Driven Development Cycle
+
+Every implementation MUST follow:
+
+1. **RED Phase**: Write failing test first
+   - Test must describe desired behavior
+   - Test MUST fail initially
+   - Test must be meaningful (no trivial assertions)
+
+2. **GREEN Phase**: Make test pass
+   - Write MINIMUM code to pass test
+   - Don't add features not required by test
+   - Focus on making test green, not perfection
+
+3. **REFACTOR Phase**: Improve code
+   - Improve structure while tests stay green
+   - Remove duplication
+   - Enhance readability
+
+## CONTEXT OPTIMIZATION RULES
+
+See **`.claude/rules/context-optimization.md`** for detailed context preservation patterns and agent usage requirements.
+
+## ERROR HANDLING PIPELINE
+
+See **`.claude/rules/development-workflow.md`** for complete error handling and development pipelines.
+
+## WHY THESE RULES EXIST
+
+### Development Quality
+
+- **No partial implementations** → Technical debt compounds exponentially
+- **No mock services in tests** → Real bugs hide behind mocks
+- **TDD mandatory** → Prevents regression and ensures coverage
+
+### Context Preservation
+
+- **Agent-first search** → Preserves main thread for decisions
+- **No verbose outputs** → Maintains conversation clarity
+- **10-20% return rule** → Focuses on actionable insights
+
+### Code Integrity
+
+- **No "_fixed" suffixes** → Indicates poor planning
+- **No orphan docs** → Documentation should be intentional
+- **No mixed concerns** → Maintainability over convenience
+
+## Philosophy
+
+### Error Handling
+
+- **Fail fast** for critical configuration (missing text model)
+- **Log and continue** for optional features (extraction model)
+- **Graceful degradation** when external services unavailable
+- **User-friendly messages** through resilience layer
+
+### Testing
+
+See **`.claude/rules/test-execution.md`** for testing standards and requirements.
+
+## Tone and Behavior
+
+- Criticism is welcome. Please tell me when I am wrong or mistaken, or even when you think I might be wrong or mistaken.
+- Please tell me if there is a better approach than the one I am taking.
+- Please tell me if there is a relevant standard or convention that I appear to be unaware of.
+- Be skeptical.
+- Be concise.
+- Short summaries are OK, but don't give an extended breakdown unless we are working through the details of a plan.
+- Do not flatter, and do not give compliments unless I am specifically asking for your judgement.
+- Occasional pleasantries are fine.
+- Feel free to ask many questions. If you are in doubt of my intent, don't guess. Ask.
+
+## ABSOLUTE RULES
+
+See **`.claude/rules/naming-conventions.md`** for code quality standards and prohibited patterns.
+
+Key principles:
+
+- NO PARTIAL IMPLEMENTATION
+- NO CODE DUPLICATION (always search first)
+- IMPLEMENT TEST FOR EVERY FUNCTION (TDD required)
+- NO CHEATER TESTS (tests must be meaningful)
+- Follow all rules defined in `.claude/rules/` without exception
+
+## 📋 Quick Reference Checklists
+
+### Before Committing
 
 ```bash
-# Validate project
-pm validate
+# Minimum Definition of Done
+✓ Tests written and passing (TDD)
+✓ Code formatted (black, prettier, eslint)
+✓ No partial implementations
+✓ No code duplication
+✓ Error handling implemented
+✓ Security considered
 
-# Run optimization analysis
-pm optimize
+# Run these checks (automated with git hooks)
+npm test          # or pytest
+npm run lint      # or ruff check
+npm run build     # Ensure production build works
+npm run typecheck # TypeScript validation
 
-# Prepare release
-pm release
+# Or use safe-commit script for all checks
+./scripts/safe-commit.sh "feat: your message"
 
-# Check health
-npm run pm:health
+# Simulate CI locally before push
+npm run ci:local  # Full CI pipeline simulation
 ```
 
-## Development Workflow
+### Before Creating PR
 
-1. **Before changes**: Run `pm validate` to ensure clean state
-2. **During development**: Use appropriate agents for tasks
-3. **Before commit**: Run tests with `npm test`
-4. **Before release**: Run `pm release` workflow
-
-## Git Strategy
-
-**IMPORTANT**: ClaudeAutoPM uses a **unified branch-based Git strategy**.
-
-- **NO WORKTREES**: Git worktrees are not supported
-- **Use branches**: All work happens in feature/epic branches
-- **Follow the rules**: See `autopm/.claude/rules/git-strategy.md`
-- **One branch per epic**: Keep work isolated
-- **Pull frequently**: Avoid conflicts with regular pulls
-
-For detailed Git workflow, refer to the authoritative guide in `autopm/.claude/rules/git-strategy.md`
-
-## Project Structure
-
-```
-AUTOPM/
-├── .claude/                 # Project's own Claude configuration
-│   ├── agents/             # Maintenance agents
-│   ├── commands/           # PM commands
-│   ├── rules/              # Self-maintenance rules
-│   └── strategies/         # Optimization strategies
-├── autopm/                 # Framework source (distributed)
-│   └── .claude/           # Framework resources
-├── install/               # Installation scripts
-├── test/                  # Test suites
-└── docs/                  # Documentation
+```bash
+✓ Branch up to date with main
+✓ All tests passing
+✓ CI/CD pipeline green
+✓ Documentation updated
+✓ Breaking changes noted
 ```
 
-## Current Status
+### Code Quality Checklist
 
-- **Version**: 1.0.7
-- **Agents**: ~35 (Phase 1 optimization complete)
-- **Context Efficiency**: 60%
-- **Test Coverage**: 95%
+```bash
+✓ Functions are single-purpose
+✓ Variable names are descriptive
+✓ No hardcoded values
+✓ No debugging code left
+✓ Comments explain "why" not "what"
+```
 
-## Optimization Progress
-
-### ✅ Phase 1 Complete
-- Consolidated UI frameworks (4→1)
-- Consolidated Python backends (3→1)
-- Consolidated Docker agents (3→1)
-- Consolidated E2E testing (2→1)
-
-### 🔄 Phase 2 Pending
-- Cloud architect consolidation
-- Database expert consolidation
-- Further optimizations
-
-## Key Principles
-
-1. **Dogfood** - Use own capabilities
-2. **Automate** - Minimize manual work
-3. **Validate** - Test everything
-4. **Document** - Keep docs current
-5. **Optimize** - Continuously improve
-
-## Emergency Contacts
-
-- GitHub: https://github.com/rafeekpro/ClaudeAutoPM
-- Issues: https://github.com/rafeekpro/ClaudeAutoPM/issues
-
-Remember: This project maintains itself using its own tools!
+For detailed checklists, see `.claude/checklists/`

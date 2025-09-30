@@ -83,13 +83,15 @@ During installation, you'll be asked to:
 
 **1. Choose a configuration preset:**
 
-| Preset | Description | Best For |
-|--------|-------------|----------|
-| **Minimal** | Traditional development without containers | Small projects, beginners |
-| **Docker-only** | Container-first with adaptive execution | Medium projects, local development |
-| **Full DevOps** 🎯 | Docker + Kubernetes with CI/CD | Production projects (RECOMMENDED) |
-| **Performance** | Maximum parallelization (8 agents) | Large projects, powerful machines |
-| **Custom** | Configure each option manually | Specific requirements |
+| Preset | Requirements | Description | Best For |
+|--------|--------------|-------------|----------|
+| **Minimal** | None | Traditional development without containers | Small projects, beginners |
+| **Docker-only** | Docker | Container-first with adaptive execution | Medium projects, local development |
+| **Full DevOps** 🎯 | Docker + kubectl | Docker + Kubernetes with CI/CD | Production projects (RECOMMENDED) |
+| **Performance** | Docker + kubectl | Maximum parallelization (8 agents) | Large projects, powerful machines |
+| **Custom** | Varies | Configure each option manually | Specific requirements |
+
+> 💡 **Note:** The installer automatically detects available tools (Docker, kubectl) and only shows compatible options. Missing tools? See installation links in the interactive prompt.
 
 **2. Select your project management provider:**
 
