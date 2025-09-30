@@ -530,6 +530,20 @@ This server can be integrated with various agents and context pools.
   // ==========================================
 
   /**
+   * Calculate percentage with safe division
+   * @param {number} numerator
+   * @param {number} denominator
+   * @returns {string} Formatted percentage or 'N/A%'
+   * @private
+   */
+  _calculatePercentage(numerator, denominator) {
+    if (denominator === 0) {
+      return 'N/A%';
+    }
+    return `${Math.round((numerator / denominator) * 100)}%`;
+  }
+
+  /**
    * Analyze all agents to find MCP usage
    * @returns {Object} Analysis result with agent-to-MCP mapping
    */
@@ -571,7 +585,8 @@ This server can be integrated with various agents and context pools.
           const agentName = nameMatch ? nameMatch[1].trim() : path.basename(entry.name, '.md');
 
           // Extract MCP URIs (mcp://server-name/path)
-          const matches = [...content.matchAll(MCPHandler.MCP_URI_REGEX)];
+          const regex = new RegExp(MCPHandler.MCP_URI_REGEX.source, MCPHandler.MCP_URI_REGEX.flags);
+          const matches = [...content.matchAll(regex)];
 
           if (matches.length > 0) {
             result.agentsWithMCP++;
@@ -794,11 +809,8 @@ This server can be integrated with various agents and context pools.
 
     console.log('📈 Summary:');
     console.log(`   Total agents: ${analysis.totalAgents}`);
-    if (analysis.totalAgents > 0) {
-      console.log(`   Using MCP: ${analysis.agentsWithMCP} (${Math.round(analysis.agentsWithMCP / analysis.totalAgents * 100)}%)`);
-    } else {
-      console.log(`   Using MCP: ${analysis.agentsWithMCP} (N/A%)`);
-    }
+    const percentage = this._calculatePercentage(analysis.agentsWithMCP, analysis.totalAgents);
+    console.log(`   Using MCP: ${analysis.agentsWithMCP} (${percentage})`);
     console.log(`   MCP servers in use: ${sorted.length}`);
   }
 
@@ -895,7 +907,8 @@ This server can be integrated with various agents and context pools.
     // Parse existing vars
     const existingVars = {};
     existingContent.split('\n').forEach(line => {
-      if (!line.trim() || line.trim().startsWith('#')) return; // skip empty/comment lines
+      const trimmedLine = line.trim();
+      if (!trimmedLine || trimmedLine.startsWith('#')) return; // skip empty/comment lines
       const parts = line.split('=', 2);
       if (parts.length === 2) {
         existingVars[parts[0]] = parts[1];
