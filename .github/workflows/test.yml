@@ -33,4 +33,3 @@ jobs:
 
     - name: Check test coverage
       run: npm run test:coverage
-      continue-on-error: true
