@@ -1072,14 +1072,10 @@ This server can be integrated with various agents and context pools.
     // Show missing env vars details
     if (checkResult.missingEnvVars.length > 0) {
       console.log('🔑 Missing Environment Variables:\n');
-      const byServer = {};
-      checkResult.missingEnvVars.forEach(({ server, variable }) => {
-        if (!byServer[server]) byServer[server] = [];
-        byServer[server].push(variable);
-      });
+      const byServer = Object.groupBy(checkResult.missingEnvVars, ({ server }) => server);
       Object.entries(byServer).forEach(([server, vars]) => {
         console.log(`   ${server}:`);
-        vars.forEach(v => console.log(`      - ${v}`));
+        vars.forEach(({ variable }) => console.log(`      - ${variable}`));
       });
       console.log();
     }
