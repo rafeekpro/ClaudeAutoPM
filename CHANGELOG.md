@@ -7,7 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.11.10] - 2025-09-29
 
+### ✨ Added
+- **New MCP Integrations** - Integrated support for additional MCP providers, expanding framework compatibility.
 
+### 🛠️ Changed
+- **Strategy Migration** - Migrated core strategy logic to a new modular architecture for improved maintainability and extensibility.
+
+### 🗑️ Removed
+- **Deprecated Components** - Removed legacy components and obsolete modules to streamline the codebase.
 ## [1.11.8] - 2025-09-29
 
 
