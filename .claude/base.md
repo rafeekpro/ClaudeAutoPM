@@ -10,7 +10,7 @@ All rule files in `.claude/rules/` define mandatory behaviors and must be follow
 
 ### Core Development Rules
 
-- **tdd-enforcement.md** - Test-Driven Development cycle (RED-GREEN-REFACTOR). HIGHEST PRIORITY for all code changes
+- **Test-Driven Development** - TDD cycle (RED-GREEN-REFACTOR). HIGHEST PRIORITY for all code changes
 - **pipeline-mandatory.md** - Required pipelines for errors, features, bugs, code search, and log analysis
 - **naming-conventions.md** - Naming standards, code quality requirements, and prohibited patterns
 - **context-optimization.md** - Agent usage patterns for context preservation (<20% data return)
@@ -185,7 +185,7 @@ Key principles:
 
 - NO PARTIAL IMPLEMENTATION
 - NO CODE DUPLICATION (always search first)
-- IMPLEMENT TEST FOR EVERY FUNCTION (see `.claude/rules/tdd-enforcement.md`)
+- IMPLEMENT TEST FOR EVERY FUNCTION (TDD required)
 - NO CHEATER TESTS (tests must be meaningful)
 - Follow all rules defined in `.claude/rules/` without exception
 
@@ -195,7 +195,7 @@ Key principles:
 
 ```bash
 # Minimum Definition of Done
-✓ Tests written and passing (TDD - see .claude/rules/tdd-enforcement.md)
+✓ Tests written and passing (TDD)
 ✓ Code formatted (black, prettier, eslint)
 ✓ No partial implementations
 ✓ No code duplication
