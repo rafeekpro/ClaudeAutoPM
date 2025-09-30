@@ -43,25 +43,43 @@ ClaudeAutoPM uses a **hybrid approach** combining deterministic operations with 
 
 ## 📺 Visual Walkthrough
 
-See ClaudeAutoPM in action - from installation to deployment:
+See ClaudeAutoPM in action - from installation to deployment. **Click to expand each video:**
 
-### 1️⃣ Install AutoPM
-![Install AutoPM](docs/assets/video-1.gif)
+<details>
+<summary><b>1️⃣ Install AutoPM</b> - Complete installation process</summary>
+<br>
+<img src="docs/assets/video-1.gif" width="100%" alt="Install AutoPM">
+</details>
 
-### 2️⃣ First Claude Execution
-![First Claude Execution](docs/assets/video-2.gif)
+<details>
+<summary><b>2️⃣ First Claude Execution</b> - Setting up and running Claude Code</summary>
+<br>
+<img src="docs/assets/video-2.gif" width="100%" alt="First Claude Execution">
+</details>
 
-### 3️⃣ Creation of PRD
-![Create PRD](docs/assets/video-3.gif)
+<details>
+<summary><b>3️⃣ Creation of PRD</b> - Product Requirements Document workflow</summary>
+<br>
+<img src="docs/assets/video-3.gif" width="100%" alt="Create PRD">
+</details>
 
-### 4️⃣ GitHub Sync and Start Working on Issues
-![GitHub Sync](docs/assets/video-4.gif)
+<details>
+<summary><b>4️⃣ GitHub Sync and Start Working</b> - Synchronizing with GitHub and beginning tasks</summary>
+<br>
+<img src="docs/assets/video-4.gif" width="100%" alt="GitHub Sync">
+</details>
 
-### 5️⃣ Issues Finished
-![Issues Complete](docs/assets/video-5.gif)
+<details>
+<summary><b>5️⃣ Issues Finished</b> - Completing and closing tasks</summary>
+<br>
+<img src="docs/assets/video-5.gif" width="100%" alt="Issues Complete">
+</details>
 
-### 6️⃣ Checking the Work Done (Web App + FastAPI)
-![Web App and FastAPI](docs/assets/video-6.gif)
+<details>
+<summary><b>6️⃣ Checking the Work Done</b> - Running Web App + FastAPI demo</summary>
+<br>
+<img src="docs/assets/video-6.gif" width="100%" alt="Web App and FastAPI">
+</details>
 
 ## 🚀 Get Started in 5 Minutes
 
