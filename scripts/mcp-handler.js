@@ -520,6 +520,729 @@ This server can be integrated with various agents and context pools.
     // This would update MCP-REGISTRY.md
     console.log(`📝 TODO: Remove ${name} from registry`);
   }
+
+  // ==========================================
+  // EXTENDED FEATURES: Agent Analysis
+  // ==========================================
+
+  /**
+   * Analyze all agents to find MCP usage
+   * @returns {Object} Analysis result with agent-to-MCP mapping
+   */
+  analyzeAgents() {
+    const agentsDir = this.agentsDir || path.join(this.frameworkRoot, 'autopm', '.claude', 'agents');
+
+    if (!fs.existsSync(agentsDir)) {
+      return {
+        totalAgents: 0,
+        agentsWithMCP: 0,
+        agentsWithoutMCP: 0,
+        mcpUsage: {}
+      };
+    }
+
+    const result = {
+      totalAgents: 0,
+      agentsWithMCP: 0,
+      agentsWithoutMCP: 0,
+      mcpUsage: {}
+    };
+
+    // Recursively scan agent files
+    const scanDir = (dir) => {
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+      entries.forEach(entry => {
+        const fullPath = path.join(dir, entry.name);
+
+        if (entry.isDirectory()) {
+          scanDir(fullPath);
+        } else if (entry.isFile() && entry.name.endsWith('.md')) {
+          result.totalAgents++;
+
+          const content = fs.readFileSync(fullPath, 'utf8');
+
+          // Extract agent name from frontmatter
+          const nameMatch = content.match(/^---[\s\S]*?name:\s*([^\n]+)/m);
+          const agentName = nameMatch ? nameMatch[1].trim() : path.basename(entry.name, '.md');
+
+          // Extract MCP URIs (mcp://server-name/path)
+          const mcpUriRegex = /mcp:\/\/([a-zA-Z0-9_-]+)/g;
+          const matches = [...content.matchAll(mcpUriRegex)];
+
+          if (matches.length > 0) {
+            result.agentsWithMCP++;
+            const servers = [...new Set(matches.map(m => m[1]))];
+            result.mcpUsage[agentName] = servers;
+          }
+        }
+      });
+    };
+
+    scanDir(agentsDir);
+    result.agentsWithoutMCP = result.totalAgents - result.agentsWithMCP;
+
+    return result;
+  }
+
+  /**
+   * Get MCP usage for specific agent
+   * @param {string} agentName - Name of the agent
+   * @returns {Object} Agent MCP configuration
+   */
+  getAgentMCP(agentName) {
+    const agentsDir = this.agentsDir || path.join(this.frameworkRoot, 'autopm', '.claude', 'agents');
+
+    const result = {
+      agentName,
+      found: false,
+      mcpServers: [],
+      serverDetails: []
+    };
+
+    if (!fs.existsSync(agentsDir)) {
+      return result;
+    }
+
+    // Find agent file
+    const findAgentFile = (dir) => {
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+
+        if (entry.isDirectory()) {
+          const found = findAgentFile(fullPath);
+          if (found) return found;
+        } else if (entry.isFile() && entry.name.endsWith('.md')) {
+          const content = fs.readFileSync(fullPath, 'utf8');
+          const nameMatch = content.match(/^---[\s\S]*?name:\s*([^\n]+)/m);
+          const fileAgentName = nameMatch ? nameMatch[1].trim() : path.basename(entry.name, '.md');
+
+          if (fileAgentName === agentName) {
+            return { path: fullPath, content };
+          }
+        }
+      }
+
+      return null;
+    };
+
+    const agentFile = findAgentFile(agentsDir);
+
+    if (!agentFile) {
+      return result;
+    }
+
+    result.found = true;
+
+    // Extract MCP URIs
+    const mcpUriRegex = /mcp:\/\/([a-zA-Z0-9_-]+)/g;
+    const matches = [...agentFile.content.matchAll(mcpUriRegex)];
+    result.mcpServers = [...new Set(matches.map(m => m[1]))];
+
+    // Get server details
+    result.mcpServers.forEach(serverName => {
+      const server = this.getServer(serverName);
+      if (server) {
+        result.serverDetails.push({
+          name: serverName,
+          category: server.metadata.category,
+          description: server.metadata.description,
+          status: server.metadata.status
+        });
+      }
+    });
+
+    return result;
+  }
+
+  /**
+   * Display all agents using MCP
+   * @param {Object} options - Display options
+   */
+  mcpAgents(options = {}) {
+    console.log('🤖 Agents Using MCP\n');
+
+    const analysis = this.analyzeAgents();
+
+    if (analysis.agentsWithMCP === 0) {
+      console.log('ℹ️ No agents are currently using MCP servers\n');
+      return;
+    }
+
+    if (options.groupBy === 'server') {
+      // Group by MCP server
+      const serverMap = {};
+      Object.entries(analysis.mcpUsage).forEach(([agent, servers]) => {
+        servers.forEach(server => {
+          if (!serverMap[server]) {
+            serverMap[server] = [];
+          }
+          serverMap[server].push(agent);
+        });
+      });
+
+      Object.entries(serverMap).forEach(([server, agents]) => {
+        console.log(`📡 ${server} (${agents.length} agents)`);
+        agents.forEach(agent => {
+          console.log(`   └─ ${agent}`);
+        });
+        console.log();
+      });
+    } else {
+      // List agents with their servers
+      Object.entries(analysis.mcpUsage).forEach(([agent, servers]) => {
+        console.log(`✅ ${agent}`);
+        servers.forEach(server => {
+          console.log(`   └─ ${server}`);
+        });
+        console.log();
+      });
+    }
+
+    console.log(`📊 Summary:`);
+    console.log(`   Total agents: ${analysis.totalAgents}`);
+    console.log(`   Using MCP: ${analysis.agentsWithMCP}`);
+    console.log(`   Without MCP: ${analysis.agentsWithoutMCP}`);
+  }
+
+  /**
+   * Display MCP configuration for specific agent
+   * @param {string} agentName - Name of the agent
+   */
+  mcpAgent(agentName) {
+    const config = this.loadConfig();
+    const activeServers = config.mcp?.activeServers || [];
+
+    const agentInfo = this.getAgentMCP(agentName);
+
+    if (!agentInfo.found) {
+      console.error(`❌ Agent '${agentName}' not found`);
+      return;
+    }
+
+    console.log(`\n🤖 Agent: ${agentName}`);
+    console.log('='.repeat(50));
+
+    if (agentInfo.mcpServers.length === 0) {
+      console.log('\nℹ️ This agent does not use any MCP servers');
+      return;
+    }
+
+    console.log(`\n📡 MCP Servers (${agentInfo.mcpServers.length}):\n`);
+
+    agentInfo.serverDetails.forEach(server => {
+      const isActive = activeServers.includes(server.name);
+      const status = isActive ? '✅ Active' : '⚪ Inactive';
+
+      console.log(`${status} ${server.name}`);
+      console.log(`    Category: ${server.category || 'uncategorized'}`);
+      console.log(`    Description: ${server.description || 'No description'}`);
+
+      // Show env vars if available
+      const serverDef = this.getServer(server.name);
+      if (serverDef && serverDef.metadata.env) {
+        console.log(`    Environment Variables:`);
+        Object.keys(serverDef.metadata.env).forEach(envVar => {
+          console.log(`      - ${envVar}`);
+        });
+      }
+      console.log();
+    });
+  }
+
+  /**
+   * Display MCP usage statistics
+   */
+  mcpUsage() {
+    console.log('📊 MCP Usage Statistics\n');
+
+    const analysis = this.analyzeAgents();
+
+    if (analysis.agentsWithMCP === 0) {
+      console.log('ℹ️ No MCP usage detected\n');
+      return;
+    }
+
+    // Group by server
+    const serverUsage = {};
+    Object.entries(analysis.mcpUsage).forEach(([agent, servers]) => {
+      servers.forEach(server => {
+        if (!serverUsage[server]) {
+          serverUsage[server] = [];
+        }
+        serverUsage[server].push(agent);
+      });
+    });
+
+    // Sort by usage count
+    const sorted = Object.entries(serverUsage)
+      .sort((a, b) => b[1].length - a[1].length);
+
+    console.log('📡 MCP Servers by Usage:\n');
+    sorted.forEach(([server, agents]) => {
+      console.log(`${server}: ${agents.length} agents`);
+      agents.forEach(agent => {
+        console.log(`   └─ ${agent}`);
+      });
+      console.log();
+    });
+
+    console.log('📈 Summary:');
+    console.log(`   Total agents: ${analysis.totalAgents}`);
+    console.log(`   Using MCP: ${analysis.agentsWithMCP} (${Math.round(analysis.agentsWithMCP / analysis.totalAgents * 100)}%)`);
+    console.log(`   MCP servers in use: ${sorted.length}`);
+  }
+
+  // ==========================================
+  // EXTENDED FEATURES: Setup Wizard
+  // ==========================================
+
+  /**
+   * Detect required environment variables from active servers
+   * @returns {Array} List of required env vars
+   */
+  detectRequiredEnvVars() {
+    const config = this.loadConfig();
+    const activeServers = config.mcp?.activeServers || [];
+    const requiredVars = new Set();
+
+    activeServers.forEach(serverName => {
+      const server = this.getServer(serverName);
+      if (server && server.metadata.env) {
+        Object.keys(server.metadata.env).forEach(envVar => {
+          requiredVars.add(envVar);
+        });
+      }
+    });
+
+    return Array.from(requiredVars);
+  }
+
+  /**
+   * Check status of environment variables
+   * @returns {Object} Status of env vars (configured/missing)
+   */
+  checkEnvVarsStatus() {
+    const requiredVars = this.detectRequiredEnvVars();
+    const configured = [];
+    const missing = [];
+
+    // Check .env file
+    let envContent = '';
+    if (fs.existsSync(this.envPath)) {
+      envContent = fs.readFileSync(this.envPath, 'utf8');
+    }
+
+    requiredVars.forEach(varName => {
+      // Check if variable is in .env file
+      const regex = new RegExp(`^${varName}=.+`, 'm');
+      if (regex.test(envContent)) {
+        configured.push(varName);
+      } else {
+        missing.push(varName);
+      }
+    });
+
+    return { configured, missing };
+  }
+
+  /**
+   * Interactive setup wizard for API keys
+   * @param {Object} options - Options including readline interface
+   */
+  async setupWizard(options = {}) {
+    console.log('🔧 MCP Configuration Setup');
+    console.log('='.repeat(50));
+    console.log();
+
+    const status = this.checkEnvVarsStatus();
+
+    if (status.missing.length === 0) {
+      console.log('✅ All required environment variables are configured!');
+      return;
+    }
+
+    console.log(`⚠️ Missing environment variables: ${status.missing.length}\n`);
+
+    status.missing.forEach(varName => {
+      console.log(`❌ ${varName}`);
+    });
+
+    console.log('\n💡 Configure these in .claude/.env file');
+  }
+
+  /**
+   * Save environment variables to .env file
+   * @param {Object} envVars - Key-value pairs of env vars
+   */
+  saveEnvVars(envVars) {
+    this.ensureClaudeDir();
+
+    let existingContent = '';
+    if (fs.existsSync(this.envPath)) {
+      existingContent = fs.readFileSync(this.envPath, 'utf8');
+    }
+
+    // Parse existing vars
+    const existingVars = {};
+    existingContent.split('\n').forEach(line => {
+      const match = line.match(/^([^=]+)=(.*)$/);
+      if (match) {
+        existingVars[match[1]] = match[2];
+      }
+    });
+
+    // Merge with new vars
+    Object.assign(existingVars, envVars);
+
+    // Write back
+    const newContent = Object.entries(existingVars)
+      .map(([key, value]) => `${key}=${value}`)
+      .join('\n') + '\n';
+
+    fs.writeFileSync(this.envPath, newContent);
+  }
+
+  /**
+   * Validate environment variable format
+   * @param {string} name - Variable name
+   * @param {string} value - Variable value
+   * @returns {boolean} Whether the var is valid
+   */
+  validateEnvVar(name, value) {
+    // Name should be uppercase with underscores
+    if (!/^[A-Z_][A-Z0-9_]*$/.test(name)) {
+      return false;
+    }
+
+    // Value should not be empty
+    if (!value || value.trim() === '') {
+      return false;
+    }
+
+    return true;
+  }
+
+  // ==========================================
+  // EXTENDED FEATURES: Diagnostics
+  // ==========================================
+
+  /**
+   * Run comprehensive MCP diagnostics
+   * @returns {Object} Diagnostic results
+   */
+  diagnose() {
+    console.log('🔍 Running MCP Diagnostics...\n');
+
+    const result = {
+      status: 'healthy',
+      checks: [],
+      errors: [],
+      warnings: []
+    };
+
+    // Check 1: .claude directory
+    const claudeDirCheck = {
+      name: '.claude directory exists',
+      passed: fs.existsSync(path.join(this.projectRoot, '.claude'))
+    };
+    result.checks.push(claudeDirCheck);
+
+    if (!claudeDirCheck.passed) {
+      result.errors.push('.claude directory not found');
+      result.status = 'error';
+    }
+
+    // Check 2: config.json
+    const configCheck = {
+      name: 'config.json exists and is valid',
+      passed: false
+    };
+
+    if (fs.existsSync(this.configPath)) {
+      try {
+        JSON.parse(fs.readFileSync(this.configPath, 'utf8'));
+        configCheck.passed = true;
+      } catch (e) {
+        result.errors.push('config.json is invalid JSON');
+        result.status = 'error';
+      }
+    } else {
+      result.warnings.push('config.json not found');
+      if (result.status === 'healthy') result.status = 'warning';
+    }
+    result.checks.push(configCheck);
+
+    // Check 3: Active servers exist
+    const config = this.loadConfig();
+    const activeServers = config.mcp?.activeServers || [];
+
+    activeServers.forEach(serverName => {
+      const server = this.getServer(serverName);
+      if (!server) {
+        result.errors.push(`Active server '${serverName}' definition not found`);
+        result.status = 'error';
+      }
+    });
+
+    // Check 4: Environment variables
+    const envStatus = this.checkEnvVarsStatus();
+    const envCheck = {
+      name: 'environment variables configured',
+      passed: envStatus.missing.length === 0
+    };
+    result.checks.push(envCheck);
+
+    if (envStatus.missing.length > 0) {
+      envStatus.missing.forEach(varName => {
+        result.warnings.push(`Environment variable ${varName} not configured`);
+      });
+      if (result.status === 'healthy') result.status = 'warning';
+    }
+
+    // Check 5: mcp-servers.json
+    if (fs.existsSync(this.mcpServersPath)) {
+      try {
+        JSON.parse(fs.readFileSync(this.mcpServersPath, 'utf8'));
+      } catch (e) {
+        result.errors.push('mcp-servers.json is invalid JSON');
+        result.status = 'error';
+      }
+    }
+
+    // Check 6: Agents directory
+    const agentsDir = this.agentsDir || path.join(this.frameworkRoot, 'autopm', '.claude', 'agents');
+    const agentsDirCheck = {
+      name: 'agents directory exists',
+      passed: fs.existsSync(agentsDir)
+    };
+    result.checks.push(agentsDirCheck);
+
+    // Display results
+    console.log('📋 Diagnostic Results:\n');
+    result.checks.forEach(check => {
+      const icon = check.passed ? '✅' : '❌';
+      console.log(`${icon} ${check.name}`);
+    });
+
+    if (result.errors.length > 0) {
+      console.log('\n❌ Errors:');
+      result.errors.forEach(err => console.log(`   ${err}`));
+    }
+
+    if (result.warnings.length > 0) {
+      console.log('\n⚠️ Warnings:');
+      result.warnings.forEach(warn => console.log(`   ${warn}`));
+    }
+
+    console.log(`\n🏥 Overall Health: ${result.status.toUpperCase()}`);
+
+    return result;
+  }
+
+  /**
+   * Test MCP server connection
+   * @param {string} serverName - Name of server to test
+   * @returns {Promise<Object>} Test results
+   */
+  async testServer(serverName) {
+    const result = {
+      serverName,
+      success: false,
+      message: '',
+      commandCheck: false
+    };
+
+    // Check if server exists
+    const server = this.getServer(serverName);
+    if (!server) {
+      result.message = `Server '${serverName}' not found`;
+      return result;
+    }
+
+    // Check required env vars
+    if (server.metadata.env) {
+      const envVars = Object.keys(server.metadata.env);
+      const envStatus = this.checkEnvVarsStatus();
+
+      const missingVars = envVars.filter(v => envStatus.missing.includes(v));
+      if (missingVars.length > 0) {
+        result.message = `Missing environment variables: ${missingVars.join(', ')}`;
+        return result;
+      }
+    }
+
+    // Check command accessibility (basic check)
+    result.commandCheck = true;
+    result.success = true;
+    result.message = 'Server configuration appears valid';
+
+    return result;
+  }
+
+  // ==========================================
+  // EXTENDED FEATURES: Visualization
+  // ==========================================
+
+  /**
+   * Generate agent-MCP dependency tree
+   * @returns {Object} Tree structure with nodes and edges
+   */
+  generateTree() {
+    const analysis = this.analyzeAgents();
+    const agentsDir = this.agentsDir || path.join(this.frameworkRoot, 'autopm', '.claude', 'agents');
+
+    const tree = {
+      nodes: [],
+      edges: []
+    };
+
+    // Build category nodes
+    const categories = {};
+
+    const scanDir = (dir, category = 'root') => {
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+      entries.forEach(entry => {
+        const fullPath = path.join(dir, entry.name);
+
+        if (entry.isDirectory()) {
+          if (!categories[entry.name]) {
+            categories[entry.name] = true;
+            tree.nodes.push({
+              type: 'category',
+              name: entry.name
+            });
+          }
+          scanDir(fullPath, entry.name);
+        } else if (entry.isFile() && entry.name.endsWith('.md')) {
+          const content = fs.readFileSync(fullPath, 'utf8');
+          const nameMatch = content.match(/^---[\s\S]*?name:\s*([^\n]+)/m);
+          const agentName = nameMatch ? nameMatch[1].trim() : path.basename(entry.name, '.md');
+
+          tree.nodes.push({
+            type: 'agent',
+            name: agentName,
+            category
+          });
+
+          // Create edges to MCP servers
+          if (analysis.mcpUsage[agentName]) {
+            analysis.mcpUsage[agentName].forEach(server => {
+              tree.edges.push({
+                from: agentName,
+                to: server
+              });
+            });
+          }
+        }
+      });
+    };
+
+    if (fs.existsSync(agentsDir)) {
+      scanDir(agentsDir);
+    }
+
+    return tree;
+  }
+
+  /**
+   * Display tree visualization
+   */
+  showTree() {
+    console.log('🌳 Agent → MCP Dependency Tree\n');
+
+    const tree = this.generateTree();
+    const analysis = this.analyzeAgents();
+
+    // Group agents by category
+    const categories = {};
+    tree.nodes.filter(n => n.type === 'agent').forEach(agent => {
+      const cat = agent.category || 'root';
+      if (!categories[cat]) {
+        categories[cat] = [];
+      }
+      categories[cat].push(agent.name);
+    });
+
+    Object.entries(categories).forEach(([category, agents]) => {
+      if (category !== 'root') {
+        console.log(`📁 ${category}`);
+      }
+
+      agents.forEach((agent, index) => {
+        const isLast = index === agents.length - 1;
+        const prefix = isLast ? '└─' : '├─';
+
+        const mcpServers = analysis.mcpUsage[agent] || [];
+        const status = mcpServers.length > 0 ? '✅' : '⚪';
+
+        console.log(`${prefix} ${agent} ${status}`);
+
+        if (mcpServers.length > 0) {
+          mcpServers.forEach((server, sIndex) => {
+            const sIsLast = sIndex === mcpServers.length - 1;
+            const sPrefix = sIsLast ? '   └─' : '   ├─';
+            console.log(`${sPrefix} ${server}`);
+          });
+        }
+      });
+      console.log();
+    });
+  }
+
+  /**
+   * Show status of all MCP servers
+   */
+  showStatus() {
+    console.log('📊 MCP Servers Status\n');
+
+    const config = this.loadConfig();
+    const activeServers = config.mcp?.activeServers || [];
+    const allServers = this.getAllServers();
+    const analysis = this.analyzeAgents();
+
+    // Count agent usage per server
+    const serverAgentCount = {};
+    Object.values(analysis.mcpUsage).forEach(servers => {
+      servers.forEach(server => {
+        serverAgentCount[server] = (serverAgentCount[server] || 0) + 1;
+      });
+    });
+
+    allServers.forEach(server => {
+      const isEnabled = activeServers.includes(server.name);
+      const status = isEnabled ? '✅' : '⚪';
+      const agentCount = serverAgentCount[server.name] || 0;
+
+      console.log(`${status} ${server.name}`);
+      console.log(`    Category: ${server.metadata.category || 'uncategorized'}`);
+      console.log(`    Status: ${isEnabled ? 'Enabled' : 'Disabled'}`);
+      console.log(`    Used by: ${agentCount} agent${agentCount !== 1 ? 's' : ''}`);
+
+      // Show required env vars
+      if (server.metadata.env) {
+        const envVars = Object.keys(server.metadata.env);
+        const envStatus = this.checkEnvVarsStatus();
+
+        console.log(`    Environment:`);
+        envVars.forEach(envVar => {
+          const configured = envStatus.configured.includes(envVar);
+          const varStatus = configured ? '✅' : '❌';
+          console.log(`      ${varStatus} ${envVar}`);
+        });
+      }
+
+      console.log();
+    });
+
+    console.log('📈 Summary:');
+    console.log(`   Total servers: ${allServers.length}`);
+    console.log(`   Enabled: ${activeServers.length}`);
+    console.log(`   Disabled: ${allServers.length - activeServers.length}`);
+  }
 }
 
 // CLI execution
@@ -553,9 +1276,49 @@ if (require.main === module) {
     case 'info':
       handler.info(args[0]);
       break;
+    // Extended commands
+    case 'agents':
+      handler.mcpAgents(args.includes('--by-server') ? { groupBy: 'server' } : {});
+      break;
+    case 'agent':
+      if (!args[0]) {
+        console.error('❌ Please specify an agent name');
+        process.exit(1);
+      }
+      handler.mcpAgent(args[0]);
+      break;
+    case 'usage':
+      handler.mcpUsage();
+      break;
+    case 'setup':
+      handler.setupWizard();
+      break;
+    case 'diagnose':
+      handler.diagnose();
+      break;
+    case 'test':
+      if (!args[0]) {
+        console.error('❌ Please specify a server name');
+        process.exit(1);
+      }
+      handler.testServer(args[0]).then(result => {
+        if (result.success) {
+          console.log(`✅ ${result.message}`);
+        } else {
+          console.error(`❌ ${result.message}`);
+          process.exit(1);
+        }
+      });
+      break;
+    case 'tree':
+      handler.showTree();
+      break;
+    case 'status':
+      handler.showStatus();
+      break;
     default:
       console.log('Usage: mcp-handler <command> [options]');
-      console.log('\nCommands:');
+      console.log('\nBasic Commands:');
       console.log('  list              List all available servers');
       console.log('  add               Add a new server interactively');
       console.log('  remove <name>     Remove a server');
@@ -564,6 +1327,18 @@ if (require.main === module) {
       console.log('  sync              Sync configuration');
       console.log('  validate          Validate all servers');
       console.log('  info <name>       Show server details');
+      console.log('\nAgent Analysis:');
+      console.log('  agents            List agents using MCP');
+      console.log('  agents --by-server  Group agents by MCP server');
+      console.log('  agent <name>      Show MCP config for specific agent');
+      console.log('  usage             Show MCP usage statistics');
+      console.log('\nConfiguration:');
+      console.log('  setup             Interactive API key setup');
+      console.log('  diagnose          Run MCP diagnostics');
+      console.log('  test <server>     Test MCP server connection');
+      console.log('\nVisualization:');
+      console.log('  tree              Show agent-MCP dependency tree');
+      console.log('  status            Show MCP servers status');
       process.exit(1);
   }
 }

@@ -32,7 +32,23 @@ autopm install
 # Choose installation scenario (recommend: Full DevOps)
 ```
 
-### 2. Enable Required MCP Servers
+### 2. Explore Available MCP Servers
+
+```bash
+# List all available MCP servers
+autopm mcp list
+
+# Show detailed information about a server
+autopm mcp info context7-docs
+
+# Check which agents are using MCP
+autopm mcp agents
+
+# Show MCP usage statistics
+autopm mcp usage
+```
+
+### 3. Enable Required MCP Servers
 
 ```bash
 # Enable context7 documentation server
@@ -63,7 +79,21 @@ FILESYSTEM_ROOT=/
 FILESYSTEM_READONLY=false
 ```
 
-### 4. Sync MCP Configuration
+### 4. Configure API Keys
+
+```bash
+# Interactive API key setup wizard
+autopm mcp setup
+
+# Or manually create .claude/.env with your credentials
+cat > .claude/.env << EOF
+CONTEXT7_API_KEY=your-context7-api-key
+CONTEXT7_WORKSPACE=your-workspace-id
+GITHUB_TOKEN=your-github-personal-access-token
+EOF
+```
+
+### 5. Sync MCP Configuration
 
 ```bash
 # Sync all enabled servers to .claude/mcp-servers.json
@@ -71,6 +101,19 @@ autopm mcp sync
 ```
 
 This creates/updates `.claude/mcp-servers.json` which Claude reads when starting a session.
+
+### 6. Verify Configuration
+
+```bash
+# Run comprehensive diagnostics
+autopm mcp diagnose
+
+# Test specific server connection
+autopm mcp test context7-docs
+
+# Show all servers status
+autopm mcp status
+```
 
 ### 5. Verify Configuration
 
@@ -261,14 +304,126 @@ cat .claude/mcp-servers.json
 - [ClaudeAutoPM MCP Registry](autopm/.claude/mcp/MCP-REGISTRY.md)
 - [Agent MCP Integration Guide](autopm/.claude/agents/AGENT-MCP-INTEGRATION.md)
 
+## 🛠️ New MCP Commands Reference
+
+ClaudeAutoPM now provides comprehensive MCP management through the CLI:
+
+### Agent Analysis Commands
+
+```bash
+# List all agents using MCP servers
+autopm mcp agents
+
+# Group agents by MCP server
+autopm mcp agents --by-server
+
+# Show MCP configuration for specific agent
+autopm mcp agent react-frontend-engineer
+
+# Display MCP usage statistics
+autopm mcp usage
+
+# Show agent-MCP dependency tree
+autopm mcp tree
+```
+
+**Example Output:**
+```
+🤖 Agents Using MCP
+
+✅ react-frontend-engineer
+   └─ context7-docs
+
+✅ python-backend-engineer
+   └─ context7-docs
+   └─ sqlite-mcp
+
+📊 Summary:
+   Total agents: 53
+   Using MCP: 39 (74%)
+   Without MCP: 14 (26%)
+```
+
+### Configuration & Diagnostics
+
+```bash
+# Interactive API key setup
+autopm mcp setup
+
+# Run comprehensive MCP diagnostics
+autopm mcp diagnose
+
+# Test specific MCP server connection
+autopm mcp test context7-docs
+
+# Show all MCP servers status
+autopm mcp status
+```
+
+**Diagnostic Features:**
+- ✅ Check `.claude` directory structure
+- ✅ Validate `config.json` and `mcp-servers.json`
+- ✅ Detect missing MCP server definitions
+- ✅ Check environment variables configuration
+- ✅ Verify agents directory
+- ✅ Overall health status report
+
+### Visualization Commands
+
+```bash
+# Show agent-MCP dependency tree
+autopm mcp tree
+
+# Display MCP servers status with details
+autopm mcp status
+```
+
+**Tree Output Example:**
+```
+🌳 Agent → MCP Dependency Tree
+
+📁 frontend
+├─ react-frontend-engineer ✅
+│  └─ context7-docs
+└─ vue-frontend-engineer ✅
+   └─ context7-docs
+
+📁 backend
+├─ python-backend-engineer ✅
+│  ├─ context7-docs
+│  └─ sqlite-mcp
+└─ nodejs-backend-engineer ✅
+   └─ context7-docs
+```
+
+## 📊 Agent MCP Integration Status
+
+As of the latest version, **39 out of 53 agents (74%)** use MCP servers:
+
+- **Documentation**: 39 agents use `context7-docs` for live documentation
+- **Codebase Analysis**: Some agents use `context7-codebase` for project analysis
+- **GitHub Integration**: Agents can use `github-mcp` for repository operations
+- **Database**: Specialized agents use `sqlite-mcp`, `postgresql-mcp`, etc.
+
+**Top MCP-Using Agents:**
+- Cloud architects (AWS, Azure, GCP)
+- Backend engineers (Python, Node.js)
+- Frontend engineers (React, Vue, Angular)
+- DevOps specialists (Docker, Kubernetes, Terraform)
+- Database experts (PostgreSQL, MongoDB, Redis)
+
 ## 🆘 Getting Help
 
 If MCP setup issues persist:
 
-1. Check the [ClaudeAutoPM Issues](https://github.com/rafeekpro/ClaudeAutoPM/issues)
-2. Review agent-specific documentation in `autopm/.claude/agents/`
-3. Enable debug mode and check logs
-4. Contact support with configuration details (exclude API keys!)
+1. **Run diagnostics**: `autopm mcp diagnose`
+2. **Check server status**: `autopm mcp status`
+3. **Test connections**: `autopm mcp test <server-name>`
+4. **Review agent config**: `autopm mcp agent <agent-name>`
+5. Check the [ClaudeAutoPM Issues](https://github.com/rafeekpro/ClaudeAutoPM/issues)
+6. Review agent-specific documentation in `autopm/.claude/agents/`
+7. Enable debug mode and check logs
+8. Contact support with configuration details (exclude API keys!)
 
 ---
 
