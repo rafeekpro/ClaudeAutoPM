@@ -950,6 +950,16 @@ This server can be integrated with various agents and context pools.
   // ==========================================
 
   /**
+   * Extract unique environment variable names from missingEnvVars array
+   * @param {Array} missingEnvVars - Array of objects with server and variable properties
+   * @returns {Array<string>} Array of unique variable names
+   * @private
+   */
+  _getUniqueEnvVars(missingEnvVars) {
+    return [...new Set(missingEnvVars.map(v => v.variable))];
+  }
+
+  /**
    * Check if required MCP servers are properly configured
    * @returns {Object} Configuration check result
    */
@@ -1014,7 +1024,7 @@ This server can be integrated with various agents and context pools.
 
     // Add recommendations for missing env vars
     if (result.missingEnvVars.length > 0) {
-      const uniqueVars = [...new Set(result.missingEnvVars.map(v => v.variable))];
+      const uniqueVars = this._getUniqueEnvVars(result.missingEnvVars);
       result.warnings.push(`⚠️  Missing ${uniqueVars.length} environment variable(s): ${uniqueVars.join(', ')}`);
       result.recommendations.push(`   Configure in .claude/.env file`);
       result.recommendations.push(`   Run: autopm mcp setup`);
@@ -1231,7 +1241,7 @@ This server can be integrated with various agents and context pools.
       }
 
       if (serverCheck.missingEnvVars.length > 0) {
-        const uniqueVars = [...new Set(serverCheck.missingEnvVars.map(v => v.variable))];
+        const uniqueVars = this._getUniqueEnvVars(serverCheck.missingEnvVars);
         console.log(`   ⚠️  ${uniqueVars.length} environment variable(s) not configured`);
       }
 
