@@ -32,9 +32,6 @@ module.exports = {
   // Timeouts
   testTimeout: 10000,
 
-  // Performance optimization
-  maxWorkers: '50%',
-
   // Clear mocks between tests
   clearMocks: true,
   restoreMocks: true,
