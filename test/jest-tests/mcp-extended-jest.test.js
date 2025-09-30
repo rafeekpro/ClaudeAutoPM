@@ -972,4 +972,172 @@ env:
       expect(output).toMatch(/context7-docs|agent/i);
     });
   });
+
+  describe('Environment Status Caching', () => {
+    beforeEach(() => {
+      // Create .env file with some vars
+      fs.writeFileSync(
+        path.join(handler.projectRoot, '.claude', '.env'),
+        'CONTEXT7_API_KEY=test123\nGITHUB_TOKEN=ghp_test\n'
+      );
+
+      // Create MCP server requiring env vars
+      fs.writeFileSync(
+        path.join(handler.mcpDir, 'test-server.md'),
+        `---
+name: test-server
+env:
+  TEST_VAR: "\${TEST_VAR:-}"
+  ANOTHER_VAR: "\${ANOTHER_VAR:-}"
+---
+`
+      );
+
+      // Enable the server
+      const config = handler.loadConfig();
+      config.mcp = config.mcp || {};
+      config.mcp.activeServers = ['test-server'];
+      handler.saveConfig(config);
+    });
+
+    test('should cache environment status after first check', () => {
+      // First call - should read file and cache
+      const result1 = handler.checkEnvVarsStatus();
+      expect(result1).toHaveProperty('configured');
+      expect(result1).toHaveProperty('missing');
+
+      // Second call with useCache=true - should use cache
+      const result2 = handler.checkEnvVarsStatus(true);
+      expect(result2).toEqual(result1);
+
+      // Verify cache is stored
+      expect(handler._envStatusCache).toBeDefined();
+      expect(handler._envStatusCache).toEqual(result1);
+    });
+
+    test('should read file when useCache=false even if cache exists', () => {
+      // First call - caches result
+      handler.checkEnvVarsStatus(true);
+
+      // Modify .env file
+      fs.writeFileSync(
+        path.join(handler.projectRoot, '.claude', '.env'),
+        'CONTEXT7_API_KEY=test123\nGITHUB_TOKEN=ghp_test\nTEST_VAR=test\n'
+      );
+
+      // Call with useCache=false - should read file again
+      const result = handler.checkEnvVarsStatus(false);
+      expect(result.configured).toContain('TEST_VAR');
+    });
+
+    test('should invalidate cache when saving new env vars', () => {
+      // Create server requiring NEW_VAR
+      fs.writeFileSync(
+        path.join(handler.mcpDir, 'new-var-server.md'),
+        `---
+name: new-var-server
+env:
+  NEW_VAR: "\${NEW_VAR:-}"
+---
+`
+      );
+
+      const config = handler.loadConfig();
+      config.mcp.activeServers.push('new-var-server');
+      handler.saveConfig(config);
+
+      // First check - caches result
+      const result1 = handler.checkEnvVarsStatus(true);
+      expect(handler._envStatusCache).toBeDefined();
+      expect(result1.missing).toContain('NEW_VAR');
+
+      // Save new env vars
+      handler.saveEnvVars({ NEW_VAR: 'value123' });
+
+      // Cache should be invalidated
+      expect(handler._envStatusCache).toBeNull();
+
+      // Next check should read file again
+      const result2 = handler.checkEnvVarsStatus(true);
+      expect(result2.configured).toContain('NEW_VAR');
+    });
+
+    test('should reduce file I/O when checking multiple servers', () => {
+      // Create multiple servers
+      for (let i = 1; i <= 3; i++) {
+        fs.writeFileSync(
+          path.join(handler.mcpDir, `server-${i}.md`),
+          `---
+name: server-${i}
+env:
+  VAR_${i}: "\${VAR_${i}:-}"
+---
+`
+        );
+      }
+
+      // Enable all servers
+      const config = handler.loadConfig();
+      config.mcp.activeServers = ['server-1', 'server-2', 'server-3'];
+      handler.saveConfig(config);
+
+      // Spy on fs.readFileSync to count file reads
+      const readSpy = jest.spyOn(fs, 'readFileSync');
+      const originalRead = fs.readFileSync.bind(fs);
+
+      // Let initial config/server loads happen
+      readSpy.mockClear();
+
+      // First call - will read .env file
+      handler.checkEnvVarsStatus(true);
+      const firstCallReads = readSpy.mock.calls.filter(
+        call => call[0] && call[0].includes('.env')
+      ).length;
+
+      readSpy.mockClear();
+
+      // Multiple subsequent calls with cache - should not read .env again
+      handler.checkEnvVarsStatus(true);
+      handler.checkEnvVarsStatus(true);
+      handler.checkEnvVarsStatus(true);
+
+      const cachedCallReads = readSpy.mock.calls.filter(
+        call => call[0] && call[0].includes('.env')
+      ).length;
+
+      // Cached calls should not read .env file
+      expect(firstCallReads).toBeGreaterThan(0);
+      expect(cachedCallReads).toBe(0);
+
+      readSpy.mockRestore();
+    });
+
+    test('testServer should benefit from env status caching', async () => {
+      // Create server with env requirements
+      fs.writeFileSync(
+        path.join(handler.mcpDir, 'cacheable-server.md'),
+        `---
+name: cacheable-server
+command: node
+args: ["server.js"]
+env:
+  REQUIRED_VAR: "\${REQUIRED_VAR:-}"
+---
+`
+      );
+
+      const config = handler.loadConfig();
+      config.mcp.activeServers = ['cacheable-server'];
+      handler.saveConfig(config);
+
+      // Prime the cache
+      handler.checkEnvVarsStatus(true);
+
+      // Test server - should use cached env status
+      const result = await handler.testServer('cacheable-server');
+
+      expect(result).toHaveProperty('serverName', 'cacheable-server');
+      expect(result).toHaveProperty('success');
+    });
+  });
 });
