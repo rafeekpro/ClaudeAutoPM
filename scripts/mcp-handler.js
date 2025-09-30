@@ -1014,7 +1014,7 @@ This server can be integrated with various agents and context pools.
 
     // Add recommendations for missing env vars
     if (result.missingEnvVars.length > 0) {
-      const uniqueVars = [...new Set(result.missingEnvVars.map(v => v.variable))];
+      const uniqueVars = Array.from(new Set(result.missingEnvVars.map(v => v.variable)));
       result.warnings.push(`⚠️  Missing ${uniqueVars.length} environment variable(s): ${uniqueVars.join(', ')}`);
       result.recommendations.push(`   Configure in .claude/.env file`);
       result.recommendations.push(`   Run: autopm mcp setup`);
