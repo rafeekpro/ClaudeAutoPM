@@ -12,28 +12,22 @@ describe('Interactive Guide', () => {
   test('should show help for guide command', () => {
     const result = execSync(`node ${autopmPath} guide --help`, { encoding: 'utf8' });
 
-    expect(result).toContain('Interactive ClaudeAutoPM setup and usage guide');
-    expect(result).toContain('Start interactive setup guide');
+    expect(result).toContain('Interactive setup guide');
+    expect(result).toContain('guide');
     expect(result).toContain('quickstart');
     expect(result).toContain('install');
     expect(result).toContain('config');
   });
 
-  test('should start interactive guide by default', () => {
-    // Test that the interactive guide loads without errors
-    // We pipe "7" (exit option) to exit immediately
-    const result = execSync(`echo "7" | node ${autopmPath} guide`, { encoding: 'utf8' });
+  test('should show deprecation notice for interactive guide', () => {
+    // Interactive guide has been replaced with enhanced help
+    const result = execSync(`node ${autopmPath} guide`, { encoding: 'utf8' });
 
-    expect(result).toContain('Welcome to ClaudeAutoPM');
-    expect(result).toContain('What would you like to do?');
-    expect(result).toContain('📦 Install ClaudeAutoPM in this project');
-    expect(result).toContain('🔧 Configure existing installation');
-    expect(result).toContain('🤖 Learn about agent teams');
-    expect(result).toContain('📋 Start your first PM workflow');
-    expect(result).toContain('🆘 Troubleshoot installation issues');
-    expect(result).toContain('📚 View complete documentation');
-    expect(result).toContain('🚪 Exit guide');
-    expect(result).toContain('Thank you for using ClaudeAutoPM!');
+    expect(result).toContain('The interactive guide has been replaced');
+    expect(result).toContain('autopm --help');
+    expect(result).toContain('guide config');
+    expect(result).toContain('guide tutorial');
+    expect(result).toContain('guide examples');
   });
 
   test('should generate legacy documentation when specific action provided', () => {
@@ -61,14 +55,12 @@ describe('Interactive Guide', () => {
     expect(result).toContain('FAQ created: docs/FAQ.md');
   });
 
-  test('should detect existing installation correctly', () => {
-    // Since we're running in the AUTOPM project directory, it should detect existing installation
-    // We use printf to properly format the input for the interactive guide
+  test('should show deprecation notice even with input', () => {
+    // Interactive guide has been deprecated, should show deprecation message
     const result = execSync(`printf "1\\n\\n" | node ${autopmPath} guide`, { encoding: 'utf8' });
 
-    expect(result).toContain('Already Installed');
-    expect(result).toContain('ClaudeAutoPM is already installed in this project');
-    expect(result).toContain('Found existing .claude directory');
+    expect(result).toContain('The interactive guide has been replaced');
+    expect(result).toContain('autopm --help');
   });
 
   test('interactive guide class should be importable', () => {
