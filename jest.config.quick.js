@@ -15,7 +15,9 @@ module.exports = {
     '/test/unit/',
     '/test/integration/',
     '/test/installation/',
-    '/test/scripts/'
+    '/test/scripts/',
+    '/test/cli/basic-commands.test.js',
+    '/test/cli/autopm-commands.test.js'
   ],
 
   // Coverage settings
