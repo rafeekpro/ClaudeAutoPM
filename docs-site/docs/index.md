@@ -40,25 +40,54 @@ features:
 ---
 
 <style>
-.vp-doc h2 {
+.content-container {
+  max-width: 1152px;
+  margin: 0 auto;
+  padding: 48px 24px 96px;
+}
+
+.content-container h2 {
   margin-top: 48px;
   padding-top: 24px;
   border-top: 1px solid var(--vp-c-divider);
+  font-size: 2em;
+  font-weight: 600;
 }
 
-.vp-doc ul {
-  padding-left: 1.25rem;
+.content-container h2:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
 }
 
-.vp-doc li {
-  margin: 4px 0;
+.content-container .language-bash {
+  margin: 24px 0;
 }
 
-.vp-doc strong {
+.content-container p {
+  font-size: 1.1em;
+  line-height: 1.7;
+  margin: 16px 0;
+}
+
+.content-container ul {
+  padding-left: 1.5rem;
+  margin: 24px 0;
+}
+
+.content-container li {
+  margin: 12px 0;
+  line-height: 1.7;
+  font-size: 1.05em;
+}
+
+.content-container strong {
   font-weight: 600;
   color: var(--vp-c-brand);
 }
 </style>
+
+<div class="content-container">
 
 ## Quick Start
 
@@ -80,3 +109,5 @@ ClaudeAutoPM transforms your development workflow by:
 - **Parallel agent execution** - Multiple specialized AI agents working simultaneously
 - **Provider flexibility** - Works with your existing GitHub or Azure DevOps setup
 - **Context optimization** - Intelligent management prevents information loss
+
+</div>
