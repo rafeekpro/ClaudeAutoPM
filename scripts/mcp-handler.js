@@ -909,7 +909,7 @@ This server can be integrated with various agents and context pools.
     existingContent.split('\n').forEach(line => {
       const trimmedLine = line.trim();
       if (!trimmedLine || trimmedLine.startsWith('#')) return; // skip empty/comment lines
-      const parts = line.split('=', 2);
+      const parts = trimmedLine.split('=', 2);
       if (parts.length === 2) {
         existingVars[parts[0]] = parts[1];
       }
