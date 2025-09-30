@@ -894,9 +894,10 @@ This server can be integrated with various agents and context pools.
     // Parse existing vars
     const existingVars = {};
     existingContent.split('\n').forEach(line => {
-      const match = line.match(/^([^=]+)=(.*)$/);
-      if (match) {
-        existingVars[match[1]] = match[2];
+      if (!line.trim() || line.trim().startsWith('#')) return; // skip empty/comment lines
+      const parts = line.split('=', 2);
+      if (parts.length === 2) {
+        existingVars[parts[0]] = parts[1];
       }
     });
 
