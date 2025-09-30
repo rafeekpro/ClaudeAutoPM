@@ -291,9 +291,17 @@ autopm azure:sprint-status
 autopm context:create
 ```
 
-### New in v1.9.x: Complete PM Command Suite
+### Latest Features (v1.12.x)
 
-The latest release includes 17 new PM commands providing comprehensive project management capabilities:
+**v1.12.2 - Smart Installation & Command Fixes**
+- **Smart Tool Detection** - Installer automatically detects Docker and kubectl availability
+- **Intelligent Defaults** - Installation options filtered based on available tools
+- **Command Format Fixes** - All PM scripts now use consistent `/pm:...` format
+- **Version Tracking** - Update command now properly detects installed versions
+
+**v1.9.x - Complete PM Command Suite**
+
+17 new PM commands providing comprehensive project management capabilities:
 
 #### **PRD & Epic Management**
 ```bash
