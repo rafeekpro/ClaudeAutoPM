@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.12.3] - 2025-09-30
+
+### 📚 Documentation
+- **Comprehensive Documentation Overhaul**
+  - Complete rewrite of README.md with v1.12.2 features section
+  - Complete rewrite of docs/INSTALL.md (400 lines)
+    - System requirements and platform-specific instructions (macOS, Linux, Windows)
+    - Installation presets explained in detail with recommendations
+    - Update process with version detection feature
+    - Comprehensive troubleshooting section with common errors
+  - Complete rewrite of docs/QUICKSTART.md (444 lines)
+    - 5-minute quick start guide with interactive and manual paths
+    - First workflow examples and basic commands reference
+    - Agent teams setup and automatic team switching
+    - Common workflows (daily development, feature development, team collaboration)
+    - Pro tips and troubleshooting section
+  - Complete rewrite of docs/CONFIG.md (364 lines)
+    - Complete configuration reference with environment variables
+    - Configuration commands reference (view, set, switch, validate)
+    - Execution strategies explained in detail
+    - Provider-specific settings for GitHub and Azure DevOps
+    - Advanced configuration topics (MCP servers, git hooks, custom strategies)
+  - Complete rewrite of docs/FAQ.md (375 lines)
+    - General, installation, and usage questions
+    - Configuration and troubleshooting sections
+    - Advanced topics, performance, and migration guidance
+    - Complete provider comparison and setup instructions
+
+### 🛠️ Enhanced
+- **Version Tracking in Configuration**
+  - Config files now include version and installed timestamp
+  - Enables `autopm update` to recognize current installed version
+  - Prevents unnecessary updates when already on latest version
+
 ## [1.12.2] - 2025-09-30
 
 ### 🛠️ Enhanced
