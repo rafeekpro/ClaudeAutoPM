@@ -39,43 +39,14 @@ export default defineConfig({
     sidebar: {
       '/guide/': [
         {
-          text: 'Introduction',
+          text: 'Getting Started',
           collapsed: false,
           items: [
-            { text: 'Getting Started', link: '/guide/getting-started' },
+            { text: 'Overview', link: '/guide/getting-started' },
             { text: 'Quick Start', link: '/guide/quick-start' },
             { text: 'Interactive Setup', link: '/guide/interactive-setup' },
             { text: 'Installation Guide', link: '/guide/installation' },
             { text: 'First Project', link: '/guide/first-project' }
-          ]
-        },
-        {
-          text: 'Core Concepts',
-          collapsed: false,
-          items: [
-            { text: 'Project Management', link: '/guide/project-management' },
-            { text: 'AI Agents', link: '/guide/ai-agents' },
-            { text: 'Execution Strategies', link: '/guide/execution-strategies' },
-            { text: 'Context Management', link: '/guide/context-management' }
-          ]
-        },
-        {
-          text: 'Providers',
-          collapsed: false,
-          items: [
-            { text: 'GitHub Integration', link: '/guide/github' },
-            { text: 'Azure DevOps', link: '/guide/azure-devops' },
-            { text: 'Provider Router', link: '/guide/provider-router' }
-          ]
-        },
-        {
-          text: 'Advanced',
-          collapsed: false,
-          items: [
-            { text: 'Custom Agents', link: '/guide/custom-agents' },
-            { text: 'Hooks & Automation', link: '/guide/hooks' },
-            { text: 'Performance Tuning', link: '/guide/performance' },
-            { text: 'Troubleshooting', link: '/guide/troubleshooting' }
           ]
         }
       ],
@@ -85,37 +56,9 @@ export default defineConfig({
           collapsed: false,
           items: [
             { text: 'Overview', link: '/commands/overview' },
-            { text: 'CLI Reference', link: '/commands/cli-reference' }
-          ]
-        },
-        {
-          text: 'Project Management',
-          collapsed: false,
-          items: [
+            { text: 'CLI Reference', link: '/commands/cli-reference' },
             { text: 'PM Commands', link: '/commands/pm-commands' },
-            { text: 'Epic Commands', link: '/commands/pm-epic' },
-            { text: 'Issue Commands', link: '/commands/pm-issue' },
-            { text: 'PRD Commands', link: '/commands/pm-prd' }
-          ]
-        },
-        {
-          text: 'Azure DevOps',
-          collapsed: false,
-          items: [
-            { text: 'Azure Integration', link: '/commands/azure-devops' },
-            { text: 'Task Commands', link: '/commands/azure-task' },
-            { text: 'User Story Commands', link: '/commands/azure-us' },
-            { text: 'Feature Commands', link: '/commands/azure-feature' }
-          ]
-        },
-        {
-          text: 'Development',
-          collapsed: true,
-          items: [
-            { text: 'Python Scaffolding', link: '/commands/python-scaffold' },
-            { text: 'React Scaffolding', link: '/commands/react-scaffold' },
-            { text: 'API Documentation', link: '/commands/api-docs' },
-            { text: 'Testing Commands', link: '/commands/testing' }
+            { text: 'Azure DevOps', link: '/commands/azure-devops' }
           ]
         }
       ],
@@ -166,9 +109,7 @@ export default defineConfig({
           text: 'System Architecture',
           collapsed: false,
           items: [
-            { text: 'Overview', link: '/architecture/overview' },
-            { text: 'Project Structure', link: '/architecture/structure' },
-            { text: 'Core Components', link: '/architecture/components' }
+            { text: 'Overview', link: '/architecture/overview' }
           ]
         }
       ]
