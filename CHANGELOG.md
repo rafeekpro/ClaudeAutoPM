@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.12.2] - 2025-09-30
+
 ### 🛠️ Enhanced
 - **Smart Tool Detection During Installation**
   - Installer now automatically detects Docker and kubectl availability
@@ -21,6 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed incorrect command format `pm ...` to proper slash command format `/pm:...`
   - Updated all PM scripts: prd-new, prd-parse, epic-split, epic-edit, epic-close, epic-start
   - Consistent command format across all user-facing messages and help text
+- **Configuration Files**
+  - Added https:// protocol to Context7 URLs in mcp-servers.json
+  - Removed broken references to non-existent tdd-enforcement.md file
 - **UI Fixes**
   - Fixed installation completion box - corrected bottom-right corner character (╗ → ╝)
 
