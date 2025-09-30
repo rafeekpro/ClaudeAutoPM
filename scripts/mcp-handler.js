@@ -1013,17 +1013,23 @@ This server can be integrated with various agents and context pools.
     });
 
     // Add recommendations for missing env vars
-    if (result.missingEnvVars.length > 0) {
-      const uniqueVars = Array.from(new Set(result.missingEnvVars.map(v => v.variable)));
-      result.warnings.push(`⚠️  Missing ${uniqueVars.length} environment variable(s): ${uniqueVars.join(', ')}`);
-      result.recommendations.push(`   Configure in .claude/.env file`);
-      result.recommendations.push(`   Run: autopm mcp setup`);
-    }
+    this._addMissingEnvVarRecommendations(result);
 
     return result;
   }
 
   /**
+   * Helper to add warnings and recommendations for missing environment variables
+   * @param {Object} result - The result object to update
+   */
+  _addMissingEnvVarRecommendations(result) {
+    if (result.missingEnvVars && result.missingEnvVars.length > 0) {
+      const uniqueVars = Array.from(new Set(result.missingEnvVars.map(v => v.variable)));
+      result.warnings.push(`⚠️  Missing ${uniqueVars.length} environment variable(s): ${uniqueVars.join(', ')}`);
+      result.recommendations.push(`   Configure in .claude/.env file`);
+      result.recommendations.push(`   Run: autopm mcp setup`);
+    }
+  }
    * Display quick configuration check
    */
   check() {
