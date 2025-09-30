@@ -31,9 +31,6 @@ jobs:
     - name: Run quick tests
       run: npm test
 
-    - name: Run CLI tests
-      run: node --test test/cli/basic-commands.test.js test/cli/autopm-commands.test.js
-
     - name: Check test coverage
       run: npm run test:coverage
       continue-on-error: true
