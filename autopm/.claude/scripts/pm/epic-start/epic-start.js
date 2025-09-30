@@ -164,8 +164,8 @@ class EpicStarter {
     await this.startParallelExecution(tasks);
 
     // Show next steps
-    console.log('\n💡 Monitor progress with: /pm:epic-status', this.epicName);
-    console.log('📝 View details with: /pm:epic-show', this.epicName);
+    console.log(`\n💡 Monitor progress with: /pm:epic-status ${this.epicName}`);
+    console.log(`📝 View details with: /pm:epic-show ${this.epicName}`);
   }
 }
 
