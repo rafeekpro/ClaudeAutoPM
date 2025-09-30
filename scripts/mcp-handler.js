@@ -51,6 +51,9 @@ class MCPHandler {
     this.configPath = path.join(this.projectRoot, '.claude', 'config.json');
     this.mcpServersPath = path.join(this.projectRoot, '.claude', 'mcp-servers.json');
     this.envPath = path.join(this.projectRoot, '.claude', '.env');
+
+    // Cache for environment status to reduce file I/O
+    this._envStatusCache = null;
   }
 
   /**
@@ -840,9 +843,15 @@ This server can be integrated with various agents and context pools.
 
   /**
    * Check status of environment variables
+   * @param {boolean} useCache - Whether to use cached result (default: false)
    * @returns {Object} Status of env vars (configured/missing)
    */
-  checkEnvVarsStatus() {
+  checkEnvVarsStatus(useCache = false) {
+    // Return cached result if available and requested
+    if (useCache && this._envStatusCache !== null) {
+      return this._envStatusCache;
+    }
+
     const requiredVars = this.detectRequiredEnvVars();
     const configured = [];
     const missing = [];
@@ -863,7 +872,14 @@ This server can be integrated with various agents and context pools.
       }
     });
 
-    return { configured, missing };
+    const result = { configured, missing };
+
+    // Cache the result if requested
+    if (useCache) {
+      this._envStatusCache = result;
+    }
+
+    return result;
   }
 
   /**
@@ -923,6 +939,9 @@ This server can be integrated with various agents and context pools.
       .join('\n') + '\n';
 
     fs.writeFileSync(this.envPath, newContent);
+
+    // Invalidate cache after updating env vars
+    this._envStatusCache = null;
   }
 
   /**
@@ -1282,7 +1301,7 @@ This server can be integrated with various agents and context pools.
     // Check required env vars
     if (server.metadata.env) {
       const envVars = Object.keys(server.metadata.env);
-      const envStatus = this.checkEnvVarsStatus();
+      const envStatus = this.checkEnvVarsStatus(true); // Use cache to reduce file I/O
 
       const missingVars = envVars.filter(v => envStatus.missing.includes(v));
       if (missingVars.length > 0) {
