@@ -5,6 +5,25 @@ All notable changes to the ClaudeAutoPM framework will be documented in this fil
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### 🛠️ Enhanced
+- **Smart Tool Detection During Installation**
+  - Installer now automatically detects Docker and kubectl availability
+  - Installation options are filtered based on available tools
+  - Clear visual feedback showing which tools are installed/missing
+  - Installation links provided for missing tools
+  - Prevents users from selecting scenarios requiring unavailable tools
+  - Default scenario automatically adjusts based on detected tools
+
+### 🐛 Fixed
+- **Command Format in PM Scripts**
+  - Fixed incorrect command format `pm ...` to proper slash command format `/pm:...`
+  - Updated all PM scripts: prd-new, prd-parse, epic-split, epic-edit, epic-close, epic-start
+  - Consistent command format across all user-facing messages and help text
+- **UI Fixes**
+  - Fixed installation completion box - corrected bottom-right corner character (╗ → ╝)
+
 ## [1.11.8] - 2025-09-29
 
 

@@ -26,7 +26,7 @@ class PrdCreator {
     const prdFile = path.join(this.prdsDir, `${prdName}.md`);
     if (fs.existsSync(prdFile)) {
       console.error(`❌ PRD already exists: ${prdName}`);
-      console.log(`💡 Use: pm prd-edit ${prdName}`);
+      console.log(`💡 Edit file: .claude/prds/${prdName}.md`);
       return false;
     }
 
@@ -96,10 +96,10 @@ class PrdCreator {
 
       // Show next steps
       console.log('\n💡 Next Steps:');
-      console.log(`  1. Review and refine: pm prd-edit ${prdName}`);
-      console.log(`  2. Convert to epic: pm prd-parse ${prdName}`);
-      console.log(`  3. View PRD: pm prd-show ${prdName}`);
-      console.log(`  4. List all PRDs: pm prd-list`);
+      console.log(`  1. Review PRD file: .claude/prds/${prdName}.md`);
+      console.log(`  2. Convert to epic: /pm:prd-parse ${prdName}`);
+      console.log(`  3. Check status: /pm:prd-status ${prdName}`);
+      console.log(`  4. List all PRDs: /pm:prd-list`);
 
     } finally {
       rl.close();

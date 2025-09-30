@@ -221,7 +221,7 @@ class PrdParser {
     const prdFile = path.join(this.prdsDir, `${featureName}.md`);
     if (!fs.existsSync(prdFile)) {
       console.error(`❌ PRD not found: ${featureName}`);
-      console.log(`💡 First create it with: pm prd-new ${featureName}`);
+      console.log(`💡 First create it with: /pm:prd-new ${featureName}`);
       return false;
     }
 
@@ -232,7 +232,7 @@ class PrdParser {
     if (fs.existsSync(epicFile) && !options.overwrite) {
       console.error(`⚠️  Epic '${featureName}' already exists.`);
       console.log(`💡 Use --overwrite to replace it`);
-      console.log(`💡 Or view it with: pm epic-show ${featureName}`);
+      console.log(`💡 Or view it with: /pm:epic-show ${featureName}`);
       return false;
     }
 
@@ -296,10 +296,10 @@ class PrdParser {
     }
 
     console.log(`\n💡 Next Steps:`);
-    console.log(`  1. Review epic: pm epic-show ${featureName}`);
-    console.log(`  2. Decompose into tasks: pm epic-decompose ${featureName}`);
-    console.log(`  3. Sync to GitHub: pm epic-sync ${featureName}`);
-    console.log(`  4. Start implementation: pm issue-start TASK-1`);
+    console.log(`  1. Review epic: /pm:epic-show ${featureName}`);
+    console.log(`  2. Decompose into tasks: /pm:epic-decompose ${featureName}`);
+    console.log(`  3. Sync to GitHub: /pm:epic-sync ${featureName}`);
+    console.log(`  4. Start implementation: /pm:issue-start TASK-1`);
 
     return true;
   }
@@ -486,7 +486,7 @@ ${prdSections.metrics || '- All functional requirements met\n- Performance targe
 
     if (!featureName) {
       console.error('❌ Error: Feature name required');
-      console.error('Usage: pm prd-parse <feature-name> [--overwrite]');
+      console.error('Usage: /pm:prd-parse <feature-name> [--overwrite]');
 
       // List available PRDs
       if (fs.existsSync(this.prdsDir)) {

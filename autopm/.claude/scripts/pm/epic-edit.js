@@ -359,7 +359,7 @@ class EpicEditor {
 
     if (!epicName) {
       console.error('❌ Error: Epic name required');
-      console.error('Usage: pm epic-edit <epic-name>');
+      console.error('Usage: /pm:epic-edit <epic-name>');
       console.log('\nAvailable epics:');
       this.listAvailableEpics();
       process.exit(1);

@@ -23,7 +23,8 @@ class Installer {
       BLUE: '\x1b[0;34m',
       CYAN: '\x1b[0;36m',
       NC: '\x1b[0m',
-      BOLD: '\x1b[1m'
+      BOLD: '\x1b[1m',
+      DIM: '\x1b[2m'
     };
 
     // Configuration
@@ -339,39 +340,113 @@ ${this.colors.BOLD}Examples:${this.colors.NC}
     }
   }
 
+  checkToolAvailability() {
+    const tools = {
+      docker: false,
+      kubectl: false
+    };
+
+    try {
+      execSync('docker --version', { encoding: 'utf-8', stdio: 'pipe' });
+      tools.docker = true;
+    } catch {
+      tools.docker = false;
+    }
+
+    try {
+      execSync('kubectl version --client', { encoding: 'utf-8', stdio: 'pipe' });
+      tools.kubectl = true;
+    } catch {
+      tools.kubectl = false;
+    }
+
+    return tools;
+  }
+
   async selectScenario() {
     if (this.options.scenario) {
       return this.options.scenario;
     }
 
+    // Check available tools
+    const availableTools = this.checkToolAvailability();
+
+    // Show tool availability status
+    console.log(`
+${this.colors.BOLD}Detected Tools:${this.colors.NC}`);
+    console.log(`  • Docker:     ${availableTools.docker ? this.colors.GREEN + '✓ Available' : this.colors.RED + '✗ Not installed'}${this.colors.NC}`);
+    console.log(`  • kubectl:    ${availableTools.kubectl ? this.colors.GREEN + '✓ Available' : this.colors.RED + '✗ Not installed'}${this.colors.NC}`);
+
+    if (!availableTools.docker || !availableTools.kubectl) {
+      console.log(`
+${this.colors.YELLOW}Note:${this.colors.NC} Some installation options require additional tools.`);
+      if (!availableTools.docker) {
+        console.log(`  Install Docker: ${this.colors.CYAN}https://docs.docker.com/get-docker/${this.colors.NC}`);
+      }
+      if (!availableTools.kubectl) {
+        console.log(`  Install kubectl: ${this.colors.CYAN}https://kubernetes.io/docs/tasks/tools/${this.colors.NC}`);
+      }
+    }
+
     console.log(`
 ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
+`);
 
-${this.colors.CYAN}1. Minimal${this.colors.NC} - Traditional development workflow
+    // Option 1: Minimal (always available)
+    console.log(`${this.colors.CYAN}1. Minimal${this.colors.NC} - Traditional development workflow
    • Sequential agent execution (one at a time)
    • Native tooling: npm, pip, local installs
    • Best for: Simple projects, learning, debugging
    • No containers or orchestration
+`);
 
-${this.colors.CYAN}2. Docker-only${this.colors.NC} - Containerized local development
+    // Option 2: Docker-only (requires Docker)
+    if (availableTools.docker) {
+      console.log(`${this.colors.CYAN}2. Docker-only${this.colors.NC} - Containerized local development
    • Adaptive execution (smart sequential/parallel choice)
    • Docker containers for development environment
    • Best for: Microservices, consistent environments
    • Local Docker only, no Kubernetes
+`);
+    } else {
+      console.log(`${this.colors.DIM}2. Docker-only${this.colors.NC} ${this.colors.RED}(Docker not installed)${this.colors.NC}
+`);
+    }
 
-${this.colors.GREEN}3. Full DevOps${this.colors.NC} - Complete CI/CD pipeline ${this.colors.BOLD}(RECOMMENDED)${this.colors.NC}
+    // Option 3: Full DevOps (requires Docker and kubectl)
+    if (availableTools.docker && availableTools.kubectl) {
+      console.log(`${this.colors.GREEN}3. Full DevOps${this.colors.NC} - Complete CI/CD pipeline ${this.colors.BOLD}(RECOMMENDED)${this.colors.NC}
    • Adaptive execution with Docker-first priority
    • Kubernetes manifests and cloud deployment ready
    • GitHub Actions with KIND clusters and Kaniko builds
    • Best for: Production applications, enterprise projects
+`);
+    } else if (availableTools.docker) {
+      console.log(`${this.colors.DIM}3. Full DevOps${this.colors.NC} ${this.colors.RED}(kubectl not installed)${this.colors.NC}
+`);
+    } else {
+      console.log(`${this.colors.DIM}3. Full DevOps${this.colors.NC} ${this.colors.RED}(Docker and kubectl not installed)${this.colors.NC}
+`);
+    }
 
-${this.colors.YELLOW}4. Performance${this.colors.NC} - Maximum parallel execution
+    // Option 4: Performance (requires Docker and kubectl)
+    if (availableTools.docker && availableTools.kubectl) {
+      console.log(`${this.colors.YELLOW}4. Performance${this.colors.NC} - Maximum parallel execution
    • Hybrid strategy: up to 5 parallel agents
    • Advanced context isolation and security
    • Full DevOps capabilities with speed optimization
    • Best for: Large projects, massive refactoring, power users
+`);
+    } else if (availableTools.docker) {
+      console.log(`${this.colors.DIM}4. Performance${this.colors.NC} ${this.colors.RED}(kubectl not installed)${this.colors.NC}
+`);
+    } else {
+      console.log(`${this.colors.DIM}4. Performance${this.colors.NC} ${this.colors.RED}(Docker and kubectl not installed)${this.colors.NC}
+`);
+    }
 
-${this.colors.CYAN}5. Custom${this.colors.NC} - Manual configuration
+    // Option 5: Custom (always available)
+    console.log(`${this.colors.CYAN}5. Custom${this.colors.NC} - Manual configuration
    • Configure execution strategy manually
    • Choose your own agents and workflows
    • Advanced users only
@@ -387,19 +462,54 @@ ${this.colors.CYAN}5. Custom${this.colors.NC} - Manual configuration
       output: process.stdout
     });
 
+    // Determine default based on available tools
+    const defaultChoice = availableTools.docker && availableTools.kubectl ? '3' : '1';
+
     return new Promise((resolve) => {
-      rl.question(`${this.colors.CYAN}Enter your choice (1-5) [3]: ${this.colors.NC}`, (answer) => {
-        rl.close();
-        const choice = answer.trim() || '3';
-        const scenarios = {
-          '1': 'minimal',
-          '2': 'docker',
-          '3': 'full',
-          '4': 'performance',
-          '5': 'custom'
-        };
-        resolve(scenarios[choice] || 'full');
-      });
+      const askQuestion = () => {
+        rl.question(`${this.colors.CYAN}Enter your choice (1-5) [${defaultChoice}]: ${this.colors.NC}`, (answer) => {
+          const choice = answer.trim() || defaultChoice;
+          const scenarios = {
+            '1': 'minimal',
+            '2': 'docker',
+            '3': 'full',
+            '4': 'performance',
+            '5': 'custom'
+          };
+
+          const selectedScenario = scenarios[choice];
+
+          // Validate choice based on available tools
+          if (choice === '2' && !availableTools.docker) {
+            console.log(`${this.colors.RED}✗ Docker is required for this option. Please install Docker first or choose option 1 (Minimal).${this.colors.NC}`);
+            askQuestion();
+            return;
+          }
+
+          if ((choice === '3' || choice === '4') && !availableTools.docker) {
+            console.log(`${this.colors.RED}✗ Docker is required for this option. Please install Docker first or choose option 1 (Minimal).${this.colors.NC}`);
+            askQuestion();
+            return;
+          }
+
+          if ((choice === '3' || choice === '4') && availableTools.docker && !availableTools.kubectl) {
+            console.log(`${this.colors.RED}✗ kubectl is required for this option. Please install kubectl first or choose option 2 (Docker-only).${this.colors.NC}`);
+            askQuestion();
+            return;
+          }
+
+          if (!selectedScenario) {
+            console.log(`${this.colors.RED}✗ Invalid choice. Please select 1-5.${this.colors.NC}`);
+            askQuestion();
+            return;
+          }
+
+          rl.close();
+          resolve(selectedScenario);
+        });
+      };
+
+      askQuestion();
     });
   }
 
@@ -722,7 +832,7 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
     console.log('');
     this.printMsg('GREEN', '╔══════════════════════════════════════════╗');
     this.printMsg('GREEN', '║     Installation complete! 🎉            ║');
-    this.printMsg('GREEN', '╚══════════════════════════════════════════╗');
+    this.printMsg('GREEN', '╚══════════════════════════════════════════╝');
     console.log('');
 
     this.printSuccess('ClaudeAutoPM has been installed successfully!');
