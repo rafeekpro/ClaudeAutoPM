@@ -1,0 +1,170 @@
+/**
+ * MCP Command for autopm CLI
+ * Manages Model Context Protocol servers, agents, and configuration
+ */
+
+const path = require('path');
+const MCPHandler = require('../../scripts/mcp-handler.js');
+
+module.exports = {
+  command: 'mcp <action> [options]',
+  describe: 'Manage MCP (Model Context Protocol) servers and configuration',
+
+  builder: (yargs) => {
+    return yargs
+      .positional('action', {
+        describe: 'MCP action to perform',
+        type: 'string',
+        choices: [
+          'list', 'add', 'remove', 'enable', 'disable', 'sync', 'validate', 'info',
+          'agents', 'agent', 'usage', 'setup', 'diagnose', 'test', 'tree', 'status'
+        ]
+      })
+      .option('server', {
+        alias: 's',
+        describe: 'Server name',
+        type: 'string'
+      })
+      .option('agent', {
+        alias: 'a',
+        describe: 'Agent name',
+        type: 'string'
+      })
+      .option('by-server', {
+        describe: 'Group agents by MCP server',
+        type: 'boolean',
+        default: false
+      })
+      .example('autopm mcp list', 'List all available MCP servers')
+      .example('autopm mcp enable context7-docs', 'Enable context7 documentation server')
+      .example('autopm mcp agents', 'List all agents using MCP')
+      .example('autopm mcp agent react-frontend-engineer', 'Show MCP config for specific agent')
+      .example('autopm mcp usage', 'Show MCP usage statistics')
+      .example('autopm mcp setup', 'Interactive API key setup')
+      .example('autopm mcp diagnose', 'Run MCP diagnostics')
+      .example('autopm mcp test context7-docs', 'Test MCP server connection')
+      .example('autopm mcp tree', 'Show agent-MCP dependency tree')
+      .example('autopm mcp status', 'Show MCP servers status');
+  },
+
+  handler: async (argv) => {
+    const handler = new MCPHandler();
+    const action = argv.action;
+
+    try {
+      switch (action) {
+        // Basic commands
+        case 'list':
+          handler.list();
+          break;
+
+        case 'add':
+          await handler.add();
+          break;
+
+        case 'remove':
+          if (!argv.server && !argv._[2]) {
+            console.error('❌ Please specify a server name: autopm mcp remove <server-name>');
+            process.exit(1);
+          }
+          handler.remove(argv.server || argv._[2]);
+          break;
+
+        case 'enable':
+          if (!argv.server && !argv._[2]) {
+            console.error('❌ Please specify a server name: autopm mcp enable <server-name>');
+            process.exit(1);
+          }
+          handler.enable(argv.server || argv._[2]);
+          break;
+
+        case 'disable':
+          if (!argv.server && !argv._[2]) {
+            console.error('❌ Please specify a server name: autopm mcp disable <server-name>');
+            process.exit(1);
+          }
+          handler.disable(argv.server || argv._[2]);
+          break;
+
+        case 'sync':
+          handler.sync();
+          break;
+
+        case 'validate':
+          handler.validate();
+          break;
+
+        case 'info':
+          if (!argv.server && !argv._[2]) {
+            console.error('❌ Please specify a server name: autopm mcp info <server-name>');
+            process.exit(1);
+          }
+          handler.info(argv.server || argv._[2]);
+          break;
+
+        // Agent analysis commands
+        case 'agents':
+          handler.mcpAgents(argv.byServer ? { groupBy: 'server' } : {});
+          break;
+
+        case 'agent':
+          if (!argv.agent && !argv._[2]) {
+            console.error('❌ Please specify an agent name: autopm mcp agent <agent-name>');
+            process.exit(1);
+          }
+          handler.mcpAgent(argv.agent || argv._[2]);
+          break;
+
+        case 'usage':
+          handler.mcpUsage();
+          break;
+
+        // Configuration commands
+        case 'setup':
+          await handler.setupWizard();
+          break;
+
+        case 'diagnose':
+          handler.diagnose();
+          break;
+
+        case 'test':
+          if (!argv.server && !argv._[2]) {
+            console.error('❌ Please specify a server name: autopm mcp test <server-name>');
+            process.exit(1);
+          }
+          const result = await handler.testServer(argv.server || argv._[2]);
+          if (result.success) {
+            console.log(`✅ ${result.message}`);
+          } else {
+            console.error(`❌ ${result.message}`);
+            process.exit(1);
+          }
+          break;
+
+        // Visualization commands
+        case 'tree':
+          handler.showTree();
+          break;
+
+        case 'status':
+          handler.showStatus();
+          break;
+
+        default:
+          console.error(`❌ Unknown action: ${action}`);
+          console.log('\nAvailable actions:');
+          console.log('  list, add, remove, enable, disable, sync, validate, info');
+          console.log('  agents, agent, usage, setup, diagnose, test, tree, status');
+          console.log('\nUse "autopm mcp --help" for more information');
+          process.exit(1);
+      }
+    } catch (error) {
+      console.error(`❌ Error: ${error.message}`);
+      if (argv.debug) {
+        console.error(error.stack);
+      }
+      process.exit(1);
+    }
+  }
+};

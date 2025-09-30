@@ -178,6 +178,8 @@ function main() {
     .command(require('./commands/team'))
     // Config management command
     .command(require('./commands/config'))
+    // MCP management command
+    .command(require('./commands/mcp'))
     // Global options
     .option('verbose', {
       type: 'boolean',
@@ -227,6 +229,24 @@ function main() {
 
    # Validate configuration
    autopm config validate
+
+🔌 MCP (Model Context Protocol) Management:
+   # List and manage MCP servers
+   autopm mcp list                  # List all available MCP servers
+   autopm mcp enable context7-docs  # Enable documentation server
+   autopm mcp sync                  # Sync configuration to .claude/mcp-servers.json
+
+   # Agent Analysis
+   autopm mcp agents                # List agents using MCP
+   autopm mcp agent react-frontend-engineer  # Show MCP config for agent
+   autopm mcp usage                 # Show MCP usage statistics
+   autopm mcp tree                  # Show agent-MCP dependency tree
+
+   # Configuration & Diagnostics
+   autopm mcp setup                 # Interactive API key setup
+   autopm mcp diagnose              # Run comprehensive diagnostics
+   autopm mcp test context7-docs    # Test MCP server connection
+   autopm mcp status                # Show all MCP servers status
 
 🔑 Token Setup:
    # GitHub PAT (Settings → Developer settings → Personal access tokens)
