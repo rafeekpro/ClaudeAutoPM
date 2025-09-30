@@ -1312,6 +1312,9 @@ if (require.main === module) {
           console.error(`❌ ${result.message}`);
           process.exit(1);
         }
+      }).catch(error => {
+        console.error(`❌ Error testing server: ${error && error.message ? error.message : error}`);
+        process.exit(1);
       });
       break;
     case 'tree':
