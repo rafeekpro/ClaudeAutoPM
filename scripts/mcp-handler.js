@@ -1091,15 +1091,17 @@ This server can be integrated with various agents and context pools.
       console.log();
     }
 
-    console.log('🔧 Quick Fix:');
-    if (checkResult.disabledServers.length > 0) {
-      console.log(`   autopm mcp enable ${checkResult.disabledServers[0]?.name}`);
+    if (hasIssues) {
+      console.log('🔧 Quick Fix:');
+      if (checkResult.disabledServers.length > 0) {
+        console.log(`   autopm mcp enable ${checkResult.disabledServers[0]?.name}`);
+      }
+      if (checkResult.missingEnvVars.length > 0) {
+        console.log(`   autopm mcp setup`);
+      }
+      console.log(`   autopm mcp sync`);
+      console.log();
     }
-    if (checkResult.missingEnvVars.length > 0) {
-      console.log(`   autopm mcp setup`);
-    }
-    console.log(`   autopm mcp sync`);
-    console.log();
   }
 
   /**
