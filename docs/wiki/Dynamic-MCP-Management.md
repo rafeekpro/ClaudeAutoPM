@@ -205,7 +205,7 @@ autopm mcp uninstall filesystem
 autopm mcp uninstall memory --keep-package
 
 # Force removal even if server is active
-autopm mcp uninstall context7-docs --force
+autopm mcp uninstall context7 --force
 
 # Remove globally installed package
 autopm mcp uninstall filesystem --global

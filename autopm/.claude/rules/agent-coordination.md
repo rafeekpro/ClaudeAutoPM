@@ -104,31 +104,31 @@ Notes: Added rate limiting middleware
 ```yaml
 backend-context:
   agents: [python-backend-expert, database-architect]
-  sources: [context7-docs, context7-codebase]
+  sources: [context7, context7]
   filters: [python, fastapi, flask, django, sqlalchemy, databases]
   persistence: true
 
 frontend-context:
   agents: [react-ui-expert, e2e-test-engineer]
-  sources: [context7-docs, context7-codebase]
+  sources: [context7, context7]
   filters: [react, typescript, ui-frameworks, testing]
   persistence: true
 
 infrastructure-context:
   agents: [multi-cloud-architect, kubernetes-orchestrator, docker-containerization-expert]
-  sources: [context7-docs, terraform-registry]
+  sources: [context7, terraform-registry]
   filters: [terraform, kubernetes, docker, cloud-providers]
   persistence: true
 
 devops-context:
   agents: [github-operations-specialist, mcp-context-manager]
-  sources: [context7-docs, github-mcp]
+  sources: [context7, github-mcp]
   filters: [ci-cd, github-actions, azure-devops]
   persistence: false
 
 project-context:
   agents: [ALL]
-  sources: [context7-codebase]
+  sources: [context7]
   persistence: true
   shared: true
   auto-refresh: true

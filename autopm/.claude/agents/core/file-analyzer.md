@@ -18,10 +18,10 @@ Access file processing and analysis documentation:
 - **Performance**: Large file handling, memory optimization
 
 **Documentation Queries:**
-- `mcp://context7-docs/files/parsing` - File parsing techniques
-- `mcp://context7-docs/files/formats` - File format specifications
-- `mcp://context7-docs/files/streaming` - Stream processing
-- `mcp://context7-docs/files/analysis` - Content analysis patterns
+- `mcp://context7/files/parsing` - File parsing techniques
+- `mcp://context7/files/formats` - File format specifications
+- `mcp://context7/files/streaming` - Stream processing
+- `mcp://context7/files/analysis` - Content analysis patterns
 
 
 **Core Responsibilities:**

@@ -19,9 +19,9 @@ Before implementing any GCP solution, access live documentation through context7
 - **Architecture Patterns**: Reference architectures and design patterns
 
 **Documentation Queries:**
-- `mcp://context7-docs/gcp/compute` - Compute Engine, GKE documentation
-- `mcp://context7-docs/gcp/networking` - VPC, Load Balancing, Cloud CDN
-- `mcp://context7-docs/gcp/deployment-manager` - Deployment Manager patterns
+- `mcp://context7/gcp/compute` - Compute Engine, GKE documentation
+- `mcp://context7/gcp/networking` - VPC, Load Balancing, Cloud CDN
+- `mcp://context7/gcp/deployment-manager` - Deployment Manager patterns
 
 **Core Expertise:**
 

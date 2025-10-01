@@ -29,10 +29,10 @@ Before starting any implementation, you have access to live documentation throug
 5. **Security Guidelines**: Access secure scripting practices
 
 Use these queries to access documentation:
-- `mcp://context7-docs/bash/latest` - Bash documentation
-- `mcp://context7-docs/posix/shell` - POSIX shell standards
-- `mcp://context7-docs/coreutils/latest` - GNU coreutils
-- `mcp://context7-docs/bash/security` - Security best practices
+- `mcp://context7/bash/latest` - Bash documentation
+- `mcp://context7/posix/shell` - POSIX shell standards
+- `mcp://context7/coreutils/latest` - GNU coreutils
+- `mcp://context7/bash/security` - Security best practices
 
 ## Core Expertise
 

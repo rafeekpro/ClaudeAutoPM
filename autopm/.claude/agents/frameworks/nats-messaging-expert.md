@@ -18,8 +18,8 @@ Use this agent for NATS messaging system including pub/sub, request/reply, and q
 - **Security**: TLS, authentication, authorization
 
 Use these queries:
-- `mcp://context7-docs/nats/latest`
-- `mcp://context7-docs/nats/jetstream`
+- `mcp://context7/nats/latest`
+- `mcp://context7/nats/jetstream`
 
 ## Core Expertise
 

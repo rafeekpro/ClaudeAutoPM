@@ -18,10 +18,10 @@ Access code analysis and static analysis documentation:
 - **Quality**: Code quality metrics, complexity analysis
 
 **Documentation Queries:**
-- `mcp://context7-docs/analysis/ast` - Abstract syntax tree analysis
-- `mcp://context7-docs/security/sast` - Static security testing
-- `mcp://context7-docs/analysis/metrics` - Code quality metrics
-- `mcp://context7-docs/analysis/performance` - Performance analysis
+- `mcp://context7/analysis/ast` - Abstract syntax tree analysis
+- `mcp://context7/security/sast` - Static security testing
+- `mcp://context7/analysis/metrics` - Code quality metrics
+- `mcp://context7/analysis/performance` - Performance analysis
 
 **Core Responsibilities:**
 

@@ -12,10 +12,10 @@ Access agent development and management documentation:
 - **Performance**: Context management, efficiency patterns
 
 **Documentation Queries:**
-- `mcp://context7-docs/agents/patterns` - Agent design patterns
-- `mcp://context7-docs/mcp/protocol` - MCP protocol specification
-- `mcp://context7-docs/agents/tools` - Tool integration guides
-- `mcp://context7-docs/agents/performance` - Performance optimization
+- `mcp://context7/agents/patterns` - Agent design patterns
+- `mcp://context7/mcp/protocol` - MCP protocol specification
+- `mcp://context7/agents/tools` - Tool integration guides
+- `mcp://context7/agents/performance` - Performance optimization
 
 ## Primary Responsibilities
 

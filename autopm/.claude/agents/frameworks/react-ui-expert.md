@@ -13,10 +13,10 @@ Before implementing any UI solution, access live documentation through context7:
 - **Styling**: CSS-in-JS, styled-components, emotion
 
 **Documentation Queries:**
-- `mcp://context7-docs/react/mui` - Material-UI documentation
-- `mcp://context7-docs/react/chakra-ui` - Chakra UI components
-- `mcp://context7-docs/react/ant-design` - Ant Design system
-- `mcp://context7-docs/react/patterns` - React design patterns
+- `mcp://context7/react/mui` - Material-UI documentation
+- `mcp://context7/react/chakra-ui` - Chakra UI components
+- `mcp://context7/react/ant-design` - Ant Design system
+- `mcp://context7/react/patterns` - React design patterns
 
 ## Test-Driven Development (TDD) Methodology
 

@@ -10,15 +10,15 @@ This document provides guidance on MCP (Model Context Protocol) server managemen
 
 Example MCP server configurations are available in `.claude/examples/mcp/`:
 
-### context7-docs
+### context7
 **Description**: Context7 documentation server for accessing technical documentation
 **Use Cases**: API documentation, framework guides, technical references
-**Example**: `.claude/examples/mcp/context7-docs.md`
+**Example**: `.claude/examples/mcp/context7.md`
 
-### context7-codebase
+### context7
 **Description**: Context7 codebase server for project code analysis
 **Use Cases**: Code navigation, project analysis, dependency tracking
-**Example**: `.claude/examples/mcp/context7-codebase.md`
+**Example**: `.claude/examples/mcp/context7.md`
 
 ### playwright-mcp
 **Description**: Playwright MCP server for browser automation and testing
@@ -90,7 +90,7 @@ autopm mcp uninstall filesystem
 autopm mcp uninstall memory --keep-package
 
 # Force removal even if active
-autopm mcp uninstall context7-docs --force
+autopm mcp uninstall context7 --force
 ```
 
 ### ➕ Adding Servers (Manual)
@@ -103,7 +103,7 @@ autopm mcp add
 **Option 2: Copy from Examples**
 ```bash
 # Copy an example to your project
-cp .claude/examples/mcp/context7-docs.md .claude/mcp/
+cp .claude/examples/mcp/context7.md .claude/mcp/
 
 # Or from installed framework
 cp /path/to/framework/autopm/.claude/examples/mcp/github-mcp.md .claude/mcp/
@@ -119,7 +119,7 @@ autopm mcp enable <server-name>
 autopm mcp disable <server-name>
 
 # Enable multiple servers
-autopm mcp enable context7-docs context7-codebase playwright-mcp
+autopm mcp enable context7 context7 playwright-mcp
 ```
 
 ### 📋 Listing Servers
@@ -209,19 +209,19 @@ Example usage...
 autopm mcp list
 
 # 2. Copy an example server you want to use
-cp .claude/examples/mcp/context7-docs.md .claude/mcp/
+cp .claude/examples/mcp/context7.md .claude/mcp/
 
 # 3. Configure environment variables if needed
 nano .claude/.env
 
 # 4. Enable the server
-autopm mcp enable context7-docs
+autopm mcp enable context7
 
 # 5. Sync configuration
 autopm mcp sync
 
 # 6. Test the server
-autopm mcp test context7-docs
+autopm mcp test context7
 ```
 
 ## 🔐 Security Considerations
