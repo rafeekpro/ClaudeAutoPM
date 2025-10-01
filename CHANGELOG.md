@@ -7,6 +7,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.6] - 2025-10-01
+
+### 🐛 Bug Fix
+
+**MCP Environment Variable Format**
+- Fixed `autopm mcp sync` copying metadata objects instead of simple strings
+- Claude Code expects `"VAR": "value"` not `"VAR": {default: "value"}`
+- Added `_convertEnvMetadataToStrings()` to convert registry metadata to Claude Code format
+- **Impact: Claude Code `/mcp` command now works correctly**
+
+### 🔧 Technical Changes
+
+**`scripts/mcp-handler.js`:**
+- Added `_convertEnvMetadataToStrings(envObj)` helper method
+- Converts env metadata objects to simple string format
+- Handles three cases:
+  1. Already string → keep unchanged
+  2. Metadata with literal default → use literal value
+  3. Metadata with empty default → use `${VAR:-}` format
+- Modified `sync()` to use conversion before writing
+
+### 📊 Format Conversion
+
+**Before (v1.13.5):**
+```json
+"env": {
+  "CONTEXT7_API_KEY": {              // ❌ Object
+    "default": "",
+    "description": "Your Context7 API key",
+    "required": true
+  }
+}
+```
+
+**After (v1.13.6):**
+```json
+"env": {
+  "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY:-}",  // ✅ String
+  "CONTEXT7_MODE": "documentation"                // ✅ Literal
+}
+```
+
+### 🎯 User Impact
+
+- ✅ Claude Code can parse MCP configurations
+- ✅ `/mcp` command shows servers correctly
+- ✅ Backward compatible with existing formats
+- ✅ Preserves literal defaults from registry
+- ✅ MCP servers now work in Claude Code interface
+
 ## [1.13.5] - 2025-10-01
 
 ### 🚨 Critical Bug Fix
