@@ -1098,13 +1098,74 @@ This server can be integrated with various agents and context pools.
       console.log();
     }
 
-    // Show missing env vars details
+    // Show missing env vars details with help
     if (checkResult.missingEnvVars.length > 0) {
-      console.log('🔑 Missing Environment Variables:\n');
+      console.log('🔑 Environment Variables Status:\n');
       const byServer = Object.groupBy(checkResult.missingEnvVars, ({ server }) => server);
-      Object.entries(byServer).forEach(([server, entries]) => {
-        console.log(`   ${server}:`);
-        entries.forEach(({ variable }) => console.log(`      - ${variable}`));
+
+      Object.entries(byServer).forEach(([serverName, entries]) => {
+        const server = this.getServer(serverName);
+        console.log(`   📦 ${serverName}:`);
+
+        // Categorize as required or optional
+        const required = [];
+        const optional = [];
+
+        entries.forEach(({ variable }) => {
+          const envDef = server?.metadata?.env?.[variable];
+          if (this._hasNonEmptyDefault(envDef)) {
+            optional.push({ name: variable, default: envDef.default, desc: envDef.description });
+          } else {
+            required.push({ name: variable, desc: envDef?.description || 'No description' });
+          }
+        });
+
+        if (required.length > 0) {
+          console.log('      ❌ REQUIRED (must be set):');
+          required.forEach(v => {
+            console.log(`         • ${v.name}`);
+            if (v.desc) console.log(`           ${v.desc}`);
+          });
+        }
+
+        if (optional.length > 0) {
+          console.log('      ⚠️  OPTIONAL (have defaults):');
+          optional.forEach(v => {
+            console.log(`         • ${v.name} = ${v.default}`);
+            if (v.desc) console.log(`           ${v.desc}`);
+          });
+        }
+        console.log();
+      });
+
+      // Show configuration instructions
+      console.log('📝 How to Configure:\n');
+      console.log('   1. Edit file: .claude/.env\n');
+      console.log('   2. Add required variables:\n');
+
+      Object.entries(byServer).forEach(([serverName, entries]) => {
+        const server = this.getServer(serverName);
+        console.log(`      # ${serverName}`);
+        entries.forEach(({ variable }) => {
+          const envDef = server?.metadata?.env?.[variable];
+          if (this._hasNonEmptyDefault(envDef)) {
+            console.log(`      # ${variable}=${envDef.default}  (optional)`);
+          } else {
+            const example = this._getEnvVarExample(serverName, variable);
+            console.log(`      ${variable}=${example}`);
+          }
+        });
+        console.log();
+      });
+
+      // Show where to get credentials
+      console.log('🔐 Where to Get API Keys:\n');
+      Object.keys(byServer).forEach(serverName => {
+        const info = this._getCredentialInfo(serverName);
+        if (info) {
+          console.log(`   ${serverName}:`);
+          console.log(`      ${info}`);
+        }
       });
       console.log();
     }
@@ -1116,17 +1177,71 @@ This server can be integrated with various agents and context pools.
       console.log();
     }
 
-    console.log('🔧 Quick Fix:');
+    // Step-by-step fix
+    console.log('🛠️  Step-by-Step Fix:\n');
+    let step = 1;
+
     if (Array.isArray(checkResult.disabledServers) && checkResult.disabledServers.length > 0) {
+      console.log(`   ${step}. Enable MCP server(s):`);
       checkResult.disabledServers.forEach(server => {
-        console.log(`   autopm mcp enable ${server.name}`);
+        console.log(`      autopm mcp enable ${server.name}`);
       });
+      step++;
     }
+
     if (checkResult.missingEnvVars.length > 0) {
-      console.log(`   autopm mcp setup`);
+      console.log(`   ${step}. Edit .claude/.env and add required variables`);
+      console.log(`      nano .claude/.env  # or use your editor`);
+      step++;
     }
-    console.log(`   autopm mcp sync`);
+
+    console.log(`   ${step}. Sync MCP configuration:`);
+    console.log(`      autopm mcp sync`);
+    step++;
+
+    console.log(`   ${step}. Verify everything works:`);
+    console.log('      autopm mcp check');
     console.log();
+  }
+
+  /**
+   * Get example value for environment variable
+   * @private
+   */
+  _getEnvVarExample(serverName, varName) {
+    const examples = {
+      'CONTEXT7_API_KEY': 'ctx7_1234567890abcdef',
+      'CONTEXT7_WORKSPACE': 'my-workspace-id',
+      'GITHUB_TOKEN': 'ghp_xxxxxxxxxxxxxxxxxxxx',
+      'AZURE_DEVOPS_PAT': 'your-pat-token-here'
+    };
+    return examples[varName] || 'your-value-here';
+  }
+
+  /**
+   * Get information about where to obtain credentials
+   * @private
+   */
+  _getCredentialInfo(serverName) {
+    const info = {
+      'context7-docs': '→ Sign up at https://context7.com and get API key from dashboard',
+      'context7-codebase': '→ Same credentials as context7-docs',
+      'github-mcp': '→ Generate token at https://github.com/settings/tokens',
+      'playwright-mcp': '→ No credentials needed - uses local Playwright installation'
+    };
+    return info[serverName] || '→ Check server documentation: autopm mcp info ' + serverName;
+  }
+
+  /**
+   * Check if environment variable definition has a non-empty default value
+   * @private
+   * @param {Object} envDef - Environment variable definition
+   * @returns {boolean} True if has non-empty default
+   */
+  _hasNonEmptyDefault(envDef) {
+    if (!envDef?.default) return false;
+    const defaultValue = String(envDef.default).trim();
+    return defaultValue !== '';
   }
 
   /**
