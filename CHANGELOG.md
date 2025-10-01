@@ -7,6 +7,69 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.9] - 2025-10-01
+
+### 🎨 UX Improvement
+
+**Enhanced Configuration Display (`autopm config show`)**
+- Fixed confusing MCP status messages
+- Added helpful configuration instructions
+- Shows exact steps to fix missing settings
+- **Impact: Users now know exactly how to configure AutoPM**
+
+### 🎯 What Changed
+
+**`bin/commands/config.js`:**
+- Fixed MCP status display - now shows "X active", "X configured", or "Not configured"
+- Checks both `config.mcp.activeServers` and `.claude/mcp-servers.json`
+- Added "Configuration Issues" section with actionable solutions
+- Shows exactly how to set GitHub owner, repo, and token
+- Shows how to set Azure organization, project, and PAT
+- Fixed execution strategy display when it's an object
+- Made `padRight()` safer by converting all inputs to strings
+
+### 📊 Before vs After
+
+**Before (v1.13.8):**
+```
+│ MCP:             ❌ Disabled             │
+```
+*User confused: "I have servers configured!"*
+
+**After (v1.13.9):**
+```
+│ MCP:             ⚠️  2 configured       │
+```
+```
+📋 Configuration Issues:
+
+⚠️  GitHub token not set
+   → Add to .claude/.env: GITHUB_TOKEN=ghp_your_token_here
+
+ℹ️  2 MCP server(s) configured but not active
+   → Run: autopm mcp list  (then: autopm mcp enable <server>)
+```
+
+### 🎯 User Impact
+
+✅ Clear MCP status (active vs configured vs missing)
+✅ Actionable instructions for every missing setting
+✅ Shows exact commands to run
+✅ Shows where to add tokens (.claude/.env)
+✅ No more confusion about configuration state
+
+### 🔧 Technical Details
+
+**MCP Status Logic:**
+1. If `config.mcp.activeServers` exists → show "X active" ✅
+2. Else check `.claude/mcp-servers.json` → show "X configured" ⚠️
+3. Else → show "Not configured" ❌
+
+**Configuration Issues:**
+- Detects missing provider, owner, repo, tokens
+- Shows platform-specific instructions (GitHub vs Azure)
+- Different icon per issue type (⚠️ for problems, ℹ️ for info)
+
 ## [1.13.8] - 2025-10-01
 
 ### ✨ Feature
