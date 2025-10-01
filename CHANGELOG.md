@@ -7,6 +7,67 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.11] - 2025-10-01
+
+### 🐛 Bug Fix: Corrected Playwright MCP Package Name
+
+**Fixed incorrect Playwright MCP package name**
+- Changed from non-existent `@playwright/mcp-server` to actual `@playwright/mcp`
+- **Impact: Playwright MCP server can now start in Claude Code**
+
+### 🗑️ Breaking Change: Removed Deprecated GitHub MCP
+
+**Removed deprecated GitHub MCP server from default configuration**
+- `@modelcontextprotocol/server-github` is deprecated by maintainers
+- GitHub now provides official server via Copilot API with HTTP transport
+- **Impact: Users need to manually add GitHub MCP if needed**
+
+### 🎯 What Changed
+
+**autopm/.claude/mcp-servers.json:**
+```json
+// Playwright - Fixed:
+"args": ["@playwright/mcp"]  // ✅ Was: @playwright/mcp-server
+
+// GitHub - Removed (deprecated)
+// Use: claude mcp add --transport http github ...
+```
+
+**package.json:**
+```json
+"optionalDependencies": {
+  "@upstash/context7-mcp": "^1.0.0",
+  "@playwright/mcp": "^0.0.40"
+}
+```
+
+### 📊 Default MCP Servers
+
+**After v1.13.11:**
+- ✅ `context7-docs` - Documentation (@upstash/context7-mcp)
+- ✅ `context7-codebase` - Codebase analysis (@upstash/context7-mcp)
+- ✅ `playwright-mcp` - Browser automation (@playwright/mcp)
+- ❌ `github-mcp` - REMOVED (deprecated)
+
+### 📖 Adding GitHub MCP Manually
+
+**New official GitHub MCP (via Copilot API):**
+```bash
+claude mcp add --transport http github \
+  https://api.githubcopilot.com/mcp \
+  -H "Authorization: Bearer $GITHUB_PAT"
+```
+
+See: https://github.com/github/github-mcp-server
+
+### 🔄 Migration
+
+**For existing projects:**
+```bash
+cd your-project
+autopm mcp sync  # Updates with correct packages
+```
+
 ## [1.13.10] - 2025-10-01
 
 ### 🐛 Critical Bug Fix

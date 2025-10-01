@@ -26,20 +26,11 @@
     },
     "playwright-mcp": {
       "command": "npx",
-      "args": ["@playwright/mcp-server"],
+      "args": ["@playwright/mcp"],
       "env": {
         "PLAYWRIGHT_BROWSER": "chromium",
         "PLAYWRIGHT_HEADLESS": "true"
       }
-    },
-    "github-mcp": {
-      "command": "npx",
-      "args": ["@modelcontextprotocol/server-github"],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN:-}",
-        "GITHUB_API_URL": "https://api.github.com"
-      },
-      "envFile": ".claude/.env"
     }
   },
   "contextPools": {
@@ -82,9 +73,9 @@
     "devops-context": {
       "type": "shared",
       "agents": ["github-operations-specialist", "kubernetes-orchestrator", "azure-devops-specialist"],
-      "sources": ["context7-docs", "github-mcp"],
+      "sources": ["context7-docs"],
       "filters": ["github-actions", "kubernetes", "ci-cd"],
-      "maxSize": "100MB", 
+      "maxSize": "100MB",
       "retention": "7d",
       "refresh": "daily"
     },
