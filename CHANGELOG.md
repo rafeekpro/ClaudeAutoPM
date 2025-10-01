@@ -7,6 +7,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.8] - 2025-10-01
+
+### ✨ Feature
+
+**Automatic MCP Integration During Installation**
+- Installation now automatically creates `.mcp.json` for Claude Code
+- No manual `autopm mcp sync` needed after install
+- **Impact: MCP servers work in Claude Code immediately after installation**
+
+### 🎯 What Changed
+
+**`install/install.js`:**
+- Added `.claude/mcp-servers.json` to `installItems` (now copied during install)
+- Added `setupMCPIntegration()` method called after framework installation
+- Automatically creates `.mcp.json` when `mcp-servers.json` exists
+- Shows helpful tip if no servers are activated
+
+### 📊 Installation Flow
+
+**Before (v1.13.7):**
+```
+1. autopm install
+2. autopm mcp enable context7-docs  ← Manual step
+3. autopm mcp sync                  ← Manual step
+4. Restart Claude Code              ← Manual step
+```
+
+**After (v1.13.8):**
+```
+1. autopm install                   ← Creates .mcp.json automatically!
+2. autopm mcp enable context7-docs  (optional - to activate)
+3. Restart Claude Code
+```
+
+### 🎯 User Impact
+
+- ✅ `.mcp.json` created automatically during installation
+- ✅ 4 MCP servers configured out of the box (context7-docs, context7-codebase, github-mcp, playwright-mcp)
+- ✅ No extra commands needed for Claude Code integration
+- ✅ Helpful tip shown if servers need activation
+- ✅ Works for both fresh installs and updates
+
+### 📖 Files Copied
+
+During installation, these MCP files are now installed:
+- `.claude/mcp/` - Server definitions (10 markdown files)
+- `.claude/mcp-servers.json` - Complete server configuration
+- `.mcp.json` - Claude Code format (auto-generated)
+
+### 💡 Post-Installation
+
+Users can now:
+- See servers immediately in Claude Code `/mcp` command
+- Run `autopm mcp enable <server>` to activate specific servers
+- Run `autopm mcp check` to see environment requirements
+- Edit `.claude/.env` to add API keys
+
 ## [1.13.7] - 2025-10-01
 
 ### 🔧 Critical Fix
