@@ -7,6 +7,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.7] - 2025-10-01
+
+### 🔧 Critical Fix
+
+**Claude Code MCP Integration**
+- Fixed `autopm mcp sync` to create `.mcp.json` in project root
+- Claude Code expects MCP config in `.mcp.json`, not `.claude/mcp-servers.json`
+- **Impact: Claude Code `/mcp` command now correctly discovers MCP servers**
+
+### 🎯 What Changed
+
+**`scripts/mcp-handler.js`:**
+- Modified `sync()` to write two files:
+  1. `.claude/mcp-servers.json` - AutoPM internal format (with contextPools, documentationSources)
+  2. `.mcp.json` - Claude Code format (mcpServers only)
+- Added console output showing both file locations
+- Uses `this.projectRoot` to write `.mcp.json` at project root
+
+### 📊 File Structure
+
+**Before (v1.13.6):**
+```
+project/
+  .claude/
+    mcp-servers.json    ✅ Created
+  .mcp.json             ❌ Missing (Claude Code couldn't find servers)
+```
+
+**After (v1.13.7):**
+```
+project/
+  .claude/
+    mcp-servers.json    ✅ Created (AutoPM format)
+  .mcp.json             ✅ Created (Claude Code format)
+```
+
+### 🎯 User Impact
+
+- ✅ Claude Code `/mcp` command shows configured servers
+- ✅ MCP servers discoverable by Claude Code
+- ✅ Automatic sync to both file formats
+- ✅ No manual configuration needed
+- ✅ Works across all projects after running `autopm mcp sync`
+
+### 📖 Documentation
+
+Claude Code expects MCP configuration in:
+- **Project scope**: `.mcp.json` at project root
+- **Local scope**: User-specific Claude Code settings
+- **User scope**: Global Claude Code settings
+
+AutoPM now correctly creates project-scoped configuration.
+
 ## [1.13.6] - 2025-10-01
 
 ### 🐛 Bug Fix
