@@ -137,7 +137,7 @@ class PrdCreator {
     console.log('   View PRD and track progress:');
     console.log(`   /pm:prd-status ${prdName}\n`);
 
-    console.log('💡 Don\'t know which to choose?');
+    console.log(`💡 Don't know which to choose?`);
     console.log('   • Small feature (< 10 tasks)? → Use Option 1 (/pm:epic-oneshot)');
     console.log('   • Large feature (15+ tasks)? → Use Option 2 (/pm:prd-split)');
     console.log('   • Need full control? → Use Option 3 (step-by-step)');
