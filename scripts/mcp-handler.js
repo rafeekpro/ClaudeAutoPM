@@ -264,10 +264,13 @@ class MCPHandler {
         return;
       }
 
+      // Convert env metadata to simple strings for Claude Code compatibility
+      const envVars = this._convertEnvMetadataToStrings(server.metadata.env);
+
       mcpConfig.mcpServers[serverName] = {
         command: server.metadata.command,
         args: server.metadata.args,
-        env: server.metadata.env || {},
+        env: envVars,
         envFile: server.metadata.envFile
       };
 
@@ -1247,6 +1250,42 @@ This server can be integrated with various agents and context pools.
     if (!envDef?.default) return false;
     const defaultValue = String(envDef.default).trim();
     return defaultValue !== '';
+  }
+
+  /**
+   * Convert env metadata objects to simple string format for Claude Code
+   * @private
+   * @param {Object} envObj - Environment variables object (may contain metadata)
+   * @returns {Object} Environment variables as simple strings
+   */
+  _convertEnvMetadataToStrings(envObj) {
+    if (!envObj) return {};
+
+    const converted = {};
+
+    Object.entries(envObj).forEach(([key, value]) => {
+      // If value is already a string, keep it
+      if (typeof value === 'string') {
+        converted[key] = value;
+      }
+      // If value is metadata object, convert to string format
+      else if (typeof value === 'object' && value !== null) {
+        const defaultVal = value.default || '';
+        // If it's a literal value (not empty string), use it directly
+        if (defaultVal && !defaultVal.startsWith('${')) {
+          converted[key] = defaultVal;
+        }
+        // Otherwise use variable substitution format
+        else {
+          converted[key] = `\${${key}:-${defaultVal}}`;
+        }
+      }
+      else {
+        converted[key] = String(value);
+      }
+    });
+
+    return converted;
   }
 
   /**
