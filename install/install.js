@@ -42,6 +42,7 @@ class Installer {
       '.claude/checklists',
       '.claude/strategies',
       '.claude/mcp',
+      '.claude/mcp-servers.json',
       '.claude/.env.example',
       '.claude/teams.json',
       '.claude-code'
@@ -774,6 +775,48 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
     return processedContent;
   }
 
+  setupMCPIntegration() {
+    const mcpServersPath = path.join(this.targetDir, '.claude', 'mcp-servers.json');
+    const configPath = path.join(this.targetDir, '.claude', 'config.json');
+
+    // Check if MCP servers configuration exists
+    if (!fs.existsSync(mcpServersPath)) {
+      return; // No MCP configuration, skip
+    }
+
+    try {
+      // Read config to check for active servers
+      let hasActiveServers = false;
+      if (fs.existsSync(configPath)) {
+        const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        hasActiveServers = config.mcp?.activeServers?.length > 0;
+      }
+
+      // Read mcp-servers.json to check for any configured servers
+      const mcpConfig = JSON.parse(fs.readFileSync(mcpServersPath, 'utf8'));
+      const hasServers = Object.keys(mcpConfig.mcpServers || {}).length > 0;
+
+      if (hasServers) {
+        this.printStep('Setting up Claude Code MCP integration...');
+
+        // Create .mcp.json for Claude Code
+        const mcpJsonPath = path.join(this.targetDir, '.mcp.json');
+        const claudeCodeConfig = {
+          mcpServers: mcpConfig.mcpServers
+        };
+
+        fs.writeFileSync(mcpJsonPath, JSON.stringify(claudeCodeConfig, null, 2));
+        this.printSuccess('.mcp.json created for Claude Code');
+
+        if (!hasActiveServers) {
+          this.printMsg('CYAN', '💡 Tip: Run "autopm mcp enable <server>" to activate servers');
+        }
+      }
+    } catch (error) {
+      this.printWarning(`Could not setup MCP integration: ${error.message}`);
+    }
+  }
+
   async setupGitHooks() {
     const gitDir = path.join(this.targetDir, '.git');
     if (!fs.existsSync(gitDir)) {
@@ -851,6 +894,9 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
 
     // Install CLAUDE.md
     this.installClaudeMd();
+
+    // Setup MCP integration for Claude Code
+    this.setupMCPIntegration();
 
     // Setup git hooks if requested
     if (this.options.setupHooks) {
