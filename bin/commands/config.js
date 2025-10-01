@@ -104,30 +104,28 @@ class ConfigCommand {
 
     console.log('│                                         │');
 
-    // MCP Configuration - check both config and mcp-servers.json
+    // MCP Configuration - check actual .md files in project
     const mcpActiveServers = config.mcp?.activeServers || [];
-    let mcpConfiguredServers = 0;
+    let mcpAvailableServers = 0;
 
-    // If no active servers in config, check mcp-servers.json
-    if (mcpActiveServers.length === 0) {
-      const mcpServersPath = path.join(process.cwd(), '.claude', 'mcp-servers.json');
-      if (await fs.pathExists(mcpServersPath)) {
-        try {
-          const mcpServers = await fs.readJson(mcpServersPath);
-          mcpConfiguredServers = Object.keys(mcpServers.mcpServers || {}).length;
-        } catch (error) {
-          // Ignore error
-        }
+    // Count actual server definition files (.md) in .claude/mcp/
+    const mcpDir = path.join(process.cwd(), '.claude', 'mcp');
+    if (await fs.pathExists(mcpDir)) {
+      try {
+        const files = await fs.readdir(mcpDir);
+        mcpAvailableServers = files.filter(f => f.endsWith('.md') && f !== 'MCP-REGISTRY.md').length;
+      } catch (error) {
+        // Ignore error
       }
     }
 
     let mcpStatus;
     if (mcpActiveServers.length > 0) {
-      mcpStatus = `✅ ${mcpActiveServers.length} active`;
-    } else if (mcpConfiguredServers > 0) {
-      mcpStatus = `⚠️  ${mcpConfiguredServers} configured`;
+      mcpStatus = `✅ ${mcpActiveServers.length} active (${mcpAvailableServers} total)`;
+    } else if (mcpAvailableServers > 0) {
+      mcpStatus = `⚠️  ${mcpAvailableServers} available, 0 active`;
     } else {
-      mcpStatus = '❌ Not configured';
+      mcpStatus = '⚪ No servers installed';
     }
     console.log(`│ MCP:             ${this.padRight(mcpStatus, 22)} │`);
 
@@ -211,17 +209,17 @@ class ConfigCommand {
     }
 
     if (mcpActiveServers.length === 0) {
-      if (mcpConfiguredServers > 0) {
+      if (mcpAvailableServers > 0) {
         issues.push({
           icon: 'ℹ️',
-          problem: `${mcpConfiguredServers} MCP server(s) configured but not active`,
+          problem: `${mcpAvailableServers} MCP server(s) available but not active`,
           solution: 'Run: autopm mcp list  (then: autopm mcp enable <server>)'
         });
       } else {
         issues.push({
           icon: 'ℹ️',
-          problem: 'No MCP servers configured',
-          solution: 'Run: autopm mcp list  (to see available servers)'
+          problem: 'No MCP servers installed',
+          solution: 'Add servers from examples: cp .claude/examples/mcp/*.md .claude/mcp/'
         });
       }
     }
