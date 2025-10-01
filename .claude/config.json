@@ -62,8 +62,6 @@
     ]
   },
   "mcp": {
-    "activeServers": [
-      "context7-docs"
-    ]
+    "activeServers": []
   }
 }
