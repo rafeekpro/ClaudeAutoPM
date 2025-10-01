@@ -257,7 +257,7 @@ function main() {
 🔌 MCP (Model Context Protocol) Management:
    # List and manage MCP servers
    autopm mcp list                  # List all available MCP servers
-   autopm mcp enable context7-docs  # Enable documentation server
+   autopm mcp enable context7  # Enable documentation server
    autopm mcp sync                  # Sync configuration to .claude/mcp-servers.json
 
    # Agent Analysis
@@ -269,7 +269,7 @@ function main() {
    # Configuration & Diagnostics
    autopm mcp setup                 # Interactive API key setup
    autopm mcp diagnose              # Run comprehensive diagnostics
-   autopm mcp test context7-docs    # Test MCP server connection
+   autopm mcp test context7    # Test MCP server connection
    autopm mcp status                # Show all MCP servers status
 
 🔑 Token Setup:

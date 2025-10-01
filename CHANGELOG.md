@@ -18,9 +18,9 @@ The v1.13.10 and v1.13.11 releases fixed package names in `mcp-servers.json` but
 ### 🎯 What Was Fixed
 
 **Fixed Files:**
-- `autopm/.claude/mcp/context7-docs.md`: `@context7/mcp-server` → `@upstash/context7-mcp`
-- `autopm/.claude/mcp/context7-codebase.md`: `@context7/mcp-server` → `@upstash/context7-mcp`
-- `autopm/.claude/mcp/context7-codebase.md`: Added missing `https://` to URL defaults
+- `autopm/.claude/mcp/context7.md`: `@context7/mcp-server` → `@upstash/context7-mcp`
+- `autopm/.claude/mcp/context7.md`: `@context7/mcp-server` → `@upstash/context7-mcp`
+- `autopm/.claude/mcp/context7.md`: Added missing `https://` to URL defaults
 - `autopm/.claude/mcp/playwright-mcp.md`: `@playwright/mcp-server` → `@playwright/mcp`
 
 ### 📊 Impact
@@ -62,9 +62,9 @@ Users now receive clear, actionable guidance after running:
 
 ### 📋 Example Output
 
-**After `autopm mcp enable context7-docs`:**
+**After `autopm mcp enable context7`:**
 ```
-✅ Server 'context7-docs' enabled
+✅ Server 'context7' enabled
 
 📋 Next Steps:
 
@@ -159,8 +159,8 @@ This addresses user feedback: *"po dodaniu konfiguracji autopm mcp nie mialem za
 ### 📊 Default MCP Servers
 
 **After v1.13.11:**
-- ✅ `context7-docs` - Documentation (@upstash/context7-mcp)
-- ✅ `context7-codebase` - Codebase analysis (@upstash/context7-mcp)
+- ✅ `context7` - Documentation (@upstash/context7-mcp)
+- ✅ `context7` - Codebase analysis (@upstash/context7-mcp)
 - ✅ `playwright-mcp` - Browser automation (@playwright/mcp)
 - ❌ `github-mcp` - REMOVED (deprecated)
 
@@ -222,15 +222,15 @@ This caused ALL Context7 MCP servers to fail with "✘ failed" in Claude Code.
 **Before (v1.13.9):**
 ```
 Claude Code MCP:
-❯ 1. context7-codebase    ✘ failed
-  2. context7-docs        ✘ failed
+❯ 1. context7    ✘ failed
+  2. context7        ✘ failed
 ```
 
 **After (v1.13.10):**
 ```
 Claude Code MCP:
-❯ 1. context7-codebase    ✓ running
-  2. context7-docs        ✓ running
+❯ 1. context7    ✓ running
+  2. context7        ✓ running
 ```
 
 ### 🚨 Breaking Change
@@ -255,7 +255,7 @@ Or manually update `.mcp.json`:
 ```json
 {
   "mcpServers": {
-    "context7-docs": {
+    "context7": {
       "args": ["@upstash/context7-mcp"]  // Change this
     }
   }
@@ -353,7 +353,7 @@ The Context7 MCP server is maintained by Upstash, but the configuration examples
 **Before (v1.13.7):**
 ```
 1. autopm install
-2. autopm mcp enable context7-docs  ← Manual step
+2. autopm mcp enable context7  ← Manual step
 3. autopm mcp sync                  ← Manual step
 4. Restart Claude Code              ← Manual step
 ```
@@ -361,14 +361,14 @@ The Context7 MCP server is maintained by Upstash, but the configuration examples
 **After (v1.13.8):**
 ```
 1. autopm install                   ← Creates .mcp.json automatically!
-2. autopm mcp enable context7-docs  (optional - to activate)
+2. autopm mcp enable context7  (optional - to activate)
 3. Restart Claude Code
 ```
 
 ### 🎯 User Impact
 
 - ✅ `.mcp.json` created automatically during installation
-- ✅ 4 MCP servers configured out of the box (context7-docs, context7-codebase, github-mcp, playwright-mcp)
+- ✅ 4 MCP servers configured out of the box (context7, context7, github-mcp, playwright-mcp)
 - ✅ No extra commands needed for Claude Code integration
 - ✅ Helpful tip shown if servers need activation
 - ✅ Works for both fresh installs and updates
@@ -547,7 +547,7 @@ If you lost your MCP configuration, restore it:
 git checkout .claude/mcp-servers.json
 
 # Or re-enable servers
-autopm mcp enable context7-docs
+autopm mcp enable context7
 autopm mcp enable github-mcp
 ```
 
@@ -587,7 +587,7 @@ autopm mcp enable github-mcp
 
 - `autopm/.claude/scripts/pm/prd-new.js`: Added `showNextSteps()` method (+48 lines)
 - `scripts/mcp-handler.js`: Enhanced `check()` with detailed diagnostics (+133 lines)
-- `autopm/.claude/mcp/context7-docs.md`: Structured env metadata with objects
+- `autopm/.claude/mcp/context7.md`: Structured env metadata with objects
 - All 21 MCP check tests still passing ✅
 
 ### 🎯 Addresses User Feedback
