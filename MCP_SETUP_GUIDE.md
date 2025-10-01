@@ -4,7 +4,63 @@
 
 MCP (Model Context Protocol) enables Claude to access external tools and resources like documentation, codebases, and services. This guide explains how to ensure MCP servers, especially context7, are properly configured and available in your Claude projects.
 
-## 📦 MCP Servers Available in ClaudeAutoPM
+## 🆕 Dynamic MCP Server Management (NEW!)
+
+ClaudeAutoPM now supports **dynamic discovery, installation, and management** of MCP servers from npm registry!
+
+### Quick Start with Dynamic Management
+
+```bash
+# 1. Search for available MCP servers
+autopm mcp search filesystem
+autopm mcp search @modelcontextprotocol
+
+# 2. Browse popular servers
+autopm mcp browse --official
+
+# 3. Install a server directly from npm
+autopm mcp install @modelcontextprotocol/server-filesystem --enable
+
+# 4. List your installed servers
+autopm mcp list
+
+# 5. Uninstall when no longer needed
+autopm mcp uninstall filesystem
+```
+
+### Available Dynamic Commands
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `mcp search <query>` | Search npm registry for MCP servers | `autopm mcp search azure` |
+| `mcp browse` | Browse popular/official MCP servers | `autopm mcp browse --category database` |
+| `mcp install <package>` | Install from npm + auto-configure | `autopm mcp install @modelcontextprotocol/server-memory` |
+| `mcp uninstall <name>` | Remove server + npm package | `autopm mcp uninstall memory --force` |
+
+### Official MCP Servers from npm
+
+You can discover hundreds of MCP servers at:
+- **Official Registry**: https://registry.modelcontextprotocol.io
+- **NPM Search**: https://www.npmjs.com/search?q=@modelcontextprotocol
+- **GitHub Repo**: https://github.com/modelcontextprotocol/servers
+
+Popular official packages:
+- `@modelcontextprotocol/server-filesystem` - File system access
+- `@modelcontextprotocol/server-memory` - Knowledge graph memory
+- `@modelcontextprotocol/server-sequential-thinking` - Structured problem-solving
+- `@modelcontextprotocol/server-everything` - Test all MCP features
+
+### Benefits of Dynamic Management
+
+✅ **No manual configuration** - Servers auto-configured from package metadata
+✅ **Always up-to-date** - Install latest versions from npm
+✅ **Easy discovery** - Search thousands of community servers
+✅ **Clean uninstall** - Remove both server definition and npm package
+✅ **Version control** - Install specific versions when needed
+
+## 📦 Example MCP Servers in ClaudeAutoPM
+
+**Note**: These are EXAMPLES only. No servers are pre-installed. Use the dynamic commands above to install what you need.
 
 ### Core MCP Servers
 
