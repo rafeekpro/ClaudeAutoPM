@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.4] - 2025-10-01
+
+### ✨ User Experience Enhancements
+
+**Next Steps Guidance After PRD Creation**
+- Added comprehensive next steps display after `/pm:prd-new` command
+- Shows 5 clear options to prevent users from getting lost:
+  1. **Quick Start** - `/pm:epic-oneshot` for simple features (< 10 tasks)
+  2. **Split into Epics** - `/pm:prd-split` for complex features (15+ tasks)
+  3. **Step-by-Step Workflow** - Full control over parse → decompose → sync
+  4. **Review & Edit First** - Refine PRD before processing
+  5. **Check Status** - View PRD progress anytime
+- Includes decision guidance based on feature complexity
+- Visual formatting with emojis and clear separators
+
+**Enhanced MCP Configuration Diagnostics**
+- Improved `autopm mcp check` output with categorized environment variables
+- **REQUIRED vs OPTIONAL** indicators for all env vars
+- Descriptions for each environment variable
+- Ready-to-copy example `.env` configuration
+- Direct links to get API keys and credentials
+- Step-by-step fix instructions with numbered steps
+- Shows where to get credentials for each MCP server
+
+### 🔧 Code Quality Improvements
+
+- Extracted `_hasNonEmptyDefault(envDef)` helper method
+- Eliminated duplicate logic in MCP configuration checks
+- More robust handling: converts to string, trims whitespace
+- Handles edge cases: null, undefined, whitespace-only strings
+- Improved maintainability following DRY principle
+
+### 📝 Technical Changes
+
+- `autopm/.claude/scripts/pm/prd-new.js`: Added `showNextSteps()` method (+48 lines)
+- `scripts/mcp-handler.js`: Enhanced `check()` with detailed diagnostics (+133 lines)
+- `autopm/.claude/mcp/context7-docs.md`: Structured env metadata with objects
+- All 21 MCP check tests still passing ✅
+
+### 🎯 Addresses User Feedback
+
+- ✅ Users no longer get lost after creating PRDs
+- ✅ MCP configuration errors are now self-explanatory
+- ✅ Clear guidance on what to do next at each step
+- ✅ No more guessing where to get API keys
+
 ## [1.13.3] - 2025-10-01
 
 ### ✅ Added
