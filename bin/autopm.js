@@ -180,6 +180,29 @@ function main() {
     .command(require('./commands/config'))
     // MCP management command
     .command(require('./commands/mcp'))
+    // Validation command
+    .command('validate', 'Validate ClaudeAutoPM configuration and setup',
+      (yargs) => {
+        return yargs
+          .example('autopm validate', 'Check all configuration requirements')
+          .example('autopm validate --verbose', 'Show detailed validation info');
+      },
+      async (argv) => {
+        const PostInstallChecker = require('../install/post-install-check.js');
+        const checker = new PostInstallChecker();
+
+        try {
+          await checker.runAllChecks();
+          process.exit(0);
+        } catch (error) {
+          console.error(`❌ Validation error: ${error.message}`);
+          if (argv.debug) {
+            console.error(error.stack);
+          }
+          process.exit(1);
+        }
+      }
+    )
     // Global options
     .option('verbose', {
       type: 'boolean',
@@ -203,6 +226,7 @@ function main() {
     .epilogue(`
 📖 Quick Start:
    autopm install                    # Install ClaudeAutoPM in current directory
+   autopm validate                   # Check configuration status
    autopm update                     # Update to latest framework version
    autopm team load frontend         # Load React/UI development agents
    claude --dangerously-skip-permissions .     # Open Claude Code
@@ -392,7 +416,8 @@ function main() {
    → Updates epic progress tracking
 
 🛠️  Troubleshooting:
-   # Check installation
+   # Check installation and configuration
+   autopm validate                  # Comprehensive status check
    ls -la .claude/                  # Should show: agents/, commands/, config.json
 
    # Verify configuration
