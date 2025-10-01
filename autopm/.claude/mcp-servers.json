@@ -2,7 +2,7 @@
   "mcpServers": {
     "context7-docs": {
       "command": "npx",
-      "args": ["@context7/mcp-server"],
+      "args": ["@upstash/context7-mcp"],
       "env": {
         "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY:-}",
         "CONTEXT7_MCP_URL": "${CONTEXT7_MCP_URL:-https://mcp.context7.com/mcp}",
@@ -13,8 +13,8 @@
       "envFile": ".claude/.env"
     },
     "context7-codebase": {
-      "command": "npx", 
-      "args": ["@context7/mcp-server"],
+      "command": "npx",
+      "args": ["@upstash/context7-mcp"],
       "env": {
         "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY:-}",
         "CONTEXT7_MCP_URL": "${CONTEXT7_MCP_URL:-https://mcp.context7.com/mcp}",
