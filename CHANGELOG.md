@@ -7,6 +7,66 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.5] - 2025-10-01
+
+### 🚨 Critical Bug Fix
+
+**MCP Sync Data Loss Bug**
+- Fixed critical bug in `autopm mcp sync` that deleted all MCP server configurations
+- Previously: Running sync with no active servers would wipe entire `mcp-servers.json`
+- Now: Preserves all existing servers, only updates active ones
+- Impact: **Safe to run `autopm mcp sync` anytime without data loss**
+
+### 🔧 Technical Changes
+
+**`scripts/mcp-handler.js`:**
+- `sync()` now reads existing `mcp-servers.json` before modifying
+- Preserves all servers, updates only those in `activeServers` list
+- When no active servers: preserves existing instead of wiping file
+- Better logging: shows both active count and total servers count
+
+**`.claude/config.json`:**
+- Added `mcp.activeServers` section for Claude Code integration
+- Enables `/mcp` command in Claude Code to see configured servers
+- Without this section, Claude Code shows "No MCP servers configured"
+
+### 📊 Behavior Change
+
+**Before:**
+```bash
+$ autopm mcp sync  # with empty activeServers
+ℹ️ No active servers to sync
+# Result: ALL servers deleted from mcp-servers.json ❌
+```
+
+**After:**
+```bash
+$ autopm mcp sync  # with empty activeServers
+ℹ️ No active servers in config.json
+💡 Preserving existing servers in mcp-servers.json
+📊 Existing servers: 4
+# Result: All servers preserved ✅
+```
+
+### 🎯 User Impact
+
+- ✅ No more data loss when syncing
+- ✅ Claude Code `/mcp` command now works
+- ✅ Safe to run `autopm mcp sync` anytime
+- ✅ All existing servers preserved automatically
+
+### 🔄 Recovery for Affected Users
+
+If you lost your MCP configuration, restore it:
+```bash
+# Restore from git
+git checkout .claude/mcp-servers.json
+
+# Or re-enable servers
+autopm mcp enable context7-docs
+autopm mcp enable github-mcp
+```
+
 ## [1.13.4] - 2025-10-01
 
 ### ✨ User Experience Enhancements
