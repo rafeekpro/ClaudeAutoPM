@@ -1594,8 +1594,7 @@ ${pkg.repository?.url ? `- Repository: ${pkg.repository.url}` : ''}
    */
   _getCredentialInfo(serverName) {
     const info = {
-      'context7-docs': '→ Sign up at https://context7.com and get API key from dashboard',
-      'context7-codebase': '→ Same credentials as context7-docs',
+      'context7': '→ Sign up at https://context7.com and get API key from dashboard',
       'github-mcp': '→ Generate token at https://github.com/settings/tokens',
       'playwright-mcp': '→ No credentials needed - uses local Playwright installation'
     };

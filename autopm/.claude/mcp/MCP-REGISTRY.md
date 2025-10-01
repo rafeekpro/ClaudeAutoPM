@@ -11,13 +11,8 @@ This document provides guidance on MCP (Model Context Protocol) server managemen
 Example MCP server configurations are available in `.claude/examples/mcp/`:
 
 ### context7
-**Description**: Context7 documentation server for accessing technical documentation
-**Use Cases**: API documentation, framework guides, technical references
-**Example**: `.claude/examples/mcp/context7.md`
-
-### context7
-**Description**: Context7 codebase server for project code analysis
-**Use Cases**: Code navigation, project analysis, dependency tracking
+**Description**: Context7 MCP server - up-to-date documentation database for any library or framework
+**Use Cases**: API documentation, framework guides, technical references, library lookups
 **Example**: `.claude/examples/mcp/context7.md`
 
 ### playwright-mcp
