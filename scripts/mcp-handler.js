@@ -556,6 +556,349 @@ This server can be integrated with various agents and context pools.
   }
 
   // ==========================================
+  // DISCOVERY & INSTALLATION
+  // ==========================================
+
+  /**
+   * Search npm registry for MCP servers
+   * @param {string} query - Search query
+   * @param {Object} options - Search options
+   */
+  async search(query, options = {}) {
+    console.log(`🔍 Searching npm for "${query}"...\n`);
+
+    try {
+      const { execSync } = require('child_process');
+
+      // Build npm search command
+      let searchQuery = query;
+      if (options.official) {
+        searchQuery = `@modelcontextprotocol ${query}`;
+      }
+
+      // Search npm
+      const searchResults = execSync(`npm search ${searchQuery} --json`, {
+        encoding: 'utf8',
+        stdio: ['pipe', 'pipe', 'ignore']
+      });
+
+      const packages = JSON.parse(searchResults);
+
+      // Filter for MCP-related packages
+      const mcpPackages = packages.filter(pkg => {
+        const name = pkg.name.toLowerCase();
+        const desc = (pkg.description || '').toLowerCase();
+        return name.includes('mcp') || name.includes('context') ||
+               desc.includes('mcp') || desc.includes('model context protocol');
+      });
+
+      if (mcpPackages.length === 0) {
+        console.log('❌ No MCP servers found matching your query');
+        console.log('\n💡 Try:');
+        console.log('  - Broader search terms');
+        console.log('  - Use --official to search @modelcontextprotocol packages');
+        console.log('  - Visit: https://www.npmjs.com/search?q=@modelcontextprotocol');
+        return;
+      }
+
+      console.log(`📦 Found ${mcpPackages.length} MCP server(s):\n`);
+
+      mcpPackages.forEach((pkg, index) => {
+        console.log(`${index + 1}. ${pkg.name}`);
+        console.log(`   Version: ${pkg.version}`);
+        if (pkg.description) {
+          console.log(`   Description: ${pkg.description}`);
+        }
+        console.log(`   Downloads: ${this._formatDownloads(pkg)}`);
+        console.log();
+      });
+
+      console.log('💡 To install a server:');
+      console.log(`   autopm mcp install <package-name>`);
+      console.log('\n📚 More info: https://registry.modelcontextprotocol.io');
+
+    } catch (error) {
+      console.error('❌ Search failed:', error.message);
+      console.log('\n💡 Try using npm directly: npm search mcp');
+    }
+  }
+
+  /**
+   * Browse popular/official MCP servers
+   * @param {Object} options - Browse options
+   */
+  async browse(options = {}) {
+    console.log('🌟 Popular MCP Servers\n');
+
+    const officialServers = [
+      {
+        name: '@modelcontextprotocol/server-filesystem',
+        description: 'MCP server for filesystem access',
+        category: 'codebase'
+      },
+      {
+        name: '@modelcontextprotocol/server-memory',
+        description: 'Knowledge graph memory for Claude',
+        category: 'database'
+      },
+      {
+        name: '@modelcontextprotocol/server-sequential-thinking',
+        description: 'Structured problem-solving server',
+        category: 'utility'
+      },
+      {
+        name: '@upstash/context7-mcp',
+        description: 'Context7 documentation and codebase server',
+        category: 'documentation'
+      },
+      {
+        name: '@playwright/mcp',
+        description: 'Browser automation and E2E testing',
+        category: 'testing'
+      }
+    ];
+
+    let servers = options.official ? officialServers.filter(s => s.name.startsWith('@modelcontextprotocol')) : officialServers;
+
+    if (options.category) {
+      servers = servers.filter(s => s.category === options.category);
+    }
+
+    if (servers.length === 0) {
+      console.log('❌ No servers found matching your filters');
+      return;
+    }
+
+    servers.forEach((server, index) => {
+      console.log(`${index + 1}. ${server.name}`);
+      console.log(`   Category: ${server.category}`);
+      console.log(`   Description: ${server.description}`);
+      console.log();
+    });
+
+    console.log('💡 To install a server:');
+    console.log('   autopm mcp install <package-name> --enable');
+    console.log('\n💡 To search for more:');
+    console.log('   autopm mcp search <query>');
+    console.log('\n📚 Full registry: https://registry.modelcontextprotocol.io');
+  }
+
+  /**
+   * Install MCP server from npm
+   * @param {string} packageName - NPM package name
+   * @param {Object} options - Installation options
+   */
+  async installFromNpm(packageName, options = {}) {
+    console.log(`📦 Installing MCP server: ${packageName}\n`);
+
+    try {
+      const { execSync } = require('child_process');
+
+      // Step 1: Fetch package info
+      console.log('1️⃣  Fetching package info from npm...');
+      const packageInfo = execSync(`npm view ${packageName} --json`, {
+        encoding: 'utf8'
+      });
+      const pkg = JSON.parse(packageInfo);
+      console.log(`   ✅ Found: ${pkg.name}@${pkg.version}`);
+
+      // Step 2: Install npm package
+      console.log('\n2️⃣  Installing npm package...');
+      execSync(`npm install -g ${packageName}`, {
+        encoding: 'utf8',
+        stdio: 'inherit'
+      });
+      console.log('   ✅ Installed successfully');
+
+      // Step 3: Create server definition
+      console.log('\n3️⃣  Creating server definition...');
+      const serverName = this._extractServerName(packageName);
+      const serverPath = path.join(this.mcpDir, `${serverName}.md`);
+
+      // Ensure mcp directory exists
+      if (!fs.existsSync(this.mcpDir)) {
+        fs.mkdirSync(this.mcpDir, { recursive: true });
+      }
+
+      // Create .md file
+      const serverContent = this._generateServerDefinition(pkg, packageName);
+      fs.writeFileSync(serverPath, serverContent, 'utf8');
+      console.log(`   ✅ Created: .claude/mcp/${serverName}.md`);
+
+      // Step 4: Enable if requested
+      if (options.enable) {
+        console.log('\n4️⃣  Enabling server...');
+        this.enable(serverName);
+        console.log('   ✅ Enabled in config.json');
+
+        console.log('\n5️⃣  Syncing configuration...');
+        this.sync();
+        console.log('   ✅ Updated: .claude/mcp-servers.json');
+      }
+
+      console.log(`\n🎉 MCP server '${serverName}' ready to use!`);
+      console.log('\n📝 Next steps:');
+      if (!options.enable) {
+        console.log(`  1. Enable: autopm mcp enable ${serverName}`);
+        console.log('  2. Sync: autopm mcp sync');
+      }
+      console.log(`  3. Configure environment: nano .claude/.env`);
+      console.log(`  4. Test connection: autopm mcp test ${serverName}`);
+
+    } catch (error) {
+      console.error('❌ Installation failed:', error.message);
+      console.log('\n💡 Troubleshooting:');
+      console.log('  - Check package name is correct');
+      console.log('  - Try: npm install -g ' + packageName);
+      console.log('  - Visit: https://www.npmjs.com/package/' + packageName);
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Uninstall MCP server
+   * @param {string} serverName - Server name
+   * @param {Object} options - Uninstallation options
+   */
+  async uninstallServer(serverName, options = {}) {
+    console.log(`🗑️  Uninstalling MCP server '${serverName}'...\n`);
+
+    const serverPath = path.join(this.mcpDir, `${serverName}.md`);
+
+    if (!fs.existsSync(serverPath)) {
+      console.error(`❌ Server '${serverName}' not found`);
+      console.log('\n💡 List available servers: autopm mcp list');
+      process.exit(1);
+    }
+
+    try {
+      // Step 1: Check status
+      console.log('1️⃣  Checking server status...');
+      const config = this.loadConfig();
+      const isActive = (config.mcp?.activeServers || []).includes(serverName);
+      if (isActive) {
+        console.log('   ⚠️  Server is currently enabled');
+      } else {
+        console.log('   ✅ Server is not active');
+      }
+
+      // Step 2: Disable if active
+      if (isActive && !options.force) {
+        console.log('\n2️⃣  Disabling server...');
+        this.disable(serverName);
+        console.log('   ✅ Disabled in config.json');
+      }
+
+      // Step 3: Remove definition
+      console.log('\n3️⃣  Removing server definition...');
+      fs.unlinkSync(serverPath);
+      console.log(`   ✅ Deleted: .claude/mcp/${serverName}.md`);
+
+      // Step 4: Uninstall npm package (unless --keep-package)
+      if (!options.keepPackage) {
+        console.log('\n4️⃣  Uninstalling npm package...');
+        try {
+          const { execSync } = require('child_process');
+          // Try to find package name from .md file (but it's deleted, so we'll guess)
+          execSync(`npm uninstall -g @modelcontextprotocol/server-${serverName}`, {
+            stdio: 'ignore'
+          });
+          console.log('   ✅ Uninstalled npm package');
+        } catch (error) {
+          console.log('   ⚠️  Could not uninstall npm package automatically');
+          console.log('   💡 Try: npm uninstall -g <package-name>');
+        }
+      } else {
+        console.log('\n4️⃣  Keeping npm package (--keep-package)');
+      }
+
+      // Step 5: Clean up config
+      console.log('\n5️⃣  Cleaning up configuration...');
+      this.sync();
+      console.log('   ✅ Updated: .claude/mcp-servers.json');
+
+      console.log(`\n✨ Server '${serverName}' completely removed`);
+
+    } catch (error) {
+      console.error('❌ Uninstallation failed:', error.message);
+      process.exit(1);
+    }
+  }
+
+  // Helper methods for discovery/installation
+
+  _formatDownloads(pkg) {
+    // npm search doesn't always include download counts
+    return pkg.date ? `Last publish: ${pkg.date}` : 'N/A';
+  }
+
+  _extractServerName(packageName) {
+    // Extract server name from package
+    // @modelcontextprotocol/server-filesystem -> filesystem
+    // @upstash/context7-mcp -> context7-mcp
+    const parts = packageName.split('/');
+    const name = parts[parts.length - 1];
+    return name.replace('server-', '').replace('-mcp', '');
+  }
+
+  _generateServerDefinition(pkg, packageName) {
+    const serverName = this._extractServerName(packageName);
+    const category = this._guessCategory(pkg);
+
+    return `---
+name: ${serverName}
+command: npx
+args: ["${packageName}"]
+description: ${pkg.description || 'MCP server'}
+category: ${category}
+status: active
+version: ${pkg.version}
+installed: ${new Date().toISOString()}
+---
+
+# ${pkg.name}
+
+## Description
+${pkg.description || 'MCP server'}
+
+## Installation
+This server was automatically installed via:
+\`\`\`bash
+autopm mcp install ${packageName}
+\`\`\`
+
+## Configuration
+Configure environment variables in \`.claude/.env\` if needed.
+
+## Usage
+Enable this server:
+\`\`\`bash
+autopm mcp enable ${serverName}
+autopm mcp sync
+\`\`\`
+
+## Links
+- NPM: https://www.npmjs.com/package/${packageName}
+${pkg.homepage ? `- Homepage: ${pkg.homepage}` : ''}
+${pkg.repository?.url ? `- Repository: ${pkg.repository.url}` : ''}
+`;
+  }
+
+  _guessCategory(pkg) {
+    const name = (pkg.name || '').toLowerCase();
+    const desc = (pkg.description || '').toLowerCase();
+    const text = name + ' ' + desc;
+
+    if (text.includes('filesystem') || text.includes('file')) return 'codebase';
+    if (text.includes('doc') || text.includes('context7')) return 'documentation';
+    if (text.includes('test') || text.includes('playwright')) return 'testing';
+    if (text.includes('database') || text.includes('sql') || text.includes('memory')) return 'database';
+    if (text.includes('github') || text.includes('git')) return 'integration';
+
+    return 'utility';
+  }
+
+  // ==========================================
   // EXTENDED FEATURES: Agent Analysis
   // ==========================================
 
