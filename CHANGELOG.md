@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.13] - 2025-10-01
+
+### 🐛 Critical Bug Fix: MCP Server Definition Files
+
+**Fixed incorrect package names in MCP server definition files**
+
+The v1.13.10 and v1.13.11 releases fixed package names in `mcp-servers.json` but forgot to update the individual server definition files in `autopm/.claude/mcp/`. This caused servers to fail validation and not appear in `autopm mcp list`.
+
+### 🎯 What Was Fixed
+
+**Fixed Files:**
+- `autopm/.claude/mcp/context7-docs.md`: `@context7/mcp-server` → `@upstash/context7-mcp`
+- `autopm/.claude/mcp/context7-codebase.md`: `@context7/mcp-server` → `@upstash/context7-mcp`
+- `autopm/.claude/mcp/context7-codebase.md`: Added missing `https://` to URL defaults
+- `autopm/.claude/mcp/playwright-mcp.md`: `@playwright/mcp-server` → `@playwright/mcp`
+
+### 📊 Impact
+
+**Before v1.13.13:**
+- `autopm mcp list` showed only context7 servers
+- playwright-mcp didn't appear in list
+- Server validation failed silently
+
+**After v1.13.13:**
+- All servers appear in `autopm mcp list`
+- All package names are correct and consistent
+- Server validation works properly
+
+### 🔄 Upgrade
+
+```bash
+npm install -g claude-autopm@latest
+```
+
 ## [1.13.12] - 2025-10-01
 
 ### ✨ Enhancement: Post-Configuration Guidance
