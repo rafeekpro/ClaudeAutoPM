@@ -1113,7 +1113,7 @@ This server can be integrated with various agents and context pools.
 
         entries.forEach(({ variable }) => {
           const envDef = server?.metadata?.env?.[variable];
-          if (envDef?.default && envDef.default !== '') {
+          if (this._hasNonEmptyDefault(envDef)) {
             optional.push({ name: variable, default: envDef.default, desc: envDef.description });
           } else {
             required.push({ name: variable, desc: envDef?.description || 'No description' });
@@ -1148,7 +1148,7 @@ This server can be integrated with various agents and context pools.
         console.log(`      # ${serverName}`);
         entries.forEach(({ variable }) => {
           const envDef = server?.metadata?.env?.[variable];
-          if (envDef?.default && envDef.default !== '') {
+          if (this._hasNonEmptyDefault(envDef)) {
             console.log(`      # ${variable}=${envDef.default}  (optional)`);
           } else {
             const example = this._getEnvVarExample(serverName, variable);
@@ -1230,6 +1230,18 @@ This server can be integrated with various agents and context pools.
       'playwright-mcp': '→ No credentials needed - uses local Playwright installation'
     };
     return info[serverName] || '→ Check server documentation: autopm mcp info ' + serverName;
+  }
+
+  /**
+   * Check if environment variable definition has a non-empty default value
+   * @private
+   * @param {Object} envDef - Environment variable definition
+   * @returns {boolean} True if has non-empty default
+   */
+  _hasNonEmptyDefault(envDef) {
+    if (!envDef?.default) return false;
+    const defaultValue = String(envDef.default).trim();
+    return defaultValue !== '';
   }
 
   /**
