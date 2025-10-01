@@ -199,6 +199,42 @@ autopm config switch github
 autopm config validate
 ```
 
+#### 4.6 Verify Installation & Configuration
+
+After installation, verify that everything is properly configured:
+
+```bash
+# Comprehensive configuration check
+autopm validate
+
+# Shows:
+# ✅ Essential Components (.claude directory, config, provider, git)
+# ✅ Optional Components (MCP servers, git hooks, Node.js version)
+# 📋 Next steps for incomplete setup
+```
+
+**Example Output:**
+```
+╔════════════════════════════════════════════════════════════════╗
+║         🔍 ClaudeAutoPM Configuration Status                  ║
+╚════════════════════════════════════════════════════════════════╝
+
+Essential Components:
+  ✅ .claude directory - Framework installed
+  ✅ Configuration file - Provider: github
+  ✅ Provider setup - GitHub (configured)
+  ✅ Git repository - Initialized
+
+Optional Components:
+  ✅ MCP servers - 2 active (context7-docs, github-mcp)
+  ⚠️  Git hooks - Not installed (run: bash scripts/setup-hooks.sh)
+  ✅ Node.js version - v20.10.0 (compatible)
+
+Next Steps:
+  1. Install git hooks: bash scripts/setup-hooks.sh
+  2. Run MCP configuration check: autopm mcp check
+```
+
 #### 4. Ship Your First Feature (90 seconds)
 
 ##### Option A: Using Templates (Works Everywhere)
@@ -353,8 +389,9 @@ autopm mcp tree                # Dependency tree
 
 #### **Configuration & Diagnostics**
 ```bash
+autopm mcp check               # Quick configuration check
 autopm mcp setup               # Interactive API key setup
-autopm mcp diagnose            # Run diagnostics
+autopm mcp diagnose            # Run full diagnostics
 autopm mcp test <server>       # Test server connection
 autopm mcp status              # Show servers status
 ```
@@ -460,6 +497,48 @@ autopm pm:prd-parse user-authentication --overwrite
 # Close completed epic
 autopm pm:epic-close user-auth "All authentication features complete"
 ```
+
+##### **Splitting Large PRDs into Multiple Epics**
+
+For complex features, you can split a single PRD into multiple focused epics:
+
+```bash
+# 1. Create a comprehensive PRD
+autopm pm:prd-new payment-system --template
+
+# 2. Split into focused epics using AI analysis
+/pm:prd-split payment-system
+
+# This creates multiple epics from one PRD:
+# ├─ payment-system-backend     (API, database, payment gateway integration)
+# ├─ payment-system-frontend    (UI components, checkout flow)
+# └─ payment-system-security    (PCI compliance, encryption, audit logging)
+
+# 3. Work on each epic independently
+/pm:epic-decompose payment-system-backend
+/pm:epic-sync payment-system-backend
+
+# 4. Track overall PRD progress
+autopm pm:prd-status payment-system
+# Shows:
+#   Epic: payment-system-backend  [████████░░] 80% (8/10 tasks)
+#   Epic: payment-system-frontend [████░░░░░░] 40% (4/10 tasks)
+#   Epic: payment-system-security [░░░░░░░░░░]  0% (0/8 tasks)
+#   Overall: 44% complete (12/28 tasks)
+```
+
+**When to split PRDs:**
+- ✅ Feature requires multiple specialized teams (frontend, backend, DevOps)
+- ✅ Different components have separate deployment timelines
+- ✅ Epic would exceed 15-20 tasks (becomes hard to manage)
+- ✅ Clear architectural boundaries exist (UI, API, infrastructure)
+
+**Best practices:**
+- 📝 Keep original PRD as the source of truth
+- 🏷️ Use consistent naming: `<prd-name>-<component>`
+- 🔗 Link epics back to parent PRD in description
+- 📊 Track overall progress across all child epics
+- 🎯 Each epic should be independently deployable when possible
 
 #### **Issue Lifecycle**
 ```bash
