@@ -134,6 +134,9 @@ class MCPHandler {
       this.updateRegistry(name, serverDef);
 
       rl.close();
+
+      // Show next steps
+      this.showNextSteps('add', { name, metadata: serverDef });
     } catch (error) {
       console.error('❌ Error creating server:', error.message);
       rl.close();
@@ -197,7 +200,9 @@ class MCPHandler {
     this.saveConfig(config);
 
     console.log(`✅ Server '${serverName}' enabled`);
-    console.log(`💡 Run 'autopm mcp sync' to update configuration`);
+
+    // Show next steps
+    this.showNextSteps('enable', server);
   }
 
   /**
@@ -297,6 +302,9 @@ class MCPHandler {
     console.log(`✅ Claude Code config synced to ${claudeCodeMcpPath}`);
     console.log(`📊 Active servers: ${activeServers.length}`);
     console.log(`📦 Total servers in file: ${Object.keys(mcpConfig.mcpServers).length}`);
+
+    // Show next steps after sync
+    this.showNextSteps('sync', null);
   }
 
   /**
@@ -1648,6 +1656,68 @@ This server can be integrated with various agents and context pools.
     console.log(`   Total servers: ${allServers.length}`);
     console.log(`   Enabled: ${activeServers.length}`);
     console.log(`   Disabled: ${allServers.length - activeServers.length}`);
+  }
+
+  /**
+   * Show next steps after MCP configuration actions
+   * @param {string} action - The action that was performed (enable, add, sync)
+   * @param {Object} server - Server object (for enable/add actions)
+   */
+  showNextSteps(action, server) {
+    console.log('\n📋 Next Steps:\n');
+
+    if (action === 'enable' || action === 'add') {
+      console.log('1. Run sync to update configuration:');
+      console.log('   autopm mcp sync\n');
+
+      // Check if server needs environment variables
+      if (server && server.metadata && server.metadata.env) {
+        const envVars = Object.keys(server.metadata.env);
+        if (envVars.length > 0) {
+          console.log('2. Configure required environment variables in .claude/.env:');
+          envVars.forEach(varName => {
+            const example = this._getEnvVarExample(server.name || server.metadata.name, varName);
+            console.log(`   ${varName}=${example}`);
+          });
+          console.log();
+          console.log('3. Restart Claude Code to load the server\n');
+          console.log('4. Verify server status:');
+          console.log('   /mcp (in Claude Code)\n');
+        } else {
+          console.log('2. Restart Claude Code to load the server\n');
+          console.log('3. Verify server status:');
+          console.log('   /mcp (in Claude Code)\n');
+        }
+      }
+
+      // Show where to get credentials if needed
+      if (server && server.name) {
+        const credInfo = this._getCredentialInfo(server.name);
+        if (credInfo && !credInfo.includes('No credentials needed')) {
+          console.log('💡 API Key Information:');
+          console.log(`   ${credInfo}\n`);
+        }
+      }
+    } else if (action === 'sync') {
+      console.log('1. Restart Claude Code to load the updated configuration\n');
+      console.log('2. Verify servers are running:');
+      console.log('   /mcp (in Claude Code)\n');
+
+      // Check for missing environment variables
+      const envStatus = this.checkEnvVarsStatus();
+      if (envStatus.missing.length > 0) {
+        console.log('⚠️  Some servers require environment variables:\n');
+        envStatus.missing.forEach(varName => {
+          console.log(`   ❌ ${varName}`);
+        });
+        console.log('\n3. Configure missing variables in .claude/.env\n');
+        console.log('4. Check configuration:');
+        console.log('   autopm mcp check\n');
+      } else {
+        console.log('3. Check configuration status:');
+        console.log('   autopm mcp check\n');
+      }
+    }
   }
 }
 
