@@ -94,18 +94,54 @@ class PrdCreator {
       console.log('\n✅ PRD created successfully!');
       console.log(`📄 File: ${prdFile}`);
 
-      // Show next steps
-      console.log('\n💡 Next Steps:');
-      console.log(`  1. Review PRD file: .claude/prds/${prdName}.md`);
-      console.log(`  2. Convert to epic: /pm:prd-parse ${prdName}`);
-      console.log(`  3. Check status: /pm:prd-status ${prdName}`);
-      console.log(`  4. List all PRDs: /pm:prd-list`);
+      // Show comprehensive next steps
+      this.showNextSteps(prdName);
 
     } finally {
       rl.close();
     }
 
     return true;
+  }
+
+  showNextSteps(prdName) {
+    console.log('\n' + '═'.repeat(60));
+    console.log('📋 What You Can Do Next:');
+    console.log('═'.repeat(60) + '\n');
+
+    console.log('🎯 Option 1: Quick Start (Recommended for Simple Features)');
+    console.log('   One command to parse, decompose, and sync to GitHub:');
+    console.log(`   /pm:epic-oneshot ${prdName}`);
+    console.log('   ✨ This creates epic + tasks + GitHub issues automatically\n');
+
+    console.log('🔀 Option 2: Split into Multiple Epics (For Complex Features)');
+    console.log('   Break down large PRD into focused sub-epics:');
+    console.log(`   /pm:prd-split ${prdName}`);
+    console.log('   Example: payment-system → backend, frontend, security');
+    console.log('   📚 See README section "Splitting Large PRDs into Multiple Epics"\n');
+
+    console.log('🛠️  Option 3: Step-by-Step Workflow (Full Control)');
+    console.log('   a) Convert PRD to epic:');
+    console.log(`      /pm:prd-parse ${prdName}`);
+    console.log('   b) Break epic into tasks:');
+    console.log(`      /pm:epic-decompose ${prdName}`);
+    console.log('   c) Push to GitHub/Azure:');
+    console.log(`      /pm:epic-sync ${prdName}\n`);
+
+    console.log('📝 Option 4: Review & Edit First');
+    console.log('   Review and refine the PRD before processing:');
+    console.log(`   nano .claude/prds/${prdName}.md`);
+    console.log('   Then use any option above\n');
+
+    console.log('📊 Option 5: Check Status');
+    console.log('   View PRD and track progress:');
+    console.log(`   /pm:prd-status ${prdName}\n`);
+
+    console.log('💡 Don\'t know which to choose?');
+    console.log('   • Small feature (< 10 tasks)? → Use Option 1 (/pm:epic-oneshot)');
+    console.log('   • Large feature (15+ tasks)? → Use Option 2 (/pm:prd-split)');
+    console.log('   • Need full control? → Use Option 3 (step-by-step)');
+    console.log('');
   }
 
   generatePrdContent(name, data) {

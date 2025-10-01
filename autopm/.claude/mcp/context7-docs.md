@@ -3,11 +3,26 @@ name: context7-docs
 command: npx
 args: ["@context7/mcp-server"]
 env:
-  CONTEXT7_API_KEY: "${CONTEXT7_API_KEY:-}"
-  CONTEXT7_MCP_URL: "${CONTEXT7_MCP_URL:-mcp.context7.com/mcp}"
-  CONTEXT7_API_URL: "${CONTEXT7_API_URL:-context7.com/api/v1}"
-  CONTEXT7_WORKSPACE: "${CONTEXT7_WORKSPACE:-}"
-  CONTEXT7_MODE: "documentation"
+  CONTEXT7_API_KEY:
+    default: ""
+    description: "Your Context7 API key"
+    required: true
+  CONTEXT7_MCP_URL:
+    default: "https://mcp.context7.com/mcp"
+    description: "MCP endpoint URL"
+    required: false
+  CONTEXT7_API_URL:
+    default: "https://context7.com/api/v1"
+    description: "API endpoint URL"
+    required: false
+  CONTEXT7_WORKSPACE:
+    default: "default"
+    description: "Your workspace identifier (uses default workspace if not set)"
+    required: false
+  CONTEXT7_MODE:
+    default: "documentation"
+    description: "Server mode"
+    required: false
 envFile: .claude/.env
 description: Context7 documentation server for accessing technical documentation
 category: documentation
