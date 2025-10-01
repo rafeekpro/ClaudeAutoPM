@@ -277,13 +277,24 @@ class MCPHandler {
       console.log(`  ✅ Synced: ${serverName}`);
     });
 
-    // Write configuration
+    // Write configuration to .claude/mcp-servers.json (AutoPM format)
     fs.writeFileSync(
       this.mcpServersPath,
       JSON.stringify(mcpConfig, null, 2)
     );
 
+    // Write configuration to .mcp.json (Claude Code format)
+    const claudeCodeMcpPath = path.join(this.projectRoot, '.mcp.json');
+    const claudeCodeConfig = {
+      mcpServers: mcpConfig.mcpServers
+    };
+    fs.writeFileSync(
+      claudeCodeMcpPath,
+      JSON.stringify(claudeCodeConfig, null, 2)
+    );
+
     console.log(`\n✅ Configuration synced to ${this.mcpServersPath}`);
+    console.log(`✅ Claude Code config synced to ${claudeCodeMcpPath}`);
     console.log(`📊 Active servers: ${activeServers.length}`);
     console.log(`📦 Total servers in file: ${Object.keys(mcpConfig.mcpServers).length}`);
   }
