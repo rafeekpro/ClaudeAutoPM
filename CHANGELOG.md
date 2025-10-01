@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.3] - 2025-10-01
+
+### ✅ Added
+- **Comprehensive Test Coverage** (61 new tests, 100% pass rate)
+  - `test/jest-tests/mcp-check-jest.test.js` - 21 tests for MCP configuration validation
+  - `test/jest-tests/post-install-check-jest.test.js` - 40 tests for post-installation validation
+  - Full coverage for `MCPHandler.check()` and `checkRequiredServers()` methods
+  - Complete coverage for `PostInstallChecker` class and all validation methods
+  - Integration tests for various configuration scenarios
+  - Error handling tests for edge cases
+
+### 📚 Documentation
+- **README.md Enhancements**
+  - Added `autopm mcp check` to MCP commands documentation
+  - Added section 4.6 "Verify Installation & Configuration" with `autopm validate` examples
+  - Added comprehensive "Splitting Large PRDs into Multiple Epics" guide
+    - Complete workflow example with progress tracking
+    - 4 criteria for when to split PRDs
+    - 5 best practices for managing split epics
+  - Example output showing Essential and Optional components validation
+  - Actionable next steps for incomplete configurations
+
+### 🎯 Quality Improvements
+- Zero test failures - all 61 new tests passing
+- Better developer experience with clear test coverage
+- Improved user guidance for complex project management workflows
+- Enhanced documentation for post-installation validation
+
 ## [1.13.2] - 2025-10-01
 
 ### 🐛 Fixed
