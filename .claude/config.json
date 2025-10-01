@@ -60,5 +60,10 @@
       "docker compose",
       "make"
     ]
+  },
+  "mcp": {
+    "activeServers": [
+      "context7-docs"
+    ]
   }
 }

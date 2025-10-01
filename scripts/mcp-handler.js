@@ -228,35 +228,39 @@ class MCPHandler {
     const config = this.loadConfig();
     const activeServers = config.mcp?.activeServers || [];
 
-    // Ensure .claude directory exists even if no servers
+    // Ensure .claude directory exists
     this.ensureClaudeDir();
 
+    // Read existing mcp-servers.json to preserve all servers
+    let existingMcpConfig = { mcpServers: {}, contextPools: {}, documentationSources: {} };
+    if (fs.existsSync(this.mcpServersPath)) {
+      try {
+        const content = fs.readFileSync(this.mcpServersPath, 'utf8');
+        existingMcpConfig = JSON.parse(content);
+      } catch (error) {
+        console.log('⚠️  Could not read existing mcp-servers.json, creating new');
+      }
+    }
+
     if (activeServers.length === 0) {
-      console.log('ℹ️ No active servers to sync');
-      // Still create empty mcp-servers.json
-      const emptyConfig = {
-        mcpServers: {},
-        contextPools: config.mcp?.contextPools || {},
-        documentationSources: config.mcp?.documentationSources || {}
-      };
-      fs.writeFileSync(
-        this.mcpServersPath,
-        JSON.stringify(emptyConfig, null, 2)
-      );
+      console.log('ℹ️ No active servers in config.json');
+      console.log('💡 Preserving existing servers in mcp-servers.json');
+      console.log(`📊 Existing servers: ${Object.keys(existingMcpConfig.mcpServers).length}`);
       return;
     }
 
+    // Start with existing configuration
     const mcpConfig = {
-      mcpServers: {},
-      contextPools: config.mcp?.contextPools || {},
-      documentationSources: config.mcp?.documentationSources || {}
+      mcpServers: existingMcpConfig.mcpServers || {},
+      contextPools: existingMcpConfig.contextPools || {},
+      documentationSources: existingMcpConfig.documentationSources || {}
     };
 
-    // Process each active server
+    // Update active servers from registry
     activeServers.forEach(serverName => {
       const server = this.getServer(serverName);
       if (!server) {
-        console.log(`  ⚠️ Server '${serverName}' not found, skipping`);
+        console.log(`  ⚠️ Server '${serverName}' not found in registry, skipping`);
         return;
       }
 
@@ -278,6 +282,7 @@ class MCPHandler {
 
     console.log(`\n✅ Configuration synced to ${this.mcpServersPath}`);
     console.log(`📊 Active servers: ${activeServers.length}`);
+    console.log(`📦 Total servers in file: ${Object.keys(mcpConfig.mcpServers).length}`);
   }
 
   /**
