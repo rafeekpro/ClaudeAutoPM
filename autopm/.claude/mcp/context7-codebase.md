@@ -1,11 +1,11 @@
 ---
 name: context7-codebase
 command: npx
-args: ["@context7/mcp-server"]
+args: ["@upstash/context7-mcp"]
 env:
   CONTEXT7_API_KEY: "${CONTEXT7_API_KEY:-}"
-  CONTEXT7_MCP_URL: "${CONTEXT7_MCP_URL:-mcp.context7.com/mcp}"
-  CONTEXT7_API_URL: "${CONTEXT7_API_URL:-context7.com/api/v1}"
+  CONTEXT7_MCP_URL: "${CONTEXT7_MCP_URL:-https://mcp.context7.com/mcp}"
+  CONTEXT7_API_URL: "${CONTEXT7_API_URL:-https://context7.com/api/v1}"
   CONTEXT7_WORKSPACE: "${CONTEXT7_WORKSPACE:-}"
   CONTEXT7_MODE: "codebase"
 envFile: .claude/.env

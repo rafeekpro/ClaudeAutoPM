@@ -1,7 +1,7 @@
 ---
 name: playwright-mcp
 command: npx
-args: ["@playwright/mcp-server"]
+args: ["@playwright/mcp"]
 env:
   PLAYWRIGHT_BROWSER: "${PLAYWRIGHT_BROWSER:-chromium}"
   PLAYWRIGHT_HEADLESS: "${PLAYWRIGHT_HEADLESS:-true}"
