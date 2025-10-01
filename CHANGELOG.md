@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.1] - 2025-10-01
+
+### 📚 Documentation
+- **Visual Walkthrough Enhancements**
+  - Improved video presentation with expandable sections in README
+  - Added 6 demo GIF files showcasing complete workflow
+  - Fixed video file naming and paths for better compatibility
+  - Interactive collapsible sections for each workflow step
+
+## [1.13.0] - 2025-09-30
+
+### ✨ Added
+- **MCP Configuration Check Command** (`autopm mcp check`)
+  - Quick validation of MCP server configuration
+  - Analyzes which agents require MCP servers
+  - Verifies required servers are enabled
+  - Checks environment variables are configured
+  - Provides actionable recommendations for issues
+  - Complements existing `diagnose` command with fast health check
+
+### 🛠️ Enhanced
+- **Enhanced MCP Diagnostics**
+  - `autopm mcp diagnose` now includes MCP server requirements section
+  - Shows disabled servers that are used by agents
+  - Displays missing environment variables
+  - Provides quick fix recommendations
+- **Performance Improvements**
+  - Added environment status caching to reduce file I/O operations
+  - Optimized MCP server validation checks
+  - Extracted helper methods for better code reusability
+
+### 📚 Documentation
+- **MCP Command Documentation Updates**
+  - Added comprehensive documentation for `autopm mcp check`
+  - Updated MCP workflow examples with new check command
+  - Enhanced troubleshooting guide with quick check instructions
+  - Updated MCP_SETUP_GUIDE.md with validation workflow
+
 ## [1.12.3] - 2025-09-30
 
 ### 📚 Documentation
