@@ -1,6 +1,6 @@
 {
   "name": "claude-autopm",
-  "version": "1.13.10",
+  "version": "1.13.11",
   "description": "Autonomous Project Management Framework for Claude Code - Advanced AI-powered development automation",
   "main": "bin/autopm.js",
   "bin": {
@@ -149,8 +149,7 @@
   },
   "optionalDependencies": {
     "@upstash/context7-mcp": "^1.0.0",
-    "@modelcontextprotocol/server-github": "^1.0.0",
-    "@playwright/mcp-server": "^1.0.0"
+    "@playwright/mcp": "^0.0.40"
   },
   "publishConfig": {
     "access": "public",
