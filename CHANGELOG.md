@@ -7,6 +7,91 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.10] - 2025-10-01
+
+### 🐛 Critical Bug Fix
+
+**Fixed Incorrect Context7 MCP Package Name**
+- Changed from non-existent `@context7/mcp-server` to actual `@upstash/context7-mcp`
+- **Impact: MCP servers can now actually start in Claude Code**
+
+### 🎯 What Was Wrong
+
+The MCP configuration was using a **non-existent npm package**:
+- ❌ `@context7/mcp-server` - doesn't exist on npm
+- ✅ `@upstash/context7-mcp` - real package
+
+This caused ALL Context7 MCP servers to fail with "✘ failed" in Claude Code.
+
+### 🔧 Files Changed
+
+**autopm/.claude/mcp-servers.json:**
+```json
+// Before:
+"args": ["@context7/mcp-server"]  // ❌ 404 Not Found
+
+// After:
+"args": ["@upstash/context7-mcp"]  // ✅ Works
+```
+
+**package.json:**
+```json
+"optionalDependencies": {
+  "@upstash/context7-mcp": "^1.0.0"  // Updated
+}
+```
+
+### 📊 Impact
+
+**Before (v1.13.9):**
+```
+Claude Code MCP:
+❯ 1. context7-codebase    ✘ failed
+  2. context7-docs        ✘ failed
+```
+
+**After (v1.13.10):**
+```
+Claude Code MCP:
+❯ 1. context7-codebase    ✓ running
+  2. context7-docs        ✓ running
+```
+
+### 🚨 Breaking Change
+
+If you manually installed `@context7/mcp-server` (which would fail), you'll need to:
+```bash
+npm uninstall @context7/mcp-server
+npm install @upstash/context7-mcp
+```
+
+But most users didn't install anything (because the package didn't exist), so this is just a fix.
+
+### 🎯 User Action Required
+
+**For existing projects:**
+```bash
+cd your-project
+autopm mcp sync  # Updates .mcp.json with correct package
+```
+
+Or manually update `.mcp.json`:
+```json
+{
+  "mcpServers": {
+    "context7-docs": {
+      "args": ["@upstash/context7-mcp"]  // Change this
+    }
+  }
+}
+```
+
+### 🔍 How This Happened
+
+The Context7 MCP server is maintained by Upstash, but the configuration examples used an incorrect namespace. The package search revealed:
+- ✅ `@upstash/context7-mcp` - Official package (v1.0.20)
+- ❌ `@context7/mcp-server` - Never existed
+
 ## [1.13.9] - 2025-10-01
 
 ### 🎨 UX Improvement
