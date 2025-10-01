@@ -1,7 +1,7 @@
 ---
 name: context7-docs
 command: npx
-args: ["@context7/mcp-server"]
+args: ["@upstash/context7-mcp"]
 env:
   CONTEXT7_API_KEY:
     default: ""
