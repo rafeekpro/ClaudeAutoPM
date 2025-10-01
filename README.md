@@ -226,7 +226,7 @@ Essential Components:
   ✅ Git repository - Initialized
 
 Optional Components:
-  ✅ MCP servers - 2 active (context7-docs, github-mcp)
+  ✅ MCP servers - 2 active (context7, github-mcp)
   ⚠️  Git hooks - Not installed (run: bash scripts/setup-hooks.sh)
   ✅ Node.js version - v20.10.0 (compatible)
 
@@ -382,10 +382,10 @@ autopm mcp agents
 🤖 Agents Using MCP
 
 ✅ react-frontend-engineer
-   └─ context7-docs
+   └─ context7
 
 ✅ python-backend-engineer
-   └─ context7-docs
+   └─ context7
    └─ sqlite-mcp
 
 📊 Summary:
@@ -393,7 +393,7 @@ autopm mcp agents
    Using MCP: 39 (74%)
 
 # Enable MCP servers
-autopm mcp enable context7-docs
+autopm mcp enable context7
 autopm mcp enable github-mcp
 
 # Configure API keys interactively
@@ -447,8 +447,8 @@ autopm mcp validate            # Validate all servers
 
 ### MCP Server Types
 
-- **Documentation** - `context7-docs` for live framework documentation (React, Python, AWS, etc.)
-- **Codebase** - `context7-codebase` for project analysis and navigation
+- **Documentation** - `context7` for live framework documentation (React, Python, AWS, etc.)
+- **Codebase** - `context7` for project analysis and navigation
 - **GitHub** - `github-mcp` for repository operations
 - **Databases** - `sqlite-mcp`, `postgresql-mcp`, `mongodb-mcp` for data operations
 - **Browser** - `playwright-mcp` for E2E testing and automation
@@ -457,7 +457,7 @@ autopm mcp validate            # Validate all servers
 
 ```bash
 # 1. Enable context7 documentation server
-autopm mcp enable context7-docs
+autopm mcp enable context7
 
 # 2. Configure API key
 cat > .claude/.env << EOF
@@ -472,7 +472,7 @@ autopm mcp sync
 autopm mcp diagnose
 
 # 5. Test connection
-autopm mcp test context7-docs
+autopm mcp test context7
 ```
 
 ### MCP Benefits

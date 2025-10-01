@@ -505,10 +505,10 @@ autopm mcp agents --by-server
 🤖 Agents Using MCP
 
 ✅ react-frontend-engineer
-   └─ context7-docs
+   └─ context7
 
 ✅ python-backend-engineer
-   └─ context7-docs
+   └─ context7
    └─ sqlite-mcp
 
 📊 Summary:
@@ -533,7 +533,7 @@ autopm mcp agent python-backend-engineer
 
 📡 MCP Servers (1):
 
-✅ Active context7-docs
+✅ Active context7
     Category: documentation
     Description: Context7 documentation server
     Environment Variables:
@@ -560,13 +560,13 @@ autopm mcp tree
 
 📁 frontend
 ├─ react-frontend-engineer ✅
-│  └─ context7-docs
+│  └─ context7
 └─ vue-frontend-engineer ✅
-   └─ context7-docs
+   └─ context7
 
 📁 backend
 ├─ python-backend-engineer ✅
-│  ├─ context7-docs
+│  ├─ context7
 │  └─ sqlite-mcp
 ```
 
@@ -581,19 +581,19 @@ Shows all MCP servers with their status (active/inactive) and metadata.
 ### `autopm mcp info <server>`
 Show detailed information about MCP server
 ```bash
-autopm mcp info context7-docs
+autopm mcp info context7
 ```
 
 ### `autopm mcp enable <server>`
 Enable MCP server in project
 ```bash
-autopm mcp enable context7-docs
+autopm mcp enable context7
 ```
 
 ### `autopm mcp disable <server>`
 Disable MCP server in project
 ```bash
-autopm mcp disable context7-docs
+autopm mcp disable context7
 ```
 
 ### `autopm mcp sync`
@@ -634,20 +634,20 @@ Quickly validates that all MCP servers required by your agents are properly conf
 
 ⚠️  Configuration Issues:
 
-⚠️  MCP server 'context7-docs' is used by agents but NOT enabled
+⚠️  MCP server 'context7' is used by agents but NOT enabled
 
 🔴 Disabled Servers (used by agents):
 
-   • context7-docs
+   • context7
      Category: documentation
      Description: Context7 documentation server
 
 💡 Recommendations:
 
-   Run: autopm mcp enable context7-docs
+   Run: autopm mcp enable context7
 
 🔧 Quick Fix:
-   autopm mcp enable context7-docs
+   autopm mcp enable context7
    autopm mcp sync
 ```
 
@@ -693,7 +693,7 @@ autopm mcp diagnose
 ### `autopm mcp test <server>`
 Test MCP server connection
 ```bash
-autopm mcp test context7-docs
+autopm mcp test context7
 ```
 
 Validates server configuration and connectivity.
@@ -708,7 +708,7 @@ autopm mcp status
 ```
 📊 MCP Servers Status
 
-✅ context7-docs
+✅ context7
     Category: documentation
     Status: Enabled
     Used by: 39 agents
@@ -733,7 +733,7 @@ autopm mcp status
 autopm mcp agents
 
 # 2. Enable required servers
-autopm mcp enable context7-docs
+autopm mcp enable context7
 autopm mcp enable github-mcp
 
 # 3. Configure API keys
@@ -750,7 +750,7 @@ autopm mcp diagnose
 autopm mcp status
 
 # 7. Test connections
-autopm mcp test context7-docs
+autopm mcp test context7
 ```
 
 ## Provider-Specific

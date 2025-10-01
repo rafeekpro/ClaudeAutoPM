@@ -35,7 +35,7 @@ describe('MCPHandler - Configuration Check Tests', () => {
     // Create config file
     const config = {
       mcp: {
-        activeServers: ['context7-docs']
+        activeServers: ['context7']
       }
     };
     fs.writeFileSync(
@@ -80,7 +80,7 @@ describe('MCPHandler - Configuration Check Tests', () => {
 # Test Agent
 
 ## MCP Servers Required
-- context7-docs - For documentation access
+- context7 - For documentation access
 `;
       fs.writeFileSync(
         path.join('.claude', 'agents', 'test-agent.md'),
@@ -189,7 +189,7 @@ describe('MCPHandler - Configuration Check Tests', () => {
 # Test Agent
 
 ## MCP Servers Required
-- context7-docs - Documentation
+- context7 - Documentation
 `;
       fs.writeFileSync(
         path.join('.claude', 'agents', 'test-agent.md'),
@@ -272,12 +272,15 @@ describe('MCPHandler - Configuration Check Tests', () => {
 # Test Agent
 
 ## MCP Servers Required
-- context7-docs - Documentation
+- context7 - Documentation
 `;
       fs.writeFileSync(
         path.join('.claude', 'agents', 'test-agent.md'),
         agentContent
       );
+
+      // Use temp directory agents instead of framework agents
+      handler.agentsDir = path.join(tempDir, '.claude', 'agents');
 
       const result = handler.checkRequiredServers();
 

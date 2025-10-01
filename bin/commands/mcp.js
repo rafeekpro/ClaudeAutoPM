@@ -70,14 +70,14 @@ module.exports = {
       .example('autopm mcp install @modelcontextprotocol/server-filesystem', 'Install MCP server from npm')
       .example('autopm mcp install @upstash/context7-mcp --enable', 'Install and enable immediately')
       .example('autopm mcp uninstall filesystem', 'Uninstall MCP server')
-      .example('autopm mcp enable context7-docs', 'Enable context7 documentation server')
+      .example('autopm mcp enable context7', 'Enable context7 documentation server')
       .example('autopm mcp agents', 'List all agents using MCP')
       .example('autopm mcp agent react-frontend-engineer', 'Show MCP config for specific agent')
       .example('autopm mcp usage', 'Show MCP usage statistics')
       .example('autopm mcp setup', 'Interactive API key setup')
       .example('autopm mcp check', 'Quick MCP configuration check')
       .example('autopm mcp diagnose', 'Run MCP diagnostics')
-      .example('autopm mcp test context7-docs', 'Test MCP server connection')
+      .example('autopm mcp test context7', 'Test MCP server connection')
       .example('autopm mcp tree', 'Show agent-MCP dependency tree')
       .example('autopm mcp status', 'Show MCP servers status');
   },

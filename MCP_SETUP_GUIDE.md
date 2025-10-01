@@ -64,8 +64,8 @@ Popular official packages:
 
 ### Core MCP Servers
 
-1. **context7-docs** - Technical documentation access
-2. **context7-codebase** - Project code analysis
+1. **context7** - Technical documentation access
+2. **context7** - Project code analysis
 3. **playwright-mcp** - Browser automation
 4. **github-mcp** - GitHub repository management
 5. **filesystem-mcp** - Local file system access
@@ -95,7 +95,7 @@ autopm install
 autopm mcp list
 
 # Show detailed information about a server
-autopm mcp info context7-docs
+autopm mcp info context7
 
 # Check which agents are using MCP
 autopm mcp agents
@@ -108,10 +108,10 @@ autopm mcp usage
 
 ```bash
 # Enable context7 documentation server
-autopm mcp enable context7-docs
+autopm mcp enable context7
 
 # Enable context7 codebase server
-autopm mcp enable context7-codebase
+autopm mcp enable context7
 
 # Enable other servers as needed
 autopm mcp enable github-mcp
@@ -165,7 +165,7 @@ This creates/updates `.claude/mcp-servers.json` which Claude reads when starting
 autopm mcp diagnose
 
 # Test specific server connection
-autopm mcp test context7-docs
+autopm mcp test context7
 
 # Show all servers status
 autopm mcp status
@@ -178,7 +178,7 @@ Check that `.claude/mcp-servers.json` contains your enabled servers:
 ```json
 {
   "mcpServers": {
-    "context7-docs": {
+    "context7": {
       "command": "npx",
       "args": ["@context7/mcp-server"],
       "env": {
@@ -187,7 +187,7 @@ Check that `.claude/mcp-servers.json` contains your enabled servers:
       },
       "envFile": ".claude/.env"
     },
-    "context7-codebase": {
+    "context7": {
       "command": "npx",
       "args": ["@context7/mcp-server"],
       "env": {
@@ -214,9 +214,9 @@ Check that `.claude/mcp-servers.json` contains your enabled servers:
 Agents use special URIs to access MCP resources:
 
 ```
-mcp://context7-docs/python/fastapi       # FastAPI documentation
-mcp://context7-docs/aws/ec2             # AWS EC2 documentation
-mcp://context7-codebase/project/analyze # Analyze current project
+mcp://context7/python/fastapi       # FastAPI documentation
+mcp://context7/aws/ec2             # AWS EC2 documentation
+mcp://context7/project/analyze # Analyze current project
 mcp://github-mcp/issues/list           # List GitHub issues
 ```
 
@@ -332,8 +332,8 @@ autopm install
 # Choose: 3 (Full DevOps)
 
 # 3. Enable MCP servers
-autopm mcp enable context7-docs
-autopm mcp enable context7-codebase
+autopm mcp enable context7
+autopm mcp enable context7
 autopm mcp enable github-mcp
 
 # 4. Configure environment
@@ -388,10 +388,10 @@ autopm mcp tree
 🤖 Agents Using MCP
 
 ✅ react-frontend-engineer
-   └─ context7-docs
+   └─ context7
 
 ✅ python-backend-engineer
-   └─ context7-docs
+   └─ context7
    └─ sqlite-mcp
 
 📊 Summary:
@@ -413,7 +413,7 @@ autopm mcp check                 # Fast validation of required MCP servers
 autopm mcp diagnose             # Full diagnostic report
 
 # Test specific MCP server connection
-autopm mcp test context7-docs
+autopm mcp test context7
 
 # Show all MCP servers status
 autopm mcp status
@@ -443,24 +443,24 @@ autopm mcp status
 
 📁 frontend
 ├─ react-frontend-engineer ✅
-│  └─ context7-docs
+│  └─ context7
 └─ vue-frontend-engineer ✅
-   └─ context7-docs
+   └─ context7
 
 📁 backend
 ├─ python-backend-engineer ✅
-│  ├─ context7-docs
+│  ├─ context7
 │  └─ sqlite-mcp
 └─ nodejs-backend-engineer ✅
-   └─ context7-docs
+   └─ context7
 ```
 
 ## 📊 Agent MCP Integration Status
 
 As of the latest version, **39 out of 53 agents (74%)** use MCP servers:
 
-- **Documentation**: 39 agents use `context7-docs` for live documentation
-- **Codebase Analysis**: Some agents use `context7-codebase` for project analysis
+- **Documentation**: 39 agents use `context7` for live documentation
+- **Codebase Analysis**: Some agents use `context7` for project analysis
 - **GitHub Integration**: Agents can use `github-mcp` for repository operations
 - **Database**: Specialized agents use `sqlite-mcp`, `postgresql-mcp`, etc.
 
