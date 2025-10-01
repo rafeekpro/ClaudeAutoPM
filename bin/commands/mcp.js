@@ -17,6 +17,7 @@ module.exports = {
         type: 'string',
         choices: [
           'list', 'add', 'remove', 'enable', 'disable', 'sync', 'validate', 'info',
+          'search', 'browse', 'install', 'uninstall',
           'agents', 'agent', 'usage', 'setup', 'check', 'diagnose', 'test', 'tree', 'status'
         ]
       })
@@ -39,7 +40,36 @@ module.exports = {
         type: 'boolean',
         default: false
       })
+      .option('enable', {
+        describe: 'Enable server after installation',
+        type: 'boolean',
+        default: false
+      })
+      .option('force', {
+        describe: 'Force operation (skip confirmations)',
+        type: 'boolean',
+        default: false
+      })
+      .option('keep-package', {
+        describe: 'Keep npm package when uninstalling',
+        type: 'boolean',
+        default: false
+      })
+      .option('official', {
+        describe: 'Show only official @modelcontextprotocol servers',
+        type: 'boolean',
+        default: false
+      })
+      .option('category', {
+        describe: 'Filter by category',
+        type: 'string'
+      })
       .example('autopm mcp list', 'List all available MCP servers')
+      .example('autopm mcp search filesystem', 'Search npm for MCP servers')
+      .example('autopm mcp browse --official', 'Browse official MCP servers')
+      .example('autopm mcp install @modelcontextprotocol/server-filesystem', 'Install MCP server from npm')
+      .example('autopm mcp install @upstash/context7-mcp --enable', 'Install and enable immediately')
+      .example('autopm mcp uninstall filesystem', 'Uninstall MCP server')
       .example('autopm mcp enable context7-docs', 'Enable context7 documentation server')
       .example('autopm mcp agents', 'List all agents using MCP')
       .example('autopm mcp agent react-frontend-engineer', 'Show MCP config for specific agent')
@@ -105,6 +135,35 @@ module.exports = {
             process.exit(1);
           }
           handler.info(argv.name || argv.server);
+          break;
+
+        // Discovery and installation commands
+        case 'search':
+          if (!argv.name) {
+            console.error('❌ Please specify a search query: autopm mcp search <query>');
+            process.exit(1);
+          }
+          await handler.search(argv.name, argv);
+          break;
+
+        case 'browse':
+          await handler.browse(argv);
+          break;
+
+        case 'install':
+          if (!argv.name) {
+            console.error('❌ Please specify a package name: autopm mcp install <package>');
+            process.exit(1);
+          }
+          await handler.installFromNpm(argv.name, argv);
+          break;
+
+        case 'uninstall':
+          if (!argv.name && !argv.server) {
+            console.error('❌ Please specify a server name: autopm mcp uninstall <server-name>');
+            process.exit(1);
+          }
+          await handler.uninstallServer(argv.name || argv.server, argv);
           break;
 
         // Agent analysis commands
