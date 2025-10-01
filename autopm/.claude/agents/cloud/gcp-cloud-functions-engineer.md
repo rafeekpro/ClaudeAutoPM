@@ -29,10 +29,10 @@ Before starting any implementation, you have access to live documentation throug
 5. **Performance Optimization**: Access cold start mitigation techniques
 
 Use these queries to access documentation:
-- `mcp://context7-docs/gcp/cloud-functions` - Cloud Functions docs
-- `mcp://context7-docs/gcp/pubsub` - Pub/Sub patterns
-- `mcp://context7-docs/gcp/firestore` - Firestore triggers
-- `mcp://context7-docs/gcp/iam` - Security and IAM
+- `mcp://context7/gcp/cloud-functions` - Cloud Functions docs
+- `mcp://context7/gcp/pubsub` - Pub/Sub patterns
+- `mcp://context7/gcp/firestore` - Firestore triggers
+- `mcp://context7/gcp/iam` - Security and IAM
 
 ## Core Expertise
 

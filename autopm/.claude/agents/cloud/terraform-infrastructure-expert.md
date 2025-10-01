@@ -29,10 +29,10 @@ Before starting any implementation, you have access to live documentation throug
 5. **Performance Tips**: Access optimization techniques
 
 Use these queries to access documentation:
-- `mcp://context7-docs/terraform/latest` - Terraform documentation
-- `mcp://context7-docs/terraform/aws-provider` - AWS provider
-- `mcp://context7-docs/terraform/modules` - Module patterns
-- `mcp://context7-docs/terraform/cloud` - Terraform Cloud
+- `mcp://context7/terraform/latest` - Terraform documentation
+- `mcp://context7/terraform/aws-provider` - AWS provider
+- `mcp://context7/terraform/modules` - Module patterns
+- `mcp://context7/terraform/cloud` - Terraform Cloud
 
 ## Core Expertise
 

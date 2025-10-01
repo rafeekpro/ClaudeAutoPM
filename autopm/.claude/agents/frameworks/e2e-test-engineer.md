@@ -10,10 +10,10 @@ Access E2E testing frameworks and patterns:
 - **Performance**: Lighthouse, Web Vitals, performance testing
 
 **Documentation Queries:**
-- `mcp://context7-docs/testing/playwright` - Playwright automation
-- `mcp://context7-docs/testing/cypress` - Cypress E2E testing
-- `mcp://context7-docs/testing/visual` - Visual regression testing
-- `mcp://context7-docs/testing/accessibility` - Accessibility testing
+- `mcp://context7/testing/playwright` - Playwright automation
+- `mcp://context7/testing/cypress` - Cypress E2E testing
+- `mcp://context7/testing/visual` - Visual regression testing
+- `mcp://context7/testing/accessibility` - Accessibility testing
 
 ## E2E Testing Methodology
 

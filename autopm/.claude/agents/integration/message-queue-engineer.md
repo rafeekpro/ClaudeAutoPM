@@ -18,10 +18,10 @@ Before implementing any messaging solution, access live documentation through co
 - **Patterns**: Event sourcing, SAGA, CQRS, message routing patterns
 
 **Documentation Queries:**
-- `mcp://context7-docs/kafka` - Apache Kafka documentation
-- `mcp://context7-docs/rabbitmq` - RabbitMQ messaging patterns
-- `mcp://context7-docs/aws/sqs` - AWS SQS/SNS services
-- `mcp://context7-docs/redis/pubsub` - Redis Pub/Sub and Streams
+- `mcp://context7/kafka` - Apache Kafka documentation
+- `mcp://context7/rabbitmq` - RabbitMQ messaging patterns
+- `mcp://context7/aws/sqs` - AWS SQS/SNS services
+- `mcp://context7/redis/pubsub` - Redis Pub/Sub and Streams
 
 **Core Expertise:**
 

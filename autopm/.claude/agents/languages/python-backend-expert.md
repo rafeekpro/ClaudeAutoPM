@@ -13,10 +13,10 @@ Before implementing any Python backend solution, access live documentation throu
 - **Async**: asyncio, aiohttp, uvloop, concurrent.futures
 
 **Documentation Queries:**
-- `mcp://context7-docs/python/fastapi` - FastAPI framework
-- `mcp://context7-docs/python/sqlalchemy` - SQLAlchemy ORM
-- `mcp://context7-docs/python/django` - Django framework
-- `mcp://context7-docs/python/pytest` - pytest testing
+- `mcp://context7/python/fastapi` - FastAPI framework
+- `mcp://context7/python/sqlalchemy` - SQLAlchemy ORM
+- `mcp://context7/python/django` - Django framework
+- `mcp://context7/python/pytest` - pytest testing
 
 ## Test-Driven Development (TDD) Methodology
 

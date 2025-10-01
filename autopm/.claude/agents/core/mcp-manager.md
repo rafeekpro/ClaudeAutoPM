@@ -181,8 +181,8 @@ When invoked as an agent:
 
 ### Python Development Setup
 ```bash
-autopm mcp enable context7-docs
-autopm mcp enable context7-codebase
+autopm mcp enable context7
+autopm mcp enable context7
 # Configure for Python documentation
 # Set up codebase indexing
 ```

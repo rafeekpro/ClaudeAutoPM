@@ -18,10 +18,10 @@ Before implementing any observability solution, access live documentation throug
 - **APM Solutions**: Application performance monitoring best practices
 
 **Documentation Queries:**
-- `mcp://context7-docs/prometheus` - Prometheus monitoring system
-- `mcp://context7-docs/grafana` - Grafana dashboards and visualizations
-- `mcp://context7-docs/elasticsearch` - Elasticsearch and ELK Stack
-- `mcp://context7-docs/opentelemetry` - OpenTelemetry instrumentation
+- `mcp://context7/prometheus` - Prometheus monitoring system
+- `mcp://context7/grafana` - Grafana dashboards and visualizations
+- `mcp://context7/elasticsearch` - Elasticsearch and ELK Stack
+- `mcp://context7/opentelemetry` - OpenTelemetry instrumentation
 
 **Core Expertise:**
 

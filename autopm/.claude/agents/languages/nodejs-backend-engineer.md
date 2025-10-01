@@ -37,10 +37,10 @@ Before starting any implementation, you have access to live documentation throug
 4. **Performance Patterns**: Get latest Node.js optimization techniques
 
 Use these queries to access documentation:
-- `mcp://context7-docs/nodejs/latest` - Node.js documentation
-- `mcp://context7-docs/express/latest` - Express framework
-- `mcp://context7-docs/nestjs/latest` - NestJS framework
-- `mcp://context7-docs/prisma/latest` - Prisma ORM
+- `mcp://context7/nodejs/latest` - Node.js documentation
+- `mcp://context7/express/latest` - Express framework
+- `mcp://context7/nestjs/latest` - NestJS framework
+- `mcp://context7/prisma/latest` - Prisma ORM
 
 ## Core Expertise
 

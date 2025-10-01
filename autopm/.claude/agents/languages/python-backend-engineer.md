@@ -35,9 +35,9 @@ Before starting any implementation, you have access to live documentation throug
 4. **Performance Patterns**: Access latest async patterns and optimization techniques
 
 Use these queries to access documentation:
-- `mcp://context7-docs/fastapi/latest` - FastAPI documentation
-- `mcp://context7-docs/sqlalchemy/2.0` - SQLAlchemy 2.0 async patterns  
-- `mcp://context7-docs/pydantic/v2` - Pydantic v2 validation patterns
+- `mcp://context7/fastapi/latest` - FastAPI documentation
+- `mcp://context7/sqlalchemy/2.0` - SQLAlchemy 2.0 async patterns  
+- `mcp://context7/pydantic/v2` - Pydantic v2 validation patterns
 
 **Core Expertise:**
 

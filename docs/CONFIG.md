@@ -264,7 +264,7 @@ Edit `.claude/mcp-servers.json`:
 ```json
 {
   "mcpServers": {
-    "context7-docs": {
+    "context7": {
       "command": "npx",
       "args": ["@context7/mcp-server"],
       "env": {

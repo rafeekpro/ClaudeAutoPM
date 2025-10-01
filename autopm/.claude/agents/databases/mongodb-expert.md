@@ -29,10 +29,10 @@ Before starting any implementation, you have access to live documentation throug
 5. **Security Configuration**: Access authentication and encryption setup
 
 Use these queries to access documentation:
-- `mcp://context7-docs/mongodb/latest` - MongoDB documentation
-- `mcp://context7-docs/mongodb/aggregation` - Aggregation framework
-- `mcp://context7-docs/mongodb/atlas` - Atlas cloud features
-- `mcp://context7-docs/mongodb/performance` - Performance tuning
+- `mcp://context7/mongodb/latest` - MongoDB documentation
+- `mcp://context7/mongodb/aggregation` - Aggregation framework
+- `mcp://context7/mongodb/atlas` - Atlas cloud features
+- `mcp://context7/mongodb/performance` - Performance tuning
 
 ## Core Expertise
 

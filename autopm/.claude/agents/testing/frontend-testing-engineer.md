@@ -27,10 +27,10 @@ Before implementing any testing solution, access live documentation through cont
 - **Best Practices**: Testing patterns, mocking strategies, assertion libraries
 
 **Documentation Queries:**
-- `mcp://context7-docs/javascript/jest` - Jest testing framework
-- `mcp://context7-docs/react/testing-library` - React Testing Library
-- `mcp://context7-docs/vue/test-utils` - Vue Test Utils
-- `mcp://context7-docs/angular/testing` - Angular testing utilities
+- `mcp://context7/javascript/jest` - Jest testing framework
+- `mcp://context7/react/testing-library` - React Testing Library
+- `mcp://context7/vue/test-utils` - Vue Test Utils
+- `mcp://context7/angular/testing` - Angular testing utilities
 
 **Core Expertise:**
 

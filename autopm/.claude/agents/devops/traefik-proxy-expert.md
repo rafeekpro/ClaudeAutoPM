@@ -418,6 +418,6 @@ services:
 3. **Security Updates**: Review latest security recommendations
 
 Use these queries to access documentation:
-- `mcp://context7-docs/traefik/latest` - Traefik documentation
-- `mcp://context7-docs/traefik/docker` - Docker integration
-- `mcp://context7-docs/traefik/kubernetes` - Kubernetes setup
+- `mcp://context7/traefik/latest` - Traefik documentation
+- `mcp://context7/traefik/docker` - Docker integration
+- `mcp://context7/traefik/kubernetes` - Kubernetes setup

@@ -12,10 +12,10 @@ These are **EXAMPLES ONLY**. They are NOT automatically installed or enabled.
 
 ```bash
 # Copy a specific example to your project's .claude/mcp/ directory
-cp .claude/examples/mcp/context7-docs.md .claude/mcp/
+cp .claude/examples/mcp/context7.md .claude/mcp/
 
 # Then enable it
-autopm mcp enable context7-docs
+autopm mcp enable context7
 
 # And sync
 autopm mcp sync
@@ -42,9 +42,8 @@ autopm mcp add
 
 ## 📚 Available Examples
 
-### Context7 Servers
-- **context7-docs.md** - Documentation server for technical docs
-- **context7-codebase.md** - Codebase analysis and navigation
+### Documentation Servers
+- **context7.md** - Context7 up-to-date documentation database
 
 ### Integration Servers
 - **github-mcp.md** - GitHub repository management
@@ -77,21 +76,18 @@ Make sure to:
 
 ```bash
 # 1. Copy example
-cp .claude/examples/mcp/context7-docs.md .claude/mcp/
+cp .claude/examples/mcp/context7.md .claude/mcp/
 
-# 2. Set up environment variables
-echo "CONTEXT7_API_KEY=your-key-here" >> .claude/.env
+# 2. Enable the server
+autopm mcp enable context7
 
-# 3. Enable the server
-autopm mcp enable context7-docs
-
-# 4. Sync configuration
+# 3. Sync configuration
 autopm mcp sync
 
-# 5. Test the connection
-autopm mcp test context7-docs
+# 4. Test the connection
+autopm mcp test context7
 
-# 6. Check status
+# 5. Check status
 autopm mcp status
 ```
 

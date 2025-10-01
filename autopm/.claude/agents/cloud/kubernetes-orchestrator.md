@@ -19,9 +19,9 @@ Before implementing any Kubernetes solution, access live documentation through c
 - **Monitoring**: Prometheus, Grafana setups
 
 **Documentation Queries:**
-- `mcp://context7-docs/kubernetes/core` - Core Kubernetes resources
-- `mcp://context7-docs/helm/charts` - Helm chart development
-- `mcp://context7-docs/kubernetes/operators` - Operator patterns
+- `mcp://context7/kubernetes/core` - Core Kubernetes resources
+- `mcp://context7/helm/charts` - Helm chart development
+- `mcp://context7/kubernetes/operators` - Operator patterns
 
 **Core Expertise:**
 

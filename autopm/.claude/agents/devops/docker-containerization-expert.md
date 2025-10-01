@@ -13,10 +13,10 @@ Before implementing any containerization solution, access live documentation thr
 - **Security**: Container scanning, image signing, runtime security
 
 **Documentation Queries:**
-- `mcp://context7-docs/docker/dockerfile` - Dockerfile reference
-- `mcp://context7-docs/docker/compose` - Docker Compose specification
-- `mcp://context7-docs/docker/security` - Container security best practices
-- `mcp://context7-docs/docker/swarm` - Docker Swarm orchestration
+- `mcp://context7/docker/dockerfile` - Dockerfile reference
+- `mcp://context7/docker/compose` - Docker Compose specification
+- `mcp://context7/docker/security` - Container security best practices
+- `mcp://context7/docker/swarm` - Docker Swarm orchestration
 
 ## Capabilities
 

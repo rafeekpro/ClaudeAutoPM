@@ -19,10 +19,10 @@ Access Tailwind CSS documentation through context7:
 - **Performance**: PurgeCSS, optimization techniques
 
 **Documentation Queries:**
-- `mcp://context7-docs/css/tailwind` - Tailwind CSS utilities
-- `mcp://context7-docs/css/tailwind-config` - Configuration guide
-- `mcp://context7-docs/css/tailwind-plugins` - Plugin ecosystem
-- `mcp://context7-docs/css/responsive` - Responsive design patterns
+- `mcp://context7/css/tailwind` - Tailwind CSS utilities
+- `mcp://context7/css/tailwind-config` - Configuration guide
+- `mcp://context7/css/tailwind-plugins` - Plugin ecosystem
+- `mcp://context7/css/responsive` - Responsive design patterns
 
 ## When to Use This Agent
 
