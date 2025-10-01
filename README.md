@@ -344,6 +344,33 @@ Teams support inheritance, so specialized teams automatically include base agent
 
 ClaudeAutoPM provides comprehensive MCP management for agent-to-tool integration. **39 out of 53 agents (74%)** use MCP servers for live documentation and external tool access.
 
+### 🆕 Dynamic Server Discovery & Installation
+
+**NEW!** Discover and install MCP servers directly from npm registry:
+
+```bash
+# Search for MCP servers
+autopm mcp search filesystem
+autopm mcp search @modelcontextprotocol
+
+# Browse official servers
+autopm mcp browse --official
+
+# Install directly from npm (auto-configures everything)
+autopm mcp install @modelcontextprotocol/server-filesystem --enable
+
+# Uninstall when done
+autopm mcp uninstall filesystem
+```
+
+**Benefits:**
+- 🔍 **Search thousands** of community MCP servers
+- 📦 **One-command install** - npm package + auto-configuration
+- 🔄 **Always up-to-date** - Install latest versions
+- 🗑️ **Clean removal** - Uninstall server + npm package together
+
+**Official MCP Registry**: https://registry.modelcontextprotocol.io
+
 ### Quick Start with MCP
 
 ```bash
@@ -378,7 +405,18 @@ autopm mcp sync
 
 ### MCP Commands
 
-#### **Agent Analysis**
+#### **🔍 Discovery & Installation (NEW!)**
+```bash
+autopm mcp search <query>         # Search npm registry for MCP servers
+autopm mcp browse                 # Browse popular/official servers
+autopm mcp browse --category db   # Browse by category
+autopm mcp install <package>      # Install from npm + auto-configure
+autopm mcp install <pkg> --enable # Install and enable immediately
+autopm mcp uninstall <name>       # Remove server + npm package
+autopm mcp uninstall <name> --keep-package  # Keep npm package
+```
+
+#### **🤖 Agent Analysis**
 ```bash
 autopm mcp agents              # List agents using MCP
 autopm mcp agents --by-server  # Group by MCP server
@@ -387,7 +425,7 @@ autopm mcp usage               # Usage statistics
 autopm mcp tree                # Dependency tree
 ```
 
-#### **Configuration & Diagnostics**
+#### **⚙️ Configuration & Diagnostics**
 ```bash
 autopm mcp check               # Quick configuration check
 autopm mcp setup               # Interactive API key setup
@@ -396,13 +434,15 @@ autopm mcp test <server>       # Test server connection
 autopm mcp status              # Show servers status
 ```
 
-#### **Server Management**
+#### **📦 Server Management**
 ```bash
-autopm mcp list                # List available servers
+autopm mcp list                # List installed servers
+autopm mcp list --detailed     # List with full details
 autopm mcp info <server>       # Server details
 autopm mcp enable <server>     # Enable server
 autopm mcp disable <server>    # Disable server
 autopm mcp sync                # Sync configuration
+autopm mcp validate            # Validate all servers
 ```
 
 ### MCP Server Types
