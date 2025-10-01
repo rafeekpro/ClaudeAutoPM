@@ -7,7 +7,7 @@ const path = require('path');
 const MCPHandler = require('../../scripts/mcp-handler.js');
 
 module.exports = {
-  command: 'mcp <action> [options]',
+  command: 'mcp <action> [name]',
   describe: 'Manage MCP (Model Context Protocol) servers and configuration',
 
   builder: (yargs) => {
@@ -19,6 +19,10 @@ module.exports = {
           'list', 'add', 'remove', 'enable', 'disable', 'sync', 'validate', 'info',
           'agents', 'agent', 'usage', 'setup', 'check', 'diagnose', 'test', 'tree', 'status'
         ]
+      })
+      .positional('name', {
+        describe: 'Server or agent name (for actions that require it)',
+        type: 'string'
       })
       .option('server', {
         alias: 's',
@@ -64,27 +68,27 @@ module.exports = {
           break;
 
         case 'remove':
-          if (!argv.server && !argv._[2]) {
+          if (!argv.name && !argv.server) {
             console.error('❌ Please specify a server name: autopm mcp remove <server-name>');
             process.exit(1);
           }
-          handler.remove(argv.server || argv._[2]);
+          handler.remove(argv.name || argv.server);
           break;
 
         case 'enable':
-          if (!argv.server && !argv._[2]) {
+          if (!argv.name && !argv.server) {
             console.error('❌ Please specify a server name: autopm mcp enable <server-name>');
             process.exit(1);
           }
-          handler.enable(argv.server || argv._[2]);
+          handler.enable(argv.name || argv.server);
           break;
 
         case 'disable':
-          if (!argv.server && !argv._[2]) {
+          if (!argv.name && !argv.server) {
             console.error('❌ Please specify a server name: autopm mcp disable <server-name>');
             process.exit(1);
           }
-          handler.disable(argv.server || argv._[2]);
+          handler.disable(argv.name || argv.server);
           break;
 
         case 'sync':
@@ -96,11 +100,11 @@ module.exports = {
           break;
 
         case 'info':
-          if (!argv.server && !argv._[2]) {
+          if (!argv.name && !argv.server) {
             console.error('❌ Please specify a server name: autopm mcp info <server-name>');
             process.exit(1);
           }
-          handler.info(argv.server || argv._[2]);
+          handler.info(argv.name || argv.server);
           break;
 
         // Agent analysis commands
@@ -109,11 +113,11 @@ module.exports = {
           break;
 
         case 'agent':
-          if (!argv.agent && !argv._[2]) {
+          if (!argv.name && !argv.agent) {
             console.error('❌ Please specify an agent name: autopm mcp agent <agent-name>');
             process.exit(1);
           }
-          handler.mcpAgent(argv.agent || argv._[2]);
+          handler.mcpAgent(argv.name || argv.agent);
           break;
 
         case 'usage':
@@ -134,11 +138,11 @@ module.exports = {
           break;
 
         case 'test':
-          if (!argv.server && !argv._[2]) {
+          if (!argv.name && !argv.server) {
             console.error('❌ Please specify a server name: autopm mcp test <server-name>');
             process.exit(1);
           }
-          const result = await handler.testServer(argv.server || argv._[2]);
+          const result = await handler.testServer(argv.name || argv.server);
           if (result.success) {
             console.log(`✅ ${result.message}`);
           } else {
