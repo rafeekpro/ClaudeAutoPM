@@ -47,7 +47,7 @@ class MCPHandler {
   constructor() {
     this.projectRoot = process.cwd();
     this.frameworkRoot = path.join(__dirname, '..');
-    this.mcpDir = path.join(this.frameworkRoot, 'autopm', '.claude', 'mcp');
+    this.mcpDir = path.join(this.projectRoot, '.claude', 'mcp');
     this.configPath = path.join(this.projectRoot, '.claude', 'config.json');
     this.mcpServersPath = path.join(this.projectRoot, '.claude', 'mcp-servers.json');
     this.envPath = path.join(this.projectRoot, '.claude', '.env');
