@@ -294,7 +294,7 @@ describe('PostInstallChecker', () => {
       fs.mkdirSync('.claude', { recursive: true });
       const config = {
         mcp: {
-          activeServers: ['context7-docs', 'github-mcp']
+          activeServers: ['context7', 'github-mcp']
         }
       };
       checker.config = config;
@@ -501,7 +501,7 @@ describe('PostInstallChecker', () => {
       const config = {
         provider: 'github',
         github: { token: 'test-token' },
-        mcp: { activeServers: ['context7-docs'] }
+        mcp: { activeServers: ['context7'] }
       };
       fs.writeFileSync(
         path.join('.claude', 'config.json'),

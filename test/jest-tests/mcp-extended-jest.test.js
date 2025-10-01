@@ -79,14 +79,14 @@ describe('MCP Handler - Extended Features (TDD)', () => {
       // Create mock agent files with MCP references
       const agentsDir = handler.agentsDir;
 
-      // Agent using context7-docs
+      // Agent using context7
       fs.writeFileSync(
         path.join(agentsDir, 'react-frontend.md'),
         `---
 name: react-frontend-engineer
 ---
-Use mcp://context7-docs/react/latest for documentation.
-Access via mcp://context7-docs/typescript/react for types.
+Use mcp://context7/react/latest for documentation.
+Access via mcp://context7/typescript/react for types.
 `
       );
 
@@ -96,8 +96,8 @@ Access via mcp://context7-docs/typescript/react for types.
         `---
 name: python-backend-engineer
 ---
-Documentation: mcp://context7-docs/python/fastapi
-Codebase: mcp://context7-codebase/project/analyze
+Documentation: mcp://context7/python/fastapi
+Codebase: mcp://context7/project/analyze
 Database: mcp://sqlite-mcp/query
 `
       );
@@ -114,9 +114,9 @@ This agent does not use MCP.
 
       // Create MCP server definitions
       fs.writeFileSync(
-        path.join(handler.mcpDir, 'context7-docs.md'),
+        path.join(handler.mcpDir, 'context7.md'),
         `---
-name: context7-docs
+name: context7
 category: documentation
 status: active
 ---
@@ -153,11 +153,11 @@ status: active
       const result = handler.analyzeAgents();
 
       expect(result.mcpUsage).toHaveProperty('react-frontend-engineer');
-      expect(result.mcpUsage['react-frontend-engineer']).toContain('context7-docs');
+      expect(result.mcpUsage['react-frontend-engineer']).toContain('context7');
 
       expect(result.mcpUsage).toHaveProperty('python-backend-engineer');
-      expect(result.mcpUsage['python-backend-engineer']).toContain('context7-docs');
-      expect(result.mcpUsage['python-backend-engineer']).toContain('context7-codebase');
+      expect(result.mcpUsage['python-backend-engineer']).toContain('context7');
+      expect(result.mcpUsage['python-backend-engineer']).toContain('context7');
       expect(result.mcpUsage['python-backend-engineer']).toContain('sqlite-mcp');
     });
 
@@ -176,7 +176,7 @@ status: active
         `---
 name: nestjs-expert
 ---
-Use mcp://context7-docs/nestjs for documentation.
+Use mcp://context7/nestjs for documentation.
 `
       );
 
@@ -207,7 +207,7 @@ Use mcp://unknown-server/path (unknown server).
       const result = handler.analyzeAgents();
 
       expect(result.mcpUsage['python-backend-engineer']).toEqual(
-        expect.arrayContaining(['context7-docs', 'context7-codebase', 'sqlite-mcp'])
+        expect.arrayContaining(['context7', 'context7', 'sqlite-mcp'])
       );
     });
 
@@ -237,8 +237,8 @@ Use mcp://unknown-server/path (unknown server).
         `---
 name: react-frontend-engineer
 ---
-Use mcp://context7-docs/react/latest
-Access mcp://context7-docs/typescript/react
+Use mcp://context7/react/latest
+Access mcp://context7/typescript/react
 `
       );
     });
@@ -254,7 +254,7 @@ Access mcp://context7-docs/typescript/react
 
       expect(result.found).toBe(true);
       expect(result.agentName).toBe('react-frontend-engineer');
-      expect(result.mcpServers).toContain('context7-docs');
+      expect(result.mcpServers).toContain('context7');
     });
 
     test('should return empty result for non-existent agent', () => {
@@ -283,9 +283,9 @@ This agent has no MCP references.
     test('should include MCP server details when available', () => {
       // Create MCP server definition
       fs.writeFileSync(
-        path.join(handler.mcpDir, 'context7-docs.md'),
+        path.join(handler.mcpDir, 'context7.md'),
         `---
-name: context7-docs
+name: context7
 category: documentation
 description: Context7 documentation server
 status: active
@@ -300,7 +300,7 @@ args: ["@context7/mcp-server"]
       expect(result).toHaveProperty('serverDetails');
       expect(result.serverDetails[0]).toHaveProperty('name');
       expect(result.serverDetails[0]).toHaveProperty('category');
-      expect(result.serverDetails[0].name).toBe('context7-docs');
+      expect(result.serverDetails[0].name).toBe('context7');
     });
   });
 
@@ -312,7 +312,7 @@ args: ["@context7/mcp-server"]
         `---
 name: react-frontend-engineer
 ---
-Use mcp://context7-docs/react
+Use mcp://context7/react
 `
       );
 
@@ -321,7 +321,7 @@ Use mcp://context7-docs/react
         `---
 name: python-backend-engineer
 ---
-Use mcp://context7-docs/python
+Use mcp://context7/python
 Use mcp://sqlite-mcp/query
 `
       );
@@ -337,7 +337,7 @@ Use mcp://sqlite-mcp/query
 
       expect(output).toContain('react-frontend-engineer');
       expect(output).toContain('python-backend-engineer');
-      expect(output).toContain('context7-docs');
+      expect(output).toContain('context7');
     });
 
     test('should show message when no agents use MCP', () => {
@@ -364,7 +364,7 @@ Use mcp://sqlite-mcp/query
       const output = consoleLogSpy.mock.calls.map(call => call[0]).join('\n');
 
       // Should show MCP servers as headers
-      expect(output).toContain('context7-docs');
+      expect(output).toContain('context7');
       expect(output).toContain('sqlite-mcp');
     });
   });
@@ -377,15 +377,15 @@ Use mcp://sqlite-mcp/query
 name: react-frontend-engineer
 description: React development expert
 ---
-Use mcp://context7-docs/react/latest for documentation.
+Use mcp://context7/react/latest for documentation.
 `
       );
 
       // Create MCP server def
       fs.writeFileSync(
-        path.join(handler.mcpDir, 'context7-docs.md'),
+        path.join(handler.mcpDir, 'context7.md'),
         `---
-name: context7-docs
+name: context7
 category: documentation
 command: npx
 args: ["@context7/mcp-server"]
@@ -400,7 +400,7 @@ env:
         handler.configPath,
         JSON.stringify({
           mcp: {
-            activeServers: ['context7-docs']
+            activeServers: ['context7']
           }
         }, null, 2)
       );
@@ -415,7 +415,7 @@ env:
       const output = consoleLogSpy.mock.calls.map(call => call[0]).join('\n');
 
       expect(output).toContain('react-frontend-engineer');
-      expect(output).toContain('context7-docs');
+      expect(output).toContain('context7');
     });
 
     test('should show if MCP servers are active or inactive', () => {
@@ -423,8 +423,8 @@ env:
 
       const output = consoleLogSpy.mock.calls.map(call => call[0]).join(' ');
 
-      // context7-docs is active
-      expect(output).toMatch(/context7-docs|active/i);
+      // context7 is active
+      expect(output).toMatch(/context7|active/i);
     });
 
     test('should show error for non-existent agent', () => {
@@ -466,17 +466,17 @@ No MCP usage here.
       // Create multiple agents
       fs.writeFileSync(
         path.join(handler.agentsDir, 'react-frontend.md'),
-        'Use mcp://context7-docs/react\n'
+        'Use mcp://context7/react\n'
       );
 
       fs.writeFileSync(
         path.join(handler.agentsDir, 'python-backend.md'),
-        'Use mcp://context7-docs/python\nUse mcp://sqlite-mcp/query\n'
+        'Use mcp://context7/python\nUse mcp://sqlite-mcp/query\n'
       );
 
       fs.writeFileSync(
         path.join(handler.agentsDir, 'nodejs-backend.md'),
-        'Use mcp://context7-docs/nodejs\n'
+        'Use mcp://context7/nodejs\n'
       );
     });
 
@@ -488,7 +488,7 @@ No MCP usage here.
       expect(consoleLogSpy).toHaveBeenCalled();
       const output = consoleLogSpy.mock.calls.map(call => call[0]).join('\n');
 
-      expect(output).toContain('context7-docs');
+      expect(output).toContain('context7');
       expect(output).toContain('sqlite-mcp');
     });
 
@@ -497,8 +497,8 @@ No MCP usage here.
 
       const output = consoleLogSpy.mock.calls.map(call => call[0]).join('\n');
 
-      // context7-docs is used by 3 agents
-      expect(output).toMatch(/context7-docs.*3/);
+      // context7 is used by 3 agents
+      expect(output).toMatch(/context7.*3/);
       // sqlite-mcp is used by 1 agent
       expect(output).toMatch(/sqlite-mcp.*1/);
     });
@@ -524,16 +524,16 @@ No MCP usage here.
         handler.configPath,
         JSON.stringify({
           mcp: {
-            activeServers: ['context7-docs', 'github-mcp']
+            activeServers: ['context7', 'github-mcp']
           }
         }, null, 2)
       );
 
       // Create MCP server definitions
       fs.writeFileSync(
-        path.join(handler.mcpDir, 'context7-docs.md'),
+        path.join(handler.mcpDir, 'context7.md'),
         `---
-name: context7-docs
+name: context7
 env:
   CONTEXT7_API_KEY: "\${CONTEXT7_API_KEY:-}"
   CONTEXT7_WORKSPACE: "\${CONTEXT7_WORKSPACE:-}"
@@ -645,16 +645,16 @@ env:
         handler.configPath,
         JSON.stringify({
           mcp: {
-            activeServers: ['context7-docs', 'broken-server']
+            activeServers: ['context7', 'broken-server']
           }
         }, null, 2)
       );
 
       // Create MCP server that exists
       fs.writeFileSync(
-        path.join(handler.mcpDir, 'context7-docs.md'),
+        path.join(handler.mcpDir, 'context7.md'),
         `---
-name: context7-docs
+name: context7
 command: npx
 args: ["@context7/mcp-server"]
 env:
@@ -749,9 +749,9 @@ env:
   describe('testServer() - Test MCP Server Connection', () => {
     beforeEach(() => {
       fs.writeFileSync(
-        path.join(handler.mcpDir, 'context7-docs.md'),
+        path.join(handler.mcpDir, 'context7.md'),
         `---
-name: context7-docs
+name: context7
 command: npx
 args: ["@context7/mcp-server"]
 env:
@@ -764,7 +764,7 @@ env:
     test('should test specific MCP server', async () => {
       expect(handler.testServer).toBeDefined();
 
-      const result = await handler.testServer('context7-docs');
+      const result = await handler.testServer('context7');
 
       expect(result).toHaveProperty('serverName');
       expect(result).toHaveProperty('success');
@@ -779,15 +779,15 @@ env:
     });
 
     test('should check required environment variables', async () => {
-      // context7-docs requires CONTEXT7_API_KEY which is not set in test env
-      const result = await handler.testServer('context7-docs');
+      // context7 requires CONTEXT7_API_KEY which is not set in test env
+      const result = await handler.testServer('context7');
 
       // In test environment, CONTEXT7_API_KEY should be missing
       expect(result.message).toMatch(/missing.*environment|server configuration/i);
     });
 
     test('should validate server command accessibility', async () => {
-      const result = await handler.testServer('context7-docs');
+      const result = await handler.testServer('context7');
 
       expect(result).toHaveProperty('commandCheck');
     });
@@ -805,12 +805,12 @@ env:
 
       fs.writeFileSync(
         path.join(handler.agentsDir, 'frontend', 'react-engineer.md'),
-        'Use mcp://context7-docs/react\n'
+        'Use mcp://context7/react\n'
       );
 
       fs.writeFileSync(
         path.join(handler.agentsDir, 'backend', 'python-engineer.md'),
-        'Use mcp://context7-docs/python\nUse mcp://sqlite-mcp/query\n'
+        'Use mcp://context7/python\nUse mcp://sqlite-mcp/query\n'
       );
     });
 
@@ -837,7 +837,7 @@ env:
       const tree = handler.generateTree();
 
       const reactEdge = tree.edges.find(
-        e => e.from === 'react-engineer' && e.to === 'context7-docs'
+        e => e.from === 'react-engineer' && e.to === 'context7'
       );
       expect(reactEdge).toBeDefined();
     });
@@ -870,16 +870,16 @@ env:
         handler.configPath,
         JSON.stringify({
           mcp: {
-            activeServers: ['context7-docs']
+            activeServers: ['context7']
           }
         }, null, 2)
       );
 
       // Create MCP servers
       fs.writeFileSync(
-        path.join(handler.mcpDir, 'context7-docs.md'),
+        path.join(handler.mcpDir, 'context7.md'),
         `---
-name: context7-docs
+name: context7
 status: active
 ---
 `
@@ -909,7 +909,7 @@ status: active
       expect(consoleLogSpy).toHaveBeenCalled();
       const output = consoleLogSpy.mock.calls.map(call => call[0]).join('\n');
 
-      expect(output).toContain('context7-docs');
+      expect(output).toContain('context7');
       expect(output).toContain('github-mcp');
     });
 
@@ -918,8 +918,8 @@ status: active
 
       const output = consoleLogSpy.mock.calls.map(call => call[0]).join('\n');
 
-      // context7-docs is enabled (✅)
-      expect(output).toMatch(/context7-docs.*✅|enabled/i);
+      // context7 is enabled (✅)
+      expect(output).toMatch(/context7.*✅|enabled/i);
       // github-mcp is not enabled (⚪)
       expect(output).toMatch(/github-mcp.*⚪|disabled/i);
     });
@@ -959,17 +959,17 @@ env:
     });
 
     test('should show agent usage count per server', () => {
-      // Create agent using context7-docs
+      // Create agent using context7
       fs.writeFileSync(
         path.join(handler.agentsDir, 'test-agent.md'),
-        'Use mcp://context7-docs/test\n'
+        'Use mcp://context7/test\n'
       );
 
       handler.showStatus();
 
       const output = consoleLogSpy.mock.calls.map(call => call[0]).join(' ');
 
-      expect(output).toMatch(/context7-docs|agent/i);
+      expect(output).toMatch(/context7|agent/i);
     });
   });
 
