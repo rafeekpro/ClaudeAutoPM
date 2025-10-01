@@ -7,6 +7,87 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.12] - 2025-10-01
+
+### ✨ Enhancement: Post-Configuration Guidance
+
+**Added comprehensive next steps after MCP configuration commands**
+
+Users now receive clear, actionable guidance after running:
+- `autopm mcp enable <server>`
+- `autopm mcp add`
+- `autopm mcp sync`
+
+### 🎯 What Changed
+
+**New `showNextSteps()` method in MCPHandler:**
+- Shows step-by-step instructions after configuration
+- Lists required environment variables with examples
+- Provides API key sources and documentation links
+- Reminds users to restart Claude Code and verify servers
+
+### 📋 Example Output
+
+**After `autopm mcp enable context7-docs`:**
+```
+✅ Server 'context7-docs' enabled
+
+📋 Next Steps:
+
+1. Run sync to update configuration:
+   autopm mcp sync
+
+2. Configure required environment variables in .claude/.env:
+   CONTEXT7_API_KEY=ctx7_1234567890abcdef
+   CONTEXT7_WORKSPACE=my-workspace-id
+
+3. Restart Claude Code to load the server
+
+4. Verify server status:
+   /mcp (in Claude Code)
+
+💡 API Key Information:
+   → Sign up at https://context7.com and get API key from dashboard
+```
+
+**After `autopm mcp sync`:**
+```
+✅ Configuration synced...
+
+📋 Next Steps:
+
+1. Restart Claude Code to load the updated configuration
+
+2. Verify servers are running:
+   /mcp (in Claude Code)
+
+⚠️  Some servers require environment variables:
+
+   ❌ CONTEXT7_API_KEY
+
+3. Configure missing variables in .claude/.env
+
+4. Check configuration:
+   autopm mcp check
+```
+
+### 🎁 User Experience Improvement
+
+**Before v1.13.12:**
+- Commands completed silently
+- No guidance on what to do next
+- Users left confused about how to proceed
+
+**After v1.13.12:**
+- Clear step-by-step instructions
+- Environment variable examples
+- Links to credential sources
+- Verification commands
+
+### 🔄 Impact
+
+This addresses user feedback: *"po dodaniu konfiguracji autopm mcp nie mialem zadnej informacji na temat uruchomienia sync ani innych krokow"*
+
 ## [1.13.11] - 2025-10-01
 
 ### 🐛 Bug Fix: Corrected Playwright MCP Package Name
