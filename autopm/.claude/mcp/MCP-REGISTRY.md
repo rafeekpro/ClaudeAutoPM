@@ -20,11 +20,6 @@ Example MCP server configurations are available in `.claude/examples/mcp/`:
 **Use Cases**: E2E testing, visual testing, browser automation
 **Example**: `.claude/examples/mcp/playwright-mcp.md`
 
-### github-mcp
-**Description**: GitHub MCP server for repository management
-**Use Cases**: Issue tracking, PR management, repository analysis
-**Example**: `.claude/examples/mcp/github-mcp.md`
-
 ### filesystem-mcp
 **Description**: Local filesystem access server
 **Use Cases**: File operations, directory navigation, content management
@@ -101,7 +96,7 @@ autopm mcp add
 cp .claude/examples/mcp/context7.md .claude/mcp/
 
 # Or from installed framework
-cp /path/to/framework/autopm/.claude/examples/mcp/github-mcp.md .claude/mcp/
+cp /path/to/framework/autopm/.claude/examples/mcp/playwright-mcp.md .claude/mcp/
 ```
 
 ### ✅ Enabling/Disabling Servers

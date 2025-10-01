@@ -1,32 +1,14 @@
 {
   "mcpServers": {
-    "context7-docs": {
+    "context7": {
       "command": "npx",
       "args": [
-        "@context7/mcp-server"
+        "-y",
+        "@upstash/context7-mcp"
       ],
       "env": {
-        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY:-}",
-        "CONTEXT7_MCP_URL": "https://mcp.context7.com/mcp",
-        "CONTEXT7_API_URL": "https://context7.com/api/v1",
-        "CONTEXT7_WORKSPACE": "default",
-        "CONTEXT7_MODE": "documentation"
-      },
-      "envFile": ".claude/.env"
-    },
-    "context7-codebase": {
-      "command": "npx",
-      "args": [
-        "@context7/mcp-server"
-      ],
-      "env": {
-        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY:-}",
-        "CONTEXT7_MCP_URL": "${CONTEXT7_MCP_URL:-https://mcp.context7.com/mcp}",
-        "CONTEXT7_API_URL": "${CONTEXT7_API_URL:-https://context7.com/api/v1}",
-        "CONTEXT7_WORKSPACE": "${CONTEXT7_WORKSPACE:-}",
-        "CONTEXT7_MODE": "codebase"
-      },
-      "envFile": ".claude/.env"
+        "DEFAULT_MINIMUM_TOKENS": "${DEFAULT_MINIMUM_TOKENS:-10000}"
+      }
     },
     "playwright-mcp": {
       "command": "npx",
@@ -37,17 +19,6 @@
         "PLAYWRIGHT_BROWSER": "chromium",
         "PLAYWRIGHT_HEADLESS": "true"
       }
-    },
-    "github-mcp": {
-      "command": "npx",
-      "args": [
-        "@modelcontextprotocol/server-github"
-      ],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN:-}",
-        "GITHUB_API_URL": "https://api.github.com"
-      },
-      "envFile": ".claude/.env"
     }
   },
   "contextPools": {
@@ -58,7 +29,7 @@
         "mcp-context-manager"
       ],
       "sources": [
-        "context7-docs"
+        "context7"
       ],
       "filters": [
         "fastapi",
@@ -78,7 +49,7 @@
         "mcp-context-manager"
       ],
       "sources": [
-        "context7-docs"
+        "context7"
       ],
       "filters": [
         "azure-devops",
@@ -97,7 +68,7 @@
         "playwright-test-engineer"
       ],
       "sources": [
-        "context7-docs"
+        "context7"
       ],
       "filters": [
         "react",
@@ -118,7 +89,7 @@
         "aws-cloud-architect"
       ],
       "sources": [
-        "context7-docs"
+        "context7"
       ],
       "filters": [
         "terraform",
@@ -138,8 +109,7 @@
         "azure-devops-specialist"
       ],
       "sources": [
-        "context7-docs",
-        "github-mcp"
+        "context7"
       ],
       "filters": [
         "github-actions",
@@ -178,7 +148,7 @@
         "code-analyzer"
       ],
       "sources": [
-        "context7-codebase"
+        "context7"
       ],
       "maxSize": "300MB",
       "retention": "30d",
