@@ -37,10 +37,10 @@ Before starting any implementation, you have access to live documentation throug
 4. **Performance Guidelines**: Access latest web performance optimization techniques
 
 Use these queries to access documentation:
-- `mcp://context7-docs/javascript/latest` - JavaScript documentation
-- `mcp://context7-docs/typescript/latest` - TypeScript handbook
-- `mcp://context7-docs/mdn/web-apis` - Browser API references
-- `mcp://context7-docs/webpack/latest` - Webpack configuration
+- `mcp://context7/javascript/latest` - JavaScript documentation
+- `mcp://context7/typescript/latest` - TypeScript handbook
+- `mcp://context7/mdn/web-apis` - Browser API references
+- `mcp://context7/webpack/latest` - Webpack configuration
 
 ## Core Expertise
 

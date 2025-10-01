@@ -1067,6 +1067,6 @@ sign_user_key() {
 3. **Configuration Examples**: Review advanced SSH configurations
 
 Use these queries to access documentation:
-- `mcp://context7-docs/openssh/latest` - OpenSSH documentation
-- `mcp://context7-docs/ssh/security` - SSH security hardening
-- `mcp://context7-docs/ssh/tunneling` - Advanced tunneling techniques
+- `mcp://context7/openssh/latest` - OpenSSH documentation
+- `mcp://context7/ssh/security` - SSH security hardening
+- `mcp://context7/ssh/tunneling` - Advanced tunneling techniques

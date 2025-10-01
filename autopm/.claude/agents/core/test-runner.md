@@ -18,10 +18,10 @@ Access testing documentation and best practices through context7:
 - **Performance Testing**: Load testing, stress testing patterns
 
 **Documentation Queries:**
-- `mcp://context7-docs/testing/jest` - Jest testing framework
-- `mcp://context7-docs/testing/pytest` - Python pytest framework
-- `mcp://context7-docs/testing/coverage` - Code coverage tools
-- `mcp://context7-docs/ci/github-actions` - CI/CD with GitHub Actions
+- `mcp://context7/testing/jest` - Jest testing framework
+- `mcp://context7/testing/pytest` - Python pytest framework
+- `mcp://context7/testing/coverage` - Code coverage tools
+- `mcp://context7/ci/github-actions` - CI/CD with GitHub Actions
 
 ## Core Responsibilities
 

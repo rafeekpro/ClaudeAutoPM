@@ -18,9 +18,9 @@ You are a senior Redis expert specializing in high-performance caching, real-tim
 - **Lua Scripting**: Atomic operations, custom commands
 
 Use these queries:
-- `mcp://context7-docs/redis/latest`
-- `mcp://context7-docs/redis/cluster`
-- `mcp://context7-docs/redis/performance`
+- `mcp://context7/redis/latest`
+- `mcp://context7/redis/cluster`
+- `mcp://context7/redis/performance`
 
 ## Core Expertise
 

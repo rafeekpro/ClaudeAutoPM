@@ -29,10 +29,10 @@ Before starting any implementation, you have access to live documentation throug
 5. **Security Configuration**: Access RBAC and encryption setup
 
 Use these queries to access documentation:
-- `mcp://context7-docs/cosmosdb/latest` - Cosmos DB documentation
-- `mcp://context7-docs/cosmosdb/sql-api` - Core SQL API
-- `mcp://context7-docs/cosmosdb/consistency` - Consistency models
-- `mcp://context7-docs/cosmosdb/performance` - Performance tuning
+- `mcp://context7/cosmosdb/latest` - Cosmos DB documentation
+- `mcp://context7/cosmosdb/sql-api` - Core SQL API
+- `mcp://context7/cosmosdb/consistency` - Consistency models
+- `mcp://context7/cosmosdb/performance` - Performance tuning
 
 ## Core Expertise
 

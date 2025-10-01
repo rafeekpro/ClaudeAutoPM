@@ -18,10 +18,10 @@ Access parallel processing and concurrency documentation:
 - **Patterns**: Map-reduce, pipeline, producer-consumer
 
 **Documentation Queries:**
-- `mcp://context7-docs/concurrency/patterns` - Concurrency patterns
-- `mcp://context7-docs/parallel/workers` - Worker pool management
-- `mcp://context7-docs/parallel/queues` - Task queue systems
-- `mcp://context7-docs/parallel/optimization` - Performance tuning
+- `mcp://context7/concurrency/patterns` - Concurrency patterns
+- `mcp://context7/parallel/workers` - Worker pool management
+- `mcp://context7/parallel/queues` - Task queue systems
+- `mcp://context7/parallel/optimization` - Performance tuning
 
 
 ## Core Responsibilities

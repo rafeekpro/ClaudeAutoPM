@@ -20,10 +20,10 @@ Access UX design and accessibility documentation:
 - **Tools**: Figma, Sketch, design tokens, component libraries
 
 **Documentation Queries:**
-- `mcp://context7-docs/design/material` - Material Design guidelines
-- `mcp://context7-docs/design/accessibility` - Accessibility standards
-- `mcp://context7-docs/design/patterns` - UX design patterns
-- `mcp://context7-docs/design/systems` - Design system principles
+- `mcp://context7/design/material` - Material Design guidelines
+- `mcp://context7/design/accessibility` - Accessibility standards
+- `mcp://context7/design/patterns` - UX design patterns
+- `mcp://context7/design/systems` - Design system principles
 
 
 ## Core Expertise
