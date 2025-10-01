@@ -11,6 +11,7 @@ Complete list of available /pm: commands in ClaudeAutoPM framework.
 - [Context Management](#context-management)
 - [Project Maintenance](#project-maintenance)
 - [Agent Team Management](#agent-team-management-team)
+- [Configuration Management](#configuration-management)
 - [MCP Management](#mcp-management)
 - [Provider-Specific](#provider-specific)
 
@@ -390,6 +391,100 @@ or when no team is active:
 
 **Team configuration:**
 Teams are defined in `.claude/teams.json` file. You can add custom teams or modify existing ones.
+
+## Configuration Management
+
+### `autopm validate`
+Comprehensive configuration status check
+
+```bash
+autopm validate
+```
+
+**What it checks:**
+- ✅ `.claude` directory and structure
+- ✅ Configuration file (`config.json`)
+- ✅ Provider setup (GitHub or Azure DevOps)
+- ✅ Git repository initialization
+- ⚪ MCP server configuration
+- ⚪ Git hooks installation
+- ⚪ Node.js version compatibility
+
+**Example output:**
+```
+╔════════════════════════════════════════════════════════════════╗
+║         🔍 ClaudeAutoPM Configuration Status                  ║
+╚════════════════════════════════════════════════════════════════╝
+
+📋 Essential Components:
+
+✅ .claude directory         OK         Framework installed
+✅ Configuration file        OK         Provider: github
+✅ Provider setup            OK         Configured: user/repo
+✅ Git repository            OK         Initialized
+
+🔧 Optional Components:
+
+✅   └─ agents/              Present
+✅   └─ commands/            Present
+✅   └─ rules/               Present
+✅   └─ scripts/             Present
+✅ MCP Servers               4 server(s) configured
+✅ MCP Environment           Environment file exists
+✅ Git hooks                 Installed
+✅ Node.js version           v22.19.0 (supported)
+
+──────────────────────────────────────────────────────────────────────
+
+✅ All essential components are configured!
+
+🚀 Ready to start! Try:
+
+   claude --dangerously-skip-permissions .
+   /pm:validate
+```
+
+**When to use:**
+- After installation to verify setup
+- Before starting development
+- When troubleshooting configuration issues
+- To check if all required tools are available
+
+**Next steps shown when issues found:**
+- Missing provider configuration → `autopm config set provider github|azure`
+- Missing GitHub token → Set `GITHUB_TOKEN` environment variable
+- Missing MCP setup → `autopm mcp check`
+
+### `autopm config show`
+Display current configuration
+
+```bash
+autopm config show
+```
+
+### `autopm config set <key> <value>`
+Configure project settings
+
+```bash
+autopm config set provider github
+autopm config set github.owner <username>
+autopm config set github.repo <repository>
+```
+
+### `autopm config validate`
+Validate configuration settings
+
+```bash
+autopm config validate
+```
+
+### `autopm config switch <provider>`
+Quick switch between providers
+
+```bash
+autopm config switch github
+autopm config switch azure
+```
 
 ## MCP Management
 

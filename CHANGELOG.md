@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.2] - 2025-10-01
+
+### 🐛 Fixed
+- **MCP Command Argument Parsing**
+  - Fixed `autopm mcp enable <server-name>` not accepting server name as positional argument
+  - Changed command signature from `mcp <action> [options]` to `mcp <action> [name]`
+  - Added proper positional argument handling for server and agent names
+  - All MCP commands now correctly parse server/agent names from command line
+  - Maintains backward compatibility with `--server` and `--agent` flags
+
+### 🛠️ Enhanced
+- **Post-Installation Validation**
+  - Added automatic configuration check after `autopm install`
+  - New `autopm validate` command for comprehensive setup verification
+  - Visual status display shows Essential and Optional components
+  - Actionable next steps when configuration is incomplete
+  - Checks: `.claude` directory, config file, provider setup, MCP servers, git hooks, Node.js version
+
 ## [1.13.1] - 2025-10-01
 
 ### 📚 Documentation

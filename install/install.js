@@ -797,6 +797,18 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
     }
   }
 
+  async runPostInstallCheck() {
+    const PostInstallChecker = require('./post-install-check.js');
+    const checker = new PostInstallChecker();
+
+    try {
+      await checker.runAllChecks();
+    } catch (error) {
+      this.printWarning(`Configuration check failed: ${error.message}`);
+      console.log('You can run the check later with: autopm config validate\n');
+    }
+  }
+
   async run() {
     // Handle help and version
     if (this.options.help) {
@@ -852,14 +864,8 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
     this.printMsg('GREEN', '╚══════════════════════════════════════════╝');
     console.log('');
 
-    this.printSuccess('ClaudeAutoPM has been installed successfully!');
-    console.log('');
-    this.printStep('Next steps:');
-    console.log('  1. Review CLAUDE.md for project configuration');
-    console.log('  2. Run: ./scripts/setup-hooks.sh to setup git hooks');
-    console.log('  3. Open Claude Code in this directory');
-    console.log('  4. In Claude, run: /pm:validate');
-    console.log('');
+    // Run post-installation configuration check
+    await this.runPostInstallCheck();
 
     process.exit(0);
   }
