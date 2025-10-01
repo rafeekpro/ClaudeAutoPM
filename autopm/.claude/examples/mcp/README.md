@@ -25,7 +25,7 @@ autopm mcp sync
 
 ```bash
 # Copy and modify
-cp .claude/examples/mcp/github-mcp.md .claude/mcp/my-custom-server.md
+cp .claude/examples/mcp/playwright-mcp.md .claude/mcp/my-custom-server.md
 nano .claude/mcp/my-custom-server.md
 
 # Enable and sync
@@ -46,7 +46,6 @@ autopm mcp add
 - **context7.md** - Context7 up-to-date documentation database
 
 ### Integration Servers
-- **github-mcp.md** - GitHub repository management
 - **filesystem-mcp.md** - Local filesystem operations
 
 ### Testing Servers

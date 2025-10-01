@@ -194,11 +194,11 @@ autopm mcp enable playwright-mcp
 # Set up visual testing baselines
 ```
 
-### GitHub Integration
+### Playwright Testing
 ```bash
-autopm mcp enable github-mcp
-# Configure PAT token
-# Set default repository
+autopm mcp enable playwright-mcp
+# Configure browser automation
+# Set test defaults
 ```
 
 ## Metrics and Monitoring
