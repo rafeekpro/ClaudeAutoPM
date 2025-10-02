@@ -339,6 +339,63 @@ ${this.colors.BOLD}Examples:${this.colors.NC}
         this.printSuccess(`Installed ${script}`);
       }
     }
+
+    // Install package.json if it doesn't exist
+    const packageJsonPath = path.join(this.targetDir, 'package.json');
+    const packageJsonTemplatePath = path.join(this.autopmDir, 'scripts', 'package.json.template');
+
+    if (!fs.existsSync(packageJsonPath) && fs.existsSync(packageJsonTemplatePath)) {
+      this.printStep('Creating package.json from template...');
+      const templateContent = fs.readFileSync(packageJsonTemplatePath, 'utf-8');
+
+      // Try to get project name from directory
+      const projectName = path.basename(this.targetDir);
+
+      // Parse template and add name field
+      const packageJson = JSON.parse(templateContent);
+      packageJson.name = projectName;
+      packageJson.version = packageJson.version || '1.0.0';
+      packageJson.description = packageJson.description || '';
+      packageJson.main = packageJson.main || 'index.js';
+      packageJson.license = packageJson.license || 'ISC';
+
+      fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf-8');
+      this.printSuccess('Created package.json');
+    } else if (fs.existsSync(packageJsonPath)) {
+      this.printInfo('package.json already exists, skipping');
+    }
+  }
+
+  installDependencies() {
+    const packageJsonPath = path.join(this.targetDir, 'package.json');
+
+    if (!fs.existsSync(packageJsonPath)) {
+      this.printInfo('No package.json found, skipping dependency installation');
+      return;
+    }
+
+    this.printStep('Installing npm dependencies...');
+
+    try {
+      // Check if package.json has dependencies
+      const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+      if (!packageJson.dependencies || Object.keys(packageJson.dependencies).length === 0) {
+        this.printInfo('No dependencies to install');
+        return;
+      }
+
+      // Run npm install
+      execSync('npm install', {
+        cwd: this.targetDir,
+        encoding: 'utf-8',
+        stdio: 'inherit'
+      });
+
+      this.printSuccess('Dependencies installed successfully');
+    } catch (error) {
+      this.printWarning(`Failed to install dependencies: ${error.message}`);
+      this.printInfo('You can manually run: npm install');
+    }
   }
 
   checkToolAvailability() {
@@ -902,6 +959,9 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
     if (this.options.setupHooks) {
       await this.setupGitHooks();
     }
+
+    // Install npm dependencies
+    this.installDependencies();
 
     // Final success message
     console.log('');
