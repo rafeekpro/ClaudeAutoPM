@@ -180,6 +180,8 @@ function main() {
     .command(require('./commands/config'))
     // MCP management command
     .command(require('./commands/mcp'))
+    // Epic management command
+    .command(require('./commands/epic'))
     // Validation command
     .command('validate', 'Validate ClaudeAutoPM configuration and setup',
       (yargs) => {
