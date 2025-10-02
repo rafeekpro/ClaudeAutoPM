@@ -269,6 +269,165 @@ autopm pm:epic-sync user-auth
 
 **That's it!** You're now using structured, spec-driven development with AI agents.
 
+## 📋 Complete PM Workflow Guide
+
+### Understanding the Process: PRD → Epic → Tasks
+
+ClaudeAutoPM follows a structured workflow from requirements to implementation:
+
+```
+PRD (Product Requirements)
+  ↓
+Epic Split (Optional - for complex projects)
+  ↓
+Task Decomposition
+  ↓
+GitHub/Azure Sync
+  ↓
+Development & Tracking
+```
+
+### Quick Decision Guide
+
+**When to use ONE epic (`/pm:epic-decompose`):**
+- ✅ Simple feature (1-2 weeks)
+- ✅ Single component (frontend OR backend)
+- ✅ One developer
+- ✅ Examples: "Add user profile page", "Create REST API endpoint"
+
+**When to use MULTIPLE epics (`/pm:epic-split`):**
+- ✅ Complex project (2+ months)
+- ✅ Multiple components (frontend + backend + infrastructure)
+- ✅ Multiple teams working in parallel
+- ✅ Examples: "E-commerce platform", "Social media dashboard"
+
+### Workflow Examples
+
+<details>
+<summary><b>Simple Feature Workflow</b> - Single epic, quick delivery</summary>
+
+```bash
+# 1. Create PRD
+/pm:prd-new user-profile
+
+# 2. Parse and analyze
+/pm:prd-parse user-profile
+
+# 3. Decompose into tasks (ONE epic)
+/pm:epic-decompose user-profile
+# Creates: .claude/epics/user-profile/
+#   ├── epic.md
+#   ├── 001.md  # Create profile component
+#   ├── 002.md  # Add avatar upload
+#   ├── 003.md  # Implement edit form
+#   └── 004.md  # Add validation
+
+# 4. Sync with GitHub/Azure
+/pm:epic-sync user-profile
+
+# 5. Start working
+/pm:next                    # Get next task
+/pm:issue-start #123        # Begin work
+# ... development ...
+/pm:issue-close #123        # Complete task
+```
+</details>
+
+<details>
+<summary><b>Complex Project Workflow</b> - Multiple epics, phased delivery</summary>
+
+```bash
+# 1. Create PRD
+/pm:prd-new ecommerce-platform
+
+# 2. Parse and analyze
+/pm:prd-parse ecommerce-platform
+
+# 3. Split into multiple epics (AUTOMATIC)
+/pm:epic-split ecommerce-platform
+# Automatically creates 6 epics:
+#   Epic 1: Infrastructure (Docker, DB, Redis) - P0, 1w
+#   Epic 2: Auth Backend (JWT, users, RBAC) - P0, 2w
+#   Epic 3: Product API (catalog, orders) - P0, 3w
+#   Epic 4: Frontend Foundation (React setup) - P0, 1w
+#   Epic 5: E-commerce UI (pages, cart) - P1, 3w
+#   Epic 6: Testing & Deployment (CI/CD) - P1, 1w
+
+# 4. Decompose EACH epic into tasks
+/pm:epic-decompose ecommerce-platform/01-infrastructure    # 12 tasks
+/pm:epic-decompose ecommerce-platform/02-auth-backend      # 15 tasks
+/pm:epic-decompose ecommerce-platform/03-product-api       # 20 tasks
+/pm:epic-decompose ecommerce-platform/04-frontend          # 10 tasks
+/pm:epic-decompose ecommerce-platform/05-ui                # 25 tasks
+/pm:epic-decompose ecommerce-platform/06-testing           #  8 tasks
+# TOTAL: ~90 tasks across 6 epics
+
+# 5. Sync ALL epics at once
+/pm:epic-sync ecommerce-platform
+
+# 6. Parallel team work
+/pm:next  # Team 1: Infrastructure (P0)
+/pm:next  # Team 2: Auth Backend (P0, parallel)
+/pm:next  # Team 3: Frontend Foundation (P0, parallel)
+```
+</details>
+
+<details>
+<summary><b>Multiple PRDs Workflow</b> - Independent features</summary>
+
+```bash
+# Create multiple independent features
+/pm:prd-new login-page
+/pm:prd-new payment-system
+/pm:prd-new notifications
+
+# Process each independently
+/pm:prd-parse login-page
+/pm:epic-decompose login-page      # 5 tasks
+/pm:epic-sync login-page
+
+/pm:prd-parse payment-system
+/pm:epic-decompose payment-system  # 8 tasks
+/pm:epic-sync payment-system
+
+/pm:prd-parse notifications
+/pm:epic-decompose notifications   # 4 tasks
+/pm:epic-sync notifications
+
+# /pm:next automatically picks highest priority across ALL epics
+```
+</details>
+
+### Key Commands Reference
+
+| Command | Purpose | When to Use |
+|---------|---------|-------------|
+| `/pm:prd-new <name>` | Create PRD | Always start here |
+| `/pm:prd-parse <name>` | Analyze PRD | After writing requirements |
+| `/pm:epic-split <name>` | Create multiple epics | Complex, multi-component projects |
+| `/pm:epic-decompose <name>` | Break into tasks | Always (once per epic) |
+| `/pm:epic-sync <name>` | Sync with GitHub/Azure | After decomposition |
+| `/pm:context` | Show current state | Check progress anytime |
+| `/pm:next` | Get next task | Ready to work |
+| `/pm:issue-start #N` | Start task | Before coding |
+| `/pm:issue-close #N` | Complete task | After finishing |
+
+### FAQ
+
+**Q: Can I create multiple PRDs at once?**
+A: Yes! Each PRD is independent. Create as many as you need.
+
+**Q: How do I decide between epic-split and epic-decompose?**
+A: Use epic-split for multi-component projects (frontend + backend + infra). Use epic-decompose for single-component features.
+
+**Q: Do I need to decompose ALL epics after split?**
+A: Yes, before syncing. But you can decompose them one at a time as needed.
+
+**Q: How do I check my progress?**
+A: Use `/pm:context` to see current project, epics, and task progress.
+
+📖 **Full Workflow Guide:** See [PM-WORKFLOW-GUIDE.md](PM-WORKFLOW-GUIDE.md) for detailed examples and decision flows.
+
 ## 🎯 Core Workflow: Crawl → Walk → Run
 
 ### Crawl: Basic Commands

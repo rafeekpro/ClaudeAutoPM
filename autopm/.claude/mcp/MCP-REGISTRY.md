@@ -96,7 +96,7 @@ autopm mcp add
 cp .claude/examples/mcp/context7.md .claude/mcp/
 
 # Or from installed framework
-cp /path/to/framework/autopm/.claude/examples/mcp/playwright-mcp.md .claude/mcp/
+cp .claude/examples/mcp/playwright-mcp.md .claude/mcp/
 ```
 
 ### ✅ Enabling/Disabling Servers

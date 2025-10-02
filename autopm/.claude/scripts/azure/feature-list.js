@@ -5,8 +5,8 @@
  * Lists all features in the current project
  */
 
-const AzureDevOpsClient = require('../../lib/azure/client');
-const AzureFormatter = require('../../lib/azure/formatter');
+const AzureDevOpsClient = require('../../providers/azure/lib/client');
+const AzureFormatter = require('../../providers/azure/lib/formatter');
 const chalk = require('chalk');
 const path = require('path');
 const fs = require('fs');

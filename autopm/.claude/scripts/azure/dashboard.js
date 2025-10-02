@@ -7,7 +7,7 @@
 
 const path = require('path');
 const fs = require('fs');
-const AzureDevOpsClient = require('../../lib/azure/client');
+const AzureDevOpsClient = require('../../providers/azure/lib/client');
 
 // Simple chalk replacement for stub
 const chalk = {

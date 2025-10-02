@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { logError } = require('./lib/logger');
 
 /**
  * PM Next Script (Node.js version)
@@ -73,9 +74,32 @@ async function next() {
   }
 
   addMessage('');
+
+  // Display TDD reminder if tasks are available
+  if (result.found > 0) {
+    displayTddReminder(addMessage);
+  }
+
   addMessage(`📊 Summary: ${result.found} tasks ready to start`);
 
   return result;
+}
+
+/**
+ * Display TDD reminder to ensure test-driven development practices
+ * Extracted to maintain single responsibility and improve testability
+ * @param {Function} addMessage - Function to add messages to the output
+ */
+function displayTddReminder(addMessage) {
+  addMessage('⚠️  TDD REMINDER - Before starting work:');
+  addMessage('');
+  addMessage('   🚨 ALWAYS follow Test-Driven Development:');
+  addMessage('   1. RED: Write failing test first');
+  addMessage('   2. GREEN: Write minimal code to pass');
+  addMessage('   3. REFACTOR: Clean up while keeping tests green');
+  addMessage('');
+  addMessage('   See .claude/rules/tdd.enforcement.md for details');
+  addMessage('');
 }
 
 // Helper function to find available tasks
@@ -161,7 +185,7 @@ if (require.main === module) {
   module.exports.next().then(() => {
     process.exit(0);
   }).catch(err => {
-    console.error('Next tasks failed:', err.message);
+    logError('Next tasks command failed', err);
     process.exit(1);
   });
 }
