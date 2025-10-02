@@ -37,7 +37,7 @@
     },
     "react-docs": {
       "type": "shared",
-      "agents": ["react-frontend-engineer", "playwright-test-engineer"],
+      "agents": ["react-frontend-engineer", "frontend-testing-engineer"],
       "sources": ["context7"],
       "filters": ["react", "nextjs", "typescript", "tailwind", "vite"],
       "maxSize": "75MB",
@@ -64,7 +64,7 @@
     },
     "testing-context": {
       "type": "shared",
-      "agents": ["playwright-test-engineer", "test-runner"],
+      "agents": ["frontend-testing-engineer", "test-runner"],
       "sources": ["context7", "playwright-mcp"],
       "filters": ["playwright", "testing", "e2e"],
       "maxSize": "50MB",

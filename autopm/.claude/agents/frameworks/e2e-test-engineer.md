@@ -192,7 +192,7 @@ test('visual regression', async ({ page }) => {
 - mcp__playwright__fill
 
 ## Integration Points
-- Tests applications from: react-ui-expert, python-backend-expert
+- Tests applications from: react-frontend-engineer, python-backend-engineer
 - Validates deployments by: kubernetes-orchestrator
 - Reports to: github-operations-specialist
 - Uses infrastructure from: docker-containerization-expert

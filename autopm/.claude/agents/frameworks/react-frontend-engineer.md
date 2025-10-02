@@ -191,7 +191,7 @@ Before delivering code:
 **Integration with Other Agents:**
 
 - **python-backend-engineer**: API contract definition and type generation
-- **playwright-test-engineer**: E2E test scenarios and component interaction testing
+- **frontend-testing-engineer**: E2E test scenarios and component interaction testing
 - **azure-devops-specialist**: CI/CD pipeline for build and deployment
 - **github-operations-specialist**: PR workflows and code review automation
 
