@@ -124,69 +124,65 @@ async function context() {
 
       epicCount = epicDirs.length;
 
-      for (const epicDir of epicDirs) {
-        const epicPath = path.join('.claude/epics', epicDir);
-
-        // Count tasks in this epic (including subdirectories)
-        let epicTasks = 0;
-        let epicCompleted = 0;
-        let epicInProgress = 0;
-        let epicPending = 0;
-
-        function countTasksInDir(dir) {
-          try {
-            const entries = fs.readdirSync(dir, { withFileTypes: true });
-
-            for (const entry of entries) {
-              const fullPath = path.join(dir, entry.name);
-
-              if (entry.isDirectory()) {
-                countTasksInDir(fullPath);
-              } else if (entry.isFile() && /^\d{3}\.md$/.test(entry.name)) {
-                epicTasks++;
-                totalTasks++;
-
-                try {
-                  const content = fs.readFileSync(fullPath, 'utf8');
-                  const statusMatch = content.match(/^status:\s*(.+)$/m);
-
-                  if (statusMatch) {
-                    const status = statusMatch[1].trim().toLowerCase();
-                    if (status === 'completed' || status === 'done' || status === 'closed') {
-                      epicCompleted++;
-                      completedTasks++;
-                    } else if (status === 'in-progress' || status === 'in_progress') {
-                      epicInProgress++;
-                      inProgressTasks++;
-                    } else {
-                      epicPending++;
-                      pendingTasks++;
-                    }
+      // Helper to count tasks in a directory and update counters
+      function countTasksInDir(dir, counters) {
+        try {
+          const entries = fs.readdirSync(dir, { withFileTypes: true });
+          for (const entry of entries) {
+            const fullPath = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+              countTasksInDir(fullPath, counters);
+            } else if (entry.isFile() && /^\d{3}\.md$/.test(entry.name)) {
+              counters.epicTasks++;
+              totalTasks++;
+              try {
+                const content = fs.readFileSync(fullPath, 'utf8');
+                const statusMatch = content.match(/^status:\s*(.+)$/m);
+                if (statusMatch) {
+                  const status = statusMatch[1].trim().toLowerCase();
+                  if (status === 'completed' || status === 'done' || status === 'closed') {
+                    counters.epicCompleted++;
+                    completedTasks++;
+                  } else if (status === 'in-progress' || status === 'in_progress') {
+                    counters.epicInProgress++;
+                    inProgressTasks++;
                   } else {
-                    epicPending++;
+                    counters.epicPending++;
                     pendingTasks++;
                   }
-                } catch (err) {
-                  epicPending++;
+                } else {
+                  counters.epicPending++;
                   pendingTasks++;
                 }
+              } catch (err) {
+                counters.epicPending++;
+                pendingTasks++;
               }
             }
-          } catch (err) {
-            // Directory read error
           }
+        } catch (err) {
+          // Directory read error
         }
+      }
 
-        countTasksInDir(epicPath);
-
-        if (epicTasks > 0) {
-          const progress = Math.round((epicCompleted / epicTasks) * 100);
+      for (const epicDir of epicDirs) {
+        const epicPath = path.join('.claude/epics', epicDir);
+        // Count tasks in this epic (including subdirectories)
+        let counters = {
+          epicTasks: 0,
+          epicCompleted: 0,
+          epicInProgress: 0,
+          epicPending: 0
+        };
+        countTasksInDir(epicPath, counters);
+        if (counters.epicTasks > 0) {
+          const progress = Math.round((counters.epicCompleted / counters.epicTasks) * 100);
           epicDetails.push({
             name: epicDir,
-            tasks: epicTasks,
-            completed: epicCompleted,
-            inProgress: epicInProgress,
-            pending: epicPending,
+            tasks: counters.epicTasks,
+            completed: counters.epicCompleted,
+            inProgress: counters.epicInProgress,
+            pending: counters.epicPending,
             progress: progress
           });
         }
