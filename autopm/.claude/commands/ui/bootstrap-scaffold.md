@@ -8,7 +8,7 @@ Create a complete Bootstrap-based UI structure with responsive components and th
 ```
 
 ## Purpose
-Use the bootstrap-ui-expert agent to create a complete Bootstrap application scaffold with modern components, responsive design, and customizable themes.
+Use the react-ui-expert agent (with framework=bootstrap) to create a complete Bootstrap application scaffold with modern components, responsive design, and customizable themes.
 
 ## Parameters
 - `theme`: Theme variant (light, dark, corporate, minimal)
@@ -18,7 +18,7 @@ Use the bootstrap-ui-expert agent to create a complete Bootstrap application sca
 
 ## Agent Usage
 ```
-Use the bootstrap-ui-expert agent to create a complete Bootstrap application scaffold.
+Use the react-ui-expert agent with framework=bootstrap to create a complete Bootstrap application scaffold.
 ```
 
 ## Expected Outcome
@@ -32,10 +32,11 @@ Use the bootstrap-ui-expert agent to create a complete Bootstrap application sca
 ## Example Usage
 ```
 Task: Create Bootstrap dashboard with sidebar navigation, responsive cards grid, and contact forms
-Agent: bootstrap-ui-expert
-Parameters: theme=corporate, components=navbar,sidebar,cards,forms,modals, responsive=all, features=dark-mode,validation
+Agent: react-ui-expert
+Parameters: framework=bootstrap, theme=corporate, components=navbar,sidebar,cards,forms,modals, responsive=all, features=dark-mode,validation
 ```
 
 ## Related Agents
 - tailwindcss-expert: For utility-first alternative
 - react-frontend-engineer: For React + Bootstrap integration
+- react-ui-expert: Main agent for UI component architecture
