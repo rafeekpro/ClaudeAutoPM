@@ -170,10 +170,10 @@ Ask these questions to determine the best agent:
 4. **What are the performance requirements?**
    - Critical → tailwindcss-expert or react-frontend-engineer
    - Important → react-frontend-engineer (with optimization)
-   - Standard → react-ui-expert or react-ui-expert
+   - Standard → react-ui-expert or react-frontend-engineer
 
 5. **Is accessibility a requirement?**
-   - Critical → react-frontend-engineer or react-frontend-engineer
+   - Critical → react-frontend-engineer or react-ui-expert
    - Important → react-ui-expert
    - Standard → react-ui-expert or tailwindcss-expert (with extra work)
 
