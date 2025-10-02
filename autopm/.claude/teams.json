@@ -23,9 +23,7 @@
     "description": "Team specializing in Python backend development.",
     "inherits": ["base"],
     "agents": [
-      "python-backend-expert.md",
-      "fastapi-backend-engineer.md",
-      "flask-backend-engineer.md",
+      "python-backend-engineer.md",
       "postgresql-expert.md",
       "mongodb-expert.md"
     ]
@@ -34,9 +32,9 @@
     "description": "Team for JavaScript/TypeScript UI development.",
     "inherits": ["base"],
     "agents": [
-      "react-ui-expert.md",
+      "react-frontend-engineer.md",
       "javascript-frontend-engineer.md",
-      "e2e-test-engineer.md",
+      "frontend-testing-engineer.md",
       "ux-design-expert.md",
       "tailwindcss-expert.md"
     ]

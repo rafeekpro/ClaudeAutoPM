@@ -74,7 +74,7 @@ autopm mcp sync
 ### Integration with Agents
 
 Used extensively with:
-- `e2e-test-engineer` - For E2E test creation
+- `frontend-testing-engineer` - For E2E test creation
 - `react-frontend-engineer` - For UI testing
 - `ux-design-expert` - For visual regression
 
@@ -309,4 +309,4 @@ npx playwright show-trace trace.zip
 
 - [Playwright Documentation](https://playwright.dev)
 - [MCP Browser Control](https://modelcontextprotocol.org/browser)
-- [E2E Test Engineer Agent](../agents/frameworks/e2e-test-engineer.md)
+- [E2E Test Engineer Agent](../agents/frameworks/frontend-testing-engineer.md)

@@ -137,9 +137,9 @@ accessibility_level:
 - Agent
 
 ## Integration Points
-- Works with: react-frontend-engineer, playwright-test-engineer
-- Provides UI for: python-backend-expert, nodejs-backend-engineer
-- Tested by: e2e-test-engineer
+- Works with: react-frontend-engineer, frontend-testing-engineer
+- Provides UI for: python-backend-engineer, nodejs-backend-engineer
+- Tested by: frontend-testing-engineer
 
 ## Example Invocation
 

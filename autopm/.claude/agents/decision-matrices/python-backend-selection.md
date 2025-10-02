@@ -2,7 +2,7 @@
 
 ## Quick Selection Guide
 
-Choose between `fastapi-backend-engineer` and `flask-backend-engineer` based on your project requirements:
+Choose between `python-backend-engineer` and `python-backend-engineer` based on your project requirements:
 
 | Requirement | FastAPI | Flask |
 |-------------|---------|-------|
@@ -29,7 +29,7 @@ Choose between `fastapi-backend-engineer` and `flask-backend-engineer` based on 
 
 ## Detailed Agent Comparison
 
-### fastapi-backend-engineer
+### python-backend-engineer
 
 **Best For:**
 - **Modern APIs**: REST/GraphQL APIs with auto-documentation
@@ -55,7 +55,7 @@ Choose between `fastapi-backend-engineer` and `flask-backend-engineer` based on 
 - IoT data ingestion APIs
 - Modern single-page app backends
 
-### flask-backend-engineer
+### python-backend-engineer
 
 **Best For:**
 - **Traditional Web Applications**: Server-rendered applications
@@ -86,7 +86,7 @@ Choose between `fastapi-backend-engineer` and `flask-backend-engineer` based on 
 ### 1. What type of application are you building?
 
 #### API-Only Applications
-→ **fastapi-backend-engineer**
+→ **python-backend-engineer**
 **Reasoning:**
 - Auto-generated API documentation
 - Built-in request/response validation
@@ -94,7 +94,7 @@ Choose between `fastapi-backend-engineer` and `flask-backend-engineer` based on 
 - Native async support for database operations
 
 #### Web Applications with Templates
-→ **flask-backend-engineer**
+→ **python-backend-engineer**
 **Reasoning:**
 - Mature template engine (Jinja2)
 - Server-side rendering capabilities
@@ -103,13 +103,13 @@ Choose between `fastapi-backend-engineer` and `flask-backend-engineer` based on 
 
 #### Hybrid (API + Web)
 → **Consider both or choose based on primary focus:**
-- API-heavy → fastapi-backend-engineer
-- Web-heavy → flask-backend-engineer
+- API-heavy → python-backend-engineer
+- Web-heavy → python-backend-engineer
 
 ### 2. What are your performance requirements?
 
 #### High Performance Required
-→ **fastapi-backend-engineer**
+→ **python-backend-engineer**
 **Use When:**
 - 1000+ requests per second expected
 - Low latency requirements (< 100ms)
@@ -117,7 +117,7 @@ Choose between `fastapi-backend-engineer` and `flask-backend-engineer` based on 
 - Concurrent user handling important
 
 #### Standard Performance Acceptable
-→ **flask-backend-engineer**
+→ **python-backend-engineer**
 **Use When:**
 - < 1000 requests per second
 - Response time requirements moderate
@@ -127,7 +127,7 @@ Choose between `fastapi-backend-engineer` and `flask-backend-engineer` based on 
 ### 3. What is your team's experience level?
 
 #### Python Beginners to Intermediate
-→ **flask-backend-engineer**
+→ **python-backend-engineer**
 **Reasoning:**
 - Simpler concepts and patterns
 - Extensive tutorials and examples
@@ -135,7 +135,7 @@ Choose between `fastapi-backend-engineer` and `flask-backend-engineer` based on 
 - Gradual learning curve
 
 #### Python Advanced or Performance-Focused Teams
-→ **fastapi-backend-engineer**
+→ **python-backend-engineer**
 **Reasoning:**
 - Leverages advanced Python features
 - Type hints and modern patterns
@@ -145,7 +145,7 @@ Choose between `fastapi-backend-engineer` and `flask-backend-engineer` based on 
 ### 4. What are your integration requirements?
 
 #### Modern Stack (React, Vue, Mobile Apps)
-→ **fastapi-backend-engineer**
+→ **python-backend-engineer**
 **Features:**
 - Auto-generated API clients
 - OpenAPI specification
@@ -153,7 +153,7 @@ Choose between `fastapi-backend-engineer` and `flask-backend-engineer` based on 
 - CORS handling built-in
 
 #### Traditional Stack (Server-rendered, jQuery)
-→ **flask-backend-engineer**
+→ **python-backend-engineer**
 **Features:**
 - Template inheritance
 - Form handling with WTForms
@@ -165,7 +165,7 @@ Choose between `fastapi-backend-engineer` and `flask-backend-engineer` based on 
 ### API Development
 
 #### RESTful API for Mobile App
-**Choice**: fastapi-backend-engineer
+**Choice**: python-backend-engineer
 **Reasoning:**
 - Auto-generated API documentation
 - Request/response validation
@@ -173,7 +173,7 @@ Choose between `fastapi-backend-engineer` and `flask-backend-engineer` based on 
 - Easy async database operations
 
 #### Enterprise API with Complex Business Logic
-**Choice**: fastapi-backend-engineer
+**Choice**: python-backend-engineer
 **Reasoning:**
 - Type safety for complex data structures
 - Dependency injection for business services
@@ -183,7 +183,7 @@ Choose between `fastapi-backend-engineer` and `flask-backend-engineer` based on 
 ### Web Applications
 
 #### Content Management System
-**Choice**: flask-backend-engineer
+**Choice**: python-backend-engineer
 **Reasoning:**
 - Server-side rendering capabilities
 - Admin interface patterns
@@ -191,7 +191,7 @@ Choose between `fastapi-backend-engineer` and `flask-backend-engineer` based on 
 - Traditional web architecture
 
 #### E-commerce Platform
-**Choice**: flask-backend-engineer
+**Choice**: python-backend-engineer
 **Reasoning:**
 - Complex form handling (checkout, admin)
 - Server-side rendering for SEO
@@ -201,7 +201,7 @@ Choose between `fastapi-backend-engineer` and `flask-backend-engineer` based on 
 ### Hybrid Applications
 
 #### SaaS Platform (Web + API)
-**Primary Choice**: fastapi-backend-engineer
+**Primary Choice**: python-backend-engineer
 **Reasoning:**
 - API-first for modern frontend
 - WebSocket for real-time features
@@ -215,7 +215,7 @@ Choose between `fastapi-backend-engineer` and `flask-backend-engineer` based on 
 ### Specific Scenarios
 
 #### Microservices Architecture
-**Choice**: fastapi-backend-engineer
+**Choice**: python-backend-engineer
 **Features:**
 - Smaller, focused services
 - Async communication between services
@@ -223,7 +223,7 @@ Choose between `fastapi-backend-engineer` and `flask-backend-engineer` based on 
 - High performance per service
 
 #### Machine Learning API
-**Choice**: fastapi-backend-engineer
+**Choice**: python-backend-engineer
 **Features:**
 - Async model inference
 - Request validation for ML inputs
@@ -231,7 +231,7 @@ Choose between `fastapi-backend-engineer` and `flask-backend-engineer` based on 
 - WebSocket for real-time predictions
 
 #### Legacy System Integration
-**Choice**: flask-backend-engineer
+**Choice**: python-backend-engineer
 **Features:**
 - Established integration patterns
 - Flexible architecture for custom needs
@@ -240,8 +240,8 @@ Choose between `fastapi-backend-engineer` and `flask-backend-engineer` based on 
 
 #### Startup MVP
 **Choice**: Depends on team and product
-- **Technical team building API**: fastapi-backend-engineer
-- **Mixed team building web app**: flask-backend-engineer
+- **Technical team building API**: python-backend-engineer
+- **Mixed team building web app**: python-backend-engineer
 
 ## Performance Comparison
 
