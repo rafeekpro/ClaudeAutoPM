@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const MCPHandler = require('../../scripts/mcp-handler.js');
 
 // Paths
 const projectRoot = process.cwd();
@@ -66,6 +67,69 @@ function validateAgentFiles(agents, projectRoot) {
   });
 
   return missingAgents;
+}
+
+// Helper function to validate MCP dependencies for agents
+function validateAgentMCPDependencies(agents, projectRoot) {
+  const warnings = [];
+
+  try {
+    const mcpHandler = new MCPHandler();
+    const config = mcpHandler.loadConfig();
+    const activeServers = config.mcp?.activeServers || [];
+
+    // Track all required MCP servers across all agents
+    const requiredServers = new Map(); // server -> [agents that need it]
+
+    agents.forEach(agentPath => {
+      // Extract agent name from path
+      // Handle both "core/test-runner.md" and "test-runner.md" formats
+      let agentName = agentPath;
+      if (agentName.endsWith('.md')) {
+        agentName = agentName.slice(0, -3); // Remove .md extension
+      }
+      // Get just the filename without directory
+      agentName = path.basename(agentName);
+
+      // Get MCP dependencies for this agent
+      const agentMCP = mcpHandler.getAgentMCP(agentName);
+
+      if (agentMCP.found && agentMCP.mcpServers.length > 0) {
+        agentMCP.mcpServers.forEach(serverName => {
+          if (!requiredServers.has(serverName)) {
+            requiredServers.set(serverName, []);
+          }
+          requiredServers.get(serverName).push(agentName);
+        });
+      }
+    });
+
+    // Check which required servers are missing or inactive
+    requiredServers.forEach((agentNames, serverName) => {
+      const isActive = activeServers.includes(serverName);
+      const serverExists = mcpHandler.getServer(serverName);
+
+      if (!serverExists) {
+        warnings.push({
+          type: 'not_installed',
+          server: serverName,
+          agents: agentNames
+        });
+      } else if (!isActive) {
+        warnings.push({
+          type: 'not_active',
+          server: serverName,
+          agents: agentNames
+        });
+      }
+    });
+
+  } catch (error) {
+    // If MCP validation fails, just warn but don't block
+    console.warn('⚠️  Warning: Could not validate MCP dependencies');
+  }
+
+  return warnings;
 }
 
 // Helper function to generate agent include list in Markdown format
@@ -214,6 +278,28 @@ const commands = {
         missingAgents.forEach(agent => {
           console.warn(`   - ${agent}`);
         });
+      }
+
+      // Validate MCP dependencies
+      const mcpWarnings = validateAgentMCPDependencies(agents, projectRoot);
+      if (mcpWarnings.length > 0) {
+        console.warn('\n⚠️  MCP Dependency Warnings:\n');
+
+        mcpWarnings.forEach(warning => {
+          if (warning.type === 'not_installed') {
+            console.warn(`❌ MCP server '${warning.server}' is NOT INSTALLED`);
+            console.warn(`   Required by: ${warning.agents.join(', ')}`);
+            console.warn(`   Fix: autopm mcp install ${warning.server}`);
+          } else if (warning.type === 'not_active') {
+            console.warn(`⚪ MCP server '${warning.server}' is NOT ACTIVE`);
+            console.warn(`   Required by: ${warning.agents.join(', ')}`);
+            console.warn(`   Fix: autopm mcp enable ${warning.server}`);
+          }
+          console.warn('');
+        });
+
+        console.warn('💡 Tip: Run "autopm mcp list" to see all MCP servers');
+        console.warn('💡 Tip: Run "autopm mcp setup" for interactive configuration\n');
       }
 
       // Update CLAUDE.md with the new agent list
