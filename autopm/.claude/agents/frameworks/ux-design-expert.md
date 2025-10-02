@@ -153,8 +153,8 @@ Access UX design and accessibility documentation:
 
 ### Works With
 - **react-frontend-engineer**: Implementation of designs
-- **react-frontend-engineer**, **react-frontend-engineer**, **antd-react-expert**: Component styling
-- **tailwindcss-expert**, **bootstrap-ui-expert**: CSS frameworks
+- **react-ui-expert**: Component styling and design systems
+- **tailwindcss-expert**: Utility-first CSS framework
 - **frontend-testing-engineer**: Usability testing automation
 - **javascript-frontend-engineer**: Interactive features
 
