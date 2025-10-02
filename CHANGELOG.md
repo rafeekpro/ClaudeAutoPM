@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.20.1] - 2025-01-10
+
+### Fixed
+- **Agent Reference Cleanup (7 PRs, ~230+ fixes across ~35 files)**
+  - Fixed all deprecated and non-existent agent references throughout documentation (#201, #202, #203, #204, #205, #206, #207)
+  - Replaced `docker-expert` → `docker-containerization-expert` (7 files)
+  - Replaced `python-backend-expert` → `python-backend-engineer` in appropriate contexts (~35 references)
+  - Replaced UI framework agents (`mui-react-expert`, `chakra-ui-expert`, `antd-react-expert`, `bootstrap-ui-expert`) → `react-ui-expert` (~42 references)
+  - Replaced testing agents (`playwright-test-engineer`, `playwright-mcp-frontend-tester`) → `e2e-test-engineer` (~70 references)
+  - Fixed non-existent agents: `multi-cloud-architect` → `terraform-infrastructure-expert` (11 references)
+  - Fixed non-existent agents: `database-architect` → `postgresql-expert` (9 references)
+  - Added `mongodb-expert` to backend-context MCP pool for consistency
+  - Removed duplicate agent references in decision matrices and coordination docs
+  - Updated `python-backend-selection.md` to compare frameworks (FastAPI vs Flask) instead of agents
+
+### Impact
+- Eliminates "Agent type not found" runtime errors
+- All agent references now point to active agents defined in AGENT-REGISTRY.md
+- Improved clarity on framework selection (FastAPI vs Flask) within unified python-backend-engineer agent
+- Better guidance for choosing between component-focused (react-ui-expert) and full-app (react-frontend-engineer) approaches
+
+### Documentation
+- All documentation now consistent with AGENT-REGISTRY.md v1.1.0 agent consolidation model
+- Decision matrices updated to reflect parameterized agent usage (framework=fastapi/flask, framework=mui/chakra/etc.)
+
 ## [1.20.0] - 2025-10-02
 
 ### 🧹 Cleanup: Package Size Optimization & Development Standards
