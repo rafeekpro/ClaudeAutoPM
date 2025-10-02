@@ -59,10 +59,10 @@ async function context() {
   }
 
   console.log(`  Provider:       ${provider}`);
-  if (provider === 'Github') {
+  if (provider.toLowerCase() === 'github') {
     console.log(`  GitHub Owner:   ${githubOwner}`);
     console.log(`  GitHub Repo:    ${githubRepo}`);
-  } else if (provider === 'Azure') {
+  } else if (provider.toLowerCase() === 'azure') {
     console.log(`  Azure Org:      ${azureOrg}`);
     console.log(`  Azure Project:  ${azureProject}`);
   }
