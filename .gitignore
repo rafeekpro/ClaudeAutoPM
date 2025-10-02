@@ -7,7 +7,6 @@
 .DS_Store
 Thumbs.db
 desktop.ini
-/.claude/
 
 # Environment & Secrets
 # --------------------
@@ -15,7 +14,6 @@ desktop.ini
 .env.local
 .env.*.local
 .claude/.env
-CLAUDE.md
 
 # Dependencies
 # ------------
@@ -76,10 +74,12 @@ pnpm-debug.log*
 # ----------------
 .gitconfig.local
 
-# MCP & Claude Specific
-# --------------------
+# MCP & Claude Specific (Dynamic/Cache files)
+# -------------------------------------------
 .claude/mcp-cache/
 .claude/context-pools/
+.claude/context/
+.claude/.claud-code-editor-temp-*
 
 # Documentation Build
 # -------------------
