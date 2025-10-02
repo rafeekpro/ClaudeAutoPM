@@ -7,6 +7,150 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.17.0] - 2025-10-02
+
+### ✨ Feature: Mandatory Agent Usage Enforcement
+
+**Systematic enforcement to ensure specialized agents are used for complex tasks**
+
+Users reported that after installation, Claude Code wasn't consistently using specialized agents, requiring constant reminders. This release adds comprehensive enforcement mechanisms.
+
+### 🎯 What's New
+
+1. **Agent Mandatory Rule (`agent-mandatory.md`):**
+   - 🚨 HIGHEST PRIORITY rule file
+   - Clear guidelines: When to ALWAYS use agents vs when you can do it yourself
+   - Agent selection guide by task type and technology
+   - Violation examples with ✅ CORRECT and ❌ WRONG patterns
+   - Quick reference tables for common tasks
+
+2. **CLAUDE.md Template Updates:**
+   - Prominent "🚨 AGENT USAGE - MANDATORY" section at top
+   - Quick reference table visible immediately
+   - "Before doing ANY complex task: Check if there's a specialized agent"
+   - References comprehensive agent-mandatory.md rule
+
+3. **Hooks Installation:**
+   - `.claude/hooks/` directory now installed to all projects
+   - `enforce-agents.sh` and `enforce-agents.js` for runtime enforcement
+   - Blocks direct execution of complex tasks
+   - Suggests appropriate agents for violations
+
+### 📊 Impact
+
+**Before v1.17.0:**
+```
+User: "Build a FastAPI endpoint"
+Claude: *writes Python code directly*
+User: "Please use an agent!"
+```
+
+**After v1.17.0:**
+```
+User: "Build a FastAPI endpoint"
+Claude: "I'll use the python-backend-engineer agent..."
+*Uses Task tool automatically*
+```
+
+### 🔧 Technical Changes
+
+**New Files:**
+- `autopm/.claude/rules/agent-mandatory.md` - Comprehensive agent usage rules
+
+**Modified Files:**
+- `autopm/.claude/templates/claude-templates/base.md` - Added agent enforcement section
+- `install/install.js` - Added `.claude/hooks` to installItems array
+
+**Hooks Included:**
+- `enforce-agents.sh` - Shell wrapper for hook
+- `enforce-agents.js` - Node.js enforcement logic
+- Blocks: Direct grep/find, test execution, large file reads
+- Suggests: code-analyzer, test-runner, file-analyzer agents
+
+### 📝 Migration Notes
+
+**For new installations:**
+- Agent enforcement is automatic! 🎉
+
+**For existing installations:**
+```bash
+autopm update
+# Updates templates and installs hooks
+```
+
+## [1.16.0] - 2025-10-02
+
+### ✨ Feature: Epic Status Command
+
+**Global epic status tracking with CLI commands**
+
+Added `autopm epic` commands for viewing epic progress, task breakdown, and status across multi-level epic structures.
+
+### 🎯 What's New
+
+1. **Epic Status Script (`epic-status.sh`):**
+   - Counts total/completed/in-progress/pending tasks
+   - Visual progress bar
+   - Sub-epic breakdown with individual counts
+   - Robust bash implementation (no parse errors)
+
+2. **Epic CLI Commands:**
+   - `autopm epic list` - List all available epics
+   - `autopm epic status <name>` - Show epic progress
+   - `autopm epic breakdown <name>` - Detailed task breakdown
+
+3. **Integration:**
+   - Works with multi-level epic structures
+   - Supports 100+ tasks across multiple sub-epics
+   - Task status tracking (completed/in-progress/pending)
+
+### 📊 Example Output
+
+```bash
+$ autopm epic status fullstack
+
+Epic: fullstack
+====================
+
+Total tasks:     101
+Completed:       45 (44%)
+In Progress:     5
+Pending:         51
+
+Progress: [======================----------------------------] 44%
+
+Sub-Epic Breakdown:
+-------------------
+  01-infrastructure           12 tasks (8 completed)
+  02-auth-backend             15 tasks (6 completed)
+  03-frontend-foundation      18 tasks (10 completed)
+  ...
+```
+
+### 🔧 Technical Changes
+
+**New Files:**
+- `autopm/scripts/epic-status.sh` - Bash script for epic analysis
+- `bin/commands/epic.js` - CLI command module
+
+**Modified Files:**
+- `bin/autopm.js` - Registered epic command
+- `install/install.js` - Added epic-status.sh to installer
+
+## [1.15.5] - 2025-10-02
+
+### 🐛 Bug Fix: Package.json Installation
+
+**Fixed installer not creating package.json or installing dependencies**
+
+Same as v1.15.4 but with corrected version number and proper npm publication.
+
+### 🔧 Changes
+
+- Ensured package.json.template includes js-yaml dependency
+- Installer creates package.json and runs npm install
+- All PM scripts have required dependencies
+
 ## [1.15.4] - 2025-10-02
 
 ### 🐛 Bug Fix: Missing Dependencies After Installation
