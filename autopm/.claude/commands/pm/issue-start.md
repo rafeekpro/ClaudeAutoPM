@@ -33,6 +33,26 @@ Begin work on a GitHub issue with parallel agents based on work stream analysis.
    ` ``
    If no analysis exists and no --analyze flag, stop execution.
 
+## ⚠️ TDD REMINDER - READ THIS FIRST
+
+**CRITICAL: This project follows Test-Driven Development (TDD).**
+
+Before ANY coding work begins, you MUST follow the RED-GREEN-REFACTOR cycle:
+
+1. **RED Phase**: Write failing test that describes the desired behavior
+2. **GREEN Phase**: Write minimum code to make test pass
+3. **REFACTOR Phase**: Clean up code while keeping tests green
+
+**For this issue:**
+- Read the task requirements from the task file
+- Identify what tests are needed BEFORE any implementation
+- All agents must start with test creation
+- No implementation without tests first
+
+See `.claude/rules/tdd.enforcement.md` for complete TDD requirements.
+
+---
+
 ## Instructions
 
 ### 1. Ensure Branch Exists
@@ -103,11 +123,29 @@ Task:
   description: "Issue #$ARGUMENTS Stream {X}"
   subagent_type: "{agent_type}"
   prompt: |
-    **CRITICAL RULE: This project uses 'Docker-first development'.**
+    **🚨 CRITICAL RULE #1: Test-Driven Development (TDD) is MANDATORY**
+
+    You MUST follow the RED-GREEN-REFACTOR cycle:
+    1. **RED**: Write a FAILING test first that describes the desired behavior
+    2. **GREEN**: Write MINIMUM code to make the test pass
+    3. **REFACTOR**: Clean up code while keeping all tests green
+
+    **NO CODE WITHOUT TESTS FIRST.** Zero exceptions.
+    - Every function starts with a test
+    - Every bug fix starts with a test that reproduces it
+    - Every feature starts with failing acceptance tests
+
+    See `.claude/rules/tdd.enforcement.md` for complete requirements.
+
+    ---
+
+    **CRITICAL RULE #2: This project uses 'Docker-first development'.**
     - All commands (dependency installation, tests, running the application) MUST be executed inside a Docker container using `docker compose run --rm <service_name> <command>`.
     - DO NOT run `npm`, `pip`, `pytest`, etc., directly on the host.
     - The source code is mounted as a VOLUME, so file changes will be immediately visible in the container (hot-reloading).
     - Full rules can be found in `.claude/rules/docker-first-development.md`.
+
+    ---
 
     You are working on Issue #$ARGUMENTS in the epic branch.
 
@@ -120,10 +158,12 @@ Task:
     
     Requirements:
     1. Read full task from: .claude/epics/{epic_name}/{task_file}
-    2. Work ONLY in your assigned files
-    3. Commit frequently with format: "Issue #$ARGUMENTS: {specific change}"
-    4. Update progress in: .claude/epics/{epic_name}/updates/$ARGUMENTS/stream-{X}.md
-    5. Follow coordination rules in /rules/agent-coordination.md
+    2. **START WITH TESTS**: Write failing tests BEFORE any implementation
+    3. Work ONLY in your assigned files
+    4. Follow TDD cycle: RED (test fails) → GREEN (minimal code) → REFACTOR (cleanup)
+    5. Commit frequently with format: "Issue #$ARGUMENTS: {specific change}"
+    6. Update progress in: .claude/epics/{epic_name}/updates/$ARGUMENTS/stream-{X}.md
+    7. Follow coordination rules in /rules/agent-coordination.md
     
     If you need to modify files outside your scope:
     - Check if another stream owns them
@@ -155,6 +195,11 @@ Launching {count} parallel agents:
 
 Progress tracking:
   .claude/epics/{epic_name}/updates/$ARGUMENTS/
+
+⚠️  TDD CHECKLIST - All agents MUST follow:
+  1. ❌ RED: Write failing test
+  2. ❌ GREEN: Make test pass (minimal code)
+  3. ❌ REFACTOR: Clean up code
 
 Monitor with: /pm:epic-status {epic_name}
 Sync updates: /pm:issue-sync $ARGUMENTS

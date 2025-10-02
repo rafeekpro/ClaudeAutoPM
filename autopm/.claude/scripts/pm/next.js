@@ -73,6 +73,20 @@ async function next() {
   }
 
   addMessage('');
+
+  // TDD Reminder
+  if (result.found > 0) {
+    addMessage('⚠️  TDD REMINDER - Before starting work:');
+    addMessage('');
+    addMessage('   🚨 ALWAYS follow Test-Driven Development:');
+    addMessage('   1. RED: Write failing test first');
+    addMessage('   2. GREEN: Write minimal code to pass');
+    addMessage('   3. REFACTOR: Clean up while keeping tests green');
+    addMessage('');
+    addMessage('   See .claude/rules/tdd.enforcement.md for details');
+    addMessage('');
+  }
+
   addMessage(`📊 Summary: ${result.found} tasks ready to start`);
 
   return result;
