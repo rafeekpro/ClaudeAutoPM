@@ -9,6 +9,21 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/logging-utils.sh"
 source "${SCRIPT_DIR}/datetime-utils.sh"
 
+# Escape special characters for use in sed pattern
+sed_escape_pattern() {
+    local str="$1"
+    # Escape characters that have special meaning in sed patterns: . * [ ] ^ $ \ /
+    printf '%s\n' "$str" | sed 's/[]\/$*.^[]/\\&/g'
+}
+
+# Escape special characters for use in sed replacement
+sed_escape_replacement() {
+    local str="$1"
+    # Escape backslashes first, then other special characters
+    # This prevents double-escaping issues
+    printf '%s\n' "$str" | sed 's/\\/\\\\/g; s/&/\\&/g; s/|/\\|/g'
+}
+
 # Update or add a field in frontmatter
 update_frontmatter_field() {
     local file_path="$1"
@@ -25,18 +40,32 @@ update_frontmatter_field() {
     # Create backup
     cp "$file_path" "${file_path}.bak"
 
+    # Escape field name and value for safe use in sed
+    local escaped_field_name
+    local escaped_field_value
+    escaped_field_name=$(sed_escape_pattern "$field_name")
+    escaped_field_value=$(sed_escape_replacement "$field_value")
+
     # Check if field exists
     if grep -q "^${field_name}:" "$file_path"; then
-        # Update existing field
-        sed -i.tmp "/^${field_name}:/c\\${field_name}: ${field_value}" "$file_path"
+        # Update existing field - delete old line and insert new one
+        # This approach avoids sed replacement string escaping issues
+        grep -v "^${escaped_field_name}:" "$file_path" > "${file_path}.tmp"
+        {
+            head -1 "${file_path}.tmp"  # First --- line
+            printf '%s: %s\n' "$field_name" "$field_value"  # New field value
+            tail -n +2 "${file_path}.tmp"  # Rest of file
+        } > "${file_path}.tmp2" && mv "${file_path}.tmp2" "$file_path"
         rm -f "${file_path}.tmp"
         log_debug "Updated existing field: $field_name"
     else
         # Add new field after the first line of frontmatter (after opening ---)
-        awk -v field="${field_name}: ${field_value}" '
-            /^---$/ && NR==1 { print; print field; next }
-            { print }
-        ' "$file_path" > "${file_path}.tmp" && mv "${file_path}.tmp" "$file_path"
+        # Write the new line directly to avoid variable expansion issues
+        {
+            head -1 "$file_path"  # First --- line
+            printf '%s: %s\n' "$field_name" "$field_value"  # New field (preserves all chars)
+            tail -n +2 "$file_path"  # Rest of file
+        } > "${file_path}.tmp" && mv "${file_path}.tmp" "$file_path"
         log_debug "Added new field: $field_name"
     fi
 
@@ -60,8 +89,14 @@ get_frontmatter_field() {
         return 1
     fi
 
+    # Escape field name for safe use in patterns
+    local escaped_field_name
+    escaped_field_name=$(sed_escape_pattern "$field_name")
+
     local field_value
-    field_value=$(grep "^${field_name}:" "$file_path" | sed "s/^${field_name}: *//" | head -1)
+    # Use | delimiter to avoid conflicts with / in values
+    # Only remove the field name, colon, and exactly one space (YAML format)
+    field_value=$(grep "^${field_name}:" "$file_path" | sed "s|^${escaped_field_name}: ||" | head -1)
 
     log_debug "Retrieved field $field_name: '$field_value'"
     log_function_exit "get_frontmatter_field"

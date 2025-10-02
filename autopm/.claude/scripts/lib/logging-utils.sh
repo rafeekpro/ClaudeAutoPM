@@ -4,22 +4,26 @@
 
 set -euo pipefail
 
-# Colors for output
-readonly RED='\033[0;31m'
-readonly GREEN='\033[0;32m'
-readonly YELLOW='\033[1;33m'
-readonly BLUE='\033[0;34m'
-readonly PURPLE='\033[0;35m'
-readonly CYAN='\033[0;36m'
-readonly WHITE='\033[1;37m'
-readonly NC='\033[0m' # No Color
+# Colors for output (only define if not already defined)
+if [[ -z "${RED:-}" ]]; then
+    readonly RED='\033[0;31m'
+    readonly GREEN='\033[0;32m'
+    readonly YELLOW='\033[1;33m'
+    readonly BLUE='\033[0;34m'
+    readonly PURPLE='\033[0;35m'
+    readonly CYAN='\033[0;36m'
+    readonly WHITE='\033[1;37m'
+    readonly NC='\033[0m' # No Color
+fi
 
-# Log levels
-readonly LOG_LEVEL_DEBUG=0
-readonly LOG_LEVEL_INFO=1
-readonly LOG_LEVEL_WARNING=2
-readonly LOG_LEVEL_ERROR=3
-readonly LOG_LEVEL_SUCCESS=4
+# Log levels (only define if not already defined)
+if [[ -z "${LOG_LEVEL_DEBUG:-}" ]]; then
+    readonly LOG_LEVEL_DEBUG=0
+    readonly LOG_LEVEL_INFO=1
+    readonly LOG_LEVEL_WARNING=2
+    readonly LOG_LEVEL_ERROR=3
+    readonly LOG_LEVEL_SUCCESS=4
+fi
 
 # Default log level (can be overridden by AUTOPM_LOG_LEVEL env var)
 LOG_LEVEL=${AUTOPM_LOG_LEVEL:-$LOG_LEVEL_INFO}

@@ -1,10 +1,14 @@
 const fs = require('fs');
 const path = require('path');
+const { logError } = require('./lib/logger');
 
 /**
  * PM Context Script
  * Displays current project context, configuration, and progress
  */
+
+// Constants
+const TASK_FILE_PATTERN = /^\d{3}\.md$/;
 
 async function context() {
   console.log('');
@@ -132,7 +136,7 @@ async function context() {
             const fullPath = path.join(dir, entry.name);
             if (entry.isDirectory()) {
               countTasksInDir(fullPath, counters);
-            } else if (entry.isFile() && /^\d{3}\.md$/.test(entry.name)) {
+            } else if (entry.isFile() && TASK_FILE_PATTERN.test(entry.name)) {
               counters.epicTasks++;
               totalTasks++;
               try {
@@ -142,7 +146,7 @@ async function context() {
                   const status = statusMatch[1].trim().toLowerCase();
                   if (status === 'completed' || status === 'done' || status === 'closed') {
                     counters.epicCompleted++;
-              } else if (entry.isFile() && /^\d+\.md$/.test(entry.name)) {
+                    completedTasks++;
                   } else if (status === 'in-progress' || status === 'in_progress') {
                     counters.epicInProgress++;
                     inProgressTasks++;
@@ -244,7 +248,7 @@ async function context() {
               bestTask = subTask;
               bestTime = subTask.timeMs;
             }
-          } else if (entry.isFile() && /^\d{3}\.md$/.test(entry.name)) {
+          } else if (entry.isFile() && TASK_FILE_PATTERN.test(entry.name)) {
             const stats = fs.statSync(fullPath);
             if (stats.mtimeMs > bestTime) {
               const content = fs.readFileSync(fullPath, 'utf8');
@@ -326,7 +330,7 @@ function getTimeAgo(date) {
 // Run if called directly
 if (require.main === module) {
   context().catch(err => {
-    console.error('Error:', err.message);
+    logError('Error executing context command', err);
     process.exit(1);
   });
 }

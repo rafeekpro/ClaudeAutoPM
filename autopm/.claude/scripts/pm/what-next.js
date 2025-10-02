@@ -1,11 +1,37 @@
 const fs = require('fs');
 const fsPromises = require('fs').promises;
 const path = require('path');
+const { logError, logWarning, logDebug } = require('./lib/logger');
 
 /**
  * PM What-Next Script
  * Intelligent context-aware suggestions for next steps
  */
+
+// ============================================================================
+// Configuration Constants
+// ============================================================================
+
+// Task file naming pattern (e.g., 001.md, 002.md)
+const TASK_FILE_PATTERN = /^\d{3}\.md$/;
+
+// Epic complexity detection thresholds
+const COMPLEXITY_THRESHOLDS = {
+  // Content length threshold (characters)
+  LARGE_EPIC_SIZE: parseInt(process.env.PM_LARGE_EPIC_SIZE) || 5000,
+
+  // Task count thresholds
+  MANY_TASKS: parseInt(process.env.PM_MANY_TASKS) || 20,
+
+  // Keywords indicating multi-layer architecture
+  ARCHITECTURE_KEYWORDS: {
+    frontend: ['frontend', 'ui', 'client', 'react', 'vue', 'angular'],
+    backend: ['backend', 'api', 'server', 'service'],
+    database: ['database', 'db', 'postgres', 'mysql', 'mongodb'],
+    infrastructure: ['infrastructure', 'deploy', 'k8s', 'kubernetes', 'docker', 'ci/cd'],
+    integration: ['integration', 'third-party', 'external api', 'webhook']
+  }
+};
 
 async function whatNext() {
   console.log('');
@@ -75,13 +101,27 @@ async function analyzeProjectState() {
       const epicPath = path.join('.claude/epics', epicName);
       return analyzeEpicAsync(epicPath, epicName)
         .catch(err => {
-          console.error(`Failed to analyze epic "${epicName}":`, err);
-          return null; // or a fallback object if preferred
+          logWarning(`Failed to analyze epic "${epicName}": ${err.message}`);
+          logDebug(err.stack);
+          // Return a minimal fallback object to prevent Promise.all from failing
+          return {
+            name: epicName,
+            path: epicPath,
+            hasTasks: false,
+            taskCount: 0,
+            completedCount: 0,
+            inProgressCount: 0,
+            openCount: 0,
+            inProgressTasks: [],
+            openTasks: [],
+            isComplex: false,
+            hasArchitecture: false,
+            analysisFailed: true
+          };
         });
     });
 
-    const epicInfosRaw = await Promise.all(epicAnalysisPromises);
-    const epicInfos = epicInfosRaw.filter(info => info !== null);
+    const epicInfos = await Promise.all(epicAnalysisPromises);
 
     // Aggregate results
     for (const epicInfo of epicInfos) {
@@ -144,7 +184,7 @@ async function analyzeEpicAsync(epicPath, epicName) {
   // Check for task files
   try {
     const files = await fsPromises.readdir(epicPath);
-    const taskFiles = files.filter(f => /^\d{3}\.md$/.test(f));
+    const taskFiles = files.filter(f => TASK_FILE_PATTERN.test(f));
 
     info.hasTasks = taskFiles.length > 0;
     info.taskCount = taskFiles.length;
@@ -225,7 +265,7 @@ function analyzeEpic(epicPath, epicName) {
   // Check for task files
   try {
     const taskFiles = fs.readdirSync(epicPath)
-      .filter(f => /^\d{3}\.md$/.test(f));
+      .filter(f => TASK_FILE_PATTERN.test(f));
 
     info.hasTasks = taskFiles.length > 0;
     info.taskCount = taskFiles.length;
@@ -261,6 +301,89 @@ function analyzeEpic(epicPath, epicName) {
   }
 
   return info;
+}
+
+// ============================================================================
+// Epic Complexity Detection
+// ============================================================================
+
+/**
+ * Detect if an epic is complex enough to warrant splitting into sub-epics
+ *
+ * @param {string} epicContent - Content of the epic.md file
+ * @param {object} epicInfo - Epic metadata (taskCount, etc.)
+ * @returns {object} { isComplex: boolean, reasons: string[] }
+ */
+function detectEpicComplexity(epicContent, epicInfo = {}) {
+  const reasons = [];
+
+  if (!epicContent) {
+    return { isComplex: false, reasons: [] };
+  }
+
+  const contentLower = epicContent.toLowerCase();
+
+  // 1. Check for multi-layer architecture (frontend + backend)
+  const hasMultipleLayers = detectMultipleArchitectureLayers(contentLower);
+  if (hasMultipleLayers.detected) {
+    reasons.push(`Multiple architecture layers: ${hasMultipleLayers.layers.join(', ')}`);
+  }
+
+  // 2. Check for large content size
+  if (epicContent.length > COMPLEXITY_THRESHOLDS.LARGE_EPIC_SIZE) {
+    reasons.push(`Large epic size: ${epicContent.length} characters (threshold: ${COMPLEXITY_THRESHOLDS.LARGE_EPIC_SIZE})`);
+  }
+
+  // 3. Check for high estimated task count (if available)
+  if (epicInfo.taskCount && epicInfo.taskCount > COMPLEXITY_THRESHOLDS.MANY_TASKS) {
+    reasons.push(`Many tasks: ${epicInfo.taskCount} (threshold: ${COMPLEXITY_THRESHOLDS.MANY_TASKS})`);
+  }
+
+  // 4. Check for infrastructure/deployment complexity
+  const hasInfrastructure = COMPLEXITY_THRESHOLDS.ARCHITECTURE_KEYWORDS.infrastructure
+    .some(keyword => contentLower.includes(keyword));
+  if (hasInfrastructure) {
+    reasons.push('Contains infrastructure/deployment components');
+  }
+
+  // 5. Check for external integrations
+  const hasIntegrations = COMPLEXITY_THRESHOLDS.ARCHITECTURE_KEYWORDS.integration
+    .some(keyword => contentLower.includes(keyword));
+  if (hasIntegrations) {
+    reasons.push('Contains external service integrations');
+  }
+
+  return {
+    isComplex: reasons.length >= 2, // At least 2 complexity indicators
+    reasons
+  };
+}
+
+/**
+ * Detect multiple architecture layers in epic content
+ *
+ * @param {string} contentLower - Lowercase epic content
+ * @returns {object} { detected: boolean, layers: string[] }
+ */
+function detectMultipleArchitectureLayers(contentLower) {
+  const layers = [];
+  const keywords = COMPLEXITY_THRESHOLDS.ARCHITECTURE_KEYWORDS;
+
+  // Check each layer
+  for (const [layerName, layerKeywords] of Object.entries(keywords)) {
+    if (layerName === 'integration') continue; // Skip integration layer
+
+    const hasLayer = layerKeywords.some(keyword => contentLower.includes(keyword));
+    if (hasLayer) {
+      layers.push(layerName);
+    }
+  }
+
+  // Complex if has 2+ distinct layers (e.g., frontend + backend)
+  return {
+    detected: layers.length >= 2,
+    layers
+  };
 }
 
 // Generate suggestions based on state
@@ -305,11 +428,8 @@ function generateSuggestions(state) {
     for (const epic of epicsNeedingDecomposition) {
       // Check if this is a complex epic that should be split
       const epicContent = tryReadFile(path.join('.claude/epics', epic.name, 'epic.md'));
-      const isComplex = epicContent && (
-        epicContent.includes('frontend') && epicContent.includes('backend') ||
-        epicContent.includes('infrastructure') ||
-        epicContent.length > 5000
-      );
+      const complexityResult = detectEpicComplexity(epicContent, epic);
+      const isComplex = complexityResult.isComplex;
 
       if (isComplex) {
         suggestions.push({
@@ -532,7 +652,7 @@ function tryReadFile(filePath) {
 // Run if called directly
 if (require.main === module) {
   whatNext().catch(err => {
-    console.error('Error:', err.message);
+    logError('Error executing what-next command', err);
     process.exit(1);
   });
 }
