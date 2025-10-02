@@ -28,7 +28,7 @@ Each MCP server is defined in a Markdown file with:
 - **monitoring**: Observability and metrics
 
 ### Configuration Management
-- Servers defined in `autopm/.claude/mcp/*.md`
+- Servers defined in `.claude/mcp/*.md`
 - Active servers tracked in `.claude/config.json`
 - Runtime config generated to `.claude/mcp-servers.json`
 - Environment variables in `.claude/.env`
