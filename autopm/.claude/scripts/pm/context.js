@@ -231,35 +231,44 @@ async function context() {
 
     if (fs.existsSync('.claude/epics')) {
       function findRecentTask(dir) {
+        let bestTask = null;
+        let bestTime = 0;
         const entries = fs.readdirSync(dir, { withFileTypes: true });
 
         for (const entry of entries) {
           const fullPath = path.join(dir, entry.name);
 
           if (entry.isDirectory()) {
-            findRecentTask(fullPath);
+            const subTask = findRecentTask(fullPath);
+            if (subTask && subTask.timeMs > bestTime) {
+              bestTask = subTask;
+              bestTime = subTask.timeMs;
+            }
           } else if (entry.isFile() && /^\d{3}\.md$/.test(entry.name)) {
             const stats = fs.statSync(fullPath);
-            if (stats.mtimeMs > recentTime) {
-              recentTime = stats.mtimeMs;
-
-              // Extract task title
+            if (stats.mtimeMs > bestTime) {
               const content = fs.readFileSync(fullPath, 'utf8');
               const titleMatch = content.match(/^#\s+(.+)$/m);
               const statusMatch = content.match(/^status:\s*(.+)$/m);
-
-              recentTask = {
+              bestTask = {
                 path: fullPath,
                 title: titleMatch ? titleMatch[1] : entry.name,
                 status: statusMatch ? statusMatch[1].trim() : 'pending',
-                time: stats.mtime
+                time: stats.mtime,
+                timeMs: stats.mtimeMs
               };
+              bestTime = stats.mtimeMs;
             }
           }
         }
+        return bestTask;
       }
 
-      findRecentTask('.claude/epics');
+      const foundTask = findRecentTask('.claude/epics');
+      if (foundTask) {
+        recentTask = foundTask;
+        recentTime = foundTask.timeMs;
+      }
     }
 
     if (recentTask) {
