@@ -7,6 +7,72 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.15.4] - 2025-10-02
+
+### 🐛 Bug Fix: Missing Dependencies After Installation
+
+**Fixed installer not creating package.json or installing dependencies**
+
+The installer was not creating `package.json` in user projects, causing PM scripts like `epic-split.js` to fail with "Cannot find module 'js-yaml'" error.
+
+### 🎯 What Was Fixed
+
+1. **Added package.json.template handling:**
+   - Template now includes `js-yaml` dependency
+   - Installer creates `package.json` from template if it doesn't exist
+   - Auto-fills project name from directory name
+
+2. **Added automatic dependency installation:**
+   - Installer now runs `npm install` after copying files
+   - Only installs if `package.json` has dependencies
+   - Provides helpful error message if installation fails
+
+3. **Fixed PM script requirements:**
+   - `epic-split.js` now has required `js-yaml` dependency
+   - All other PM scripts will have dependencies available
+
+### 📊 Impact
+
+**Before v1.15.4:**
+```bash
+autopm install
+# Creates .claude/ but NO package.json
+# User runs /pm:epic-split
+# ERROR: Cannot find module 'js-yaml'
+```
+
+**After v1.15.4:**
+```bash
+autopm install
+# ✅ Creates package.json with dependencies
+# ✅ Runs npm install automatically
+# ✅ js-yaml installed and ready
+# User runs /pm:epic-split
+# ✅ Works perfectly!
+```
+
+### 🔧 Technical Changes
+
+**Files Modified:**
+- `autopm/scripts/package.json.template` - Added `js-yaml: ^4.1.0`
+- `install/install.js` - Added `installDependencies()` method
+- `install/install.js` - Added package.json creation logic in `installScripts()`
+
+### 📝 Migration Notes
+
+**For existing installations:**
+```bash
+# Add to your project root:
+npm install js-yaml
+
+# Or recreate package.json:
+cp autopm/scripts/package.json.template package.json
+npm install
+```
+
+**For new installations:**
+- Everything works automatically! 🎉
+
 ## [1.13.13] - 2025-10-01
 
 ### 🐛 Critical Bug Fix: MCP Server Definition Files
