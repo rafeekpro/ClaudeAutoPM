@@ -103,7 +103,7 @@ Notes: Added rate limiting middleware
 
 ```yaml
 backend-context:
-  agents: [python-backend-expert, postgresql-expert]
+  agents: [python-backend-expert, postgresql-expert, mongodb-expert]
   sources: [context7, context7]
   filters: [python, fastapi, flask, django, sqlalchemy, databases]
   persistence: true
