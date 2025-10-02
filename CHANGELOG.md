@@ -7,6 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.20.0] - 2025-10-02
+
+### 🧹 Cleanup: Package Size Optimization & Development Standards
+
+**Major cleanup of project structure and introduction of comprehensive development standards**
+
+### 🎯 What's Changed
+
+1. **lib/ Directory Cleanup:**
+   - Removed 18 unused subdirectories (azure, context, documentation, github, helpers, performance, pm, providers, python, react, regression, release, tailwind, traefik, utils, validators, workflow)
+   - Removed 3 unused files (agentExecutor.js.deprecated, commandHelpers.js, prdMetadata.js)
+   - Kept only `lib/guide/` which is used by CLI `autopm guide` command
+   - **Result:** Significantly reduced npm package size
+
+2. **New DEVELOPMENT-STANDARDS.md (836 lines):**
+   - Single source of truth for all AutoPM development standards
+   - Comprehensive templates and guidelines for:
+     - Agents (with examples and structures)
+     - Rules (best practices and naming)
+     - Commands (implementation patterns)
+     - Scripts (coding standards)
+     - Hooks (integration guide)
+   - Naming conventions and file organization
+   - Context management strategies
+
+3. **.claude/ Structure Optimization:**
+   - Reduced from 200+ files to 58 files (70% reduction)
+   - Removed unnecessary agents, rules, commands, and scripts
+   - Focus exclusively on JavaScript/Node.js/Bash development
+   - Removed Python, React, Tailwind, Traefik, and other framework-specific agents
+   - Streamlined project-level configuration
+
+### 📦 Package Impact
+
+- Smaller npm package size
+- Faster installation
+- Cleaner project structure
+- Easier maintenance
+
+### 🔧 Breaking Changes
+
+None - all changes are internal optimizations
+
 ## [1.19.0] - 2025-10-02
 
 ### ✨ Feature: PM Workflow Documentation & Context Command
