@@ -38,6 +38,7 @@ class Installer {
       '.claude/agents',
       '.claude/commands',
       '.claude/rules',
+      '.claude/hooks',
       '.claude/scripts',
       '.claude/checklists',
       '.claude/strategies',

@@ -2,6 +2,26 @@
 
 > Think carefully and implement the most concise solution that changes as little code as possible.
 
+## 🚨 AGENT USAGE - MANDATORY
+
+**CRITICAL: You MUST use specialized agents for ALL non-trivial tasks.**
+
+See: `.claude/rules/agent-mandatory.md` for complete enforcement rules.
+
+### Quick Reference - When to Use Agents:
+
+| Task Type | Agent | Example |
+|-----------|-------|---------|
+| Python code | `python-backend-engineer` | Build FastAPI endpoint |
+| React/UI | `react-frontend-engineer` | Create dashboard component |
+| Testing | `test-runner` | Run test suite |
+| Database | `postgresql-expert`, `mongodb-expert` | Design schema |
+| DevOps | `kubernetes-orchestrator`, `docker-containerization-expert` | Deploy app |
+| Code review | `code-analyzer` | Find bugs/security issues |
+| Large files | `file-analyzer` | Parse logs >1000 lines |
+
+**Before doing ANY complex task**: Check if there's a specialized agent. If YES → USE IT!
+
 ## Active Team Agents
 
 <!-- AGENTS_START -->
@@ -13,10 +33,14 @@
 
 All rule files in `.claude/rules/` define mandatory behaviors and must be followed:
 
+### 🚨 HIGHEST PRIORITY Rules
+
+- **agent-mandatory.md** - MANDATORY agent usage for all non-trivial tasks. READ THIS FIRST!
+- **tdd.enforcement.md** - Test-Driven Development cycle (RED-GREEN-REFACTOR)
+- **pipeline-mandatory.md** - Required pipelines for errors, features, bugs, code search, and log analysis
+
 ### Core Development Rules
 
-- **tdd.enforcement.md** - Test-Driven Development cycle (RED-GREEN-REFACTOR). HIGHEST PRIORITY for all code changes
-- **pipeline-mandatory.md** - Required pipelines for errors, features, bugs, code search, and log analysis
 - **naming-conventions.md** - Naming standards, code quality requirements, and prohibited patterns
 - **context-optimization.md** - Agent usage patterns for context preservation (<20% data return)
 - **development-workflow.md** - Development patterns, search-before-create, and best practices
