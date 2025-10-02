@@ -73,10 +73,15 @@ async function analyzeProjectState() {
     // Example: 10 epics × 50 tasks = 500 files processed in parallel
     const epicAnalysisPromises = epicDirs.map(epicName => {
       const epicPath = path.join('.claude/epics', epicName);
-      return analyzeEpicAsync(epicPath, epicName);
+      return analyzeEpicAsync(epicPath, epicName)
+        .catch(err => {
+          console.error(`Failed to analyze epic "${epicName}":`, err);
+          return null; // or a fallback object if preferred
+        });
     });
 
-    const epicInfos = await Promise.all(epicAnalysisPromises);
+    const epicInfosRaw = await Promise.all(epicAnalysisPromises);
+    const epicInfos = epicInfosRaw.filter(info => info !== null);
 
     // Aggregate results
     for (const epicInfo of epicInfos) {
