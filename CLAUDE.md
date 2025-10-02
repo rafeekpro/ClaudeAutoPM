@@ -17,6 +17,19 @@
 > This is the development repository for ClaudeAutoPM framework.
 > **IMPORTANT**: This project uses its own framework capabilities for self-maintenance.
 
+## 📋 Development Standards
+
+**ALL development MUST follow standards defined in:** `.claude/DEVELOPMENT-STANDARDS.md`
+
+This document defines MANDATORY standards for:
+- Agent development (templates, checklists, principles)
+- Rules development (patterns, formats, enforcement)
+- Command development (structure, output formats, tools)
+- Script development (Bash/Node.js templates, utilities)
+- Hook development (enforcement patterns)
+- Naming conventions (prohibitions, required patterns)
+- Code quality standards (principles, anti-patterns, checklist)
+
 ## 🚀 Development Methodology
 
 ### Test-Driven Development (TDD) is MANDATORY
