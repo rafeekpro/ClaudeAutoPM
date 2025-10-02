@@ -142,7 +142,7 @@ async function context() {
                   const status = statusMatch[1].trim().toLowerCase();
                   if (status === 'completed' || status === 'done' || status === 'closed') {
                     counters.epicCompleted++;
-                    completedTasks++;
+              } else if (entry.isFile() && /^\d+\.md$/.test(entry.name)) {
                   } else if (status === 'in-progress' || status === 'in_progress') {
                     counters.epicInProgress++;
                     inProgressTasks++;
