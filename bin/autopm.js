@@ -292,6 +292,7 @@ function main() {
 
 💡 Claude Code PM Commands:
    /pm:status                       # Project overview and health
+   /pm:context                      # Show current project context and progress
    /pm:validate                     # Validate configuration
    /pm:prd-new feature-name         # Create new Product Requirements Document
    /pm:prd-parse feature-name       # Parse PRD into epic structure
@@ -304,6 +305,29 @@ function main() {
    /pm:standup                      # Generate daily standup summary
    /pm:search keyword               # Search across PRDs and epics
    /pm:help                         # Show all PM commands
+
+📋 PM Workflow Decision Guide:
+
+   WHEN TO USE ONE EPIC (/pm:epic-decompose):
+   ✅ Simple feature (1-2 weeks)
+   ✅ Single component (frontend OR backend)
+   ✅ One developer
+   Examples: "User profile page", "REST API endpoint"
+
+   WHEN TO USE MULTIPLE EPICS (/pm:epic-split):
+   ✅ Complex project (2+ months)
+   ✅ Multiple components (frontend + backend + infra)
+   ✅ Multiple teams working in parallel
+   Examples: "E-commerce platform", "Social dashboard"
+
+   SIMPLE FEATURE FLOW:
+   /pm:prd-new feature → /pm:prd-parse feature → /pm:epic-decompose feature
+
+   COMPLEX PROJECT FLOW:
+   /pm:prd-new project → /pm:prd-parse project → /pm:epic-split project
+   → /pm:epic-decompose project/01-epic1 → /pm:epic-decompose project/02-epic2 ...
+
+   📖 Full Guide: See PM-WORKFLOW-GUIDE.md
 
 🚀 Complete Workflows:
 

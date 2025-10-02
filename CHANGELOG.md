@@ -7,6 +7,128 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.19.0] - 2025-10-02
+
+### ✨ Feature: PM Workflow Documentation & Context Command
+
+**Comprehensive PM workflow guide and new context command for project visibility**
+
+Users requested better understanding of the PM workflow process and a way to view current project state inside Claude Code.
+
+### 🎯 What's New
+
+1. **Complete PM Workflow Guide (`PM-WORKFLOW-GUIDE.md`):**
+   - Step-by-step process explanation (PRD → Parse → Split/Decompose → Sync)
+   - Decision guide: When to use one epic vs multiple epics
+   - Multiple workflow examples (simple features, complex projects, multiple PRDs)
+   - FAQ section answering common questions
+   - Quick reference tables and decision flowcharts
+
+2. **Enhanced Documentation:**
+   - Added "Complete PM Workflow Guide" section to README.md
+   - Updated `autopm help` with workflow decision guide
+   - Clear criteria for choosing `/pm:epic-split` vs `/pm:epic-decompose`
+
+3. **New `/pm:context` Command:**
+   - Displays current project configuration
+   - Shows active team and PRD list
+   - Epic progress with per-epic breakdown
+   - Visual progress bars for overall progress
+   - Recent activity tracking
+   - Quick command suggestions
+
+### 📊 Example Output
+
+**`/pm:context` in Claude Code:**
+```
+🎯 Project Context
+============================================================
+
+📦 Project Information:
+  Name:           my-project
+  Directory:      /path/to/project
+
+⚙️  Configuration:
+  Provider:       Github
+  GitHub Owner:   username
+  GitHub Repo:    repo-name
+
+👥 Active Team:
+  Team:           fullstack
+
+📄 Product Requirements (PRDs):
+  Total:          3
+    • user-authentication
+    • payment-system
+    • notifications
+
+📚 Epics & Progress:
+  Total Epics:    2
+  Total Tasks:    45
+    Completed:    20
+    In Progress:  5
+    Pending:      20
+
+  Epic Breakdown:
+    user-authentication
+      [==========----------] 50% (10/20 tasks)
+    payment-system
+      [========------------] 40% (10/25 tasks)
+
+📊 Overall Progress:
+  [====================--------------------] 44%
+  20 / 45 tasks completed
+
+🔄 Recent Activity:
+  Last Modified:  Implement JWT authentication
+  Status:         in-progress
+  Modified:       2 hours ago
+  File:           .claude/epics/user-authentication/003.md
+```
+
+### 🎯 Workflow Decision Guide
+
+**ONE epic (`/pm:epic-decompose`):**
+- Simple features (1-2 weeks)
+- Single component (frontend OR backend)
+- One developer
+- Examples: "User profile page", "REST API endpoint"
+
+**MULTIPLE epics (`/pm:epic-split`):**
+- Complex projects (2+ months)
+- Multiple components (frontend + backend + infrastructure)
+- Multiple teams working in parallel
+- Examples: "E-commerce platform", "Social media dashboard"
+
+### 🔧 Technical Changes
+
+**New Files:**
+- `PM-WORKFLOW-GUIDE.md` - Complete 400+ line workflow guide
+- `autopm/.claude/commands/pm/context.md` - Command definition
+- `autopm/.claude/scripts/pm/context.js` - Implementation (330 lines)
+
+**Modified Files:**
+- `README.md` - Added "Complete PM Workflow Guide" section
+- `bin/autopm.js` - Added workflow decision guide to help epilogue
+
+**Key Features of context.js:**
+- Project information extraction from package.json
+- Configuration reading from .claude/config.json
+- Active team detection from .claude/active_team.txt
+- PRD counting and listing from .claude/prds/
+- Epic/task progress tracking with status parsing
+- Progress bar generation
+- Recent activity tracking with time-ago calculations
+- Quick command suggestions
+
+### 📝 Addresses User Feedback
+
+This release answers user questions:
+- "nie rozumiem jaki jest proces" → Complete workflow guide
+- "Czy moge stworzyc kilka PRD na raz?" → Yes, explained in guide
+- "jak rozdzielam PRD na kilka Epikow a jak na jeden?" → Decision criteria provided
+- "Czy mozna dodac komende ktora wypisze aktualna konfiguracje?" → `/pm:context` command added
+
 ## [1.18.0] - 2025-10-02
 
 ### ✨ Feature: MCP Dependency Validation for Teams
