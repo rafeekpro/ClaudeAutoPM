@@ -291,6 +291,7 @@ function main() {
    autopm team reset                # Reset to default team
 
 💡 Claude Code PM Commands:
+   /pm:what-next                    # ⭐ Smart suggestions for what to do next
    /pm:status                       # Project overview and health
    /pm:context                      # Show current project context and progress
    /pm:validate                     # Validate configuration

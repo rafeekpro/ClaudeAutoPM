@@ -37,6 +37,19 @@ Users requested better understanding of the PM workflow process and a way to vie
    - Recent activity tracking
    - Quick command suggestions
 
+4. **New `/pm:what-next` Command:**
+   - Intelligent context-aware suggestions for next steps
+   - Analyzes current project state (PRDs, epics, tasks)
+   - Shows concrete commands with real project names (not abstract syntax)
+   - Explains why each step is needed
+   - Marks recommended actions with ⭐
+   - Adapts to different scenarios:
+     - New project → Suggests creating first PRD
+     - Has PRD → Suggests parsing to epic
+     - Has epic → Suggests decomposing or splitting
+     - Has tasks → Suggests syncing to GitHub
+     - Ready to work → Suggests starting tasks with TDD
+
 ### 📊 Example Output
 
 **`/pm:context` in Claude Code:**
@@ -86,6 +99,32 @@ Users requested better understanding of the PM workflow process and a way to vie
   File:           .claude/epics/user-authentication/003.md
 ```
 
+**`/pm:what-next` in Claude Code:**
+```
+🎯 What Should I Do Next?
+============================================================
+
+📊 Current Project Status:
+
+  📄 PRDs: 1 (user-authentication)
+  📚 Epics: 1
+  ✅ Tasks: 0 / 2 completed
+  📋 Ready: 2 tasks waiting
+
+💡 Suggested Next Steps:
+
+1. ⭐ Start Working on Tasks
+   You have 2 tasks ready to work on
+
+   /pm:next
+   → Shows highest priority available tasks
+   /pm:issue-start 001
+   → Start: "Implement JWT authentication"
+   💭 Begin implementation with TDD approach
+
+💡 Tip: Run /pm:context to see detailed project status
+```
+
 ### 🎯 Workflow Decision Guide
 
 **ONE epic (`/pm:epic-decompose`):**
@@ -106,6 +145,8 @@ Users requested better understanding of the PM workflow process and a way to vie
 - `PM-WORKFLOW-GUIDE.md` - Complete 400+ line workflow guide
 - `autopm/.claude/commands/pm/context.md` - Command definition
 - `autopm/.claude/scripts/pm/context.js` - Implementation (330 lines)
+- `autopm/.claude/commands/pm/what-next.md` - Command definition
+- `autopm/.claude/scripts/pm/what-next.js` - Implementation (400+ lines)
 
 **Modified Files:**
 - `README.md` - Added "Complete PM Workflow Guide" section
@@ -121,6 +162,16 @@ Users requested better understanding of the PM workflow process and a way to vie
 - Recent activity tracking with time-ago calculations
 - Quick command suggestions
 
+**Key Features of what-next.js:**
+- Multi-scenario project state analysis (7 distinct scenarios)
+- Context-aware command suggestions with real project names
+- Epic complexity detection (simple vs complex for split decision)
+- Priority-based suggestion ordering (high/medium/low)
+- Recommendation markers (⭐) for best next action
+- Explanations for why each step is needed
+- Adapts to project phase (new → PRD → epic → tasks → work)
+- In-progress task tracking and continuation suggestions
+
 ### 📝 Addresses User Feedback
 
 This release answers user questions:
@@ -128,6 +179,7 @@ This release answers user questions:
 - "Czy moge stworzyc kilka PRD na raz?" → Yes, explained in guide
 - "jak rozdzielam PRD na kilka Epikow a jak na jeden?" → Decision criteria provided
 - "Czy mozna dodac komende ktora wypisze aktualna konfiguracje?" → `/pm:context` command added
+- "chcialbym wewnatrz claude taka komende 'what-next'" → `/pm:what-next` command with intelligent suggestions
 
 ## [1.18.0] - 2025-10-02
 
