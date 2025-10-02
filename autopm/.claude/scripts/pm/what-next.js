@@ -522,6 +522,9 @@ function tryReadFile(filePath) {
   try {
     return fs.readFileSync(filePath, 'utf8');
   } catch (err) {
+    if (err.code !== 'ENOENT') {
+      console.error(`Error reading file "${filePath}":`, err.message);
+    }
     return null;
   }
 }
