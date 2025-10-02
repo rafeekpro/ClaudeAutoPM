@@ -5,12 +5,13 @@
 
 <!-- AGENTS_START -->
 - @include .claude/agents/core/agent-manager.md
-- @include .claude/agents/devops/azure-devops-specialist.md
 - @include .claude/agents/core/code-analyzer.md
-- @include .claude/agents/devops/docker-containerization-expert.md
 - @include .claude/agents/core/file-analyzer.md
-- @include .claude/agents/devops/github-operations-specialist.md
 - @include .claude/agents/core/test-runner.md
+- @include .claude/agents/languages/bash-scripting-expert.md
+- @include .claude/agents/languages/javascript-frontend-engineer.md
+- @include .claude/agents/languages/nodejs-backend-engineer.md
+- @include .claude/agents/testing/e2e-test-engineer.md
 <!-- AGENTS_END -->
 
 > This is the development repository for ClaudeAutoPM framework.
