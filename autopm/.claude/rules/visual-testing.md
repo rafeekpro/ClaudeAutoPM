@@ -179,8 +179,8 @@ describe('Accessibility', () => {
 
 ### Required Agents for Visual Testing
 
-- **playwright-test-engineer**: Visual regression tests
-- **playwright-mcp-frontend-tester**: Browser automation
+- **frontend-testing-engineer**: Visual regression tests
+- **frontend-testing-engineer**: Browser automation
 - **react-frontend-engineer**: Component development
 - **code-analyzer**: Review UI code quality
 
@@ -188,7 +188,7 @@ describe('Accessibility', () => {
 
 ```
 1. Implement UI change following TDD
-2. playwright-test-engineer → Create visual tests
+2. frontend-testing-engineer → Create visual tests
 3. Run visual regression tests at all breakpoints
 4. code-analyzer → Verify accessibility
 5. Capture screenshots for PR

@@ -300,7 +300,7 @@ Before delivering GitHub configurations:
 
 - **react-frontend-engineer**: Frontend deployment workflows
 - **python-backend-engineer**: Backend CI/CD pipelines
-- **playwright-test-engineer**: E2E testing in workflows
+- **frontend-testing-engineer**: E2E testing in workflows
 - **kubernetes-orchestrator**: Deployment to K8s clusters
 - **azure-devops-specialist**: Cross-platform integration
 

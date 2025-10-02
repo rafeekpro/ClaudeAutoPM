@@ -18,7 +18,7 @@ streams:
 
   backend:
     name: "Backend Implementation"
-    agent: "python-backend-expert"
+    agent: "python-backend-engineer"
     priority: 2
     dependencies: ["analysis"]
     tasks:

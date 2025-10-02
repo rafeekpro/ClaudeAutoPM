@@ -30,7 +30,7 @@ streams:
 
   components:
     name: "Component Development"
-    agent: "react-ui-expert"
+    agent: "react-frontend-engineer"
     priority: 2
     parameters:
       framework: "mui"
@@ -83,7 +83,7 @@ streams:
 
   tests:
     name: "Testing & QA"
-    agent: "playwright-test-engineer"
+    agent: "frontend-testing-engineer"
     priority: 5
     dependencies: ["integration"]
     tasks:

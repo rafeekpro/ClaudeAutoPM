@@ -153,9 +153,9 @@ Access UX design and accessibility documentation:
 
 ### Works With
 - **react-frontend-engineer**: Implementation of designs
-- **mui-react-expert**, **chakra-ui-expert**, **antd-react-expert**: Component styling
+- **react-frontend-engineer**, **react-frontend-engineer**, **antd-react-expert**: Component styling
 - **tailwindcss-expert**, **bootstrap-ui-expert**: CSS frameworks
-- **playwright-test-engineer**: Usability testing automation
+- **frontend-testing-engineer**: Usability testing automation
 - **javascript-frontend-engineer**: Interactive features
 
 ### Provides To

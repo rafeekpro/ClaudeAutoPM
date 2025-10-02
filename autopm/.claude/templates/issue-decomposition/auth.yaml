@@ -30,7 +30,7 @@ streams:
 
   backend:
     name: "Service Layer"
-    agent: "python-backend-expert"
+    agent: "python-backend-engineer"
     priority: 2
     parameters:
       framework: "fastapi"
@@ -49,7 +49,7 @@ streams:
 
   api:
     name: "API Endpoints"
-    agent: "fastapi-backend-engineer"
+    agent: "python-backend-engineer"
     priority: 3
     dependencies: ["backend"]
     tasks:
@@ -68,7 +68,7 @@ streams:
 
   frontend:
     name: "UI Components"
-    agent: "react-ui-expert"
+    agent: "react-frontend-engineer"
     priority: 4
     parameters:
       framework: "mui"
@@ -91,7 +91,7 @@ streams:
 
   tests:
     name: "Test Suite"
-    agent: "playwright-test-engineer"
+    agent: "frontend-testing-engineer"
     priority: 5
     dependencies: ["frontend", "api"]
     tasks:

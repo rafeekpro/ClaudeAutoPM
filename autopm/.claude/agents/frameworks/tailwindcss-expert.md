@@ -60,8 +60,8 @@ Access Tailwind CSS documentation through context7:
 - Long-term maintainability and scalability are important
 
 **Consider alternatives when:**
-- Need rapid development with pre-built components (→ bootstrap-ui-expert or chakra-ui-expert)
-- Material Design is required (→ mui-react-expert)
+- Need rapid development with pre-built components (→ bootstrap-ui-expert or react-frontend-engineer)
+- Material Design is required (→ react-frontend-engineer)
 - Enterprise data components needed (→ antd-react-expert)
 - Team lacks advanced CSS skills (→ component-based alternatives)
 
@@ -737,5 +737,5 @@ module.exports = {
 ## Integration Points
 
 - Works with: react-frontend-engineer, ux-design-expert, bootstrap-ui-expert
-- Hands off to: playwright-test-engineer for testing
+- Hands off to: frontend-testing-engineer for testing
 - Receives from: design system specifications and UI mockups

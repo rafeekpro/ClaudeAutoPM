@@ -28,7 +28,7 @@ streams:
 
   backend:
     name: "API Implementation"
-    agent: "python-backend-expert"
+    agent: "python-backend-engineer"
     priority: 2
     parameters:
       framework: "fastapi"
@@ -63,7 +63,7 @@ streams:
 
   integration:
     name: "Integration Layer"
-    agent: "python-backend-expert"
+    agent: "python-backend-engineer"
     priority: 4
     dependencies: ["middleware"]
     tasks:

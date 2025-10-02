@@ -26,7 +26,7 @@ Use appropriate agents for traditional development:
 - Component architecture and state management
 - Traditional build tools (webpack, vite)
 
-#### playwright-test-engineer
+#### frontend-testing-engineer
 - E2E testing with native runners
 - Cross-browser testing
 - Test automation frameworks
