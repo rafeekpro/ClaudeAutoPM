@@ -130,7 +130,7 @@ Use these queries:
 
 ## Integration Points
 
-- Works with: kubernetes-orchestrator, docker-expert, nodejs-backend-engineer, python-backend-engineer, github-operations-specialist
+- Works with: kubernetes-orchestrator, docker-containerization-expert, nodejs-backend-engineer, python-backend-engineer, github-operations-specialist
 - Provides to: Microservices, event systems, real-time apps, distributed systems
 - Client libraries: Go, Python, Node.js, Java, C#, Rust
 

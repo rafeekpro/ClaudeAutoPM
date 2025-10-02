@@ -4,7 +4,7 @@ Use Docker-aware agents for containerized development:
 
 ### Docker Specialists (PRIMARY)
 
-#### docker-expert
+#### docker-containerization-expert
 **Use for**: Dockerfile optimization, multi-stage builds, security
 - Container best practices
 - Image size optimization

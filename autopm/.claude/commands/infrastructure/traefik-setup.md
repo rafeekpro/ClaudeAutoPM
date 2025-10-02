@@ -38,5 +38,5 @@ Parameters: environment=production, ssl=letsencrypt, discovery=docker, features=
 ```
 
 ## Related Agents
-- docker-expert: For container configuration
+- docker-containerization-expert: For container configuration
 - kubernetes-orchestrator: For K8s integration

@@ -43,7 +43,7 @@ project/
 ```bash
 # 1. Check if Docker files exist
 if [ ! -f "Dockerfile" ]; then
-  Use docker-expert agent to create Dockerfile
+  Use docker-containerization-expert agent to create Dockerfile
 fi
 
 # 2. Build development image
