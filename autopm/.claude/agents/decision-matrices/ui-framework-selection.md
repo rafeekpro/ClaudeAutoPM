@@ -31,7 +31,7 @@ Use this matrix to choose the right UI framework agent based on your project req
 ### Project Type
 
 #### Enterprise Applications
-**Primary Choice: antd-react-expert**
+**Primary Choice: react-ui-expert**
 - Pre-built complex components (ProTable, ProForm)
 - Enterprise-grade data management
 - Professional design language
@@ -44,7 +44,7 @@ Use this matrix to choose the right UI framework agent based on your project req
 - Large ecosystem
 
 #### Startup/MVP
-**Primary Choice: bootstrap-ui-expert**
+**Primary Choice: react-ui-expert**
 - Fastest development time
 - Extensive pre-built templates
 - Strong community resources
@@ -72,7 +72,7 @@ Use this matrix to choose the right UI framework agent based on your project req
 ### Team Expertise
 
 #### Junior Developers
-1. **bootstrap-ui-expert** - Familiar patterns, extensive docs
+1. **react-ui-expert** - Familiar patterns, extensive docs
 2. **react-frontend-engineer** - Intuitive API, good defaults
 3. **react-frontend-engineer** - Material Design guidelines
 
@@ -86,22 +86,22 @@ Use this matrix to choose the right UI framework agent based on your project req
 #### Performance Critical
 1. **tailwindcss-expert** - Purged CSS, optimal bundles
 2. **react-frontend-engineer** - Tree-shakeable, efficient
-3. **bootstrap-ui-expert** - Minimal JS overhead
+3. **react-ui-expert** - Minimal JS overhead
 
 #### Accessibility Required
 1. **react-frontend-engineer** - Accessibility-first design
 2. **react-frontend-engineer** - ARIA compliance built-in
-3. **antd-react-expert** - Enterprise accessibility
+3. **react-ui-expert** - Enterprise accessibility
 
 #### Mobile-First
 1. **tailwindcss-expert** - Mobile-first utilities
-2. **bootstrap-ui-expert** - Mobile-first grid
+2. **react-ui-expert** - Mobile-first grid
 3. **react-frontend-engineer** - Responsive design patterns
 
 ### Industry/Domain
 
 #### Financial Services
-**Primary: antd-react-expert**
+**Primary: react-ui-expert**
 - Data-heavy interfaces
 - Professional appearance
 - Complex forms/tables
@@ -144,7 +144,7 @@ Use this matrix to choose the right UI framework agent based on your project req
 
 #### From Custom CSS → Component Library
 - **Reason**: Faster development, consistency
-- **Agent**: react-frontend-engineer (modern) or bootstrap-ui-expert (familiar)
+- **Agent**: react-frontend-engineer (modern) or react-ui-expert (familiar)
 - **Effort**: Moderate to High
 - **Benefits**: Accessibility, maintainability
 
@@ -153,41 +153,41 @@ Use this matrix to choose the right UI framework agent based on your project req
 Ask these questions to determine the best agent:
 
 1. **What is the primary use case?**
-   - Admin dashboard → antd-react-expert
-   - Marketing site → bootstrap-ui-expert or tailwindcss-expert
+   - Admin dashboard → react-ui-expert
+   - Marketing site → react-ui-expert or tailwindcss-expert
    - SaaS product → react-frontend-engineer or react-frontend-engineer
 
 2. **What is the team's experience level?**
-   - Junior team → bootstrap-ui-expert or react-frontend-engineer
+   - Junior team → react-ui-expert or react-frontend-engineer
    - Senior team → tailwindcss-expert or react-frontend-engineer
 
 3. **How important is design flexibility?**
    - Critical → tailwindcss-expert
    - Important → react-frontend-engineer
-   - Standard → react-frontend-engineer or antd-react-expert
-   - Basic → bootstrap-ui-expert
+   - Standard → react-frontend-engineer or react-ui-expert
+   - Basic → react-ui-expert
 
 4. **What are the performance requirements?**
    - Critical → tailwindcss-expert or react-frontend-engineer
    - Important → react-frontend-engineer (with optimization)
-   - Standard → antd-react-expert or bootstrap-ui-expert
+   - Standard → react-ui-expert or react-ui-expert
 
 5. **Is accessibility a requirement?**
    - Critical → react-frontend-engineer or react-frontend-engineer
-   - Important → antd-react-expert
-   - Standard → bootstrap-ui-expert or tailwindcss-expert (with extra work)
+   - Important → react-ui-expert
+   - Standard → react-ui-expert or tailwindcss-expert (with extra work)
 
 6. **What type of data interfaces are needed?**
-   - Complex tables → antd-react-expert or react-frontend-engineer
+   - Complex tables → react-ui-expert or react-frontend-engineer
    - Forms → All frameworks suitable
    - Charts/visualization → react-frontend-engineer or tailwindcss-expert
-   - Simple content → bootstrap-ui-expert or react-frontend-engineer
+   - Simple content → react-ui-expert or react-frontend-engineer
 
 ## Agent Selection Examples
 
 ### Example 1: B2B SaaS Dashboard
 **Requirements**: Professional look, complex data tables, user management, responsive
-**Choice**: antd-react-expert
+**Choice**: react-ui-expert
 **Reasoning**: ProTable for data, enterprise components, professional design
 
 ### Example 2: Consumer Mobile App
@@ -197,7 +197,7 @@ Ask these questions to determine the best agent:
 
 ### Example 3: Startup MVP
 **Requirements**: Fast development, standard UI patterns, small team, limited budget
-**Choice**: bootstrap-ui-expert
+**Choice**: react-ui-expert
 **Reasoning**: Fastest development, familiar patterns, extensive resources
 
 ### Example 4: Design System Creation

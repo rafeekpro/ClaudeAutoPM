@@ -6,7 +6,7 @@
 
 ### 1. FRAMEWORK DECISION MATRIX
 
-**Bootstrap** - Use `bootstrap-ui-expert`:
+**Bootstrap** - Use `react-ui-expert` (framework=bootstrap):
 
 - Rapid prototyping and MVP development
 - Component-heavy applications (dashboards, admin panels)
