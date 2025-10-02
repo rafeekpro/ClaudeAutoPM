@@ -323,7 +323,8 @@ ${this.colors.BOLD}Examples:${this.colors.NC}
       'safe-commit.sh',
       'safe-commit.js',
       'setup-hooks.sh',
-      'setup-hooks.js'
+      'setup-hooks.js',
+      'epic-status.sh'
     ];
 
     for (const script of scripts) {
