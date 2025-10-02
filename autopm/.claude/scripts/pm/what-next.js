@@ -1,4 +1,5 @@
 const fs = require('fs');
+const fsPromises = require('fs').promises;
 const path = require('path');
 
 /**
@@ -67,10 +68,18 @@ async function analyzeProjectState() {
     state.hasEpics = epicDirs.length > 0;
     state.epicCount = epicDirs.length;
 
-    // Analyze each epic
-    for (const epicName of epicDirs) {
+    // Analyze all epics in parallel for better performance
+    // This prevents blocking when projects have many epics/tasks
+    // Example: 10 epics × 50 tasks = 500 files processed in parallel
+    const epicAnalysisPromises = epicDirs.map(epicName => {
       const epicPath = path.join('.claude/epics', epicName);
-      const epicInfo = analyzeEpic(epicPath, epicName);
+      return analyzeEpicAsync(epicPath, epicName);
+    });
+
+    const epicInfos = await Promise.all(epicAnalysisPromises);
+
+    // Aggregate results
+    for (const epicInfo of epicInfos) {
       state.epics.push(epicInfo);
 
       // Count tasks
@@ -100,7 +109,87 @@ async function analyzeProjectState() {
   return state;
 }
 
-// Analyze single epic
+// Analyze single epic (async version for parallel processing)
+async function analyzeEpicAsync(epicPath, epicName) {
+  const info = {
+    name: epicName,
+    hasEpicFile: false,
+    hasTasks: false,
+    taskCount: 0,
+    completedCount: 0,
+    inProgressCount: 0,
+    openCount: 0,
+    syncedToGitHub: false,
+    inProgressTasks: [],
+    openTasks: []
+  };
+
+  // Check for epic.md
+  const epicFile = path.join(epicPath, 'epic.md');
+  try {
+    await fsPromises.access(epicFile);
+    info.hasEpicFile = true;
+
+    const content = await fsPromises.readFile(epicFile, 'utf8');
+    info.syncedToGitHub = /^github:/m.test(content);
+  } catch (err) {
+    // File doesn't exist or can't be read
+  }
+
+  // Check for task files
+  try {
+    const files = await fsPromises.readdir(epicPath);
+    const taskFiles = files.filter(f => /^\d{3}\.md$/.test(f));
+
+    info.hasTasks = taskFiles.length > 0;
+    info.taskCount = taskFiles.length;
+
+    // Analyze all tasks in parallel
+    const taskAnalysisPromises = taskFiles.map(async (taskFile) => {
+      const taskPath = path.join(epicPath, taskFile);
+      try {
+        const content = await fsPromises.readFile(taskPath, 'utf8');
+        const statusMatch = content.match(/^status:\s*(.+)$/m);
+        const status = statusMatch ? statusMatch[1].trim().toLowerCase() : 'open';
+
+        const nameMatch = content.match(/^name:\s*(.+)$/m);
+        const taskName = nameMatch ? nameMatch[1].trim() : taskFile;
+
+        const taskNum = taskFile.replace('.md', '');
+
+        return { status, taskName, taskNum };
+      } catch (err) {
+        // Ignore task read errors
+        return null;
+      }
+    });
+
+    const taskResults = await Promise.all(taskAnalysisPromises);
+
+    // Aggregate task results
+    for (const result of taskResults) {
+      if (!result) continue;
+
+      const { status, taskName, taskNum } = result;
+
+      if (status === 'completed' || status === 'done' || status === 'closed') {
+        info.completedCount++;
+      } else if (status === 'in-progress' || status === 'in_progress') {
+        info.inProgressCount++;
+        info.inProgressTasks.push({ epicName, taskNum, name: taskName });
+      } else {
+        info.openCount++;
+        info.openTasks.push({ epicName, taskNum, name: taskName });
+      }
+    }
+  } catch (err) {
+    // Ignore directory read errors
+  }
+
+  return info;
+}
+
+// Analyze single epic (synchronous - kept for backward compatibility)
 function analyzeEpic(epicPath, epicName) {
   const info = {
     name: epicName,
