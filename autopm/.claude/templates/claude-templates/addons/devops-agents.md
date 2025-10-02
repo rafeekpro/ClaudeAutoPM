@@ -20,7 +20,7 @@ Use specialized agents for Docker + Kubernetes workflows:
 
 ### Container Specialists
 
-#### docker-expert
+#### docker-containerization-expert
 **Use for**: Production-grade images
 - Multi-stage builds
 - Security hardening

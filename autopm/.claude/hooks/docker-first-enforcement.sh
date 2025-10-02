@@ -89,7 +89,7 @@ check_docker_files() {
     if [[ ${#missing_files[@]} -gt 0 ]]; then
         echo ""
         echo "📝 MISSING FILES: ${missing_files[*]}"
-        echo "💡 TIP: Use docker-expert agent to create Docker files:"
+        echo "💡 TIP: Use docker-containerization-expert agent to create Docker files:"
         echo "   Task: Create Docker development environment for this project"
         echo ""
     fi
