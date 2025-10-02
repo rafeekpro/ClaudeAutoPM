@@ -17,7 +17,7 @@ Do NOT perform complex tasks yourself. Use the Task tool to delegate to appropri
    - Example: "I need to create an API endpoint" → Use python-backend-engineer
 
 2. **Testing**
-   - Use: `test-runner`, `frontend-testing-engineer`, `frontend-testing-engineer`
+   - Use: `test-runner`, `frontend-testing-engineer`, `e2e-test-engineer`
    - Example: "Run the test suite" → Use test-runner
 
 3. **Infrastructure/DevOps**
