@@ -7,6 +7,81 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.18.0] - 2025-10-02
+
+### ✨ Feature: MCP Dependency Validation for Teams
+
+**Automatic detection and warnings for missing MCP server dependencies when loading agent teams**
+
+Users requested visibility when agents require MCP servers that aren't installed or activated. This release adds automatic validation during team loading.
+
+### 🎯 What's New
+
+1. **Automatic MCP Dependency Detection:**
+   - Scans all agents in a team for MCP server requirements
+   - Detects `mcp://server-name/path` URIs in agent documentation
+   - Validates against currently active MCP servers
+   - Shows warnings with clear fix instructions
+
+2. **Two Types of Warnings:**
+   - ❌ **NOT INSTALLED**: Server definition doesn't exist
+     - Fix: `autopm mcp install <server-name>`
+   - ⚪ **NOT ACTIVE**: Server exists but isn't enabled
+     - Fix: `autopm mcp enable <server-name>`
+
+3. **Clear Action Items:**
+   - Lists which agents need each missing server
+   - Provides exact command to fix the issue
+   - Includes helpful tips for MCP configuration
+
+### 📊 Example Output
+
+```bash
+$ autopm team load frontend
+
+🔄 Loading team 'frontend'...
+   Resolved 9 agents (including inherited)
+
+⚠️  MCP Dependency Warnings:
+
+⚪ MCP server 'context7' is NOT ACTIVE
+   Required by: react-frontend-engineer, javascript-frontend-engineer, ux-design-expert
+   Fix: autopm mcp enable context7
+
+💡 Tip: Run "autopm mcp list" to see all MCP servers
+💡 Tip: Run "autopm mcp setup" for interactive configuration
+
+✓ Updated CLAUDE.md with team agents
+✓ Team 'frontend' activated successfully
+```
+
+### 🔧 Technical Changes
+
+**Modified Files:**
+- `bin/commands/team.js` - Added `validateAgentMCPDependencies()` function
+- `bin/commands/team.js` - Integrated MCP validation into team load command
+
+**How It Works:**
+1. After resolving team agents, validates MCP dependencies
+2. Uses existing MCPHandler to scan agent files for MCP URIs
+3. Checks each required server against active servers list
+4. Displays warnings for missing/inactive servers
+5. Continues with team loading (non-blocking validation)
+
+### 📝 Migration Notes
+
+**For all users:**
+- MCP validation happens automatically when loading teams
+- No configuration required - works out of the box
+- Warnings are informational and don't block team loading
+
+**Affected Agents:**
+Many agents now declare MCP dependencies for documentation access:
+- `react-frontend-engineer` - Needs context7 for React/Next.js docs
+- `python-backend-engineer` - Needs context7 for Python/FastAPI docs
+- `javascript-frontend-engineer` - Needs context7 for JS/TS docs
+- And many more...
+
 ## [1.17.0] - 2025-10-02
 
 ### ✨ Feature: Mandatory Agent Usage Enforcement
