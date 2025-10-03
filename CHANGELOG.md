@@ -7,6 +7,75 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.26.0] - 2025-10-03
+
+### 🚀 New Tool
+
+**Epic Status Tracker (JavaScript)**
+
+Replaced `epic-status.sh` (104 lines of Bash) with clean, testable JavaScript tool.
+
+### Added
+
+**New JavaScript Tool:**
+- `epicStatus.js` - Complete epic progress tracking
+  - Replaces `epic-status.sh` (104 lines Bash)
+  - Counts tasks by status (completed/in-progress/pending)
+  - Calculates progress percentage
+  - Visual progress bar rendering
+  - Sub-epic breakdown with statistics
+  - 200 lines of clean, testable code
+  - 21 comprehensive unit tests (100% pass rate)
+
+**Features:**
+- Parse frontmatter from markdown task files
+- Find task files with pattern matching (`\d+.md`)
+- Count tasks by status with variant support (`in_progress` vs `in-progress`)
+- Generate ASCII progress bars with customizable length
+- List available epics in directory
+- Comprehensive error handling for missing files/directories
+
+**Usage:**
+```bash
+# Show epic status
+node .claude/lib/commands/pm/epicStatus.js epic-name
+
+# List available epics
+node .claude/lib/commands/pm/epicStatus.js
+```
+
+### Changed
+
+**Code Quality Improvements:**
+- 📊 Now **10 Bash scripts** → **3 JavaScript tools** (was 9 → 2)
+- 📉 Total reduction: ~2600 → ~1500 lines (42% reduction)
+- ✅ All functions exported and fully tested
+- 🧪 Test coverage: 21 tests for epicStatus.js
+- 📖 Clear function signatures with JSDoc potential
+- 🚀 No subprocess overhead (pure Node.js)
+
+**Documentation:**
+- Added Epic Status section to README.md
+- Example output visualization
+- Updated "Why JavaScript Tools?" stats
+
+### Technical Details
+
+**epicStatus.js exports:**
+- `parseFrontmatter(filePath)` - Extract YAML frontmatter
+- `findTaskFiles(dir, maxDepth)` - Recursive task file discovery
+- `countTasksByStatus(taskFiles)` - Status aggregation
+- `generateProgressBar(percentage, length)` - ASCII visualization
+- `getSubEpicBreakdown(epicDir)` - Sub-epic statistics
+- `formatEpicStatus(epicName, epicDir)` - Complete report generation
+- `listAvailableEpics(epicsDir)` - Directory listing
+
+### Deprecated
+
+- `autopm/scripts/epic-status.sh` - Replaced by `epicStatus.js`
+  - Old Bash script still works but discouraged
+  - Will be removed in v2.0.0
+
 ## [1.25.0] - 2025-10-03
 
 ### 🚀 Major Improvement
