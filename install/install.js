@@ -364,7 +364,7 @@ ${this.colors.BOLD}Examples:${this.colors.NC}
       fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf-8');
       this.printSuccess('Created package.json');
     } else if (fs.existsSync(packageJsonPath)) {
-      this.printInfo('package.json already exists, skipping');
+      this.printStep('package.json already exists, skipping');
     }
   }
 
@@ -372,7 +372,7 @@ ${this.colors.BOLD}Examples:${this.colors.NC}
     const packageJsonPath = path.join(this.targetDir, 'package.json');
 
     if (!fs.existsSync(packageJsonPath)) {
-      this.printInfo('No package.json found, skipping dependency installation');
+      this.printStep('No package.json found, skipping dependency installation');
       return;
     }
 
@@ -382,7 +382,7 @@ ${this.colors.BOLD}Examples:${this.colors.NC}
       // Check if package.json has dependencies
       const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
       if (!packageJson.dependencies || Object.keys(packageJson.dependencies).length === 0) {
-        this.printInfo('No dependencies to install');
+        this.printStep('No dependencies to install');
         return;
       }
 
@@ -396,7 +396,7 @@ ${this.colors.BOLD}Examples:${this.colors.NC}
       this.printSuccess('Dependencies installed successfully');
     } catch (error) {
       this.printWarning(`Failed to install dependencies: ${error.message}`);
-      this.printInfo('You can manually run: npm install');
+      this.printStep('You can manually run: npm install');
     }
   }
 
