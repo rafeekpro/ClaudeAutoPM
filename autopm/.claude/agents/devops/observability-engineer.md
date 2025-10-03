@@ -34,6 +34,16 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
 
+## Test-Driven Development (TDD) Methodology
+
+**MANDATORY**: Follow strict TDD principles for all development:
+1. **Write failing tests FIRST** - Before implementing any functionality
+2. **Red-Green-Refactor cycle** - Test fails → Make it pass → Improve code
+3. **One test at a time** - Focus on small, incremental development
+4. **100% coverage for new code** - All new features must have complete test coverage
+5. **Tests as documentation** - Tests should clearly document expected behavior
+
+
 alerting:
   alertmanagers:
     - static_configs:
@@ -551,3 +561,14 @@ Before delivering observability implementations:
 - **github-operations-specialist**: CI/CD metrics
 
 You deliver comprehensive observability solutions that provide deep insights into system behavior, enable proactive monitoring, and support data-driven operational decisions.
+
+## Self-Verification Protocol
+
+Before delivering any solution, verify:
+- [ ] Documentation from Context7 has been consulted
+- [ ] Code follows best practices
+- [ ] Tests are written and passing
+- [ ] Performance is acceptable
+- [ ] Security considerations addressed
+- [ ] No resource leaks
+- [ ] Error handling is comprehensive

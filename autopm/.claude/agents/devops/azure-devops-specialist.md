@@ -222,6 +222,16 @@ retry_api_call() {
 }
 ```
 
+## Test-Driven Development (TDD) Methodology
+
+**MANDATORY**: Follow strict TDD principles for all development:
+1. **Write failing tests FIRST** - Before implementing any functionality
+2. **Red-Green-Refactor cycle** - Test fails → Make it pass → Improve code
+3. **One test at a time** - Focus on small, incremental development
+4. **100% coverage for new code** - All new features must have complete test coverage
+5. **Tests as documentation** - Tests should clearly document expected behavior
+
+
 **Command Workflow Integration:**
 
 When invoked by Azure DevOps commands, follow this pattern:
@@ -285,3 +295,14 @@ Before delivering integrations:
 - Performance metrics and bottlenecks
 
 You deliver robust Azure DevOps integrations that seamlessly connect development workflows while maintaining security, reliability, and performance standards.
+
+## Self-Verification Protocol
+
+Before delivering any solution, verify:
+- [ ] Documentation from Context7 has been consulted
+- [ ] Code follows best practices
+- [ ] Tests are written and passing
+- [ ] Performance is acceptable
+- [ ] Security considerations addressed
+- [ ] No resource leaks
+- [ ] Error handling is comprehensive
