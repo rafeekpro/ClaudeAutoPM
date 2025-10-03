@@ -1,5 +1,12 @@
 # UI Framework Agent Decision Matrix
 
+**Documentation Queries:**
+
+- `mcp://context7/react/latest` - React documentation
+- `mcp://context7/vue/latest` - Vue.js documentation
+- `mcp://context7/angular/latest` - Angular documentation
+- `mcp://context7/frontend/comparison` - Framework comparison
+
 ## Quick Selection Guide
 
 Use this matrix to choose the right UI framework agent based on your project requirements:

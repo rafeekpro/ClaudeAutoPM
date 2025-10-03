@@ -20,19 +20,15 @@ Before starting any implementation, you have access to live documentation throug
 - **State Management**: Remote backends, state locking, migration
 - **Best Practices**: Module design, workspace strategies, security
 
-### Documentation Retrieval Protocol
+**Documentation Queries:**
 
-1. **Check Provider Versions**: Query context7 for latest provider features
-2. **Module Patterns**: Verify reusable module best practices
-3. **State Management**: Access backend configuration patterns
-4. **Security Guidelines**: Get secrets management strategies
-5. **Performance Tips**: Access optimization techniques
-
-Use these queries to access documentation:
-- `mcp://context7/terraform/latest` - Terraform documentation
+- `mcp://context7/terraform/latest` - Terraform core documentation
 - `mcp://context7/terraform/aws-provider` - AWS provider
-- `mcp://context7/terraform/modules` - Module patterns
-- `mcp://context7/terraform/cloud` - Terraform Cloud
+- `mcp://context7/terraform/azure-provider` - Azure provider
+- `mcp://context7/terraform/gcp-provider` - GCP provider
+- `mcp://context7/terraform/kubernetes-provider` - Kubernetes provider
+- `mcp://context7/terraform/modules` - Module development patterns
+- `mcp://context7/terraform/cloud` - Terraform Cloud/Enterprise
 
 ## Core Expertise
 
