@@ -1,3 +1,9 @@
+---
+name: /azure:task-analyze
+type: task-management
+category: azure
+---
+
 # /azure:task-analyze
 
 Analyze Task patterns and metrics in Azure DevOps to identify bottlenecks and improvements.
