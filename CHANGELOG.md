@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.21.0] - 2025-01-10
+
+### 📚 Documentation
+- **Complete Documentation Structure**
+  - Added comprehensive documentation in `docs/` directory (11,451+ new lines)
+  - New guides: Getting Started, CLI Reference, Agent Registry, Workflows
+  - Architecture documentation and core concepts
+  - Integration guides for GitHub, Azure DevOps, Context7, MCP servers
+  - Troubleshooting guides, FAQ, and debugging resources
+  - Complete agent registry with detailed descriptions
+  - CLI command reference with examples for all 109+ commands
+
+### 📖 README
+- **Comprehensive README Rewrite** (#209, #210, #211)
+  - Clearer project description and value proposition
+  - Visual walkthrough with GIF demonstrations (6 workflow examples)
+  - Improved feature comparison tables
+  - Better structured quick start guide
+  - Enhanced configuration preset explanations
+  - Updated examples and usage patterns
+
+### 🎯 Key Documentation Additions
+- `docs/getting-started/` - Installation and quick start guides
+- `docs/cli-reference/` - Complete CLI command documentation
+- `docs/agents/` - Agent registry and categorization
+- `docs/workflows/` - End-to-end workflow examples
+- `docs/integrations/` - Integration guides for external services
+- `docs/troubleshooting/` - Common issues and debugging
+
+### 📊 Stats
+- 32 files changed
+- 11,451 insertions
+- 878 deletions
+- Major improvement in project documentation and accessibility
+
 ## [1.20.1] - 2025-01-10
 
 ### Fixed
