@@ -30,21 +30,62 @@ Break epic into concrete, actionable tasks.
 # Example: /pm:epic-decompose ecommerce-platform/01-infrastructure
 ```
 
-## Required Documentation Access
+## 🔴 CRITICAL: Context7 Required (ZERO TOLERANCE)
 
-**MANDATORY:** Before decomposing epics, query Context7 for best practices:
+**⚠️  STOP! Read this BEFORE proceeding:**
 
-**Documentation Queries:**
-- `mcp://context7/agile/epic-decomposition` - Epic breakdown best practices
-- `mcp://context7/agile/task-sizing` - Task estimation and sizing
-- `mcp://context7/agile/user-stories` - User story formats (INVEST criteria)
-- `mcp://context7/project-management/task-breakdown` - Work breakdown structure
+This command requires Context7 documentation queries. **This is NOT optional.**
 
-**Why This is Required:**
-- Ensures tasks follow industry-standard decomposition patterns
-- Applies current best practices for task sizing and dependencies
-- Validates task structure against proven methodologies
-- Prevents common anti-patterns in task breakdown
+### ❌ DO NOT:
+- Skip Context7 queries
+- Use training data instead
+- Proceed without querying
+- Ignore this requirement
+
+### ✅ YOU MUST:
+1. **STOP** here and read the queries below
+2. **QUERY** each Context7 link using MCP
+3. **APPLY** Context7 patterns in task creation
+4. **VERIFY** tasks match Context7 standards
+
+---
+
+**MANDATORY Documentation Queries:**
+
+```
+mcp://context7/agile/epic-decomposition
+```
+↳ Epic breakdown best practices, decomposition strategies
+
+```
+mcp://context7/agile/task-sizing
+```
+↳ Task estimation and sizing (1-3 day rule, T-shirt sizing)
+
+```
+mcp://context7/agile/user-stories
+```
+↳ User story formats (INVEST criteria: Independent, Negotiable, Valuable, Estimable, Small, Testable)
+
+```
+mcp://context7/project-management/task-breakdown
+```
+↳ Work breakdown structure, dependency mapping
+
+---
+
+**Why This is MANDATORY:**
+- ❌ Training data (Jan 2025) may be outdated
+- ✅ Context7 has CURRENT best practices
+- ❌ Skipping = outdated patterns, anti-patterns, incorrect structure
+- ✅ Querying = industry-standard, proven methodologies
+
+**Verification:**
+User may ask: "Did you use Context7?"
+Your answer MUST be: "Yes! I queried [list queries] and applied [list patterns]"
+
+**Enforcement:**
+See `.claude/rules/context7-mandatory.md` for full enforcement policy.
 
 ## Required Rules
 

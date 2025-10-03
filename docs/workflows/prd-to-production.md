@@ -417,7 +417,7 @@ Updated epic file with issue numbers.
 ### Step 3.1: Start First Task
 
 ```
-/pm:next-task
+/pm:next
 ```
 
 **Claude's Response:**

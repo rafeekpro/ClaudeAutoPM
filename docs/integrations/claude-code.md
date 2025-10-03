@@ -18,7 +18,7 @@ All PM commands available in Claude Code:
 /pm:prd-new "description"
 /pm:epic-decompose prd-file
 /pm:epic-sync epic-file
-/pm:next-task
+/pm:next
 /pm:issue-close "message"
 ```
 

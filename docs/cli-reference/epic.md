@@ -379,7 +379,7 @@ Epic contains:
 Next steps:
   1. Review epic file: epics/epic-001-task-management-api.md
   2. Sync with GitHub: autopm epic sync epics/epic-001.md
-  3. Start working: /pm:next-task
+  3. Start working: /pm:next
 ```
 
 ---
@@ -622,7 +622,7 @@ autopm epic status epics/epic-001.md
 
 ```bash
 # Get next task
-# (Use /pm:next-task in Claude Code)
+# (Use /pm:next in Claude Code)
 
 # Work on task
 # (Implement features)

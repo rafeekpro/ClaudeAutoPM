@@ -252,7 +252,7 @@ View on GitHub: https://github.com/your-user/your-repo/issues/1
 ### Start Working on First Task
 
 ```
-/pm:next-task
+/pm:next
 ```
 
 **What Claude does:**
@@ -343,7 +343,7 @@ In 5 minutes, you've:
 
 ```bash
 # Get next task
-/pm:next-task
+/pm:next
 
 # Or show all tasks
 /pm:status
@@ -388,7 +388,7 @@ Use github-operations-specialist to create GitHub Actions workflow
 /pm:prd-new "description"           # Create new PRD
 /pm:epic-decompose prd-file         # Create epic from PRD
 /pm:epic-sync epic-file             # Sync epic with GitHub
-/pm:next-task                       # Get next task to work on
+/pm:next                       # Get next task to work on
 /pm:issue-start <number>            # Start working on issue
 /pm:issue-close "message"           # Complete current issue
 /pm:status                          # Show project status

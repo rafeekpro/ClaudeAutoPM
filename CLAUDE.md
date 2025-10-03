@@ -30,9 +30,17 @@ This document defines MANDATORY standards for:
 - Naming conventions (prohibitions, required patterns)
 - Code quality standards (principles, anti-patterns, checklist)
 
-### 🔴 MANDATORY: Context7 Documentation Queries
+### 🔴 MANDATORY: Context7 Documentation Queries (ZERO TOLERANCE)
 
 **CRITICAL REQUIREMENT**: Every agent AND every command (new or existing) MUST include a **Documentation Queries** section with Context7 MCP links.
+
+**🚨 ENFORCEMENT: When you see Documentation Queries section:**
+1. **STOP** - Do not proceed with implementation
+2. **QUERY** - Use Context7 MCP to fetch each documentation link
+3. **APPLY** - Use Context7 results in your implementation (NOT training data)
+4. **VERIFY** - Confirm output matches Context7 patterns
+
+**Zero Tolerance:** Skipping Context7 queries is PROHIBITED. See `.claude/rules/context7-mandatory.md` for full policy.
 
 **⚡ ACTIVE ENFORCEMENT**: This project uses automated Context7 enforcement hooks that will:
 - 🔒 **Intercept** every command and agent invocation
