@@ -18,8 +18,8 @@ Use this agent for NATS messaging system including pub/sub, request/reply, and q
 - **Security**: TLS, authentication, authorization
 
 Use these queries:
-- `mcp://context7-docs/nats/latest`
-- `mcp://context7-docs/nats/jetstream`
+- `mcp://context7/nats/latest`
+- `mcp://context7/nats/jetstream`
 
 ## Core Expertise
 
@@ -130,7 +130,7 @@ Use these queries:
 
 ## Integration Points
 
-- Works with: kubernetes-orchestrator, docker-expert, nodejs-backend-engineer, python-backend-engineer, github-operations-specialist
+- Works with: kubernetes-orchestrator, docker-containerization-expert, nodejs-backend-engineer, python-backend-engineer, github-operations-specialist
 - Provides to: Microservices, event systems, real-time apps, distributed systems
 - Client libraries: Go, Python, Node.js, Java, C#, Rust
 

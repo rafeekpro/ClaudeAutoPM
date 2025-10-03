@@ -18,22 +18,22 @@ const https = require('https');
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 
-// Import utilities
-const Logger = require('../../lib/utils/logger');
-const FileSystem = require('../../lib/utils/filesystem');
-const Config = require('../../lib/utils/config');
+// TODO: Implement utility modules before using this script
+// const Logger = require('../../lib/utils/logger');
+// const FileSystem = require('../../lib/utils/filesystem');
+// const Config = require('../../lib/utils/config');
 
 class AzureBlocked {
   constructor(options = {}) {
-    // Initialize utilities
-    const loggerOptions = {
-      verbose: options.verbose || false,
-      silent: options.silent || false
-    };
+    // Initialize utilities (commented out until utils are implemented)
+    // const loggerOptions = {
+    //   verbose: options.verbose || false,
+    //   silent: options.silent || false
+    // };
 
-    this.logger = new Logger(loggerOptions);
-    this.fs = new FileSystem(this.logger);
-    this.config = new Config(this.logger);
+    // this.logger = new Logger(loggerOptions);
+    // this.fs = new FileSystem(this.logger);
+    // this.config = new Config(this.logger);
 
     // Set options
     this.options = {

@@ -7,7 +7,6 @@
 .DS_Store
 Thumbs.db
 desktop.ini
-.claude/
 
 # Environment & Secrets
 # --------------------
@@ -15,7 +14,6 @@ desktop.ini
 .env.local
 .env.*.local
 .claude/.env
-CLAUDE.md
 
 # Dependencies
 # ------------
@@ -76,10 +74,12 @@ pnpm-debug.log*
 # ----------------
 .gitconfig.local
 
-# MCP & Claude Specific
-# --------------------
+# MCP & Claude Specific (Dynamic/Cache files)
+# -------------------------------------------
 .claude/mcp-cache/
 .claude/context-pools/
+.claude/context/
+.claude/.claud-code-editor-temp-*
 
 # Documentation Build
 # -------------------
@@ -104,6 +104,21 @@ DIRECTORY_ANALYSIS.md
 MIGRATION*.md
 test-mcp-setup.js
 
+# Backup Folders
+# --------------
+.claude-backup-*/
+
+# Documentation Assets
+# --------------------
+
+
+# Temporary/Working Documentation
+# --------------------------------
+AGENT_RESPONSIBILITY_MATRIX.md
+BATCH_MCP_UPDATES.md
+SYSTEM_IMPROVEMENTS_PLAN.md
+TOOL_AUDIT_SUMMARY.md
+
 # Shell Completions Cache
 # -----------------------
 completions/*.cache
@@ -114,3 +129,4 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+.mcp.json

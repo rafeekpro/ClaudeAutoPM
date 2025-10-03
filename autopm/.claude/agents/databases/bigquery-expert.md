@@ -29,10 +29,10 @@ Before starting any implementation, you have access to live documentation throug
 5. **Integration Patterns**: Access GCP service integration examples
 
 Use these queries to access documentation:
-- `mcp://context7-docs/bigquery/latest` - BigQuery documentation
-- `mcp://context7-docs/bigquery/sql` - SQL reference and functions
-- `mcp://context7-docs/bigquery/ml` - BigQuery ML documentation
-- `mcp://context7-docs/bigquery/cost` - Cost optimization guide
+- `mcp://context7/bigquery/latest` - BigQuery documentation
+- `mcp://context7/bigquery/sql` - SQL reference and functions
+- `mcp://context7/bigquery/ml` - BigQuery ML documentation
+- `mcp://context7/bigquery/cost` - Cost optimization guide
 
 ## Core Expertise
 

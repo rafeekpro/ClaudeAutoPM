@@ -37,5 +37,5 @@ Parameters: theme=modern, utilities=custom-spacing,gradients,animations, compone
 ```
 
 ## Related Agents
-- bootstrap-ui-expert: For component-based alternative
+- react-ui-expert: For component-based alternative
 - react-frontend-engineer: For React + Tailwind integration

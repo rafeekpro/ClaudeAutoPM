@@ -854,6 +854,6 @@ class ContentValidator:
 3. **Best Practices**: Review safety and performance guidelines
 
 Use these queries to access documentation:
-- `mcp://context7-docs/gemini/latest` - Gemini API documentation
-- `mcp://context7-docs/gemini/safety` - Safety and content filtering
-- `mcp://context7-docs/gemini/multimodal` - Multimodal capabilities
+- `mcp://context7/gemini/latest` - Gemini API documentation
+- `mcp://context7/gemini/safety` - Safety and content filtering
+- `mcp://context7/gemini/multimodal` - Multimodal capabilities

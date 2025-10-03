@@ -50,6 +50,19 @@ Do not bother the user with preflight checks progress ("I'm not going to ..."). 
    - For each epic, check if status is already "completed"
    - If any epic is completed, warn user: "⚠️ Epic(s) marked as completed. Are you sure you want to decompose again?"
 
+## ⚠️ TDD REMINDER
+
+**CRITICAL: All tasks MUST follow Test-Driven Development (TDD).**
+
+When creating tasks, ensure each task includes:
+- TDD Requirements section (RED-GREEN-REFACTOR cycle)
+- "Tests written FIRST" as first item in Definition of Done
+- References to `.claude/rules/tdd.enforcement.md`
+
+Every generated task file will remind developers to write tests first.
+
+---
+
 ## Instructions
 
 You are decomposing epic(s) into specific, actionable tasks for: **$ARGUMENTS**
@@ -123,6 +136,14 @@ conflicts_with: []  # Tasks that modify same files, e.g., [003, 004]
 ## Description
 Clear, concise description of what needs to be done
 
+## ⚠️ TDD Requirements
+**This project uses Test-Driven Development. You MUST:**
+1. 🔴 RED: Write failing test first
+2. 🟢 GREEN: Write minimal code to make test pass
+3. 🔵 REFACTOR: Clean up code while keeping tests green
+
+See `.claude/rules/tdd.enforcement.md` for complete requirements.
+
 ## Acceptance Criteria
 - [ ] Specific criterion 1
 - [ ] Specific criterion 2
@@ -143,8 +164,10 @@ Clear, concise description of what needs to be done
 - Parallel: true/false (can run in parallel with other tasks)
 
 ## Definition of Done
-- [ ] Code implemented
-- [ ] Tests written and passing
+- [ ] Tests written FIRST (RED phase)
+- [ ] Code implemented (GREEN phase)
+- [ ] Code refactored (REFACTOR phase)
+- [ ] All tests passing
 - [ ] Documentation updated
 - [ ] Code reviewed
 - [ ] Deployed to staging

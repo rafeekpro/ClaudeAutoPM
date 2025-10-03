@@ -18,4 +18,4 @@ Creates Playwright test suite with Page Object Model.
 - Adds visual regression setup
 - Creates CI/CD integration scripts
 
-Use the playwright-test-engineer agent to create comprehensive E2E test suite.
+Use the frontend-testing-engineer agent to create comprehensive E2E test suite.

@@ -20,10 +20,10 @@ Comprehensive coordination system for multi-agent collaboration in ClaudeAutoPM.
 | python-backend-expert | Backend APIs | `*.py`, `requirements.txt`, `pyproject.toml` | react-ui-expert, kubernetes, cloud architects | framework: fastapi/flask/django |
 | react-ui-expert | Frontend UI | `*.tsx`, `*.jsx`, `*.css`, `package.json` | python-backend, e2e-test | framework: mui/chakra/antd/bootstrap |
 | e2e-test-engineer | E2E Tests | `tests/`, `*.spec.ts`, `playwright.config.ts` | react-ui, python-backend | tool: playwright/cypress |
-| multi-cloud-architect | Cloud Infrastructure | `terraform/`, `*.tf`, cloud configs | kubernetes, docker | provider: aws/azure/gcp |
+| terraform-infrastructure-expert | Cloud Infrastructure | `terraform/`, `*.tf`, cloud configs | kubernetes, docker, cloud architects | provider: aws/azure/gcp |
 | kubernetes-orchestrator | K8s Manifests | `k8s/`, `charts/`, `*.yaml` | cloud architects, github-ops | tool: helm/kustomize |
 | docker-containerization-expert | Containers | `Dockerfile*`, `docker-compose*.yml` | All deployment agents | strategy: multi-stage/compose |
-| database-architect | Database | `migrations/`, `*.sql`, schema files | python-backend | engine: postgresql/mysql/mongodb |
+| postgresql-expert / mongodb-expert | Database | `migrations/`, `*.sql`, schema files | python-backend-engineer | engine: postgresql/mongodb/redis |
 | github-operations-specialist | CI/CD | `.github/`, `*.yml`, `*.yaml` | All agents | platform: actions/azure-devops |
 | mcp-context-manager | Context | `.claude/mcp-servers.json`, context pools | All agents | pool: shared/isolated |
 
@@ -32,7 +32,7 @@ Comprehensive coordination system for multi-agent collaboration in ClaudeAutoPM.
 | Agent | Use Case | Replaces |
 |-------|----------|----------|
 | azure-devops-specialist | Azure DevOps specific | Part of github-operations |
-| playwright-mcp-frontend-tester | MCP browser control | Enhanced e2e-test |
+| e2e-test-engineer | E2E testing with Playwright/Cypress | Support role |
 | code-analyzer | Read-only analysis | Support role |
 | file-analyzer | Log/file summarization | Support role |
 | test-runner | Test execution only | Support role |
@@ -103,32 +103,32 @@ Notes: Added rate limiting middleware
 
 ```yaml
 backend-context:
-  agents: [python-backend-expert, database-architect]
-  sources: [context7-docs, context7-codebase]
+  agents: [python-backend-expert, postgresql-expert, mongodb-expert]
+  sources: [context7, context7]
   filters: [python, fastapi, flask, django, sqlalchemy, databases]
   persistence: true
 
 frontend-context:
   agents: [react-ui-expert, e2e-test-engineer]
-  sources: [context7-docs, context7-codebase]
+  sources: [context7, context7]
   filters: [react, typescript, ui-frameworks, testing]
   persistence: true
 
 infrastructure-context:
-  agents: [multi-cloud-architect, kubernetes-orchestrator, docker-containerization-expert]
-  sources: [context7-docs, terraform-registry]
+  agents: [terraform-infrastructure-expert, kubernetes-orchestrator, docker-containerization-expert]
+  sources: [context7, terraform-registry]
   filters: [terraform, kubernetes, docker, cloud-providers]
   persistence: true
 
 devops-context:
   agents: [github-operations-specialist, mcp-context-manager]
-  sources: [context7-docs, github-mcp]
+  sources: [context7, github-mcp]
   filters: [ci-cd, github-actions, azure-devops]
   persistence: false
 
 project-context:
   agents: [ALL]
-  sources: [context7-codebase]
+  sources: [context7]
   persistence: true
   shared: true
   auto-refresh: true
@@ -159,7 +159,7 @@ Stream B: Frontend Development
   Priority: P1
 
 Stream C: Infrastructure
-  Agent: multi-cloud-architect
+  Agent: terraform-infrastructure-expert
   Parameters:
     provider: aws
     iac: terraform
@@ -243,7 +243,7 @@ graph LR
   B -->|UI Ready| C[e2e-test-engineer]
   C -->|Tests Pass| D[github-operations-specialist]
   D -->|CI/CD Ready| E[kubernetes-orchestrator]
-  E -->|Deployment Config| F[multi-cloud-architect]
+  E -->|Deployment Config| F[terraform-infrastructure-expert]
   F -->|Infrastructure| G[Production]
 ```
 
@@ -261,7 +261,7 @@ graph LR
 
 ```mermaid
 graph LR
-  A[multi-cloud-architect] -->|New Infrastructure| B[docker-containerization-expert]
+  A[terraform-infrastructure-expert] -->|New Infrastructure| B[docker-containerization-expert]
   B -->|Updated Images| C[kubernetes-orchestrator]
   C -->|Manifests Ready| D[github-operations-specialist]
   D -->|Blue-Green Deploy| E[Production]
@@ -325,11 +325,11 @@ git commit -m "Multiple changes"
 
 | Scenario | Priority | Lead Agent | Support Agents | SLA |
 |----------|----------|------------|----------------|-----|
-| Production Down | P0 | kubernetes-orchestrator | multi-cloud, python-backend | 15 min |
+| Production Down | P0 | kubernetes-orchestrator | terraform-infrastructure-expert, python-backend | 15 min |
 | Security Vulnerability | P0 | code-analyzer | python-backend, github-ops | 30 min |
-| Data Loss Risk | P0 | database-architect | multi-cloud, kubernetes | 15 min |
+| Data Loss Risk | P0 | postgresql-expert | terraform-infrastructure-expert, kubernetes | 15 min |
 | Failed Deployment | P1 | github-operations-specialist | kubernetes-orchestrator | 1 hour |
-| Performance Degradation | P1 | python-backend-expert | database-architect, multi-cloud | 2 hours |
+| Performance Degradation | P1 | python-backend-expert | postgresql-expert, terraform-infrastructure-expert | 2 hours |
 | Test Failures | P2 | e2e-test-engineer | react-ui, python-backend | 4 hours |
 | Feature Development | P3 | Varies by stream | Full stack team | 1-5 days |
 | Technical Debt | P4 | code-analyzer | All relevant agents | Best effort |
@@ -338,13 +338,13 @@ git commit -m "Multiple changes"
 
 ### Never Modify Without Coordination
 
-- **Production configurations** - Requires multi-cloud-architect + kubernetes-orchestrator
+- **Production configurations** - Requires terraform-infrastructure-expert + kubernetes-orchestrator
 - **Security settings** - Requires security review + python-backend-expert
 - **API contracts** - Requires python-backend + react-ui agreement
-- **Database schemas** - Requires database-architect + python-backend
+- **Database schemas** - Requires postgresql-expert + python-backend
 - **Authentication flows** - Requires security review + full stack team
 - **Payment processing** - Requires security + compliance review
-- **User data handling** - Requires privacy review + database-architect
+- **User data handling** - Requires privacy review + postgresql-expert
 
 ### Safe for Independent Work
 
@@ -405,31 +405,31 @@ git commit -m "chore: Sync checkpoint"
 ### System Down
 
 1. **kubernetes-orchestrator** takes incident command
-2. **multi-cloud-architect** checks infrastructure health
+2. **terraform-infrastructure-expert** checks infrastructure health
 3. **python-backend-expert** validates application state
-4. **database-architect** verifies data integrity
+4. **postgresql-expert** verifies data integrity
 5. **github-operations-specialist** prepares rollback if needed
 
 ### Security Breach
 
 1. **code-analyzer** identifies scope and entry point
-2. **multi-cloud-architect** isolates affected resources
+2. **terraform-infrastructure-expert** isolates affected resources
 3. **python-backend-expert** patches vulnerability
-4. **database-architect** audits data access
+4. **postgresql-expert** audits data access
 5. **github-operations-specialist** deploys emergency fix
 
 ### Performance Crisis
 
 1. **python-backend-expert** profiles application bottlenecks
-2. **database-architect** analyzes and optimizes queries
+2. **postgresql-expert** analyzes and optimizes queries
 3. **docker-containerization-expert** optimizes container resources
 4. **kubernetes-orchestrator** scales resources horizontally
-5. **multi-cloud-architect** provisions additional infrastructure
+5. **terraform-infrastructure-expert** provisions additional infrastructure
 
 ### Data Corruption
 
-1. **database-architect** stops writes immediately
-2. **multi-cloud-architect** initiates backup restoration
+1. **postgresql-expert** stops writes immediately
+2. **terraform-infrastructure-expert** initiates backup restoration
 3. **kubernetes-orchestrator** redirects traffic to healthy replicas
 4. **python-backend-expert** validates data integrity checks
 5. **e2e-test-engineer** runs full regression suite
@@ -444,11 +444,13 @@ git commit -m "chore: Sync checkpoint"
 | flask-backend-engineer | python-backend-expert | framework: flask |
 | mui-react-expert | react-ui-expert | framework: mui |
 | chakra-ui-expert | react-ui-expert | framework: chakra |
+| antd-react-expert | react-ui-expert | framework: antd |
+| bootstrap-ui-expert | react-ui-expert | framework: bootstrap |
 | docker-expert | docker-containerization-expert | focus: dockerfile |
 | docker-compose-expert | docker-containerization-expert | focus: compose |
-| aws-cloud-architect | multi-cloud-architect | provider: aws |
-| gcp-cloud-architect | multi-cloud-architect | provider: gcp |
+| docker-development-orchestrator | docker-containerization-expert | focus: development |
 | playwright-test-engineer | e2e-test-engineer | tool: playwright |
+| playwright-mcp-frontend-tester | e2e-test-engineer | browser_control: mcp-enhanced |
 
 ### Backward Compatibility
 

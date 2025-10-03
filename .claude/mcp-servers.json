@@ -1,106 +1,155 @@
 {
   "mcpServers": {
-    "context7-docs": {
+    "context7": {
       "command": "npx",
-      "args": ["@context7/mcp-server"],
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ],
       "env": {
-        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY:-}",
-        "CONTEXT7_MCP_URL": "${CONTEXT7_MCP_URL:-https://mcp.context7.com/mcp}",
-        "CONTEXT7_API_URL": "${CONTEXT7_API_URL:-https://context7.com/api/v1}",
-        "CONTEXT7_WORKSPACE": "${CONTEXT7_WORKSPACE:-}",
-        "CONTEXT7_MODE": "documentation"
-      },
-      "envFile": ".claude/.env"
-    },
-    "context7-codebase": {
-      "command": "npx", 
-      "args": ["@context7/mcp-server"],
-      "env": {
-        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY:-}",
-        "CONTEXT7_MCP_URL": "${CONTEXT7_MCP_URL:-https://mcp.context7.com/mcp}",
-        "CONTEXT7_API_URL": "${CONTEXT7_API_URL:-https://context7.com/api/v1}",
-        "CONTEXT7_WORKSPACE": "${CONTEXT7_WORKSPACE:-}",
-        "CONTEXT7_MODE": "codebase"
-      },
-      "envFile": ".claude/.env"
+        "DEFAULT_MINIMUM_TOKENS": "${DEFAULT_MINIMUM_TOKENS:-10000}"
+      }
     },
     "playwright-mcp": {
       "command": "npx",
-      "args": ["@playwright/mcp-server"],
+      "args": [
+        "@playwright/mcp-server"
+      ],
       "env": {
         "PLAYWRIGHT_BROWSER": "chromium",
         "PLAYWRIGHT_HEADLESS": "true"
       }
-    },
-    "github-mcp": {
-      "command": "npx",
-      "args": ["@modelcontextprotocol/server-github"],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN:-}",
-        "GITHUB_API_URL": "https://api.github.com"
-      },
-      "envFile": ".claude/.env"
     }
   },
   "contextPools": {
     "python-docs": {
       "type": "shared",
-      "agents": ["python-backend-engineer", "mcp-context-manager"],
-      "sources": ["context7-docs"],
-      "filters": ["fastapi", "sqlalchemy", "pydantic", "uvicorn", "pytest"],
+      "agents": [
+        "python-backend-engineer",
+        "mcp-context-manager"
+      ],
+      "sources": [
+        "context7"
+      ],
+      "filters": [
+        "fastapi",
+        "sqlalchemy",
+        "pydantic",
+        "uvicorn",
+        "pytest"
+      ],
       "maxSize": "100MB",
       "retention": "7d",
       "refresh": "daily"
     },
     "azure-docs": {
       "type": "shared",
-      "agents": ["azure-devops-specialist", "mcp-context-manager"], 
-      "sources": ["context7-docs"],
-      "filters": ["azure-devops", "rest-api", "work-items", "pipelines"],
+      "agents": [
+        "azure-devops-specialist",
+        "mcp-context-manager"
+      ],
+      "sources": [
+        "context7"
+      ],
+      "filters": [
+        "azure-devops",
+        "rest-api",
+        "work-items",
+        "pipelines"
+      ],
       "maxSize": "75MB",
-      "retention": "7d", 
+      "retention": "7d",
       "refresh": "daily"
     },
     "react-docs": {
       "type": "shared",
-      "agents": ["react-frontend-engineer", "playwright-test-engineer"],
-      "sources": ["context7-docs"],
-      "filters": ["react", "nextjs", "typescript", "tailwind", "vite"],
+      "agents": [
+        "react-frontend-engineer",
+        "playwright-test-engineer"
+      ],
+      "sources": [
+        "context7"
+      ],
+      "filters": [
+        "react",
+        "nextjs",
+        "typescript",
+        "tailwind",
+        "vite"
+      ],
       "maxSize": "75MB",
       "retention": "7d",
       "refresh": "daily"
     },
     "cloud-docs": {
-      "type": "shared", 
-      "agents": ["gcp-cloud-architect", "azure-cloud-architect", "aws-cloud-architect"],
-      "sources": ["context7-docs"],
-      "filters": ["terraform", "kubernetes", "docker", "helm"],
+      "type": "shared",
+      "agents": [
+        "gcp-cloud-architect",
+        "azure-cloud-architect",
+        "aws-cloud-architect"
+      ],
+      "sources": [
+        "context7"
+      ],
+      "filters": [
+        "terraform",
+        "kubernetes",
+        "docker",
+        "helm"
+      ],
       "maxSize": "150MB",
       "retention": "7d",
       "refresh": "daily"
     },
     "devops-context": {
       "type": "shared",
-      "agents": ["github-operations-specialist", "kubernetes-orchestrator", "azure-devops-specialist"],
-      "sources": ["context7-docs", "github-mcp"],
-      "filters": ["github-actions", "kubernetes", "ci-cd"],
-      "maxSize": "100MB", 
+      "agents": [
+        "github-operations-specialist",
+        "kubernetes-orchestrator",
+        "azure-devops-specialist"
+      ],
+      "sources": [
+        "context7"
+      ],
+      "filters": [
+        "github-actions",
+        "kubernetes",
+        "ci-cd"
+      ],
+      "maxSize": "100MB",
       "retention": "7d",
       "refresh": "daily"
     },
     "testing-context": {
       "type": "shared",
-      "agents": ["playwright-test-engineer", "test-runner"],
-      "sources": ["context7-docs", "playwright-mcp"],
-      "filters": ["playwright", "testing", "e2e"],
+      "agents": [
+        "playwright-test-engineer",
+        "test-runner"
+      ],
+      "sources": [
+        "context7-docs",
+        "playwright-mcp"
+      ],
+      "filters": [
+        "playwright",
+        "testing",
+        "e2e"
+      ],
       "maxSize": "50MB",
-      "retention": "7d", 
+      "retention": "7d",
       "refresh": "daily"
     },
     "project-context": {
       "type": "persistent",
-      "agents": ["python-backend-engineer", "react-frontend-engineer", "azure-devops-specialist", "code-analyzer"],
-      "sources": ["context7-codebase"],
+      "agents": [
+        "python-backend-engineer",
+        "react-frontend-engineer",
+        "azure-devops-specialist",
+        "code-analyzer"
+      ],
+      "sources": [
+        "context7"
+      ],
       "maxSize": "300MB",
       "retention": "30d",
       "refresh": "on-change"
@@ -111,25 +160,33 @@
       "url": "https://fastapi.tiangolo.com",
       "type": "api-docs",
       "priority": "high",
-      "agents": ["python-backend-engineer"]
+      "agents": [
+        "python-backend-engineer"
+      ]
     },
     "sqlalchemy": {
       "url": "https://docs.sqlalchemy.org/en/20/",
-      "type": "orm-docs", 
+      "type": "orm-docs",
       "priority": "high",
-      "agents": ["python-backend-engineer"]
+      "agents": [
+        "python-backend-engineer"
+      ]
     },
     "azure-devops-rest": {
       "url": "https://docs.microsoft.com/en-us/rest/api/azure/devops/",
       "type": "api-reference",
-      "priority": "high", 
-      "agents": ["azure-devops-specialist"]
+      "priority": "high",
+      "agents": [
+        "azure-devops-specialist"
+      ]
     },
     "azure-devops-services": {
       "url": "https://docs.microsoft.com/en-us/azure/devops/",
       "type": "service-docs",
       "priority": "medium",
-      "agents": ["azure-devops-specialist"]
+      "agents": [
+        "azure-devops-specialist"
+      ]
     }
   }
 }

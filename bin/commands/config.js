@@ -90,7 +90,11 @@ class ConfigCommand {
     console.log(`│ Kubernetes:      ${this.padRight(k8sStatus, 22)} │`);
 
     // Execution strategy - check both formats
-    const executionStrategy = config.execution_strategy || config.execution?.strategy || 'adaptive';
+    let executionStrategy = config.execution_strategy?.mode || config.execution_strategy || config.execution?.strategy || 'adaptive';
+    // Handle if it's still an object
+    if (typeof executionStrategy === 'object') {
+      executionStrategy = executionStrategy.mode || 'adaptive';
+    }
     console.log(`│ Execution:       ${this.padRight(executionStrategy, 22)} │`);
 
     // Show parallel limit if hybrid strategy
@@ -100,10 +104,32 @@ class ConfigCommand {
 
     console.log('│                                         │');
 
-    // Features - optional/legacy features
-    const mcpStatus = config.features?.mcp ? '✅ Enabled' : '❌ Disabled';
+    // MCP Configuration - check actual .md files in project
+    const mcpActiveServers = config.mcp?.activeServers || [];
+    let mcpAvailableServers = 0;
+
+    // Count actual server definition files (.md) in .claude/mcp/
+    const mcpDir = path.join(process.cwd(), '.claude', 'mcp');
+    if (await fs.pathExists(mcpDir)) {
+      try {
+        const files = await fs.readdir(mcpDir);
+        mcpAvailableServers = files.filter(f => f.endsWith('.md') && f !== 'MCP-REGISTRY.md').length;
+      } catch (error) {
+        // Ignore error
+      }
+    }
+
+    let mcpStatus;
+    if (mcpActiveServers.length > 0) {
+      mcpStatus = `✅ ${mcpActiveServers.length} active (${mcpAvailableServers} total)`;
+    } else if (mcpAvailableServers > 0) {
+      mcpStatus = `⚠️  ${mcpAvailableServers} available, 0 active`;
+    } else {
+      mcpStatus = '⚪ No servers installed';
+    }
     console.log(`│ MCP:             ${this.padRight(mcpStatus, 22)} │`);
 
+    // Features - optional/legacy features
     const autoCommit = config.features?.autoCommit ? '✅ Enabled' : '❌ Disabled';
     console.log(`│ Auto Commit:     ${this.padRight(autoCommit, 22)} │`);
 
@@ -121,12 +147,96 @@ class ConfigCommand {
 
     console.log('└─────────────────────────────────────────┘\n');
 
+    // Show configuration issues and how to fix them
+    const issues = [];
+
+    if (!config.provider || config.provider === 'not set') {
+      issues.push({
+        icon: '⚠️',
+        problem: 'Provider not configured',
+        solution: 'Run: autopm config set provider github  (or azure)'
+      });
+    }
+
+    if (config.provider === 'github') {
+      const github = config.providers?.github;
+      if (!github?.owner || github.owner === 'not set') {
+        issues.push({
+          icon: '⚠️',
+          problem: 'GitHub owner not set',
+          solution: 'Run: autopm config set github.owner YOUR_USERNAME'
+        });
+      }
+      if (!github?.repo || github.repo === 'not set') {
+        issues.push({
+          icon: '⚠️',
+          problem: 'GitHub repository not set',
+          solution: 'Run: autopm config set github.repo YOUR_REPO'
+        });
+      }
+      if (!process.env.GITHUB_TOKEN) {
+        issues.push({
+          icon: '⚠️',
+          problem: 'GitHub token not set',
+          solution: 'Add to .claude/.env: GITHUB_TOKEN=ghp_your_token_here'
+        });
+      }
+    }
+
+    if (config.provider === 'azure') {
+      const azure = config.providers?.azure;
+      if (!azure?.organization) {
+        issues.push({
+          icon: '⚠️',
+          problem: 'Azure organization not set',
+          solution: 'Run: autopm config set azure.organization YOUR_ORG'
+        });
+      }
+      if (!azure?.project) {
+        issues.push({
+          icon: '⚠️',
+          problem: 'Azure project not set',
+          solution: 'Run: autopm config set azure.project YOUR_PROJECT'
+        });
+      }
+      if (!process.env.AZURE_DEVOPS_PAT) {
+        issues.push({
+          icon: '⚠️',
+          problem: 'Azure DevOps token not set',
+          solution: 'Add to .claude/.env: AZURE_DEVOPS_PAT=your_token_here'
+        });
+      }
+    }
+
+    if (mcpActiveServers.length === 0) {
+      if (mcpAvailableServers > 0) {
+        issues.push({
+          icon: 'ℹ️',
+          problem: `${mcpAvailableServers} MCP server(s) available but not active`,
+          solution: 'Run: autopm mcp list  (then: autopm mcp enable <server>)'
+        });
+      } else {
+        issues.push({
+          icon: 'ℹ️',
+          problem: 'No MCP servers installed',
+          solution: 'Add servers from examples: cp .claude/examples/mcp/*.md .claude/mcp/'
+        });
+      }
+    }
+
+    // Display issues if any
+    if (issues.length > 0) {
+      console.log('📋 Configuration Issues:\n');
+      issues.forEach(issue => {
+        console.log(`${issue.icon}  ${issue.problem}`);
+        console.log(`   → ${issue.solution}\n`);
+      });
+    }
+
     // Show available commands hint
-    console.log('💡 Available commands:');
-    console.log('  autopm config set <key> <value>  - Set configuration value');
-    console.log('  autopm config toggle <feature>   - Toggle feature on/off');
-    console.log('  autopm config switch <provider>  - Switch to different provider');
-    console.log('  autopm config validate           - Validate configuration');
+    console.log('💡 Quick Commands:');
+    console.log('  autopm config validate           - Check configuration');
+    console.log('  autopm mcp check                 - Check MCP requirements');
     console.log('  autopm config --help             - Show all options\n');
   }
 
@@ -134,7 +244,8 @@ class ConfigCommand {
    * Helper to pad strings
    */
   padRight(str, length) {
-    return str.padEnd(length);
+    const s = String(str || '');
+    return s.padEnd(length);
   }
 
   /**

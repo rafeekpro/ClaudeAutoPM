@@ -33,6 +33,25 @@ Launch parallel agents to work on epic tasks using the unified branch strategy.
    ```
    If output is not empty: "❌ You have uncommitted changes. Please commit or stash them before starting an epic"
 
+## ⚠️ TDD REMINDER - READ THIS FIRST
+
+**CRITICAL: This project follows Test-Driven Development (TDD).**
+
+Before ANY coding work begins on this epic, you MUST follow the RED-GREEN-REFACTOR cycle:
+
+1. **RED Phase**: Write failing test that describes the desired behavior
+2. **GREEN Phase**: Write minimum code to make test pass
+3. **REFACTOR Phase**: Clean up code while keeping tests green
+
+**For this epic:**
+- All tasks have TDD requirements section
+- Every agent must start with test creation
+- No implementation without tests first
+
+See `.claude/rules/tdd.enforcement.md` for complete TDD requirements.
+
+---
+
 ## Instructions
 
 ### 1. Create or Enter Branch

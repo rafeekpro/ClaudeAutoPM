@@ -7,6 +7,1207 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.20.1] - 2025-01-10
+
+### Fixed
+- **Agent Reference Cleanup (7 PRs, ~230+ fixes across ~35 files)**
+  - Fixed all deprecated and non-existent agent references throughout documentation (#201, #202, #203, #204, #205, #206, #207)
+  - Replaced `docker-expert` → `docker-containerization-expert` (7 files)
+  - Replaced `python-backend-expert` → `python-backend-engineer` in appropriate contexts (~35 references)
+  - Replaced UI framework agents (`mui-react-expert`, `chakra-ui-expert`, `antd-react-expert`, `bootstrap-ui-expert`) → `react-ui-expert` (~42 references)
+  - Replaced testing agents (`playwright-test-engineer`, `playwright-mcp-frontend-tester`) → `e2e-test-engineer` (~70 references)
+  - Fixed non-existent agents: `multi-cloud-architect` → `terraform-infrastructure-expert` (11 references)
+  - Fixed non-existent agents: `database-architect` → `postgresql-expert` (9 references)
+  - Added `mongodb-expert` to backend-context MCP pool for consistency
+  - Removed duplicate agent references in decision matrices and coordination docs
+  - Updated `python-backend-selection.md` to compare frameworks (FastAPI vs Flask) instead of agents
+
+### Impact
+- Eliminates "Agent type not found" runtime errors
+- All agent references now point to active agents defined in AGENT-REGISTRY.md
+- Improved clarity on framework selection (FastAPI vs Flask) within unified python-backend-engineer agent
+- Better guidance for choosing between component-focused (react-ui-expert) and full-app (react-frontend-engineer) approaches
+
+### Documentation
+- All documentation now consistent with AGENT-REGISTRY.md v1.1.0 agent consolidation model
+- Decision matrices updated to reflect parameterized agent usage (framework=fastapi/flask, framework=mui/chakra/etc.)
+
+## [1.20.0] - 2025-10-02
+
+### 🧹 Cleanup: Package Size Optimization & Development Standards
+
+**Major cleanup of project structure and introduction of comprehensive development standards**
+
+### 🎯 What's Changed
+
+1. **lib/ Directory Cleanup:**
+   - Removed 18 unused subdirectories (azure, context, documentation, github, helpers, performance, pm, providers, python, react, regression, release, tailwind, traefik, utils, validators, workflow)
+   - Removed 3 unused files (agentExecutor.js.deprecated, commandHelpers.js, prdMetadata.js)
+   - Kept only `lib/guide/` which is used by CLI `autopm guide` command
+   - **Result:** Significantly reduced npm package size
+
+2. **New DEVELOPMENT-STANDARDS.md (836 lines):**
+   - Single source of truth for all AutoPM development standards
+   - Comprehensive templates and guidelines for:
+     - Agents (with examples and structures)
+     - Rules (best practices and naming)
+     - Commands (implementation patterns)
+     - Scripts (coding standards)
+     - Hooks (integration guide)
+   - Naming conventions and file organization
+   - Context management strategies
+
+3. **.claude/ Structure Optimization:**
+   - Reduced from 200+ files to 58 files (70% reduction)
+   - Removed unnecessary agents, rules, commands, and scripts
+   - Focus exclusively on JavaScript/Node.js/Bash development
+   - Removed Python, React, Tailwind, Traefik, and other framework-specific agents
+   - Streamlined project-level configuration
+
+### 📦 Package Impact
+
+- Smaller npm package size
+- Faster installation
+- Cleaner project structure
+- Easier maintenance
+
+### 🔧 Breaking Changes
+
+None - all changes are internal optimizations
+
+## [1.19.0] - 2025-10-02
+
+### ✨ Feature: PM Workflow Documentation & Context Command
+
+**Comprehensive PM workflow guide and new context command for project visibility**
+
+Users requested better understanding of the PM workflow process and a way to view current project state inside Claude Code.
+
+### 🎯 What's New
+
+1. **Complete PM Workflow Guide (`PM-WORKFLOW-GUIDE.md`):**
+   - Step-by-step process explanation (PRD → Parse → Split/Decompose → Sync)
+   - Decision guide: When to use one epic vs multiple epics
+   - Multiple workflow examples (simple features, complex projects, multiple PRDs)
+   - FAQ section answering common questions
+   - Quick reference tables and decision flowcharts
+
+2. **Enhanced Documentation:**
+   - Added "Complete PM Workflow Guide" section to README.md
+   - Updated `autopm help` with workflow decision guide
+   - Clear criteria for choosing `/pm:epic-split` vs `/pm:epic-decompose`
+
+3. **New `/pm:context` Command:**
+   - Displays current project configuration
+   - Shows active team and PRD list
+   - Epic progress with per-epic breakdown
+   - Visual progress bars for overall progress
+   - Recent activity tracking
+   - Quick command suggestions
+
+4. **New `/pm:what-next` Command:**
+   - Intelligent context-aware suggestions for next steps
+   - Analyzes current project state (PRDs, epics, tasks)
+   - Shows concrete commands with real project names (not abstract syntax)
+   - Explains why each step is needed
+   - Marks recommended actions with ⭐
+   - Adapts to different scenarios:
+     - New project → Suggests creating first PRD
+     - Has PRD → Suggests parsing to epic
+     - Has epic → Suggests decomposing or splitting
+     - Has tasks → Suggests syncing to GitHub
+     - Ready to work → Suggests starting tasks with TDD
+
+### 📊 Example Output
+
+**`/pm:context` in Claude Code:**
+```
+🎯 Project Context
+============================================================
+
+📦 Project Information:
+  Name:           my-project
+  Directory:      /path/to/project
+
+⚙️  Configuration:
+  Provider:       Github
+  GitHub Owner:   username
+  GitHub Repo:    repo-name
+
+👥 Active Team:
+  Team:           fullstack
+
+📄 Product Requirements (PRDs):
+  Total:          3
+    • user-authentication
+    • payment-system
+    • notifications
+
+📚 Epics & Progress:
+  Total Epics:    2
+  Total Tasks:    45
+    Completed:    20
+    In Progress:  5
+    Pending:      20
+
+  Epic Breakdown:
+    user-authentication
+      [==========----------] 50% (10/20 tasks)
+    payment-system
+      [========------------] 40% (10/25 tasks)
+
+📊 Overall Progress:
+  [====================--------------------] 44%
+  20 / 45 tasks completed
+
+🔄 Recent Activity:
+  Last Modified:  Implement JWT authentication
+  Status:         in-progress
+  Modified:       2 hours ago
+  File:           .claude/epics/user-authentication/003.md
+```
+
+**`/pm:what-next` in Claude Code:**
+```
+🎯 What Should I Do Next?
+============================================================
+
+📊 Current Project Status:
+
+  📄 PRDs: 1 (user-authentication)
+  📚 Epics: 1
+  ✅ Tasks: 0 / 2 completed
+  📋 Ready: 2 tasks waiting
+
+💡 Suggested Next Steps:
+
+1. ⭐ Start Working on Tasks
+   You have 2 tasks ready to work on
+
+   /pm:next
+   → Shows highest priority available tasks
+   /pm:issue-start 001
+   → Start: "Implement JWT authentication"
+   💭 Begin implementation with TDD approach
+
+💡 Tip: Run /pm:context to see detailed project status
+```
+
+### 🎯 Workflow Decision Guide
+
+**ONE epic (`/pm:epic-decompose`):**
+- Simple features (1-2 weeks)
+- Single component (frontend OR backend)
+- One developer
+- Examples: "User profile page", "REST API endpoint"
+
+**MULTIPLE epics (`/pm:epic-split`):**
+- Complex projects (2+ months)
+- Multiple components (frontend + backend + infrastructure)
+- Multiple teams working in parallel
+- Examples: "E-commerce platform", "Social media dashboard"
+
+### 🔧 Technical Changes
+
+**New Files:**
+- `PM-WORKFLOW-GUIDE.md` - Complete 400+ line workflow guide
+- `autopm/.claude/commands/pm/context.md` - Command definition
+- `autopm/.claude/scripts/pm/context.js` - Implementation (330 lines)
+- `autopm/.claude/commands/pm/what-next.md` - Command definition
+- `autopm/.claude/scripts/pm/what-next.js` - Implementation (400+ lines)
+
+**Modified Files:**
+- `README.md` - Added "Complete PM Workflow Guide" section
+- `bin/autopm.js` - Added workflow decision guide to help epilogue
+
+**Key Features of context.js:**
+- Project information extraction from package.json
+- Configuration reading from .claude/config.json
+- Active team detection from .claude/active_team.txt
+- PRD counting and listing from .claude/prds/
+- Epic/task progress tracking with status parsing
+- Progress bar generation
+- Recent activity tracking with time-ago calculations
+- Quick command suggestions
+
+**Key Features of what-next.js:**
+- Multi-scenario project state analysis (7 distinct scenarios)
+- Context-aware command suggestions with real project names
+- Epic complexity detection (simple vs complex for split decision)
+- Priority-based suggestion ordering (high/medium/low)
+- Recommendation markers (⭐) for best next action
+- Explanations for why each step is needed
+- Adapts to project phase (new → PRD → epic → tasks → work)
+- In-progress task tracking and continuation suggestions
+
+### 📝 Addresses User Feedback
+
+This release answers user questions:
+- "nie rozumiem jaki jest proces" → Complete workflow guide
+- "Czy moge stworzyc kilka PRD na raz?" → Yes, explained in guide
+- "jak rozdzielam PRD na kilka Epikow a jak na jeden?" → Decision criteria provided
+- "Czy mozna dodac komende ktora wypisze aktualna konfiguracje?" → `/pm:context` command added
+- "chcialbym wewnatrz claude taka komende 'what-next'" → `/pm:what-next` command with intelligent suggestions
+
+## [1.18.0] - 2025-10-02
+
+### ✨ Feature: MCP Dependency Validation for Teams
+
+**Automatic detection and warnings for missing MCP server dependencies when loading agent teams**
+
+Users requested visibility when agents require MCP servers that aren't installed or activated. This release adds automatic validation during team loading.
+
+### 🎯 What's New
+
+1. **Automatic MCP Dependency Detection:**
+   - Scans all agents in a team for MCP server requirements
+   - Detects `mcp://server-name/path` URIs in agent documentation
+   - Validates against currently active MCP servers
+   - Shows warnings with clear fix instructions
+
+2. **Two Types of Warnings:**
+   - ❌ **NOT INSTALLED**: Server definition doesn't exist
+     - Fix: `autopm mcp install <server-name>`
+   - ⚪ **NOT ACTIVE**: Server exists but isn't enabled
+     - Fix: `autopm mcp enable <server-name>`
+
+3. **Clear Action Items:**
+   - Lists which agents need each missing server
+   - Provides exact command to fix the issue
+   - Includes helpful tips for MCP configuration
+
+### 📊 Example Output
+
+```bash
+$ autopm team load frontend
+
+🔄 Loading team 'frontend'...
+   Resolved 9 agents (including inherited)
+
+⚠️  MCP Dependency Warnings:
+
+⚪ MCP server 'context7' is NOT ACTIVE
+   Required by: react-frontend-engineer, javascript-frontend-engineer, ux-design-expert
+   Fix: autopm mcp enable context7
+
+💡 Tip: Run "autopm mcp list" to see all MCP servers
+💡 Tip: Run "autopm mcp setup" for interactive configuration
+
+✓ Updated CLAUDE.md with team agents
+✓ Team 'frontend' activated successfully
+```
+
+### 🔧 Technical Changes
+
+**Modified Files:**
+- `bin/commands/team.js` - Added `validateAgentMCPDependencies()` function
+- `bin/commands/team.js` - Integrated MCP validation into team load command
+
+**How It Works:**
+1. After resolving team agents, validates MCP dependencies
+2. Uses existing MCPHandler to scan agent files for MCP URIs
+3. Checks each required server against active servers list
+4. Displays warnings for missing/inactive servers
+5. Continues with team loading (non-blocking validation)
+
+### 📝 Migration Notes
+
+**For all users:**
+- MCP validation happens automatically when loading teams
+- No configuration required - works out of the box
+- Warnings are informational and don't block team loading
+
+**Affected Agents:**
+Many agents now declare MCP dependencies for documentation access:
+- `react-frontend-engineer` - Needs context7 for React/Next.js docs
+- `python-backend-engineer` - Needs context7 for Python/FastAPI docs
+- `javascript-frontend-engineer` - Needs context7 for JS/TS docs
+- And many more...
+
+## [1.17.0] - 2025-10-02
+
+### ✨ Feature: Mandatory Agent Usage Enforcement
+
+**Systematic enforcement to ensure specialized agents are used for complex tasks**
+
+Users reported that after installation, Claude Code wasn't consistently using specialized agents, requiring constant reminders. This release adds comprehensive enforcement mechanisms.
+
+### 🎯 What's New
+
+1. **Agent Mandatory Rule (`agent-mandatory.md`):**
+   - 🚨 HIGHEST PRIORITY rule file
+   - Clear guidelines: When to ALWAYS use agents vs when you can do it yourself
+   - Agent selection guide by task type and technology
+   - Violation examples with ✅ CORRECT and ❌ WRONG patterns
+   - Quick reference tables for common tasks
+
+2. **CLAUDE.md Template Updates:**
+   - Prominent "🚨 AGENT USAGE - MANDATORY" section at top
+   - Quick reference table visible immediately
+   - "Before doing ANY complex task: Check if there's a specialized agent"
+   - References comprehensive agent-mandatory.md rule
+
+3. **Hooks Installation:**
+   - `.claude/hooks/` directory now installed to all projects
+   - `enforce-agents.sh` and `enforce-agents.js` for runtime enforcement
+   - Blocks direct execution of complex tasks
+   - Suggests appropriate agents for violations
+
+### 📊 Impact
+
+**Before v1.17.0:**
+```
+User: "Build a FastAPI endpoint"
+Claude: *writes Python code directly*
+User: "Please use an agent!"
+```
+
+**After v1.17.0:**
+```
+User: "Build a FastAPI endpoint"
+Claude: "I'll use the python-backend-engineer agent..."
+*Uses Task tool automatically*
+```
+
+### 🔧 Technical Changes
+
+**New Files:**
+- `autopm/.claude/rules/agent-mandatory.md` - Comprehensive agent usage rules
+
+**Modified Files:**
+- `autopm/.claude/templates/claude-templates/base.md` - Added agent enforcement section
+- `install/install.js` - Added `.claude/hooks` to installItems array
+
+**Hooks Included:**
+- `enforce-agents.sh` - Shell wrapper for hook
+- `enforce-agents.js` - Node.js enforcement logic
+- Blocks: Direct grep/find, test execution, large file reads
+- Suggests: code-analyzer, test-runner, file-analyzer agents
+
+### 📝 Migration Notes
+
+**For new installations:**
+- Agent enforcement is automatic! 🎉
+
+**For existing installations:**
+```bash
+autopm update
+# Updates templates and installs hooks
+```
+
+## [1.16.0] - 2025-10-02
+
+### ✨ Feature: Epic Status Command
+
+**Global epic status tracking with CLI commands**
+
+Added `autopm epic` commands for viewing epic progress, task breakdown, and status across multi-level epic structures.
+
+### 🎯 What's New
+
+1. **Epic Status Script (`epic-status.sh`):**
+   - Counts total/completed/in-progress/pending tasks
+   - Visual progress bar
+   - Sub-epic breakdown with individual counts
+   - Robust bash implementation (no parse errors)
+
+2. **Epic CLI Commands:**
+   - `autopm epic list` - List all available epics
+   - `autopm epic status <name>` - Show epic progress
+   - `autopm epic breakdown <name>` - Detailed task breakdown
+
+3. **Integration:**
+   - Works with multi-level epic structures
+   - Supports 100+ tasks across multiple sub-epics
+   - Task status tracking (completed/in-progress/pending)
+
+### 📊 Example Output
+
+```bash
+$ autopm epic status fullstack
+
+Epic: fullstack
+====================
+
+Total tasks:     101
+Completed:       45 (44%)
+In Progress:     5
+Pending:         51
+
+Progress: [======================----------------------------] 44%
+
+Sub-Epic Breakdown:
+-------------------
+  01-infrastructure           12 tasks (8 completed)
+  02-auth-backend             15 tasks (6 completed)
+  03-frontend-foundation      18 tasks (10 completed)
+  ...
+```
+
+### 🔧 Technical Changes
+
+**New Files:**
+- `autopm/scripts/epic-status.sh` - Bash script for epic analysis
+- `bin/commands/epic.js` - CLI command module
+
+**Modified Files:**
+- `bin/autopm.js` - Registered epic command
+- `install/install.js` - Added epic-status.sh to installer
+
+## [1.15.5] - 2025-10-02
+
+### 🐛 Bug Fix: Package.json Installation
+
+**Fixed installer not creating package.json or installing dependencies**
+
+Same as v1.15.4 but with corrected version number and proper npm publication.
+
+### 🔧 Changes
+
+- Ensured package.json.template includes js-yaml dependency
+- Installer creates package.json and runs npm install
+- All PM scripts have required dependencies
+
+## [1.15.4] - 2025-10-02
+
+### 🐛 Bug Fix: Missing Dependencies After Installation
+
+**Fixed installer not creating package.json or installing dependencies**
+
+The installer was not creating `package.json` in user projects, causing PM scripts like `epic-split.js` to fail with "Cannot find module 'js-yaml'" error.
+
+### 🎯 What Was Fixed
+
+1. **Added package.json.template handling:**
+   - Template now includes `js-yaml` dependency
+   - Installer creates `package.json` from template if it doesn't exist
+   - Auto-fills project name from directory name
+
+2. **Added automatic dependency installation:**
+   - Installer now runs `npm install` after copying files
+   - Only installs if `package.json` has dependencies
+   - Provides helpful error message if installation fails
+
+3. **Fixed PM script requirements:**
+   - `epic-split.js` now has required `js-yaml` dependency
+   - All other PM scripts will have dependencies available
+
+### 📊 Impact
+
+**Before v1.15.4:**
+```bash
+autopm install
+# Creates .claude/ but NO package.json
+# User runs /pm:epic-split
+# ERROR: Cannot find module 'js-yaml'
+```
+
+**After v1.15.4:**
+```bash
+autopm install
+# ✅ Creates package.json with dependencies
+# ✅ Runs npm install automatically
+# ✅ js-yaml installed and ready
+# User runs /pm:epic-split
+# ✅ Works perfectly!
+```
+
+### 🔧 Technical Changes
+
+**Files Modified:**
+- `autopm/scripts/package.json.template` - Added `js-yaml: ^4.1.0`
+- `install/install.js` - Added `installDependencies()` method
+- `install/install.js` - Added package.json creation logic in `installScripts()`
+
+### 📝 Migration Notes
+
+**For existing installations:**
+```bash
+# Add to your project root:
+npm install js-yaml
+
+# Or recreate package.json:
+cp autopm/scripts/package.json.template package.json
+npm install
+```
+
+**For new installations:**
+- Everything works automatically! 🎉
+
+## [1.13.13] - 2025-10-01
+
+### 🐛 Critical Bug Fix: MCP Server Definition Files
+
+**Fixed incorrect package names in MCP server definition files**
+
+The v1.13.10 and v1.13.11 releases fixed package names in `mcp-servers.json` but forgot to update the individual server definition files in `autopm/.claude/mcp/`. This caused servers to fail validation and not appear in `autopm mcp list`.
+
+### 🎯 What Was Fixed
+
+**Fixed Files:**
+- `autopm/.claude/mcp/context7.md`: `@context7/mcp-server` → `@upstash/context7-mcp`
+- `autopm/.claude/mcp/context7.md`: `@context7/mcp-server` → `@upstash/context7-mcp`
+- `autopm/.claude/mcp/context7.md`: Added missing `https://` to URL defaults
+- `autopm/.claude/mcp/playwright-mcp.md`: `@playwright/mcp-server` → `@playwright/mcp`
+
+### 📊 Impact
+
+**Before v1.13.13:**
+- `autopm mcp list` showed only context7 servers
+- playwright-mcp didn't appear in list
+- Server validation failed silently
+
+**After v1.13.13:**
+- All servers appear in `autopm mcp list`
+- All package names are correct and consistent
+- Server validation works properly
+
+### 🔄 Upgrade
+
+```bash
+npm install -g claude-autopm@latest
+```
+
+## [1.13.12] - 2025-10-01
+
+### ✨ Enhancement: Post-Configuration Guidance
+
+**Added comprehensive next steps after MCP configuration commands**
+
+Users now receive clear, actionable guidance after running:
+- `autopm mcp enable <server>`
+- `autopm mcp add`
+- `autopm mcp sync`
+
+### 🎯 What Changed
+
+**New `showNextSteps()` method in MCPHandler:**
+- Shows step-by-step instructions after configuration
+- Lists required environment variables with examples
+- Provides API key sources and documentation links
+- Reminds users to restart Claude Code and verify servers
+
+### 📋 Example Output
+
+**After `autopm mcp enable context7`:**
+```
+✅ Server 'context7' enabled
+
+📋 Next Steps:
+
+1. Run sync to update configuration:
+   autopm mcp sync
+
+2. Configure required environment variables in .claude/.env:
+   CONTEXT7_API_KEY=ctx7_1234567890abcdef
+   CONTEXT7_WORKSPACE=my-workspace-id
+
+3. Restart Claude Code to load the server
+
+4. Verify server status:
+   /mcp (in Claude Code)
+
+💡 API Key Information:
+   → Sign up at https://context7.com and get API key from dashboard
+```
+
+**After `autopm mcp sync`:**
+```
+✅ Configuration synced...
+
+📋 Next Steps:
+
+1. Restart Claude Code to load the updated configuration
+
+2. Verify servers are running:
+   /mcp (in Claude Code)
+
+⚠️  Some servers require environment variables:
+
+   ❌ CONTEXT7_API_KEY
+
+3. Configure missing variables in .claude/.env
+
+4. Check configuration:
+   autopm mcp check
+```
+
+### 🎁 User Experience Improvement
+
+**Before v1.13.12:**
+- Commands completed silently
+- No guidance on what to do next
+- Users left confused about how to proceed
+
+**After v1.13.12:**
+- Clear step-by-step instructions
+- Environment variable examples
+- Links to credential sources
+- Verification commands
+
+### 🔄 Impact
+
+This addresses user feedback: *"po dodaniu konfiguracji autopm mcp nie mialem zadnej informacji na temat uruchomienia sync ani innych krokow"*
+
+## [1.13.11] - 2025-10-01
+
+### 🐛 Bug Fix: Corrected Playwright MCP Package Name
+
+**Fixed incorrect Playwright MCP package name**
+- Changed from non-existent `@playwright/mcp-server` to actual `@playwright/mcp`
+- **Impact: Playwright MCP server can now start in Claude Code**
+
+### 🗑️ Breaking Change: Removed Deprecated GitHub MCP
+
+**Removed deprecated GitHub MCP server from default configuration**
+- `@modelcontextprotocol/server-github` is deprecated by maintainers
+- GitHub now provides official server via Copilot API with HTTP transport
+- **Impact: Users need to manually add GitHub MCP if needed**
+
+### 🎯 What Changed
+
+**autopm/.claude/mcp-servers.json:**
+```json
+// Playwright - Fixed:
+"args": ["@playwright/mcp"]  // ✅ Was: @playwright/mcp-server
+
+// GitHub - Removed (deprecated)
+// Use: claude mcp add --transport http github ...
+```
+
+**package.json:**
+```json
+"optionalDependencies": {
+  "@upstash/context7-mcp": "^1.0.0",
+  "@playwright/mcp": "^0.0.40"
+}
+```
+
+### 📊 Default MCP Servers
+
+**After v1.13.11:**
+- ✅ `context7` - Documentation (@upstash/context7-mcp)
+- ✅ `context7` - Codebase analysis (@upstash/context7-mcp)
+- ✅ `playwright-mcp` - Browser automation (@playwright/mcp)
+- ❌ `github-mcp` - REMOVED (deprecated)
+
+### 📖 Adding GitHub MCP Manually
+
+**New official GitHub MCP (via Copilot API):**
+```bash
+claude mcp add --transport http github \
+  https://api.githubcopilot.com/mcp \
+  -H "Authorization: Bearer $GITHUB_PAT"
+```
+
+See: https://github.com/github/github-mcp-server
+
+### 🔄 Migration
+
+**For existing projects:**
+```bash
+cd your-project
+autopm mcp sync  # Updates with correct packages
+```
+
+## [1.13.10] - 2025-10-01
+
+### 🐛 Critical Bug Fix
+
+**Fixed Incorrect Context7 MCP Package Name**
+- Changed from non-existent `@context7/mcp-server` to actual `@upstash/context7-mcp`
+- **Impact: MCP servers can now actually start in Claude Code**
+
+### 🎯 What Was Wrong
+
+The MCP configuration was using a **non-existent npm package**:
+- ❌ `@context7/mcp-server` - doesn't exist on npm
+- ✅ `@upstash/context7-mcp` - real package
+
+This caused ALL Context7 MCP servers to fail with "✘ failed" in Claude Code.
+
+### 🔧 Files Changed
+
+**autopm/.claude/mcp-servers.json:**
+```json
+// Before:
+"args": ["@context7/mcp-server"]  // ❌ 404 Not Found
+
+// After:
+"args": ["@upstash/context7-mcp"]  // ✅ Works
+```
+
+**package.json:**
+```json
+"optionalDependencies": {
+  "@upstash/context7-mcp": "^1.0.0"  // Updated
+}
+```
+
+### 📊 Impact
+
+**Before (v1.13.9):**
+```
+Claude Code MCP:
+❯ 1. context7    ✘ failed
+  2. context7        ✘ failed
+```
+
+**After (v1.13.10):**
+```
+Claude Code MCP:
+❯ 1. context7    ✓ running
+  2. context7        ✓ running
+```
+
+### 🚨 Breaking Change
+
+If you manually installed `@context7/mcp-server` (which would fail), you'll need to:
+```bash
+npm uninstall @context7/mcp-server
+npm install @upstash/context7-mcp
+```
+
+But most users didn't install anything (because the package didn't exist), so this is just a fix.
+
+### 🎯 User Action Required
+
+**For existing projects:**
+```bash
+cd your-project
+autopm mcp sync  # Updates .mcp.json with correct package
+```
+
+Or manually update `.mcp.json`:
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "args": ["@upstash/context7-mcp"]  // Change this
+    }
+  }
+}
+```
+
+### 🔍 How This Happened
+
+The Context7 MCP server is maintained by Upstash, but the configuration examples used an incorrect namespace. The package search revealed:
+- ✅ `@upstash/context7-mcp` - Official package (v1.0.20)
+- ❌ `@context7/mcp-server` - Never existed
+
+## [1.13.9] - 2025-10-01
+
+### 🎨 UX Improvement
+
+**Enhanced Configuration Display (`autopm config show`)**
+- Fixed confusing MCP status messages
+- Added helpful configuration instructions
+- Shows exact steps to fix missing settings
+- **Impact: Users now know exactly how to configure AutoPM**
+
+### 🎯 What Changed
+
+**`bin/commands/config.js`:**
+- Fixed MCP status display - now shows "X active", "X configured", or "Not configured"
+- Checks both `config.mcp.activeServers` and `.claude/mcp-servers.json`
+- Added "Configuration Issues" section with actionable solutions
+- Shows exactly how to set GitHub owner, repo, and token
+- Shows how to set Azure organization, project, and PAT
+- Fixed execution strategy display when it's an object
+- Made `padRight()` safer by converting all inputs to strings
+
+### 📊 Before vs After
+
+**Before (v1.13.8):**
+```
+│ MCP:             ❌ Disabled             │
+```
+*User confused: "I have servers configured!"*
+
+**After (v1.13.9):**
+```
+│ MCP:             ⚠️  2 configured       │
+```
+```
+📋 Configuration Issues:
+
+⚠️  GitHub token not set
+   → Add to .claude/.env: GITHUB_TOKEN=ghp_your_token_here
+
+ℹ️  2 MCP server(s) configured but not active
+   → Run: autopm mcp list  (then: autopm mcp enable <server>)
+```
+
+### 🎯 User Impact
+
+✅ Clear MCP status (active vs configured vs missing)
+✅ Actionable instructions for every missing setting
+✅ Shows exact commands to run
+✅ Shows where to add tokens (.claude/.env)
+✅ No more confusion about configuration state
+
+### 🔧 Technical Details
+
+**MCP Status Logic:**
+1. If `config.mcp.activeServers` exists → show "X active" ✅
+2. Else check `.claude/mcp-servers.json` → show "X configured" ⚠️
+3. Else → show "Not configured" ❌
+
+**Configuration Issues:**
+- Detects missing provider, owner, repo, tokens
+- Shows platform-specific instructions (GitHub vs Azure)
+- Different icon per issue type (⚠️ for problems, ℹ️ for info)
+
+## [1.13.8] - 2025-10-01
+
+### ✨ Feature
+
+**Automatic MCP Integration During Installation**
+- Installation now automatically creates `.mcp.json` for Claude Code
+- No manual `autopm mcp sync` needed after install
+- **Impact: MCP servers work in Claude Code immediately after installation**
+
+### 🎯 What Changed
+
+**`install/install.js`:**
+- Added `.claude/mcp-servers.json` to `installItems` (now copied during install)
+- Added `setupMCPIntegration()` method called after framework installation
+- Automatically creates `.mcp.json` when `mcp-servers.json` exists
+- Shows helpful tip if no servers are activated
+
+### 📊 Installation Flow
+
+**Before (v1.13.7):**
+```
+1. autopm install
+2. autopm mcp enable context7  ← Manual step
+3. autopm mcp sync                  ← Manual step
+4. Restart Claude Code              ← Manual step
+```
+
+**After (v1.13.8):**
+```
+1. autopm install                   ← Creates .mcp.json automatically!
+2. autopm mcp enable context7  (optional - to activate)
+3. Restart Claude Code
+```
+
+### 🎯 User Impact
+
+- ✅ `.mcp.json` created automatically during installation
+- ✅ 4 MCP servers configured out of the box (context7, context7, github-mcp, playwright-mcp)
+- ✅ No extra commands needed for Claude Code integration
+- ✅ Helpful tip shown if servers need activation
+- ✅ Works for both fresh installs and updates
+
+### 📖 Files Copied
+
+During installation, these MCP files are now installed:
+- `.claude/mcp/` - Server definitions (10 markdown files)
+- `.claude/mcp-servers.json` - Complete server configuration
+- `.mcp.json` - Claude Code format (auto-generated)
+
+### 💡 Post-Installation
+
+Users can now:
+- See servers immediately in Claude Code `/mcp` command
+- Run `autopm mcp enable <server>` to activate specific servers
+- Run `autopm mcp check` to see environment requirements
+- Edit `.claude/.env` to add API keys
+
+## [1.13.7] - 2025-10-01
+
+### 🔧 Critical Fix
+
+**Claude Code MCP Integration**
+- Fixed `autopm mcp sync` to create `.mcp.json` in project root
+- Claude Code expects MCP config in `.mcp.json`, not `.claude/mcp-servers.json`
+- **Impact: Claude Code `/mcp` command now correctly discovers MCP servers**
+
+### 🎯 What Changed
+
+**`scripts/mcp-handler.js`:**
+- Modified `sync()` to write two files:
+  1. `.claude/mcp-servers.json` - AutoPM internal format (with contextPools, documentationSources)
+  2. `.mcp.json` - Claude Code format (mcpServers only)
+- Added console output showing both file locations
+- Uses `this.projectRoot` to write `.mcp.json` at project root
+
+### 📊 File Structure
+
+**Before (v1.13.6):**
+```
+project/
+  .claude/
+    mcp-servers.json    ✅ Created
+  .mcp.json             ❌ Missing (Claude Code couldn't find servers)
+```
+
+**After (v1.13.7):**
+```
+project/
+  .claude/
+    mcp-servers.json    ✅ Created (AutoPM format)
+  .mcp.json             ✅ Created (Claude Code format)
+```
+
+### 🎯 User Impact
+
+- ✅ Claude Code `/mcp` command shows configured servers
+- ✅ MCP servers discoverable by Claude Code
+- ✅ Automatic sync to both file formats
+- ✅ No manual configuration needed
+- ✅ Works across all projects after running `autopm mcp sync`
+
+### 📖 Documentation
+
+Claude Code expects MCP configuration in:
+- **Project scope**: `.mcp.json` at project root
+- **Local scope**: User-specific Claude Code settings
+- **User scope**: Global Claude Code settings
+
+AutoPM now correctly creates project-scoped configuration.
+
+## [1.13.6] - 2025-10-01
+
+### 🐛 Bug Fix
+
+**MCP Environment Variable Format**
+- Fixed `autopm mcp sync` copying metadata objects instead of simple strings
+- Claude Code expects `"VAR": "value"` not `"VAR": {default: "value"}`
+- Added `_convertEnvMetadataToStrings()` to convert registry metadata to Claude Code format
+- **Impact: Claude Code `/mcp` command now works correctly**
+
+### 🔧 Technical Changes
+
+**`scripts/mcp-handler.js`:**
+- Added `_convertEnvMetadataToStrings(envObj)` helper method
+- Converts env metadata objects to simple string format
+- Handles three cases:
+  1. Already string → keep unchanged
+  2. Metadata with literal default → use literal value
+  3. Metadata with empty default → use `${VAR:-}` format
+- Modified `sync()` to use conversion before writing
+
+### 📊 Format Conversion
+
+**Before (v1.13.5):**
+```json
+"env": {
+  "CONTEXT7_API_KEY": {              // ❌ Object
+    "default": "",
+    "description": "Your Context7 API key",
+    "required": true
+  }
+}
+```
+
+**After (v1.13.6):**
+```json
+"env": {
+  "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY:-}",  // ✅ String
+  "CONTEXT7_MODE": "documentation"                // ✅ Literal
+}
+```
+
+### 🎯 User Impact
+
+- ✅ Claude Code can parse MCP configurations
+- ✅ `/mcp` command shows servers correctly
+- ✅ Backward compatible with existing formats
+- ✅ Preserves literal defaults from registry
+- ✅ MCP servers now work in Claude Code interface
+
+## [1.13.5] - 2025-10-01
+
+### 🚨 Critical Bug Fix
+
+**MCP Sync Data Loss Bug**
+- Fixed critical bug in `autopm mcp sync` that deleted all MCP server configurations
+- Previously: Running sync with no active servers would wipe entire `mcp-servers.json`
+- Now: Preserves all existing servers, only updates active ones
+- Impact: **Safe to run `autopm mcp sync` anytime without data loss**
+
+### 🔧 Technical Changes
+
+**`scripts/mcp-handler.js`:**
+- `sync()` now reads existing `mcp-servers.json` before modifying
+- Preserves all servers, updates only those in `activeServers` list
+- When no active servers: preserves existing instead of wiping file
+- Better logging: shows both active count and total servers count
+
+**`.claude/config.json`:**
+- Added `mcp.activeServers` section for Claude Code integration
+- Enables `/mcp` command in Claude Code to see configured servers
+- Without this section, Claude Code shows "No MCP servers configured"
+
+### 📊 Behavior Change
+
+**Before:**
+```bash
+$ autopm mcp sync  # with empty activeServers
+ℹ️ No active servers to sync
+# Result: ALL servers deleted from mcp-servers.json ❌
+```
+
+**After:**
+```bash
+$ autopm mcp sync  # with empty activeServers
+ℹ️ No active servers in config.json
+💡 Preserving existing servers in mcp-servers.json
+📊 Existing servers: 4
+# Result: All servers preserved ✅
+```
+
+### 🎯 User Impact
+
+- ✅ No more data loss when syncing
+- ✅ Claude Code `/mcp` command now works
+- ✅ Safe to run `autopm mcp sync` anytime
+- ✅ All existing servers preserved automatically
+
+### 🔄 Recovery for Affected Users
+
+If you lost your MCP configuration, restore it:
+```bash
+# Restore from git
+git checkout .claude/mcp-servers.json
+
+# Or re-enable servers
+autopm mcp enable context7
+autopm mcp enable github-mcp
+```
+
+## [1.13.4] - 2025-10-01
+
+### ✨ User Experience Enhancements
+
+**Next Steps Guidance After PRD Creation**
+- Added comprehensive next steps display after `/pm:prd-new` command
+- Shows 5 clear options to prevent users from getting lost:
+  1. **Quick Start** - `/pm:epic-oneshot` for simple features (< 10 tasks)
+  2. **Split into Epics** - `/pm:prd-split` for complex features (15+ tasks)
+  3. **Step-by-Step Workflow** - Full control over parse → decompose → sync
+  4. **Review & Edit First** - Refine PRD before processing
+  5. **Check Status** - View PRD progress anytime
+- Includes decision guidance based on feature complexity
+- Visual formatting with emojis and clear separators
+
+**Enhanced MCP Configuration Diagnostics**
+- Improved `autopm mcp check` output with categorized environment variables
+- **REQUIRED vs OPTIONAL** indicators for all env vars
+- Descriptions for each environment variable
+- Ready-to-copy example `.env` configuration
+- Direct links to get API keys and credentials
+- Step-by-step fix instructions with numbered steps
+- Shows where to get credentials for each MCP server
+
+### 🔧 Code Quality Improvements
+
+- Extracted `_hasNonEmptyDefault(envDef)` helper method
+- Eliminated duplicate logic in MCP configuration checks
+- More robust handling: converts to string, trims whitespace
+- Handles edge cases: null, undefined, whitespace-only strings
+- Improved maintainability following DRY principle
+
+### 📝 Technical Changes
+
+- `autopm/.claude/scripts/pm/prd-new.js`: Added `showNextSteps()` method (+48 lines)
+- `scripts/mcp-handler.js`: Enhanced `check()` with detailed diagnostics (+133 lines)
+- `autopm/.claude/mcp/context7.md`: Structured env metadata with objects
+- All 21 MCP check tests still passing ✅
+
+### 🎯 Addresses User Feedback
+
+- ✅ Users no longer get lost after creating PRDs
+- ✅ MCP configuration errors are now self-explanatory
+- ✅ Clear guidance on what to do next at each step
+- ✅ No more guessing where to get API keys
+
+## [1.13.3] - 2025-10-01
+
+### ✅ Added
+- **Comprehensive Test Coverage** (61 new tests, 100% pass rate)
+  - `test/jest-tests/mcp-check-jest.test.js` - 21 tests for MCP configuration validation
+  - `test/jest-tests/post-install-check-jest.test.js` - 40 tests for post-installation validation
+  - Full coverage for `MCPHandler.check()` and `checkRequiredServers()` methods
+  - Complete coverage for `PostInstallChecker` class and all validation methods
+  - Integration tests for various configuration scenarios
+  - Error handling tests for edge cases
+
+### 📚 Documentation
+- **README.md Enhancements**
+  - Added `autopm mcp check` to MCP commands documentation
+  - Added section 4.6 "Verify Installation & Configuration" with `autopm validate` examples
+  - Added comprehensive "Splitting Large PRDs into Multiple Epics" guide
+    - Complete workflow example with progress tracking
+    - 4 criteria for when to split PRDs
+    - 5 best practices for managing split epics
+  - Example output showing Essential and Optional components validation
+  - Actionable next steps for incomplete configurations
+
+### 🎯 Quality Improvements
+- Zero test failures - all 61 new tests passing
+- Better developer experience with clear test coverage
+- Improved user guidance for complex project management workflows
+- Enhanced documentation for post-installation validation
+
+## [1.13.2] - 2025-10-01
+
+### 🐛 Fixed
+- **MCP Command Argument Parsing**
+  - Fixed `autopm mcp enable <server-name>` not accepting server name as positional argument
+  - Changed command signature from `mcp <action> [options]` to `mcp <action> [name]`
+  - Added proper positional argument handling for server and agent names
+  - All MCP commands now correctly parse server/agent names from command line
+  - Maintains backward compatibility with `--server` and `--agent` flags
+
+### 🛠️ Enhanced
+- **Post-Installation Validation**
+  - Added automatic configuration check after `autopm install`
+  - New `autopm validate` command for comprehensive setup verification
+  - Visual status display shows Essential and Optional components
+  - Actionable next steps when configuration is incomplete
+  - Checks: `.claude` directory, config file, provider setup, MCP servers, git hooks, Node.js version
+
+## [1.13.1] - 2025-10-01
+
+### 📚 Documentation
+- **Visual Walkthrough Enhancements**
+  - Improved video presentation with expandable sections in README
+  - Added 6 demo GIF files showcasing complete workflow
+  - Fixed video file naming and paths for better compatibility
+  - Interactive collapsible sections for each workflow step
+
+## [1.13.0] - 2025-09-30
+
+### ✨ Added
+- **MCP Configuration Check Command** (`autopm mcp check`)
+  - Quick validation of MCP server configuration
+  - Analyzes which agents require MCP servers
+  - Verifies required servers are enabled
+  - Checks environment variables are configured
+  - Provides actionable recommendations for issues
+  - Complements existing `diagnose` command with fast health check
+
+### 🛠️ Enhanced
+- **Enhanced MCP Diagnostics**
+  - `autopm mcp diagnose` now includes MCP server requirements section
+  - Shows disabled servers that are used by agents
+  - Displays missing environment variables
+  - Provides quick fix recommendations
+- **Performance Improvements**
+  - Added environment status caching to reduce file I/O operations
+  - Optimized MCP server validation checks
+  - Extracted helper methods for better code reusability
+
+### 📚 Documentation
+- **MCP Command Documentation Updates**
+  - Added comprehensive documentation for `autopm mcp check`
+  - Updated MCP workflow examples with new check command
+  - Enhanced troubleshooting guide with quick check instructions
+  - Updated MCP_SETUP_GUIDE.md with validation workflow
+
 ## [1.12.3] - 2025-09-30
 
 ### 📚 Documentation

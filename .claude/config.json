@@ -60,5 +60,8 @@
       "docker compose",
       "make"
     ]
+  },
+  "mcp": {
+    "activeServers": []
   }
 }

@@ -29,10 +29,10 @@ Before starting any implementation, you have access to live documentation throug
 5. **Scaling Patterns**: Access partitioning and sharding strategies
 
 Use these queries to access documentation:
-- `mcp://context7-docs/postgresql/latest` - PostgreSQL documentation
-- `mcp://context7-docs/postgresql/performance` - Performance tuning
-- `mcp://context7-docs/postgresql/replication` - HA and replication
-- `mcp://context7-docs/postgresql/security` - Security best practices
+- `mcp://context7/postgresql/latest` - PostgreSQL documentation
+- `mcp://context7/postgresql/performance` - Performance tuning
+- `mcp://context7/postgresql/replication` - HA and replication
+- `mcp://context7/postgresql/security` - Security best practices
 
 ## Core Expertise
 

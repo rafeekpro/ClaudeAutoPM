@@ -1,0 +1,109 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+      "env": {
+        "DEFAULT_MINIMUM_TOKENS": "${DEFAULT_MINIMUM_TOKENS:-10000}"
+      }
+    },
+    "playwright-mcp": {
+      "command": "npx",
+      "args": ["@playwright/mcp"],
+      "env": {
+        "PLAYWRIGHT_BROWSER": "chromium",
+        "PLAYWRIGHT_HEADLESS": "true"
+      }
+    }
+  },
+  "contextPools": {
+    "python-docs": {
+      "type": "shared",
+      "agents": ["python-backend-engineer", "mcp-context-manager"],
+      "sources": ["context7"],
+      "filters": ["fastapi", "sqlalchemy", "pydantic", "uvicorn", "pytest"],
+      "maxSize": "100MB",
+      "retention": "7d",
+      "refresh": "daily"
+    },
+    "azure-docs": {
+      "type": "shared",
+      "agents": ["azure-devops-specialist", "mcp-context-manager"],
+      "sources": ["context7"],
+      "filters": ["azure-devops", "rest-api", "work-items", "pipelines"],
+      "maxSize": "75MB",
+      "retention": "7d",
+      "refresh": "daily"
+    },
+    "react-docs": {
+      "type": "shared",
+      "agents": ["react-frontend-engineer", "frontend-testing-engineer"],
+      "sources": ["context7"],
+      "filters": ["react", "nextjs", "typescript", "tailwind", "vite"],
+      "maxSize": "75MB",
+      "retention": "7d",
+      "refresh": "daily"
+    },
+    "cloud-docs": {
+      "type": "shared",
+      "agents": ["gcp-cloud-architect", "azure-cloud-architect", "aws-cloud-architect"],
+      "sources": ["context7"],
+      "filters": ["terraform", "kubernetes", "docker", "helm"],
+      "maxSize": "150MB",
+      "retention": "7d",
+      "refresh": "daily"
+    },
+    "devops-context": {
+      "type": "shared",
+      "agents": ["github-operations-specialist", "kubernetes-orchestrator", "azure-devops-specialist"],
+      "sources": ["context7"],
+      "filters": ["github-actions", "kubernetes", "ci-cd"],
+      "maxSize": "100MB",
+      "retention": "7d",
+      "refresh": "daily"
+    },
+    "testing-context": {
+      "type": "shared",
+      "agents": ["frontend-testing-engineer", "test-runner"],
+      "sources": ["context7", "playwright-mcp"],
+      "filters": ["playwright", "testing", "e2e"],
+      "maxSize": "50MB",
+      "retention": "7d",
+      "refresh": "daily"
+    },
+    "project-context": {
+      "type": "persistent",
+      "agents": ["python-backend-engineer", "react-frontend-engineer", "azure-devops-specialist", "code-analyzer"],
+      "sources": ["context7"],
+      "maxSize": "300MB",
+      "retention": "30d",
+      "refresh": "on-change"
+    }
+  },
+  "documentationSources": {
+    "fastapi": {
+      "url": "https://fastapi.tiangolo.com",
+      "type": "api-docs",
+      "priority": "high",
+      "agents": ["python-backend-engineer"]
+    },
+    "sqlalchemy": {
+      "url": "https://docs.sqlalchemy.org/en/20/",
+      "type": "orm-docs",
+      "priority": "high",
+      "agents": ["python-backend-engineer"]
+    },
+    "azure-devops-rest": {
+      "url": "https://docs.microsoft.com/en-us/rest/api/azure/devops/",
+      "type": "api-reference",
+      "priority": "high",
+      "agents": ["azure-devops-specialist"]
+    },
+    "azure-devops-services": {
+      "url": "https://docs.microsoft.com/en-us/azure/devops/",
+      "type": "service-docs",
+      "priority": "medium",
+      "agents": ["azure-devops-specialist"]
+    }
+  }
+}

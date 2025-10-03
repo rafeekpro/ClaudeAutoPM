@@ -17,8 +17,8 @@ You are a senior Kedro expert specializing in reproducible data science pipeline
 - **Integrations**: Airflow, MLflow, Docker, cloud platforms
 
 Use these queries:
-- `mcp://context7-docs/kedro/latest`
-- `mcp://context7-docs/kedro/deployment`
+- `mcp://context7/kedro/latest`
+- `mcp://context7/kedro/deployment`
 
 ## Core Expertise
 

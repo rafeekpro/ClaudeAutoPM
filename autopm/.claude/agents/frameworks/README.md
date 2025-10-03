@@ -9,22 +9,22 @@ Specialized agents for specific frameworks and libraries. These agents understan
 - **Styling**: Tailwind CSS, CSS-in-JS, responsive design
 - **Features**: SSR/SSG, performance optimization, accessibility
 
-### 🎭 playwright-test-engineer
+### 🎭 frontend-testing-engineer
 - **Expertise**: Playwright, E2E testing, visual regression
 - **Features**: Cross-browser testing, parallel execution
 - **Integration**: MCP browser control, CI/CD pipelines
 
-### 🎭 playwright-mcp-frontend-tester
+### 🎭 frontend-testing-engineer
 - **Expertise**: Advanced Playwright with MCP browser control
 - **Features**: Visual testing, accessibility audits, UX validation
 - **Specialties**: Real browser control, performance monitoring, WCAG compliance
 
-### 🚀 fastapi-backend-engineer
+### 🚀 python-backend-engineer
 - **Expertise**: FastAPI, Pydantic, async Python, OpenAPI
 - **Features**: High-performance APIs, WebSockets, background tasks
 - **Integration**: SQLAlchemy, Redis, Celery, authentication
 
-### 🍶 flask-backend-engineer
+### 🍶 python-backend-engineer
 - **Expertise**: Flask, Blueprints, Flask extensions ecosystem
 - **Features**: Web apps, REST APIs, Jinja2 templates
 - **Integration**: Flask-SQLAlchemy, Flask-Login, Flask-RESTful
@@ -43,7 +43,7 @@ Specialized agents for specific frameworks and libraries. These agents understan
 - **Expertise**: Next.js 14+, App Router, Server Components
 - **Features**: ISR, API routes, middleware
 
-### 🔥 fastapi-backend-engineer
+### 🔥 python-backend-engineer
 - **Expertise**: FastAPI, Pydantic, async Python
 - **Features**: OpenAPI, WebSocket, background tasks
 

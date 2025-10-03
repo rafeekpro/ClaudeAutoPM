@@ -4,21 +4,21 @@ Use Docker-aware agents for containerized development:
 
 ### Docker Specialists (PRIMARY)
 
-#### docker-expert
+#### docker-containerization-expert
 **Use for**: Dockerfile optimization, multi-stage builds, security
 - Container best practices
 - Image size optimization
 - Security scanning
 - Registry management
 
-#### docker-compose-expert
+#### docker-containerization-expert
 **Use for**: Multi-container orchestration, service dependencies
 - Development environment setup
 - Service networking
 - Volume management
 - Environment configuration
 
-#### docker-development-orchestrator
+#### docker-containerization-expert
 **Use for**: Development workflows, hot reload setup
 - Volume mounting strategies
 - Development vs production configs
@@ -47,7 +47,7 @@ Use Docker-aware agents for containerized development:
 - Build optimization in Docker
 - Environment variable injection
 
-#### fastapi-backend-engineer
+#### python-backend-engineer
 - Async Python in containers
 - Uvicorn/Gunicorn configuration
 - Health check endpoints

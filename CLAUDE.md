@@ -4,19 +4,31 @@
 ## Active Team Agents
 
 <!-- AGENTS_START -->
-- @include .claude/agents/agent-manager.md
-- @include .claude/agents/azure-devops-specialist.md
-- @include .claude/agents/code-analyzer.md
-- @include .claude/agents/docker-containerization-expert.md
-- @include .claude/agents/file-analyzer.md
-- @include .claude/agents/github-operations-specialist.md
-- @include .claude/agents/kubernetes-orchestrator.md
-- @include .claude/agents/terraform-infrastructure-expert.md
-- @include .claude/agents/test-runner.md
+- @include .claude/agents/core/agent-manager.md
+- @include .claude/agents/core/code-analyzer.md
+- @include .claude/agents/core/file-analyzer.md
+- @include .claude/agents/core/test-runner.md
+- @include .claude/agents/languages/bash-scripting-expert.md
+- @include .claude/agents/languages/javascript-frontend-engineer.md
+- @include .claude/agents/languages/nodejs-backend-engineer.md
+- @include .claude/agents/testing/e2e-test-engineer.md
 <!-- AGENTS_END -->
 
 > This is the development repository for ClaudeAutoPM framework.
 > **IMPORTANT**: This project uses its own framework capabilities for self-maintenance.
+
+## 📋 Development Standards
+
+**ALL development MUST follow standards defined in:** `.claude/DEVELOPMENT-STANDARDS.md`
+
+This document defines MANDATORY standards for:
+- Agent development (templates, checklists, principles)
+- Rules development (patterns, formats, enforcement)
+- Command development (structure, output formats, tools)
+- Script development (Bash/Node.js templates, utilities)
+- Hook development (enforcement patterns)
+- Naming conventions (prohibitions, required patterns)
+- Code quality standards (principles, anti-patterns, checklist)
 
 ## 🚀 Development Methodology
 
@@ -28,16 +40,13 @@
 3. **Achieve 100% coverage** - For new code
 4. **Run tests before commit** - `npm test` must pass
 
-### Node.js Migration Status
+### Technology Stack
 
-**✅ MIGRATION COMPLETE: 96% Coverage (49/51 scripts)**
-- Successfully migrated 49 bash scripts to Node.js
-- 100% backward compatibility maintained through wrapper pattern
-- Original bash scripts backed up to `.sh.backup` files
-- Total: ~12,000+ lines of Node.js code with comprehensive tests
-- Cross-platform compatibility dramatically improved
-- External dependencies (jq, specific bash versions) removed
-- See MIGRATION_REPORT.md for full details
+- **Language**: JavaScript/Node.js (cross-platform)
+- **CLI Framework**: yargs for command parsing
+- **Testing**: Jest with comprehensive test coverage
+- **Installation**: JavaScript-based installer with interactive prompts
+- **Package Management**: npm with global installation support
 
 ### Testing Requirements
 
@@ -422,6 +431,44 @@ npm publish
 3. Test installation: `npm run test:install`
 4. Commit with: `./scripts/safe-commit.sh`
 5. Create PR with detailed description
+
+## 📝 Commit Guidelines
+
+**IMPORTANT**: When committing changes to this repository:
+
+### ❌ DO NOT Add Claude Attribution
+
+**Never** include Claude collaboration signatures in commits:
+```bash
+# ❌ DO NOT DO THIS:
+# 🤖 Generated with Claude Code
+# Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+This repository is for **human development** of the ClaudeAutoPM framework. While Claude may assist during development, all commits should be attributed only to human contributors.
+
+### ✅ Commit Message Format
+
+Use semantic commit messages:
+```bash
+feat: add dynamic MCP server installation
+fix: correct config validation logic
+docs: update MCP setup guide
+test: add integration tests for installer
+refactor: simplify agent registry logic
+```
+
+### Commit Process
+
+```bash
+# Use the safe-commit script (includes pre-commit checks)
+./scripts/safe-commit.sh "feat: your message here"
+
+# Or standard git workflow
+git add .
+git commit -m "feat: your message"
+git push
+```
 
 ## Debugging
 

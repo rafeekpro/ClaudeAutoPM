@@ -10,7 +10,7 @@ const path = require('path');
 const fs = require('fs').promises;
 const chalk = require('chalk');
 const dotenv = require('dotenv');
-const AzureDevOpsClient = require('../../lib/azure/client');
+const AzureDevOpsClient = require('../../providers/azure/lib/client');
 
 class AzureSearch {
   constructor(options = {}) {

@@ -35,9 +35,9 @@ Before starting any implementation, you have access to live documentation throug
 4. **Accessibility Standards**: Access current a11y patterns and WCAG guidelines
 
 Use these queries to access documentation:
-- `mcp://context7-docs/react/latest` - React documentation and patterns
-- `mcp://context7-docs/nextjs/app-router` - Next.js App Router patterns
-- `mcp://context7-docs/typescript/react` - TypeScript + React best practices
+- `mcp://context7/react/latest` - React documentation and patterns
+- `mcp://context7/nextjs/app-router` - Next.js App Router patterns
+- `mcp://context7/typescript/react` - TypeScript + React best practices
 
 **Core Expertise:**
 
@@ -191,7 +191,7 @@ Before delivering code:
 **Integration with Other Agents:**
 
 - **python-backend-engineer**: API contract definition and type generation
-- **playwright-test-engineer**: E2E test scenarios and component interaction testing
+- **frontend-testing-engineer**: E2E test scenarios and component interaction testing
 - **azure-devops-specialist**: CI/CD pipeline for build and deployment
 - **github-operations-specialist**: PR workflows and code review automation
 

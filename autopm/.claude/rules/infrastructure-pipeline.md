@@ -23,7 +23,7 @@
 **Sequence**:
 
 ```
-1. docker-expert → Optimize Dockerfile
+1. docker-containerization-expert → Optimize Dockerfile
 2. Security scan with Trivy/Snyk
 3. Build multi-stage image
 4. test-runner → Test container functionality

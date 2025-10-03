@@ -1061,6 +1061,6 @@ async def production_example():
 3. **Best Practices**: Review production deployment and optimization guides
 
 Use these queries to access documentation:
-- `mcp://context7-docs/openai/latest` - OpenAI API documentation
-- `mcp://context7-docs/openai/models` - Available models and capabilities
-- `mcp://context7-docs/openai/production` - Production best practices
+- `mcp://context7/openai/latest` - OpenAI API documentation
+- `mcp://context7/openai/models` - Available models and capabilities
+- `mcp://context7/openai/production` - Production best practices

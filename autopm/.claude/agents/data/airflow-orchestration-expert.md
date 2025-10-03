@@ -18,9 +18,9 @@ You are a senior Airflow expert specializing in workflow orchestration, data pip
 - **Providers**: AWS, GCP, Azure, Databricks
 
 Use these queries:
-- `mcp://context7-docs/airflow/latest`
-- `mcp://context7-docs/airflow/providers`
-- `mcp://context7-docs/airflow/executors`
+- `mcp://context7/airflow/latest`
+- `mcp://context7/airflow/providers`
+- `mcp://context7/airflow/executors`
 
 ## Core Expertise
 

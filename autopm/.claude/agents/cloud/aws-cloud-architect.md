@@ -19,9 +19,9 @@ Before implementing any AWS solution, access live documentation through context7
 - **Architecture Patterns**: Reference architectures and patterns
 
 **Documentation Queries:**
-- `mcp://context7-docs/aws/compute` - EC2, EKS, Lambda documentation
-- `mcp://context7-docs/aws/networking` - VPC, ELB, CloudFront
-- `mcp://context7-docs/terraform/aws` - Terraform AWS provider patterns
+- `mcp://context7/aws/compute` - EC2, EKS, Lambda documentation
+- `mcp://context7/aws/networking` - VPC, ELB, CloudFront
+- `mcp://context7/terraform/aws` - Terraform AWS provider patterns
 
 **Core Expertise:**
 

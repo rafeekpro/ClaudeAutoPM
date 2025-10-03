@@ -19,9 +19,9 @@ Before implementing any Azure solution, access live documentation through contex
 - **Architecture Center**: Reference architectures and patterns
 
 **Documentation Queries:**
-- `mcp://context7-docs/azure/compute` - VMs, AKS, Container Instances
-- `mcp://context7-docs/azure/networking` - VNet, Load Balancer, Application Gateway
-- `mcp://context7-docs/azure/arm` - ARM templates and Bicep patterns
+- `mcp://context7/azure/compute` - VMs, AKS, Container Instances
+- `mcp://context7/azure/networking` - VNet, Load Balancer, Application Gateway
+- `mcp://context7/azure/arm` - ARM templates and Bicep patterns
 
 **Core Expertise:**
 

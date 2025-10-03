@@ -264,7 +264,7 @@ autopm setup-env ~/my-project
 autopm mcp list
 
 # Enable recommended servers
-autopm mcp enable context7-docs
+autopm mcp enable context7
 autopm mcp enable github-mcp
 autopm mcp enable playwright-mcp
 

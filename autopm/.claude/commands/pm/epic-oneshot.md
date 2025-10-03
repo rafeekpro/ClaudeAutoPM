@@ -11,6 +11,19 @@ Decompose epic into tasks and sync to GitHub in one operation.
 /pm:epic-oneshot <feature_name>
 ```
 
+## ⚠️ TDD REMINDER
+
+**CRITICAL: All tasks generated will include TDD requirements.**
+
+This command will create tasks that REQUIRE Test-Driven Development:
+- Each task includes TDD Requirements section
+- Definition of Done starts with "Tests written FIRST"
+- All agents must follow RED-GREEN-REFACTOR cycle
+
+See `.claude/rules/tdd.enforcement.md` for complete requirements.
+
+---
+
 ## Instructions
 
 ### 1. Validate Prerequisites

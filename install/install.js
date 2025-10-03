@@ -38,10 +38,12 @@ class Installer {
       '.claude/agents',
       '.claude/commands',
       '.claude/rules',
+      '.claude/hooks',
       '.claude/scripts',
       '.claude/checklists',
       '.claude/strategies',
       '.claude/mcp',
+      '.claude/mcp-servers.json',
       '.claude/.env.example',
       '.claude/teams.json',
       '.claude-code'
@@ -322,7 +324,8 @@ ${this.colors.BOLD}Examples:${this.colors.NC}
       'safe-commit.sh',
       'safe-commit.js',
       'setup-hooks.sh',
-      'setup-hooks.js'
+      'setup-hooks.js',
+      'epic-status.sh'
     ];
 
     for (const script of scripts) {
@@ -337,6 +340,63 @@ ${this.colors.BOLD}Examples:${this.colors.NC}
         }
         this.printSuccess(`Installed ${script}`);
       }
+    }
+
+    // Install package.json if it doesn't exist
+    const packageJsonPath = path.join(this.targetDir, 'package.json');
+    const packageJsonTemplatePath = path.join(this.autopmDir, 'scripts', 'package.json.template');
+
+    if (!fs.existsSync(packageJsonPath) && fs.existsSync(packageJsonTemplatePath)) {
+      this.printStep('Creating package.json from template...');
+      const templateContent = fs.readFileSync(packageJsonTemplatePath, 'utf-8');
+
+      // Try to get project name from directory
+      const projectName = path.basename(this.targetDir);
+
+      // Parse template and add name field
+      const packageJson = JSON.parse(templateContent);
+      packageJson.name = projectName;
+      packageJson.version = packageJson.version || '1.0.0';
+      packageJson.description = packageJson.description || '';
+      packageJson.main = packageJson.main || 'index.js';
+      packageJson.license = packageJson.license || 'ISC';
+
+      fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf-8');
+      this.printSuccess('Created package.json');
+    } else if (fs.existsSync(packageJsonPath)) {
+      this.printInfo('package.json already exists, skipping');
+    }
+  }
+
+  installDependencies() {
+    const packageJsonPath = path.join(this.targetDir, 'package.json');
+
+    if (!fs.existsSync(packageJsonPath)) {
+      this.printInfo('No package.json found, skipping dependency installation');
+      return;
+    }
+
+    this.printStep('Installing npm dependencies...');
+
+    try {
+      // Check if package.json has dependencies
+      const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+      if (!packageJson.dependencies || Object.keys(packageJson.dependencies).length === 0) {
+        this.printInfo('No dependencies to install');
+        return;
+      }
+
+      // Run npm install
+      execSync('npm install', {
+        cwd: this.targetDir,
+        encoding: 'utf-8',
+        stdio: 'inherit'
+      });
+
+      this.printSuccess('Dependencies installed successfully');
+    } catch (error) {
+      this.printWarning(`Failed to install dependencies: ${error.message}`);
+      this.printInfo('You can manually run: npm install');
     }
   }
 
@@ -774,6 +834,48 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
     return processedContent;
   }
 
+  setupMCPIntegration() {
+    const mcpServersPath = path.join(this.targetDir, '.claude', 'mcp-servers.json');
+    const configPath = path.join(this.targetDir, '.claude', 'config.json');
+
+    // Check if MCP servers configuration exists
+    if (!fs.existsSync(mcpServersPath)) {
+      return; // No MCP configuration, skip
+    }
+
+    try {
+      // Read config to check for active servers
+      let hasActiveServers = false;
+      if (fs.existsSync(configPath)) {
+        const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        hasActiveServers = config.mcp?.activeServers?.length > 0;
+      }
+
+      // Read mcp-servers.json to check for any configured servers
+      const mcpConfig = JSON.parse(fs.readFileSync(mcpServersPath, 'utf8'));
+      const hasServers = Object.keys(mcpConfig.mcpServers || {}).length > 0;
+
+      if (hasServers) {
+        this.printStep('Setting up Claude Code MCP integration...');
+
+        // Create .mcp.json for Claude Code
+        const mcpJsonPath = path.join(this.targetDir, '.mcp.json');
+        const claudeCodeConfig = {
+          mcpServers: mcpConfig.mcpServers
+        };
+
+        fs.writeFileSync(mcpJsonPath, JSON.stringify(claudeCodeConfig, null, 2));
+        this.printSuccess('.mcp.json created for Claude Code');
+
+        if (!hasActiveServers) {
+          this.printMsg('CYAN', '💡 Tip: Run "autopm mcp enable <server>" to activate servers');
+        }
+      }
+    } catch (error) {
+      this.printWarning(`Could not setup MCP integration: ${error.message}`);
+    }
+  }
+
   async setupGitHooks() {
     const gitDir = path.join(this.targetDir, '.git');
     if (!fs.existsSync(gitDir)) {
@@ -794,6 +896,18 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
       } catch (error) {
         this.printError('Failed to setup git hooks');
       }
+    }
+  }
+
+  async runPostInstallCheck() {
+    const PostInstallChecker = require('./post-install-check.js');
+    const checker = new PostInstallChecker();
+
+    try {
+      await checker.runAllChecks();
+    } catch (error) {
+      this.printWarning(`Configuration check failed: ${error.message}`);
+      console.log('You can run the check later with: autopm config validate\n');
     }
   }
 
@@ -840,10 +954,16 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
     // Install CLAUDE.md
     this.installClaudeMd();
 
+    // Setup MCP integration for Claude Code
+    this.setupMCPIntegration();
+
     // Setup git hooks if requested
     if (this.options.setupHooks) {
       await this.setupGitHooks();
     }
+
+    // Install npm dependencies
+    this.installDependencies();
 
     // Final success message
     console.log('');
@@ -852,14 +972,8 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
     this.printMsg('GREEN', '╚══════════════════════════════════════════╝');
     console.log('');
 
-    this.printSuccess('ClaudeAutoPM has been installed successfully!');
-    console.log('');
-    this.printStep('Next steps:');
-    console.log('  1. Review CLAUDE.md for project configuration');
-    console.log('  2. Run: ./scripts/setup-hooks.sh to setup git hooks');
-    console.log('  3. Open Claude Code in this directory');
-    console.log('  4. In Claude, run: /pm:validate');
-    console.log('');
+    // Run post-installation configuration check
+    await this.runPostInstallCheck();
 
     process.exit(0);
   }
