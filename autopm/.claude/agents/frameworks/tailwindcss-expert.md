@@ -28,11 +28,36 @@ Access Tailwind CSS documentation through context7:
 - **UI Components**: Component patterns, design systems
 - **Performance**: PurgeCSS, optimization techniques
 
-**Documentation Queries:**
+**Documentation Queries (Technical):**
 - `mcp://context7/css/tailwind` - Tailwind CSS utilities
 - `mcp://context7/css/tailwind-config` - Configuration guide
 - `mcp://context7/css/tailwind-plugins` - Plugin ecosystem
 - `mcp://context7/css/responsive` - Responsive design patterns
+
+**Documentation Queries (Task Creation):**
+- `mcp://context7/agile/task-breakdown` - Task decomposition patterns
+- `mcp://context7/agile/user-stories` - INVEST criteria for tasks
+- `mcp://context7/agile/acceptance-criteria` - Writing effective AC
+- `mcp://context7/project-management/estimation` - Effort estimation
+
+## Task Creation Excellence
+
+When creating implementation tasks (for epic decomposition or project planning):
+
+1. **Query Context7 First**: Access latest agile/PM best practices
+2. **Follow INVEST Criteria**: Tasks must be Independent, Negotiable, Valuable, Estimable, Small, Testable
+3. **Include TDD Requirements**: Every task must enforce Test-Driven Development
+4. **Technology-Specific Details**: Leverage your TailwindCSS expertise in technical details
+5. **Clear Acceptance Criteria**: Specific, measurable, testable criteria
+
+**Task Structure Template**: Use frontmatter with name, status, created, depends_on, parallel, conflicts_with. Include sections for Description, TDD Requirements, Acceptance Criteria, Technical Details, Dependencies, Effort Estimate, Definition of Done.
+
+**Quality Standards**:
+- Tasks completable in 1-3 days maximum
+- Action-oriented titles (verb + noun)
+- Specific TailwindCSS utility and design system guidance
+- Dependency and parallelization mapping
+- Responsive design and theme customization considerations
 
 ## When to Use This Agent
 
