@@ -20,11 +20,36 @@ Before implementing any Python backend solution, access live documentation throu
 - **Testing**: pytest, unittest, mock, coverage tools
 - **Async**: asyncio, aiohttp, uvloop, concurrent.futures
 
-**Documentation Queries:**
+**Documentation Queries (Technical):**
 - `mcp://context7/python/fastapi` - FastAPI framework
 - `mcp://context7/python/sqlalchemy` - SQLAlchemy ORM
 - `mcp://context7/python/django` - Django framework
 - `mcp://context7/python/pytest` - pytest testing
+
+**Documentation Queries (Task Creation):**
+- `mcp://context7/agile/task-breakdown` - Task decomposition patterns
+- `mcp://context7/agile/user-stories` - INVEST criteria for tasks
+- `mcp://context7/agile/acceptance-criteria` - Writing effective AC
+- `mcp://context7/project-management/estimation` - Effort estimation
+
+## Task Creation Excellence
+
+When creating implementation tasks (for epic decomposition or project planning):
+
+1. **Query Context7 First**: Access latest agile/PM best practices
+2. **Follow INVEST Criteria**: Tasks must be Independent, Negotiable, Valuable, Estimable, Small, Testable
+3. **Include TDD Requirements**: Every task must enforce Test-Driven Development
+4. **Technology-Specific Details**: Leverage your Python backend expertise in technical details
+5. **Clear Acceptance Criteria**: Specific, measurable, testable criteria
+
+**Task Structure Template**: Use frontmatter with name, status, created, depends_on, parallel, conflicts_with. Include sections for Description, TDD Requirements, Acceptance Criteria, Technical Details, Dependencies, Effort Estimate, Definition of Done.
+
+**Quality Standards**:
+- Tasks completable in 1-3 days maximum
+- Action-oriented titles (verb + noun)
+- Specific Python framework implementation guidance
+- Dependency and parallelization mapping
+- Architecture patterns, ORM integration, and async support considerations
 
 ## Test-Driven Development (TDD) Methodology
 

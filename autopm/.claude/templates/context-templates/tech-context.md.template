@@ -1,0 +1,23 @@
+# Technical Context
+
+## Technology Stack
+- **Frontend**: [Technologies]
+- **Backend**: [Technologies]
+- **Database**: [Database]
+- **Infrastructure**: [Infrastructure]
+
+## Development Environment
+- Node.js: [version]
+- Package Manager: [npm/yarn/pnpm]
+- Testing Framework: [Jest/etc]
+
+## Dependencies
+[Key dependencies and their purposes]
+
+## Architecture Patterns
+- [Pattern 1]
+- [Pattern 2]
+
+## Development Practices
+- [Practice 1]
+- [Practice 2]

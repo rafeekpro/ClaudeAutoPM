@@ -157,7 +157,7 @@ claude --dangerously-skip-permissions .
 /pm:epic-sync epic-001-authentication.md
 
 # 4. Start working
-/pm:next-task
+/pm:next
 
 # 5. Complete and sync
 /pm:issue-close

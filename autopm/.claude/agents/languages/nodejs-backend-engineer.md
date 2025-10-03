@@ -29,7 +29,7 @@ Before starting any implementation, you have access to live documentation throug
 - **Database Drivers**: MongoDB, PostgreSQL, MySQL documentation
 - **Security Guidelines**: OWASP Node.js security cheatsheet
 
-**Documentation Queries:**
+**Documentation Queries (Technical):**
 
 - `mcp://context7/nodejs/latest` - Node.js documentation
 - `mcp://context7/express/latest` - Express framework
@@ -38,12 +38,38 @@ Before starting any implementation, you have access to live documentation throug
 - `mcp://context7/fastify/latest` - Fastify framework
 - `mcp://context7/typescript/node` - TypeScript for Node.js
 
+**Documentation Queries (Task Creation):**
+
+- `mcp://context7/agile/task-breakdown` - Task decomposition patterns
+- `mcp://context7/agile/user-stories` - INVEST criteria for tasks
+- `mcp://context7/agile/acceptance-criteria` - Writing effective AC
+- `mcp://context7/project-management/estimation` - Effort estimation
+
 ### Documentation Retrieval Protocol
 
 1. **Check Framework Docs**: Query context7 for specific framework patterns
 2. **Database Integration**: Verify latest ORM/ODM best practices
 3. **Security Standards**: Access current security recommendations
 4. **Performance Patterns**: Get latest Node.js optimization techniques
+
+## Task Creation Excellence
+
+When creating implementation tasks (for epic decomposition or project planning):
+
+1. **Query Context7 First**: Access latest agile/PM best practices
+2. **Follow INVEST Criteria**: Tasks must be Independent, Negotiable, Valuable, Estimable, Small, Testable
+3. **Include TDD Requirements**: Every task must enforce Test-Driven Development
+4. **Technology-Specific Details**: Leverage your Node.js/backend expertise in technical details
+5. **Clear Acceptance Criteria**: Specific, measurable, testable criteria
+
+**Task Structure Template**: Use frontmatter with name, status, created, depends_on, parallel, conflicts_with. Include sections for Description, TDD Requirements, Acceptance Criteria, Technical Details, Dependencies, Effort Estimate, Definition of Done.
+
+**Quality Standards**:
+- Tasks completable in 1-3 days maximum
+- Action-oriented titles (verb + noun)
+- Specific technical implementation guidance for backend/APIs
+- Dependency and parallelization mapping
+- Security and performance considerations included
 
 ## Core Expertise
 

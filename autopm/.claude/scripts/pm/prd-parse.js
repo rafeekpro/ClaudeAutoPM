@@ -295,9 +295,27 @@ class PrdParser {
       console.log(`  • Security: ${technicalApproach.security.length} controls`);
     }
 
+    // Determine if PRD is complex enough to suggest splitting
+    const componentCount =
+      (technicalApproach.frontend.length > 0 ? 1 : 0) +
+      (technicalApproach.backend.length > 0 ? 1 : 0) +
+      (technicalApproach.data.length > 0 ? 1 : 0) +
+      (technicalApproach.security.length > 0 ? 1 : 0);
+
+    const isComplexPrd = componentCount >= 3 || tasks.length > 10;
+
     console.log(`\n💡 Next Steps:`);
     console.log(`  1. Review epic: /pm:epic-show ${featureName}`);
-    console.log(`  2. Decompose into tasks: /pm:epic-decompose ${featureName}`);
+
+    if (isComplexPrd) {
+      console.log(`  2. Consider splitting into epics: /pm:epic-split ${featureName}`);
+      console.log(`     (Complex PRD detected - ${componentCount} components, ${tasks.length} tasks)`);
+      console.log(`     OR decompose as single epic: /pm:epic-decompose ${featureName}`);
+    } else {
+      console.log(`  2. Decompose into tasks: /pm:epic-decompose ${featureName}`);
+      console.log(`     (For complex PRDs, consider: /pm:epic-split ${featureName})`);
+    }
+
     console.log(`  3. Sync to GitHub: /pm:epic-sync ${featureName}`);
     console.log(`  4. Start implementation: /pm:issue-start TASK-1`);
 

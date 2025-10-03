@@ -97,7 +97,7 @@ autopm team load fullstack        # Load agent team
 /pm:prd-new "description"         # Create PRD
 /pm:epic-decompose prd-file       # Create epic
 /pm:epic-sync epic-file           # Sync with GitHub
-/pm:next-task                     # Get next task
+/pm:next                     # Get next task
 /pm:issue-close "message"         # Complete task
 
 # Configuration

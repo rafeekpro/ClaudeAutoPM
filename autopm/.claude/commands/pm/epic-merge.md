@@ -37,7 +37,7 @@ Merge completed epic branch back to main branch.
 
 2. **Check for active agents:**
    Read `.claude/epics/$ARGUMENTS/execution-status.md`
-   If active agents exist: "⚠️ Active agents detected. Stop them first with: /pm:epic-stop $ARGUMENTS"
+   If active agents exist: "⚠️ Active agents detected. Stop them first with: /pm:epic-close $ARGUMENTS"
 
 ## Instructions
 
@@ -123,7 +123,7 @@ Options:
    git merge --abort
    
 3. Get help:
-   /pm:epic-resolve $ARGUMENTS
+   /pm:epic-close $ARGUMENTS
 
 Branch preserved at: epic/$ARGUMENTS
 "

@@ -7,8 +7,27 @@ allowed-tools: Bash, Read, Write, LS, Task
 Break epic into concrete, actionable tasks.
 
 ## Usage
-```
+
+**Single Epic:**
+```bash
 /pm:epic-decompose <feature_name>
+```
+
+**Multi-Epic (decomposes ALL epics at once):**
+```bash
+/pm:epic-decompose <feature_name>
+# Example: /pm:epic-decompose ecommerce-platform
+# This will automatically decompose ALL epics:
+#   - 01-infrastructure
+#   - 02-auth-backend
+#   - 03-product-api
+#   - etc.
+```
+
+**Single Epic from Multi-Epic structure:**
+```bash
+/pm:epic-decompose <feature_name>/<epic_folder>
+# Example: /pm:epic-decompose ecommerce-platform/01-infrastructure
 ```
 
 ## Required Documentation Access

@@ -126,29 +126,43 @@
 
 ---
 
-### STEP 4: Decompose each epic
+### STEP 4: Decompose epics into tasks
 
-**After `/pm:epic-split` you must decompose EACH epic separately:**
+**Option 1: Decompose ALL epics at once (RECOMMENDED):**
 
 ```bash
-# Decompose each epic into tasks
-/pm:epic-decompose ecommerce-platform/01-infrastructure
-/pm:epic-decompose ecommerce-platform/02-auth-backend
-/pm:epic-decompose ecommerce-platform/03-product-api
-/pm:epic-decompose ecommerce-platform/04-frontend-foundation
-/pm:epic-decompose ecommerce-platform/05-ecommerce-ui
-/pm:epic-decompose ecommerce-platform/06-testing-deployment
+# One command decomposes ALL epics automatically!
+/pm:epic-decompose ecommerce-platform
 ```
 
-**Result of each decompose:**
+**Result:**
 ```
-.claude/epics/ecommerce-platform/01-infrastructure/
-├── epic.md
-├── 001.md    # Setup Docker Compose
-├── 002.md    # Configure PostgreSQL
-├── 003.md    # Setup Redis
-├── 004.md    # Prometheus monitoring
-└── ...
+.claude/epics/ecommerce-platform/
+├── 01-infrastructure/
+│   ├── epic.md
+│   ├── 001.md    # Setup Docker Compose
+│   ├── 002.md    # Configure PostgreSQL
+│   └── ...
+├── 02-auth-backend/
+│   ├── epic.md
+│   ├── 001.md    # User model
+│   ├── 002.md    # JWT implementation
+│   └── ...
+├── 03-product-api/
+│   ├── epic.md
+│   ├── 001.md    # Product catalog API
+│   └── ...
+└── ... (all other epics)
+```
+
+**Option 2: Decompose single epic (if you want control):**
+
+```bash
+# Decompose only one specific epic
+/pm:epic-decompose ecommerce-platform/01-infrastructure
+# Then later:
+/pm:epic-decompose ecommerce-platform/02-auth-backend
+# etc.
 ```
 
 ---
@@ -327,13 +341,9 @@ File: .claude/epics/ecommerce-platform/01-infrastructure/001.md
 /pm:epic-split fullstack-app
 # Result: 6 epics created
 
-# 4. Decompose EACH epic
-/pm:epic-decompose fullstack-app/01-infrastructure
-/pm:epic-decompose fullstack-app/02-auth-backend
-/pm:epic-decompose fullstack-app/03-product-api
-/pm:epic-decompose fullstack-app/04-frontend-foundation
-/pm:epic-decompose fullstack-app/05-ecommerce-ui
-/pm:epic-decompose fullstack-app/06-testing-deployment
+# 4. Decompose ALL epics at once
+/pm:epic-decompose fullstack-app
+# Result: All 6 epics decomposed into tasks automatically
 
 # 5. Sync ALL epics at once
 /pm:epic-sync fullstack-app
@@ -380,9 +390,7 @@ File: .claude/epics/ecommerce-platform/01-infrastructure/001.md
 /pm:prd-new ecommerce-platform
 /pm:prd-parse ecommerce-platform
 /pm:epic-split ecommerce-platform
-/pm:epic-decompose ecommerce-platform/01-infrastructure
-/pm:epic-decompose ecommerce-platform/02-auth-backend
-# ... (decompose all epics)
+/pm:epic-decompose ecommerce-platform  # Decomposes ALL epics at once
 
 # PRD 2: Simple (no split)
 /pm:prd-new email-notifications
@@ -460,26 +468,17 @@ File: .claude/epics/ecommerce-platform/01-infrastructure/001.md
 # ✓ Epic 5: E-commerce UI (pages, cart, checkout) - P1, 3w
 # ✓ Epic 6: Testing & Deployment (CI/CD, tests) - P1, 1w
 
-# 4. Decompose EACH epic
-/pm:epic-decompose ecommerce-platform/01-infrastructure
-# Creates 12 tasks (Docker, DB, Redis, monitoring...)
-
-/pm:epic-decompose ecommerce-platform/02-auth-backend
-# Creates 15 tasks (models, JWT, endpoints, RBAC...)
-
-/pm:epic-decompose ecommerce-platform/03-product-api
-# Creates 20 tasks (catalog, inventory, orders...)
-
-/pm:epic-decompose ecommerce-platform/04-frontend-foundation
-# Creates 10 tasks (React setup, routing, state...)
-
-/pm:epic-decompose ecommerce-platform/05-ecommerce-ui
-# Creates 25 tasks (product pages, cart, checkout...)
-
-/pm:epic-decompose ecommerce-platform/06-testing-deployment
-# Creates 8 tasks (CI/CD, tests, deployment...)
-
-# TOTAL: ~90 tasks across 6 epics
+# 4. Decompose ALL epics at once
+/pm:epic-decompose ecommerce-platform
+# Automatically creates tasks for ALL 6 epics:
+#   01-infrastructure: 12 tasks (Docker, DB, Redis, monitoring...)
+#   02-auth-backend: 15 tasks (models, JWT, endpoints, RBAC...)
+#   03-product-api: 20 tasks (catalog, inventory, orders...)
+#   04-frontend-foundation: 10 tasks (React setup, routing, state...)
+#   05-ecommerce-ui: 25 tasks (product pages, cart, checkout...)
+#   06-testing-deployment: 8 tasks (CI/CD, tests, deployment...)
+#
+# TOTAL: ~90 tasks across 6 epics created automatically!
 
 # 5. Sync EVERYTHING at once
 /pm:epic-sync ecommerce-platform
@@ -526,9 +525,7 @@ File: .claude/epics/ecommerce-platform/01-infrastructure/001.md
 # → Epic 2: Signup
 # → Epic 3: Password Reset
 
-/pm:epic-decompose authentication-system/01-login
-/pm:epic-decompose authentication-system/02-signup
-/pm:epic-decompose authentication-system/03-password-reset
+/pm:epic-decompose authentication-system  # Decomposes ALL 3 epics at once
 
 /pm:epic-sync authentication-system
 ```
@@ -592,7 +589,7 @@ A: YES. Edit file `.claude/prds/feature-name.md` and run `/pm:prd-parse` again.
 A: You can manually edit epics in `.claude/epics/feature-name/` and adjust.
 
 **Q: Do I have to decompose ALL epics after split?**
-A: You don't have to immediately. You can decompose only those you'll start working on. But before sync you must decompose all.
+A: Just run `/pm:epic-decompose <feature-name>` ONCE - it automatically decomposes ALL epics. Or decompose individually: `/pm:epic-decompose <feature-name>/01-epic1`
 
 **Q: What if I want to work on multiple PRDs simultaneously?**
 A: `/pm:next` automatically picks highest priority from ALL PRDs/epics.
@@ -618,10 +615,7 @@ A: epic-split automatically sets (P0 for infra/core, P1 for UI/features). You ca
 /pm:prd-new big-project
 /pm:prd-parse big-project
 /pm:epic-split big-project
-/pm:epic-decompose big-project/01-infrastructure
-/pm:epic-decompose big-project/02-backend
-/pm:epic-decompose big-project/03-frontend
-# ... (decompose all)
+/pm:epic-decompose big-project  # Decomposes ALL epics automatically
 /pm:epic-sync big-project
 /pm:next
 ```
