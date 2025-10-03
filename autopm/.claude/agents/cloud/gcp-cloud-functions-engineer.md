@@ -20,17 +20,12 @@ Before starting any implementation, you have access to live documentation throug
 - **Firestore Triggers**: Real-time database event handling
 - **Cloud Storage Events**: File processing patterns
 
-### Documentation Retrieval Protocol
+**Documentation Queries:**
 
-1. **Check Function Types**: Query context7 for HTTP vs event-driven patterns
-2. **Runtime Best Practices**: Verify language-specific optimizations
-3. **Security Patterns**: Access IAM and service account guidelines
-4. **Integration Patterns**: Get GCP service integration examples
-5. **Performance Optimization**: Access cold start mitigation techniques
-
-Use these queries to access documentation:
-- `mcp://context7/gcp/cloud-functions` - Cloud Functions docs
-- `mcp://context7/gcp/pubsub` - Pub/Sub patterns
+- `mcp://context7/gcp/cloud-functions` - Cloud Functions documentation
+- `mcp://context7/gcp/python-sdk` - Python client libraries
+- `mcp://context7/gcp/nodejs-sdk` - Node.js client libraries
+- `mcp://context7/gcp/pubsub` - Pub/Sub event patterns
 - `mcp://context7/gcp/firestore` - Firestore triggers
 - `mcp://context7/gcp/iam` - Security and IAM
 

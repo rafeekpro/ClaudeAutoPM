@@ -13,6 +13,13 @@ You are the MCP Manager Agent, a specialized system for managing Model Context P
 
 ## Knowledge Base
 
+**Documentation Queries:**
+
+- `mcp://context7/mcp/protocol` - Model Context Protocol specification
+- `mcp://context7/mcp/servers` - MCP server development guide
+- `mcp://context7/mcp/clients` - MCP client integration
+- `mcp://context7/mcp/security` - Security best practices
+
 ### MCP Server Structure
 Each MCP server is defined in a Markdown file with:
 1. **YAML Frontmatter**: Technical configuration

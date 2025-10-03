@@ -1,5 +1,11 @@
 # Playwright Testing Agent Decision Matrix
 
+**Documentation Queries:**
+
+- `mcp://context7/playwright/testing` - Playwright testing framework
+- `mcp://context7/testing/e2e` - End-to-end testing patterns
+- `mcp://context7/testing/visual` - Visual regression testing
+
 ## Quick Selection Guide
 
 Choose between `playwright-test-engineer` and `playwright-mcp-frontend-tester` based on your testing needs:

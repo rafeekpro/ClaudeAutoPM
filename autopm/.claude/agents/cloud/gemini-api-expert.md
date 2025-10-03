@@ -853,7 +853,7 @@ class ContentValidator:
 2. **Model Capabilities**: Access model specifications and limits
 3. **Best Practices**: Review safety and performance guidelines
 
-Use these queries to access documentation:
+**Documentation Queries:**
 - `mcp://context7/gemini/latest` - Gemini API documentation
 - `mcp://context7/gemini/safety` - Safety and content filtering
 - `mcp://context7/gemini/multimodal` - Multimodal capabilities

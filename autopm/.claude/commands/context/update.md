@@ -6,6 +6,22 @@ allowed-tools: Bash, Read, Write, LS
 
 This command updates the project context documentation in `.claude/context/` to reflect the current state of the project. Run this at the end of each development session to keep context accurate.
 
+## Required Documentation Access
+
+**MANDATORY:** Before AI context management, query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/ai/context-management` - context management best practices
+- `mcp://context7/llm/prompt-engineering` - prompt engineering best practices
+- `mcp://context7/ai/rag-systems` - rag systems best practices
+
+**Why This is Required:**
+- Ensures adherence to current industry standards and best practices
+- Prevents outdated or incorrect implementation patterns
+- Provides access to latest framework/tool documentation
+- Reduces errors from stale knowledge or assumptions
+
+
 ## Required Rules
 
 **IMPORTANT:** Before executing this command, read and follow:

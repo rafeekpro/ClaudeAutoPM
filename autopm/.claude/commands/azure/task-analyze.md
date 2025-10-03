@@ -8,6 +8,23 @@ Analyze Task patterns and metrics in Azure DevOps to identify bottlenecks and im
 /azure:task-analyze [options]
 ```
 
+## Required Documentation Access
+
+**MANDATORY:** Before analyzing tasks, query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/agile/task-analysis` - task analysis best practices
+- `mcp://context7/project-management/task-planning` - task planning best practices
+- `mcp://context7/agile/estimation` - estimation best practices
+- `mcp://context7/azure-devops/tasks` - tasks best practices
+
+**Why This is Required:**
+- Ensures adherence to current industry standards and best practices
+- Prevents outdated or incorrect implementation patterns
+- Provides access to latest framework/tool documentation
+- Reduces errors from stale knowledge or assumptions
+
+
 ## Description
 
 Performs deep analysis on Tasks to identify patterns, bottlenecks, and areas for improvement.

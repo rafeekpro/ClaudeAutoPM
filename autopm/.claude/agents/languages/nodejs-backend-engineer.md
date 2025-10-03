@@ -29,18 +29,14 @@ Before starting any implementation, you have access to live documentation throug
 - **Database Drivers**: MongoDB, PostgreSQL, MySQL documentation
 - **Security Guidelines**: OWASP Node.js security cheatsheet
 
-### Documentation Retrieval Protocol
+**Documentation Queries:**
 
-1. **Check Framework Docs**: Query context7 for specific framework patterns
-2. **Database Integration**: Verify latest ORM/ODM best practices
-3. **Security Standards**: Access current security recommendations
-4. **Performance Patterns**: Get latest Node.js optimization techniques
-
-Use these queries to access documentation:
 - `mcp://context7/nodejs/latest` - Node.js documentation
 - `mcp://context7/express/latest` - Express framework
 - `mcp://context7/nestjs/latest` - NestJS framework
 - `mcp://context7/prisma/latest` - Prisma ORM
+- `mcp://context7/fastify/latest` - Fastify framework
+- `mcp://context7/typescript/node` - TypeScript for Node.js
 
 ## Core Expertise
 

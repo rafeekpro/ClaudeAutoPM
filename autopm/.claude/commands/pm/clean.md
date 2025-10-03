@@ -14,6 +14,23 @@ Clean up completed work and archive old epics.
 Options:
 - `--dry-run` - Show what would be cleaned without doing it
 
+## Required Documentation Access
+
+**MANDATORY:** Before project management workflows, query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/agile/epic-management` - epic management best practices
+- `mcp://context7/project-management/issue-tracking` - issue tracking best practices
+- `mcp://context7/agile/task-breakdown` - task breakdown best practices
+- `mcp://context7/project-management/workflow` - workflow best practices
+
+**Why This is Required:**
+- Ensures adherence to current industry standards and best practices
+- Prevents outdated or incorrect implementation patterns
+- Provides access to latest framework/tool documentation
+- Reduces errors from stale knowledge or assumptions
+
+
 ## Instructions
 
 ### 1. Identify Completed Epics

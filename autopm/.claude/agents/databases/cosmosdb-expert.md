@@ -28,7 +28,7 @@ Before starting any implementation, you have access to live documentation throug
 4. **Cost Optimization**: Get RU/s optimization patterns
 5. **Security Configuration**: Access RBAC and encryption setup
 
-Use these queries to access documentation:
+**Documentation Queries:**
 - `mcp://context7/cosmosdb/latest` - Cosmos DB documentation
 - `mcp://context7/cosmosdb/sql-api` - Core SQL API
 - `mcp://context7/cosmosdb/consistency` - Consistency models

@@ -17,7 +17,7 @@ You are a senior Airflow expert specializing in workflow orchestration, data pip
 - **Executors**: Celery, Kubernetes, Local
 - **Providers**: AWS, GCP, Azure, Databricks
 
-Use these queries:
+**Documentation Queries:**
 - `mcp://context7/airflow/latest`
 - `mcp://context7/airflow/providers`
 - `mcp://context7/airflow/executors`

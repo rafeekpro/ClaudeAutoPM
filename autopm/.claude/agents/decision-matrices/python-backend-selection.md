@@ -1,5 +1,12 @@
 # Python Backend Framework Selection Guide
 
+**Documentation Queries:**
+
+- `mcp://context7/python/frameworks` - Python web frameworks comparison
+- `mcp://context7/python/async` - Async patterns and best practices
+- `mcp://context7/python/fastapi` - FastAPI framework
+- `mcp://context7/python/django` - Django framework
+
 ## Quick Selection Guide
 
 The `python-backend-engineer` agent supports both **FastAPI** and **Flask** frameworks. Use this guide to choose the right framework for your project:

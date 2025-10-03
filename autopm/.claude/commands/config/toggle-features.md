@@ -9,6 +9,21 @@ This command allows you to toggle development features on/off in your ClaudeAuto
 ```bash
 /config:toggle-features
 ```
+## Required Documentation Access
+
+**MANDATORY:** Before configuration management, query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/configuration-management/best-practices` - best practices best practices
+- `mcp://context7/devops/feature-flags` - feature flags best practices
+
+**Why This is Required:**
+- Ensures adherence to current industry standards and best practices
+- Prevents outdated or incorrect implementation patterns
+- Provides access to latest framework/tool documentation
+- Reduces errors from stale knowledge or assumptions
+
+
 
 ### What It Does
 

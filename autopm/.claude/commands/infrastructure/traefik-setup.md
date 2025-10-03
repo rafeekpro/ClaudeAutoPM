@@ -32,6 +32,23 @@ Use the traefik-proxy-expert agent to create a comprehensive Traefik reverse pro
 
 ## Example Usage
 ```
+## Required Documentation Access
+
+**MANDATORY:** Before Traefik setup, query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/infrastructure/reverse-proxy` - reverse proxy best practices
+- `mcp://context7/traefik/configuration` - configuration best practices
+- `mcp://context7/devops/networking` - networking best practices
+- `mcp://context7/security/tls` - tls best practices
+
+**Why This is Required:**
+- Ensures adherence to current industry standards and best practices
+- Prevents outdated or incorrect implementation patterns
+- Provides access to latest framework/tool documentation
+- Reduces errors from stale knowledge or assumptions
+
+
 Task: Set up Traefik reverse proxy for microservices with Let's Encrypt SSL and Docker discovery
 Agent: traefik-proxy-expert
 Parameters: environment=production, ssl=letsencrypt, discovery=docker, features=dashboard,metrics,auth

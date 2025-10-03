@@ -1066,7 +1066,7 @@ sign_user_key() {
 2. **Security Guidelines**: Access SSH security best practices
 3. **Configuration Examples**: Review advanced SSH configurations
 
-Use these queries to access documentation:
+**Documentation Queries:**
 - `mcp://context7/openssh/latest` - OpenSSH documentation
 - `mcp://context7/ssh/security` - SSH security hardening
 - `mcp://context7/ssh/tunneling` - Advanced tunneling techniques

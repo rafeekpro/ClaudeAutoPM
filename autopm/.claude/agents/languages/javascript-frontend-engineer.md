@@ -36,7 +36,7 @@ Before starting any implementation, you have access to live documentation throug
 3. **Browser Compatibility**: Verify feature support across target browsers
 4. **Performance Guidelines**: Access latest web performance optimization techniques
 
-Use these queries to access documentation:
+**Documentation Queries:**
 - `mcp://context7/javascript/latest` - JavaScript documentation
 - `mcp://context7/typescript/latest` - TypeScript handbook
 - `mcp://context7/mdn/web-apis` - Browser API references

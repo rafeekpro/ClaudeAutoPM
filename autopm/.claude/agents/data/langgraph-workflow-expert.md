@@ -493,7 +493,7 @@ def log_results(state: WorkflowState) -> WorkflowState:
 2. **Pattern Library**: Access workflow pattern examples
 3. **Best Practices**: Review performance optimization guides
 
-Use these queries to access documentation:
+**Documentation Queries:**
 - `mcp://context7/langgraph/latest` - LangGraph documentation
 - `mcp://context7/langgraph/patterns` - Workflow patterns
 - `mcp://context7/langgraph/state-management` - State handling

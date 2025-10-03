@@ -53,6 +53,23 @@ If dependencies missing:
 - Tell user: "❌ Test dependencies not installed"
 - Suggest: "Run: npm install (or pip install -r requirements.txt)"
 
+## Required Documentation Access
+
+**MANDATORY:** Before testing workflows, query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/testing/strategy` - strategy best practices
+- `mcp://context7/testing/automation` - automation best practices
+- `mcp://context7/tdd/workflow` - workflow best practices
+- `mcp://context7/testing/best-practices` - best practices best practices
+
+**Why This is Required:**
+- Ensures adherence to current industry standards and best practices
+- Prevents outdated or incorrect implementation patterns
+- Provides access to latest framework/tool documentation
+- Reduces errors from stale knowledge or assumptions
+
+
 ## Instructions
 
 ### 1. Framework-Specific Configuration

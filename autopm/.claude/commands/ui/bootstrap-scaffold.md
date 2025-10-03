@@ -31,6 +31,23 @@ Use the react-ui-expert agent with framework=bootstrap to create a complete Boot
 
 ## Example Usage
 ```
+## Required Documentation Access
+
+**MANDATORY:** Before UI framework setup, query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/ui/bootstrap` - bootstrap best practices
+- `mcp://context7/ui/tailwind` - tailwind best practices
+- `mcp://context7/frontend/design-systems` - design systems best practices
+- `mcp://context7/css/frameworks` - frameworks best practices
+
+**Why This is Required:**
+- Ensures adherence to current industry standards and best practices
+- Prevents outdated or incorrect implementation patterns
+- Provides access to latest framework/tool documentation
+- Reduces errors from stale knowledge or assumptions
+
+
 Task: Create Bootstrap dashboard with sidebar navigation, responsive cards grid, and contact forms
 Agent: react-ui-expert
 Parameters: framework=bootstrap, theme=corporate, components=navbar,sidebar,cards,forms,modals, responsive=all, features=dark-mode,validation

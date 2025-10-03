@@ -39,6 +39,23 @@ AZURE_DEVOPS_PROJECT=<your-project>
    - Search for existing User Stories with similar titles
    - If found, ask: "⚠️ Similar User Story found: [title]. Continue anyway? (yes/no)"
 
+## Required Documentation Access
+
+**MANDATORY:** Before creating user stories, query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/agile/user-stories` - user stories best practices
+- `mcp://context7/agile/invest-criteria` - invest criteria best practices
+- `mcp://context7/azure-devops/user-stories` - user stories best practices
+- `mcp://context7/requirements/writing` - writing best practices
+
+**Why This is Required:**
+- Ensures adherence to current industry standards and best practices
+- Prevents outdated or incorrect implementation patterns
+- Provides access to latest framework/tool documentation
+- Reduces errors from stale knowledge or assumptions
+
+
 ## Instructions
 
 **CRITICAL**: This command MUST use the azure-devops-specialist agent for all Azure DevOps operations.

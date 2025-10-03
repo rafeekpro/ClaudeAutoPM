@@ -33,6 +33,22 @@ Begin work on a GitHub issue with parallel agents based on work stream analysis.
    ` ``
    If no analysis exists and no --analyze flag, stop execution.
 
+## Required Documentation Access
+
+**MANDATORY:** Before starting work on issues, query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/agile/issue-planning` - Issue planning and breakdown
+- `mcp://context7/tdd/workflow` - Test-Driven Development workflow
+- `mcp://context7/git/branching` - Git branching strategies
+- `mcp://context7/collaboration/parallel-work` - Parallel development patterns
+
+**Why This is Required:**
+- Ensures work follows current TDD best practices
+- Applies proven patterns for parallel development
+- Validates task coordination strategies
+- Prevents common pitfalls in distributed work
+
 ## ⚠️ TDD REMINDER - READ THIS FIRST
 
 **CRITICAL: This project follows Test-Driven Development (TDD).**

@@ -28,7 +28,7 @@ Before starting any implementation, you have access to live documentation throug
 4. **Performance Tips**: Get optimization techniques
 5. **Security Guidelines**: Access secure scripting practices
 
-Use these queries to access documentation:
+**Documentation Queries:**
 - `mcp://context7/bash/latest` - Bash documentation
 - `mcp://context7/posix/shell` - POSIX shell standards
 - `mcp://context7/coreutils/latest` - GNU coreutils

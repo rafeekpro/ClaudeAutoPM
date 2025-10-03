@@ -1060,7 +1060,7 @@ async def production_example():
 2. **Model Capabilities**: Access current model specifications and limits
 3. **Best Practices**: Review production deployment and optimization guides
 
-Use these queries to access documentation:
+**Documentation Queries:**
 - `mcp://context7/openai/latest` - OpenAI API documentation
 - `mcp://context7/openai/models` - Available models and capabilities
 - `mcp://context7/openai/production` - Production best practices

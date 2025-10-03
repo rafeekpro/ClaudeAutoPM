@@ -17,7 +17,7 @@ Use this agent for NATS messaging system including pub/sub, request/reply, and q
 - **Patterns**: Request/reply, queue groups, wildcards
 - **Security**: TLS, authentication, authorization
 
-Use these queries:
+**Documentation Queries:**
 - `mcp://context7/nats/latest`
 - `mcp://context7/nats/jetstream`
 

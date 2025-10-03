@@ -8,6 +8,23 @@ Synchronizes GitHub Issues with Azure DevOps Work Items bidirectionally.
 
 **Usage**: `/azure:work-item-sync [--direction=both|github-to-azure|azure-to-github] [--project=project-name] [--area-path=area]`
 
+## Required Documentation Access
+
+**MANDATORY:** Before Azure DevOps integration and agile workflows, query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/azure-devops/boards` - boards best practices
+- `mcp://context7/agile/user-stories` - user stories best practices
+- `mcp://context7/project-management/work-items` - work items best practices
+- `mcp://context7/agile/sprint-planning` - sprint planning best practices
+
+**Why This is Required:**
+- Ensures adherence to current industry standards and best practices
+- Prevents outdated or incorrect implementation patterns
+- Provides access to latest framework/tool documentation
+- Reduces errors from stale knowledge or assumptions
+
+
 **Example**: `/azure:work-item-sync --direction=both --project=MyProject --area-path=MyProject\Team1`
 
 **What this does**:

@@ -32,6 +32,23 @@ Use the langgraph-workflow-expert agent to create a comprehensive LangGraph work
 
 ## Example Usage
 ```
+## Required Documentation Access
+
+**MANDATORY:** Before AI integration and LLM workflows, query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/ai/llm-integration` - llm integration best practices
+- `mcp://context7/ai/workflow-orchestration` - workflow orchestration best practices
+- `mcp://context7/openai/api` - api best practices
+- `mcp://context7/langchain/agents` - agents best practices
+
+**Why This is Required:**
+- Ensures adherence to current industry standards and best practices
+- Prevents outdated or incorrect implementation patterns
+- Provides access to latest framework/tool documentation
+- Reduces errors from stale knowledge or assumptions
+
+
 Task: Create multi-agent research workflow with coordinator, researcher, analyzer, and writer agents
 Agent: langgraph-workflow-expert
 Parameters: workflow_type=multi-agent, agents=4, state_management=checkpoints, routing=complex

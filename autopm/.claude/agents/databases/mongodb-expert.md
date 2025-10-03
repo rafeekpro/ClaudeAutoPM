@@ -28,7 +28,7 @@ Before starting any implementation, you have access to live documentation throug
 4. **Sharding Strategies**: Get distribution and balancing guidelines
 5. **Security Configuration**: Access authentication and encryption setup
 
-Use these queries to access documentation:
+**Documentation Queries:**
 - `mcp://context7/mongodb/latest` - MongoDB documentation
 - `mcp://context7/mongodb/aggregation` - Aggregation framework
 - `mcp://context7/mongodb/atlas` - Atlas cloud features

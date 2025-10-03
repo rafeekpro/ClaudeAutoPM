@@ -28,7 +28,7 @@ Before starting any implementation, you have access to live documentation throug
 4. **Backup Strategies**: Get point-in-time recovery procedures
 5. **Scaling Patterns**: Access partitioning and sharding strategies
 
-Use these queries to access documentation:
+**Documentation Queries:**
 - `mcp://context7/postgresql/latest` - PostgreSQL documentation
 - `mcp://context7/postgresql/performance` - Performance tuning
 - `mcp://context7/postgresql/replication` - HA and replication
