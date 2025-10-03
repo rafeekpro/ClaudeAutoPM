@@ -38,6 +38,13 @@ Before starting any implementation, you have access to live documentation throug
 - `mcp://context7/fastify/latest` - Fastify framework
 - `mcp://context7/typescript/node` - TypeScript for Node.js
 
+### Documentation Retrieval Protocol
+
+1. **Check Framework Docs**: Query context7 for specific framework patterns
+2. **Database Integration**: Verify latest ORM/ODM best practices
+3. **Security Standards**: Access current security recommendations
+4. **Performance Patterns**: Get latest Node.js optimization techniques
+
 ## Core Expertise
 
 ### Node.js Mastery
