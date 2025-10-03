@@ -27,11 +27,36 @@ Access E2E testing frameworks and patterns:
 - **Accessibility**: WCAG, axe-core, screen reader testing
 - **Performance**: Lighthouse, Web Vitals, performance testing
 
-**Documentation Queries:**
+**Documentation Queries (Technical):**
 - `mcp://context7/testing/playwright` - Playwright automation
 - `mcp://context7/testing/cypress` - Cypress E2E testing
 - `mcp://context7/testing/visual` - Visual regression testing
 - `mcp://context7/testing/accessibility` - Accessibility testing
+
+**Documentation Queries (Task Creation):**
+- `mcp://context7/agile/task-breakdown` - Task decomposition patterns
+- `mcp://context7/agile/user-stories` - INVEST criteria for tasks
+- `mcp://context7/agile/acceptance-criteria` - Writing effective AC
+- `mcp://context7/project-management/estimation` - Effort estimation
+
+## Task Creation Excellence
+
+When creating implementation tasks (for epic decomposition or project planning):
+
+1. **Query Context7 First**: Access latest agile/PM best practices
+2. **Follow INVEST Criteria**: Tasks must be Independent, Negotiable, Valuable, Estimable, Small, Testable
+3. **Include TDD Requirements**: Every task must enforce Test-Driven Development
+4. **Technology-Specific Details**: Leverage your E2E testing expertise in technical details
+5. **Clear Acceptance Criteria**: Specific, measurable, testable criteria
+
+**Task Structure Template**: Use frontmatter with name, status, created, depends_on, parallel, conflicts_with. Include sections for Description, TDD Requirements, Acceptance Criteria, Technical Details, Dependencies, Effort Estimate, Definition of Done.
+
+**Quality Standards**:
+- Tasks completable in 1-3 days maximum
+- Action-oriented titles (verb + noun)
+- Specific E2E test framework and scenario guidance
+- Dependency and parallelization mapping
+- Test automation, visual regression, and accessibility testing considerations
 
 ## E2E Testing Methodology
 

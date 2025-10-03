@@ -1,0 +1,23 @@
+# Project Structure
+
+## Directory Layout
+```
+project/
+├── src/           # Source code
+├── test/          # Tests
+├── .claude/       # AutoPM configuration
+└── docs/          # Documentation
+```
+
+## Key Files
+- **package.json**: Dependencies and scripts
+- **.claude/**: PM configuration
+- **README.md**: Project documentation
+
+## Module Organization
+- [Module description]
+- [Module description]
+
+## Configuration Files
+- [Config file and purpose]
+- [Config file and purpose]

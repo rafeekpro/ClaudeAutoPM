@@ -1121,7 +1121,7 @@ autopm mcp enable github-mcp
 - Added comprehensive next steps display after `/pm:prd-new` command
 - Shows 5 clear options to prevent users from getting lost:
   1. **Quick Start** - `/pm:epic-oneshot` for simple features (< 10 tasks)
-  2. **Split into Epics** - `/pm:prd-split` for complex features (15+ tasks)
+  2. **Split into Epics** - `/pm:epic-split` for complex features (15+ tasks)
   3. **Step-by-Step Workflow** - Full control over parse → decompose → sync
   4. **Review & Edit First** - Refine PRD before processing
   5. **Check Status** - View PRD progress anytime
@@ -1536,7 +1536,6 @@ Based on comprehensive analysis of existing PM tools, this release addresses:
 - Azure CLI commands for creating work items
 
 ### Added
-- Azure-specific commands after PRD creation (`/pm:azure-sync`, `/pm:azure-next`)
 - Azure work item creation instructions with `az boards` CLI
 - Proper routing based on selected provider (GitHub or Azure)
 
