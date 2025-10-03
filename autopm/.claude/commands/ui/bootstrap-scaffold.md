@@ -1,3 +1,9 @@
+---
+name: bootstrap-scaffold
+type: epic-management
+category: ui
+---
+
 claude# Bootstrap UI Scaffold Command
 
 Create a complete Bootstrap-based UI structure with responsive components and themes.
