@@ -32,7 +32,13 @@ This document defines MANDATORY standards for:
 
 ### 🔴 MANDATORY: Context7 Documentation Queries
 
-**CRITICAL REQUIREMENT**: Every agent AND every PM command (new or existing) MUST include a **Documentation Queries** section with Context7 MCP links.
+**CRITICAL REQUIREMENT**: Every agent AND every command (new or existing) MUST include a **Documentation Queries** section with Context7 MCP links.
+
+**⚡ ACTIVE ENFORCEMENT**: This project uses automated Context7 enforcement hooks that will:
+- 🔒 **Intercept** every command and agent invocation
+- 📖 **Display** required Context7 queries before execution
+- ✅ **Remind** you to query documentation before proceeding
+- 🚫 **Block** execution if Documentation Queries section is missing
 
 #### For Agents
 
@@ -173,6 +179,29 @@ node .claude/hooks/pre-agent-context7.js "@aws-cloud-architect design VPC"
 - Context7 MCP queries must be performed before implementation
 - Training data alone is NEVER sufficient for technical specifics
 - API signatures, patterns, and best practices MUST be verified against live docs
+
+**Visual User Experience:**
+
+When you type a command like `/pm:epic-decompose` or invoke an agent like `@aws-cloud-architect`, you will see:
+
+```
+🔒 Context7 Enforcement Active
+
+📋 Command: /pm:epic-decompose my-feature
+📚 Querying Context7 for required documentation...
+
+   ➜ mcp://context7/agile/epic-decomposition
+   ➜ mcp://context7/agile/task-sizing
+   ➜ mcp://context7/agile/user-stories
+   ➜ mcp://context7/project-management/task-breakdown
+
+✅ Context7 queries complete
+📖 Key findings: [summary of what was learned from Context7]
+
+Proceeding with implementation using Context7-verified best practices...
+```
+
+This ensures **transparency** - you always know when Context7 is being consulted and what guidance is being applied.
 
 ## 🚀 Development Methodology
 
