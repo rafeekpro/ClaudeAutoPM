@@ -30,12 +30,13 @@ This document defines MANDATORY standards for:
 - Naming conventions (prohibitions, required patterns)
 - Code quality standards (principles, anti-patterns, checklist)
 
-### 🔴 MANDATORY: Agent Documentation Queries
+### 🔴 MANDATORY: Context7 Documentation Queries
 
-**CRITICAL REQUIREMENT**: Every agent (new or existing) MUST include a **Documentation Queries** section with Context7 MCP links.
+**CRITICAL REQUIREMENT**: Every agent AND every PM command (new or existing) MUST include a **Documentation Queries** section with Context7 MCP links.
+
+#### For Agents
 
 **Why This is Required:**
-
 - Ensures agents always use the latest documentation
 - Prevents hallucinations and outdated information
 - Provides consistent, reliable guidance
@@ -58,18 +59,51 @@ This document defines MANDATORY standards for:
 - `mcp://context7/terraform/aws` - Terraform AWS provider patterns
 ```
 
-**Agent Obligations:**
+#### For PM Commands
+
+**Why This is Required:**
+- Ensures issues, tasks, epics, PRDs follow industry best practices
+- Applies proven agile methodologies and frameworks
+- Validates work breakdown structures against standards
+- Prevents anti-patterns in project management workflows
+
+**Required Format in Every PM Command:**
+
+```markdown
+## Required Documentation Access
+
+**MANDATORY:** Before [action], query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/agile/<topic>` - Description
+- `mcp://context7/project-management/<section>` - What this covers
+
+**Why This is Required:**
+- [Specific reasons for this command]
+```
+
+**Example (from epic-decompose.md):**
+
+```markdown
+**Documentation Queries:**
+- `mcp://context7/agile/epic-decomposition` - Epic breakdown best practices
+- `mcp://context7/agile/task-sizing` - Task estimation and sizing
+- `mcp://context7/agile/user-stories` - User story formats (INVEST criteria)
+```
+
+#### Obligations
 
 1. **ALWAYS** query Context7 documentation before implementing solutions
 2. **NEVER** rely solely on training data for technical specifics
-3. **VERIFY** code patterns and APIs against live documentation
+3. **VERIFY** patterns and approaches against live documentation
 4. **UPDATE** implementation when documentation shows better approaches
 
-**Enforcement:**
+#### Enforcement
 
 - All agent PRs must include Documentation Queries section
-- Existing agents without this section must be updated
-- Agent reviews will check for Context7 usage in implementations
+- All PM command PRs must include Required Documentation Access section
+- Existing agents/commands without this section must be updated
+- Reviews will check for Context7 usage in implementations
 
 ## 🚀 Development Methodology
 
