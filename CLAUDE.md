@@ -30,6 +30,47 @@ This document defines MANDATORY standards for:
 - Naming conventions (prohibitions, required patterns)
 - Code quality standards (principles, anti-patterns, checklist)
 
+### 🔴 MANDATORY: Agent Documentation Queries
+
+**CRITICAL REQUIREMENT**: Every agent (new or existing) MUST include a **Documentation Queries** section with Context7 MCP links.
+
+**Why This is Required:**
+
+- Ensures agents always use the latest documentation
+- Prevents hallucinations and outdated information
+- Provides consistent, reliable guidance
+- Reduces errors from stale knowledge
+
+**Required Format in Every Agent:**
+
+```markdown
+**Documentation Queries:**
+- `mcp://context7/<library-name>/<topic>` - Description of documentation
+- `mcp://context7/<framework>/<section>` - What this covers
+```
+
+**Example (from aws-cloud-architect.md):**
+
+```markdown
+**Documentation Queries:**
+- `mcp://context7/aws/compute` - EC2, EKS, Lambda documentation
+- `mcp://context7/aws/networking` - VPC, ELB, CloudFront
+- `mcp://context7/terraform/aws` - Terraform AWS provider patterns
+```
+
+**Agent Obligations:**
+
+1. **ALWAYS** query Context7 documentation before implementing solutions
+2. **NEVER** rely solely on training data for technical specifics
+3. **VERIFY** code patterns and APIs against live documentation
+4. **UPDATE** implementation when documentation shows better approaches
+
+**Enforcement:**
+
+- All agent PRs must include Documentation Queries section
+- Existing agents without this section must be updated
+- Agent reviews will check for Context7 usage in implementations
+
 ## 🚀 Development Methodology
 
 ### Test-Driven Development (TDD) is MANDATORY
