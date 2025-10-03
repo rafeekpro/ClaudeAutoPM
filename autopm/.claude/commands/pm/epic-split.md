@@ -1,3 +1,9 @@
+---
+name: epic-split
+type: epic-management
+category: pm
+---
+
 # Epic Split
 
 Automatically split a PRD into multiple logical epics based on content analysis.

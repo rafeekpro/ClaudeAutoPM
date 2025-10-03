@@ -1,3 +1,9 @@
+---
+name: openai-chat-integration
+type: ai-integration
+category: ai
+---
+
 # OpenAI Chat Integration Command
 
 Create a complete chat application using OpenAI Python SDK with advanced features.

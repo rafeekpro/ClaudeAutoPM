@@ -1,3 +1,9 @@
+---
+name: ux-design-commands
+type: epic-management
+category: general
+---
+
 # UX Design Commands
 
 ## Analysis & Audit Tools

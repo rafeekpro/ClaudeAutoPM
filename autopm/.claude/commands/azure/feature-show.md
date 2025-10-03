@@ -1,3 +1,9 @@
+---
+name: /azure:feature-show
+type: epic-management
+category: azure
+---
+
 # /azure:feature-show
 
 Display detailed information about a Feature in Azure DevOps.

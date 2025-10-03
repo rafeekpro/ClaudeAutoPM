@@ -1,3 +1,9 @@
+---
+name: tailwindcss-design-system
+type: task-management
+category: ui
+---
+
 # TailwindCSS Design System Command
 
 Create a custom design system using TailwindCSS with utility classes and component patterns.

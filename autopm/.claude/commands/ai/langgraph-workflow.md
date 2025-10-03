@@ -1,3 +1,9 @@
+---
+name: langgraph-workflow
+type: ai-workflow
+category: ai
+---
+
 # LangGraph Workflow Command
 
 Create complex AI workflows using LangGraph with state management and multi-agent collaboration.
