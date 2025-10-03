@@ -8,6 +8,23 @@ Creates a complete FastAPI project structure with modern Python tooling.
 
 **Usage**: `/python:api-scaffold [project-name] [--db=postgresql|mysql|sqlite] [--auth=jwt|oauth2]`
 
+## Required Documentation Access
+
+**MANDATORY:** Before scaffolding Python APIs, query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/python/api-scaffolding` - api scaffolding best practices
+- `mcp://context7/fastapi/structure` - structure best practices
+- `mcp://context7/api-design/rest` - rest best practices
+- `mcp://context7/python/best-practices` - best practices best practices
+
+**Why This is Required:**
+- Ensures adherence to current industry standards and best practices
+- Prevents outdated or incorrect implementation patterns
+- Provides access to latest framework/tool documentation
+- Reduces errors from stale knowledge or assumptions
+
+
 **Example**: `/python:api-scaffold task-manager --db=postgresql --auth=jwt`
 
 **What this does**:

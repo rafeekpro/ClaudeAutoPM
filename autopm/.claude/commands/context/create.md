@@ -6,6 +6,22 @@ allowed-tools: Bash, Read, Write, LS
 
 This command creates the initial project context documentation in `.claude/context/` by analyzing the current project state and establishing comprehensive baseline documentation.
 
+## Required Documentation Access
+
+**MANDATORY:** Before AI context management, query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/ai/context-management` - context management best practices
+- `mcp://context7/llm/prompt-engineering` - prompt engineering best practices
+- `mcp://context7/ai/rag-systems` - rag systems best practices
+
+**Why This is Required:**
+- Ensures adherence to current industry standards and best practices
+- Prevents outdated or incorrect implementation patterns
+- Provides access to latest framework/tool documentation
+- Reduces errors from stale knowledge or assumptions
+
+
 ## Required Rules
 
 **IMPORTANT:** Before executing this command, read and follow:

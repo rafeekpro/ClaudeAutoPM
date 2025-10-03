@@ -59,15 +59,15 @@ This document defines MANDATORY standards for:
 - `mcp://context7/terraform/aws` - Terraform AWS provider patterns
 ```
 
-#### For PM Commands
+#### For Commands
 
 **Why This is Required:**
-- Ensures issues, tasks, epics, PRDs follow industry best practices
-- Applies proven agile methodologies and frameworks
-- Validates work breakdown structures against standards
-- Prevents anti-patterns in project management workflows
+- Ensures all workflows follow industry best practices
+- Applies proven methodologies and frameworks for the specific domain
+- Validates operations against current standards
+- Prevents anti-patterns and outdated implementation patterns
 
-**Required Format in Every PM Command:**
+**Required Format in Every Command:**
 
 ```markdown
 ## Required Documentation Access
@@ -82,13 +82,30 @@ This document defines MANDATORY standards for:
 - [Specific reasons for this command]
 ```
 
-**Example (from epic-decompose.md):**
+**Examples:**
 
+From PM command (epic-decompose.md):
 ```markdown
 **Documentation Queries:**
 - `mcp://context7/agile/epic-decomposition` - Epic breakdown best practices
 - `mcp://context7/agile/task-sizing` - Task estimation and sizing
 - `mcp://context7/agile/user-stories` - User story formats (INVEST criteria)
+```
+
+From Infrastructure command (ssh-security.md):
+```markdown
+**Documentation Queries:**
+- `mcp://context7/security/ssh-hardening` - SSH hardening best practices
+- `mcp://context7/security/authentication` - Authentication methods
+- `mcp://context7/infrastructure/security` - Infrastructure security patterns
+```
+
+From Azure command (feature-decompose.md):
+```markdown
+**Documentation Queries:**
+- `mcp://context7/agile/feature-breakdown` - Feature breakdown patterns
+- `mcp://context7/azure-devops/features` - Azure DevOps features
+- `mcp://context7/project-management/work-breakdown` - Work breakdown structure
 ```
 
 #### Obligations
@@ -101,9 +118,16 @@ This document defines MANDATORY standards for:
 #### Enforcement
 
 - All agent PRs must include Documentation Queries section
-- All PM command PRs must include Required Documentation Access section
+- All command PRs must include Required Documentation Access section
 - Existing agents/commands without this section must be updated
 - Reviews will check for Context7 usage in implementations
+
+#### Coverage Status
+
+As of the latest update:
+- **Agents**: 45/45 (100%) have Documentation Queries
+- **Commands**: 100/100 (100%) have Required Documentation Access
+- **Total Coverage**: 145/145 framework components (100%)
 
 ## 🚀 Development Methodology
 

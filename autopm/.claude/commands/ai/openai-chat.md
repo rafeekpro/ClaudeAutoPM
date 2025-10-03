@@ -32,6 +32,23 @@ Use the openai-python-expert agent to create a comprehensive chat application wi
 
 ## Example Usage
 ```
+## Required Documentation Access
+
+**MANDATORY:** Before AI integration and LLM workflows, query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/ai/llm-integration` - llm integration best practices
+- `mcp://context7/ai/workflow-orchestration` - workflow orchestration best practices
+- `mcp://context7/openai/api` - api best practices
+- `mcp://context7/langchain/agents` - agents best practices
+
+**Why This is Required:**
+- Ensures adherence to current industry standards and best practices
+- Prevents outdated or incorrect implementation patterns
+- Provides access to latest framework/tool documentation
+- Reduces errors from stale knowledge or assumptions
+
+
 Task: Create chat application with GPT-4, streaming responses, function calling for web search, and conversation history
 Agent: openai-python-expert
 Parameters: model=gpt-4, features=streaming,function-calling,embeddings, safety=content-filtering,rate-limiting, storage=database

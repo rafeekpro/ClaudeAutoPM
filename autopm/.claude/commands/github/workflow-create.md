@@ -8,6 +8,23 @@ Creates GitHub Actions workflows for CI/CD pipelines.
 
 **Usage**: `/github:workflow-create [--type=ci|cd|release] [--stack=node|python|dotnet] [--deploy-to=aws|azure|gcp]`
 
+## Required Documentation Access
+
+**MANDATORY:** Before creating GitHub workflows, query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/github/workflows` - workflows best practices
+- `mcp://context7/ci-cd/github-actions` - github actions best practices
+- `mcp://context7/devops/pipeline-design` - pipeline design best practices
+- `mcp://context7/ci-cd/best-practices` - best practices best practices
+
+**Why This is Required:**
+- Ensures adherence to current industry standards and best practices
+- Prevents outdated or incorrect implementation patterns
+- Provides access to latest framework/tool documentation
+- Reduces errors from stale knowledge or assumptions
+
+
 **Example**: `/github:workflow-create --type=ci --stack=node --deploy-to=aws`
 
 **What this does**:

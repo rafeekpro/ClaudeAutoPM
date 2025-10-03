@@ -8,6 +8,23 @@ Configures Model Context Protocol (MCP) servers and context sharing between agen
 
 **Usage**: `/mcp:context-setup [--server=context7|filesystem|custom] [--pool-name=pool] [--agents=agent1,agent2] [--max-size=100MB]`
 
+## Required Documentation Access
+
+**MANDATORY:** Before MCP server setup and documentation, query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/mcp/protocol` - protocol best practices
+- `mcp://context7/mcp/servers` - servers best practices
+- `mcp://context7/ai/context-management` - context management best practices
+- `mcp://context7/mcp/integration` - integration best practices
+
+**Why This is Required:**
+- Ensures adherence to current industry standards and best practices
+- Prevents outdated or incorrect implementation patterns
+- Provides access to latest framework/tool documentation
+- Reduces errors from stale knowledge or assumptions
+
+
 **Example**: `/mcp:context-setup --server=context7 --pool-name=project-context --agents=python-backend-engineer,azure-devops-specialist --max-size=50MB`
 
 **What this does**:
