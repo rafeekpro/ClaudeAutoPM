@@ -385,9 +385,47 @@ node .claude/lib/commands/pm/issueSync.js format 123 ./updates
 - Acceptance criteria updates
 - Next steps and blockers
 
+### Epic Status (JavaScript)
+
+Track epic progress with detailed status reporting:
+
+```bash
+# Show epic status
+node .claude/lib/commands/pm/epicStatus.js fullstack/01-infrastructure
+
+# List available epics
+node .claude/lib/commands/pm/epicStatus.js
+```
+
+**Features:**
+- Counts tasks by status (completed/in-progress/pending)
+- Calculates progress percentage
+- Visual progress bar
+- Sub-epic breakdown
+- Comprehensive status reporting
+
+**Example output:**
+```
+Epic: fullstack/01-infrastructure
+==================================
+
+Total tasks:     12
+Completed:       8 (67%)
+In Progress:     2
+Pending:         2
+
+Progress: [=================================-------------] 67%
+
+Sub-Epic Breakdown:
+-------------------
+  backend                        6 tasks (4 completed)
+  frontend                       4 tasks (3 completed)
+  infrastructure                 2 tasks (1 completed)
+```
+
 ### Why JavaScript Tools?
 
-**Replaced 9 Bash scripts** (~2500 lines) with **2 JavaScript tools** (~1300 lines):
+**Replaced 10 Bash scripts** (~2600 lines) with **3 JavaScript tools** (~1500 lines):
 
 **Benefits:**
 - ✅ Zero parsing errors (no heredoc/awk/sed complexity)
