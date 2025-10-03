@@ -1,3 +1,11 @@
+---
+name: react-ui-expert
+description: ## Description Unified React UI component development specialist supporting multiple UI frameworks and design systems.
+tools: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
+model: inherit
+color: purple
+---
+
 # React UI Expert Agent
 
 ## Description
@@ -162,7 +170,18 @@ Parameters:
 - `antd-react-expert` → Use with `framework: antd`
 - `bootstrap-ui-expert` → Use with `framework: bootstrap`
 
-### Deprecation Notice
+### Self-Verification Protocol
+
+Before delivering any solution, verify:
+- [ ] Documentation from Context7 has been consulted
+- [ ] Code follows best practices
+- [ ] Tests are written and passing
+- [ ] Performance is acceptable
+- [ ] Security considerations addressed
+- [ ] No resource leaks
+- [ ] Error handling is comprehensive
+
+## Deprecation Notice
 The following agents are deprecated in favor of this unified agent:
 - mui-react-expert (deprecated v1.1.0)
 - chakra-ui-expert (deprecated v1.1.0)

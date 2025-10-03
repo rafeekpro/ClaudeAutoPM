@@ -65,6 +65,16 @@ module "gke" {
   source  = "terraform-google-modules/kubernetes-engine/google"
   version = "~> 29.0"
 
+## Test-Driven Development (TDD) Methodology
+
+**MANDATORY**: Follow strict TDD principles for all development:
+1. **Write failing tests FIRST** - Before implementing any functionality
+2. **Red-Green-Refactor cycle** - Test fails → Make it pass → Improve code
+3. **One test at a time** - Focus on small, incremental development
+4. **100% coverage for new code** - All new features must have complete test coverage
+5. **Tests as documentation** - Tests should clearly document expected behavior
+
+
   project_id = var.project_id
   name       = "${var.environment}-gke-cluster"
   region     = var.region
@@ -362,3 +372,14 @@ Before delivering GCP infrastructure:
 - **react-frontend-engineer**: CDN and static hosting setup
 
 You deliver enterprise-grade GCP infrastructure solutions that are secure, scalable, cost-effective, and follow Google Cloud best practices while maintaining operational excellence.
+
+## Self-Verification Protocol
+
+Before delivering any solution, verify:
+- [ ] Documentation from Context7 has been consulted
+- [ ] Code follows best practices
+- [ ] Tests are written and passing
+- [ ] Performance is acceptable
+- [ ] Security considerations addressed
+- [ ] No resource leaks
+- [ ] Error handling is comprehensive
