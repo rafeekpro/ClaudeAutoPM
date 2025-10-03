@@ -52,7 +52,7 @@ This is handled automatically by our modular scripts, but you can run the check 
 
 ```bash
 # Check repository protection (built into all scripts)
-bash autopm/.claude/scripts/lib/github-utils.sh
+bash .claude/scripts/lib/github-utils.sh
 ```
 
 The scripts will automatically:
@@ -66,7 +66,7 @@ Create the main GitHub issue for the epic:
 
 ```bash
 # Create epic issue with proper stats and labels
-epic_number=$(bash autopm/.claude/scripts/pm/epic-sync/create-epic-issue.sh "$ARGUMENTS")
+epic_number=$(bash .claude/scripts/pm/epic-sync/create-epic-issue.sh "$ARGUMENTS")
 
 echo "✅ Epic issue created: #$epic_number"
 ```
@@ -84,7 +84,7 @@ Create GitHub issues for all tasks with automatic parallel processing:
 
 ```bash
 # Create task issues (automatically chooses sequential/parallel)
-task_mapping_file=$(bash autopm/.claude/scripts/pm/epic-sync/create-task-issues.sh "$ARGUMENTS" "$epic_number")
+task_mapping_file=$(bash .claude/scripts/pm/epic-sync/create-task-issues.sh "$ARGUMENTS" "$epic_number")
 
 echo "✅ Task issues created. Mapping: $task_mapping_file"
 ```
@@ -109,7 +109,7 @@ Update all task dependencies and rename files to use GitHub issue numbers:
 
 ```bash
 # Update references and rename files
-bash autopm/.claude/scripts/pm/epic-sync/update-references.sh "$ARGUMENTS" "$task_mapping_file"
+bash .claude/scripts/pm/epic-sync/update-references.sh "$ARGUMENTS" "$task_mapping_file"
 
 echo "✅ Task references updated and files renamed"
 ```
@@ -128,7 +128,7 @@ Update the epic.md file with GitHub information and real task IDs:
 
 ```bash
 # Update epic file with GitHub info and real task IDs
-bash autopm/.claude/scripts/pm/epic-sync/update-epic-file.sh "$ARGUMENTS" "$epic_number"
+bash .claude/scripts/pm/epic-sync/update-epic-file.sh "$ARGUMENTS" "$epic_number"
 
 echo "✅ Epic file updated with GitHub information"
 ```
@@ -172,7 +172,7 @@ echo "🚀 Starting modular epic sync for: $EPIC_NAME"
 
 # Step 1: Create epic issue
 echo "📝 Creating epic issue..."
-epic_number=$(bash autopm/.claude/scripts/pm/epic-sync/create-epic-issue.sh "$EPIC_NAME")
+epic_number=$(bash .claude/scripts/pm/epic-sync/create-epic-issue.sh "$EPIC_NAME")
 
 if [[ -z "$epic_number" ]]; then
     echo "❌ Failed to create epic issue"
@@ -183,7 +183,7 @@ echo "✅ Epic issue created: #$epic_number"
 
 # Step 2: Create task issues
 echo "📋 Creating task issues..."
-task_mapping_file=$(bash autopm/.claude/scripts/pm/epic-sync/create-task-issues.sh "$EPIC_NAME" "$epic_number")
+task_mapping_file=$(bash .claude/scripts/pm/epic-sync/create-task-issues.sh "$EPIC_NAME" "$epic_number")
 
 if [[ ! -f "$task_mapping_file" ]]; then
     echo "❌ Failed to create task issues"
@@ -195,13 +195,13 @@ echo "✅ Created $task_count task issues"
 
 # Step 3: Update references
 echo "🔗 Updating task references..."
-bash autopm/.claude/scripts/pm/epic-sync/update-references.sh "$EPIC_NAME" "$task_mapping_file"
+bash .claude/scripts/pm/epic-sync/update-references.sh "$EPIC_NAME" "$task_mapping_file"
 
 echo "✅ Task references updated"
 
 # Step 4: Update epic file
 echo "📄 Updating epic file..."
-bash autopm/.claude/scripts/pm/epic-sync/update-epic-file.sh "$EPIC_NAME" "$epic_number"
+bash .claude/scripts/pm/epic-sync/update-epic-file.sh "$EPIC_NAME" "$epic_number"
 
 echo "✅ Epic file updated"
 
@@ -269,7 +269,7 @@ for epic_dir in $epic_dirs; do
 
     # Step 1: Create epic issue
     echo "📝 Creating epic issue..."
-    epic_number=$(bash autopm/.claude/scripts/pm/epic-sync/create-epic-issue.sh "$FEATURE_NAME/$epic_name")
+    epic_number=$(bash .claude/scripts/pm/epic-sync/create-epic-issue.sh "$FEATURE_NAME/$epic_name")
 
     if [[ -z "$epic_number" ]]; then
         echo "⚠️  Failed to create epic issue for $epic_name"
@@ -281,7 +281,7 @@ for epic_dir in $epic_dirs; do
 
     # Step 2: Create task issues for this epic
     echo "📋 Creating task issues..."
-    task_mapping_file=$(bash autopm/.claude/scripts/pm/epic-sync/create-task-issues.sh "$FEATURE_NAME/$epic_name" "$epic_number")
+    task_mapping_file=$(bash .claude/scripts/pm/epic-sync/create-task-issues.sh "$FEATURE_NAME/$epic_name" "$epic_number")
 
     if [[ -f "$task_mapping_file" ]]; then
         task_count=$(wc -l < "$task_mapping_file")
@@ -290,10 +290,10 @@ for epic_dir in $epic_dirs; do
 
         # Step 3: Update references
         echo "🔗 Updating task references..."
-        bash autopm/.claude/scripts/pm/epic-sync/update-references.sh "$FEATURE_NAME/$epic_name" "$task_mapping_file"
+        bash .claude/scripts/pm/epic-sync/update-references.sh "$FEATURE_NAME/$epic_name" "$task_mapping_file"
 
         # Step 4: Update epic file
-        bash autopm/.claude/scripts/pm/epic-sync/update-epic-file.sh "$FEATURE_NAME/$epic_name" "$epic_number"
+        bash .claude/scripts/pm/epic-sync/update-epic-file.sh "$FEATURE_NAME/$epic_name" "$epic_number"
     fi
 done
 
@@ -418,7 +418,7 @@ Enable debug logging for detailed troubleshooting:
 
 ```bash
 export AUTOPM_LOG_LEVEL=0  # Enable debug logging
-bash autopm/.claude/scripts/pm/epic-sync/create-epic-issue.sh "$EPIC_NAME"
+bash .claude/scripts/pm/epic-sync/create-epic-issue.sh "$EPIC_NAME"
 ```
 
 ## Migration from Legacy Epic Sync

@@ -253,11 +253,14 @@ git status             # Check for uncommitted changes
 
 ### Before Committing
 ```bash
-# Pre-commit validation
-npm test              # Uses test-runner
-/pm:validate registry  # Uses registry-manager
+# Pre-commit validation (automated via git hooks)
+npm test                # Uses test-runner
+npm run validate:paths  # Check for hardcoded autopm/ paths
+/pm:validate registry   # Uses registry-manager
 @code-analyzer check for security issues
 ```
+
+**Note:** Git hooks automatically run `validate:paths` before each commit to prevent hardcoded path issues.
 
 ### Before Release
 ```bash
@@ -276,11 +279,16 @@ When modifying framework files, work in the `autopm/` directory:
 - `autopm/.claude/` - Resources that will be copied to user projects
 - `autopm/.claude/templates/` - Templates for generating files (NOT copied)
 
+**⚠️ CRITICAL PATH RULE:** Never use hardcoded `autopm/` paths in framework files. The `autopm/` directory does not exist after installation. Always use `.claude/` paths instead. See `autopm/.claude/rules/framework-path-rules.md` for details.
+
 ### Testing Changes
 
 ```bash
 # Run all tests
 npm run test:all
+
+# Validate framework paths (CRITICAL before committing)
+npm run validate:paths
 
 # Test installation scenarios
 npm run test:install
@@ -290,6 +298,9 @@ npm run test:security
 
 # Validate installation
 npm run test:install:validate
+
+# Setup git hooks (run once after cloning)
+npm run setup:githooks
 ```
 
 ### Installation Flow

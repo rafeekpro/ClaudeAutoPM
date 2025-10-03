@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Pre-commit hook for ClaudeAutoPM
+# Validates framework paths before allowing commits
+
+set -e
+
+# Get the project root
+PROJECT_ROOT="$(git rev-parse --show-toplevel)"
+
+echo ""
+echo "🔒 Running pre-commit checks..."
+echo ""
+
+# Run the framework path validation
+if [ -x "$PROJECT_ROOT/scripts/validate-framework-paths.sh" ]; then
+    "$PROJECT_ROOT/scripts/validate-framework-paths.sh"
+else
+    echo "⚠️  Warning: validate-framework-paths.sh not found or not executable"
+    echo "   Skipping path validation..."
+fi
+
+echo "✅ Pre-commit checks passed!"
+echo ""
+
+exit 0

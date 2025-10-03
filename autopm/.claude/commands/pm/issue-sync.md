@@ -33,7 +33,7 @@ Run comprehensive validation checks before syncing:
 
 ```bash
 # Run preflight validation
-bash autopm/.claude/scripts/pm/issue-sync/preflight-validation.sh "$ARGUMENTS"
+bash .claude/scripts/pm/issue-sync/preflight-validation.sh "$ARGUMENTS"
 
 if [[ $? -ne 0 ]]; then
     echo "❌ Preflight validation failed"
@@ -41,9 +41,9 @@ if [[ $? -ne 0 ]]; then
 fi
 
 # Extract validated paths from preflight output
-epic_name=$(bash autopm/.claude/scripts/pm/issue-sync/preflight-validation.sh "$ARGUMENTS" | grep "Epic:" | cut -d: -f2- | xargs)
-updates_dir=$(bash autopm/.claude/scripts/pm/issue-sync/preflight-validation.sh "$ARGUMENTS" | grep "Updates Directory:" | cut -d: -f2- | xargs)
-progress_file=$(bash autopm/.claude/scripts/pm/issue-sync/preflight-validation.sh "$ARGUMENTS" | grep "Progress File:" | cut -d: -f2- | xargs)
+epic_name=$(bash .claude/scripts/pm/issue-sync/preflight-validation.sh "$ARGUMENTS" | grep "Epic:" | cut -d: -f2- | xargs)
+updates_dir=$(bash .claude/scripts/pm/issue-sync/preflight-validation.sh "$ARGUMENTS" | grep "Updates Directory:" | cut -d: -f2- | xargs)
+progress_file=$(bash .claude/scripts/pm/issue-sync/preflight-validation.sh "$ARGUMENTS" | grep "Progress File:" | cut -d: -f2- | xargs)
 
 echo "✅ Preflight checks passed"
 ```
@@ -65,7 +65,7 @@ Collect all local development updates:
 last_sync=$(grep '^last_sync:' "$progress_file" | sed 's/^last_sync: *//')
 
 # Gather all updates since last sync
-consolidated_updates=$(bash autopm/.claude/scripts/pm/issue-sync/gather-updates.sh \
+consolidated_updates=$(bash .claude/scripts/pm/issue-sync/gather-updates.sh \
     "$ARGUMENTS" \
     "$updates_dir" \
     "$last_sync")
@@ -95,7 +95,7 @@ if [[ "$completion" == "100" ]]; then
 fi
 
 # Format the comment
-formatted_comment=$(bash autopm/.claude/scripts/pm/issue-sync/format-comment.sh \
+formatted_comment=$(bash .claude/scripts/pm/issue-sync/format-comment.sh \
     "$ARGUMENTS" \
     "$consolidated_updates" \
     "$progress_file" \
@@ -119,7 +119,7 @@ Post the formatted comment to GitHub:
 
 ```bash
 # Post comment to GitHub issue
-comment_url=$(bash autopm/.claude/scripts/pm/issue-sync/post-comment.sh \
+comment_url=$(bash .claude/scripts/pm/issue-sync/post-comment.sh \
     "$ARGUMENTS" \
     "$formatted_comment" \
     "$is_completion")
@@ -146,7 +146,7 @@ Update local metadata after successful sync:
 
 ```bash
 # Update progress.md frontmatter with sync information
-bash autopm/.claude/scripts/pm/issue-sync/update-frontmatter.sh \
+bash .claude/scripts/pm/issue-sync/update-frontmatter.sh \
     "$ARGUMENTS" \
     "$progress_file" \
     "$comment_url" \
@@ -178,13 +178,13 @@ echo "🚀 Starting modular issue sync for: #$ISSUE_NUMBER"
 
 # Step 1: Preflight validation
 echo "🔍 Running preflight validation..."
-if ! bash autopm/.claude/scripts/pm/issue-sync/preflight-validation.sh "$ISSUE_NUMBER"; then
+if ! bash .claude/scripts/pm/issue-sync/preflight-validation.sh "$ISSUE_NUMBER"; then
     echo "❌ Preflight validation failed"
     exit 1
 fi
 
 # Extract paths from a single preflight run
-preflight_output=$(bash autopm/.claude/scripts/pm/issue-sync/preflight-validation.sh "$ISSUE_NUMBER")
+preflight_output=$(bash .claude/scripts/pm/issue-sync/preflight-validation.sh "$ISSUE_NUMBER")
 epic_name=$(echo "$preflight_output" | grep "Epic:" | cut -d: -f2- | xargs)
 updates_dir=$(echo "$preflight_output" | grep "Updates Directory:" | cut -d: -f2- | xargs)
 progress_file=$(echo "$preflight_output" | grep "Progress File:" | cut -d: -f2- | xargs)
@@ -196,7 +196,7 @@ echo "  Updates: $updates_dir"
 # Step 2: Gather updates
 echo "📝 Gathering local updates..."
 last_sync=$(grep '^last_sync:' "$progress_file" 2>/dev/null | sed 's/^last_sync: *//' || echo "")
-consolidated_updates=$(bash autopm/.claude/scripts/pm/issue-sync/gather-updates.sh \
+consolidated_updates=$(bash .claude/scripts/pm/issue-sync/gather-updates.sh \
     "$ISSUE_NUMBER" \
     "$updates_dir" \
     "$last_sync")
@@ -217,7 +217,7 @@ if [[ "$completion" == "100" ]]; then
     echo "  Task is complete - formatting completion comment"
 fi
 
-formatted_comment=$(bash autopm/.claude/scripts/pm/issue-sync/format-comment.sh \
+formatted_comment=$(bash .claude/scripts/pm/issue-sync/format-comment.sh \
     "$ISSUE_NUMBER" \
     "$consolidated_updates" \
     "$progress_file" \
@@ -232,7 +232,7 @@ echo "✅ Comment formatted"
 
 # Step 4: Post to GitHub
 echo "☁️ Posting to GitHub..."
-comment_url=$(bash autopm/.claude/scripts/pm/issue-sync/post-comment.sh \
+comment_url=$(bash .claude/scripts/pm/issue-sync/post-comment.sh \
     "$ISSUE_NUMBER" \
     "$formatted_comment" \
     "$is_completion")
@@ -247,7 +247,7 @@ echo "✅ Comment posted successfully"
 
 # Step 5: Update frontmatter
 echo "📝 Updating local metadata..."
-bash autopm/.claude/scripts/pm/issue-sync/update-frontmatter.sh \
+bash .claude/scripts/pm/issue-sync/update-frontmatter.sh \
     "$ISSUE_NUMBER" \
     "$progress_file" \
     "$comment_url" \
@@ -376,7 +376,7 @@ Enable debug logging for detailed troubleshooting:
 
 ```bash
 export AUTOPM_LOG_LEVEL=0  # Enable debug logging
-bash autopm/.claude/scripts/pm/issue-sync/preflight-validation.sh "$ISSUE_NUMBER"
+bash .claude/scripts/pm/issue-sync/preflight-validation.sh "$ISSUE_NUMBER"
 ```
 
 ## Migration from Legacy Issue Sync
