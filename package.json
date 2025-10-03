@@ -63,7 +63,9 @@
     "pm:test": "node scripts/self-maintenance.js test",
     "pm:metrics": "node scripts/self-maintenance.js metrics",
     "pm:optimize": "node scripts/self-maintenance.js optimize",
-    "pm:health": "node scripts/self-maintenance.js health"
+    "pm:health": "node scripts/self-maintenance.js health",
+    "validate:paths": "bash scripts/validate-framework-paths.sh",
+    "setup:githooks": "bash scripts/setup-githooks.sh"
   },
   "keywords": [
     "ai",
