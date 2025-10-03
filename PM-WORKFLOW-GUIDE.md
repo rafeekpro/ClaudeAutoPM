@@ -1,100 +1,100 @@
-# ClaudeAutoPM - Kompletny Przewodnik po Workflow PM
+# ClaudeAutoPM - Complete PM Workflow Guide
 
-## 📖 Spis Treści
+## 📖 Table of Contents
 
-1. [Podstawowy Proces](#podstawowy-proces)
-2. [Tworzenie Wielu PRD](#tworzenie-wielu-prd)
-3. [Podział na Epiki](#podział-na-epiki)
-4. [Przetwarzanie Wielu Epiców](#przetwarzanie-wielu-epiców)
-5. [Przykłady Praktyczne](#przykłady-praktyczne)
+1. [Basic Process](#basic-process)
+2. [Creating Multiple PRDs](#creating-multiple-prds)
+3. [Epic Splitting](#epic-splitting)
+4. [Processing Multiple Epics](#processing-multiple-epics)
+5. [Practical Examples](#practical-examples)
 
 ---
 
-## Podstawowy Proces
+## Basic Process
 
-### KROK 1: `/pm:prd-new feature-name`
+### STEP 1: `/pm:prd-new feature-name`
 
-**Co robi:** Tworzy Product Requirements Document
+**What it does:** Creates a Product Requirements Document
 
 ```bash
 /pm:prd-new user-authentication
 ```
 
-**Rezultat:**
-- Plik: `.claude/prds/user-authentication.md`
-- Zawiera szablon z sekcjami:
-  - Problem Statement (co rozwiązujemy)
-  - User Stories (kto, co, dlaczego)
-  - Acceptance Criteria (definicja zakończenia)
-  - Success Metrics (jak mierzymy sukces)
+**Result:**
+- File: `.claude/prds/user-authentication.md`
+- Contains template with sections:
+  - Problem Statement (what we're solving)
+  - User Stories (who, what, why)
+  - Acceptance Criteria (definition of done)
+  - Success Metrics (how we measure success)
 
-**Claude wypełnia szablon** na podstawie Twojego opisu.
+**Claude fills the template** based on your description.
 
 ---
 
-### KROK 2: `/pm:prd-parse feature-name`
+### STEP 2: `/pm:prd-parse feature-name`
 
-**Co robi:** Analizuje PRD i przygotowuje do decomposition
+**What it does:** Analyzes PRD and prepares for decomposition
 
 ```bash
 /pm:prd-parse user-authentication
 ```
 
-**Rezultat:**
-- Analizuje strukturę PRD
-- Identyfikuje komponenty (frontend, backend, database, etc.)
-- Wykrywa zależności między komponentami
-- Przygotowuje metadata do następnego kroku
+**Result:**
+- Analyzes PRD structure
+- Identifies components (frontend, backend, database, etc.)
+- Detects dependencies between components
+- Prepares metadata for next step
 
-**To jest analiza** - nie tworzy jeszcze tasków/epiców.
+**This is analysis** - doesn't create tasks/epics yet.
 
 ---
 
-### KROK 3a: `/pm:epic-decompose feature-name` (PROSTY PROJEKT)
+### STEP 3a: `/pm:epic-decompose feature-name` (SIMPLE PROJECT)
 
-**Kiedy używać:** Mały/średni projekt z jednym epicem
+**When to use:** Small/medium project with one epic
 
 ```bash
 /pm:epic-decompose user-authentication
 ```
 
-**Co robi:**
-- Tworzy **JEDEN** epic
-- Dzieli go na tasks/issues
-- Struktura:
+**What it does:**
+- Creates **ONE** epic
+- Breaks it into tasks/issues
+- Structure:
   ```
   .claude/epics/user-authentication/
-  ├── epic.md              # Główny epic
+  ├── epic.md              # Main epic
   ├── 001.md              # Task 1: Setup database
   ├── 002.md              # Task 2: Create user model
   ├── 003.md              # Task 3: Implement JWT
   └── ...
   ```
 
-**Kiedy używać:**
-- ✅ Jeden komponent (tylko backend lub tylko frontend)
-- ✅ Mała funkcjonalność (1-2 tygodnie pracy)
-- ✅ Jeden developer
-- ✅ Brak dependencies między komponentami
+**When to use:**
+- ✅ One component (only backend or only frontend)
+- ✅ Small functionality (1-2 weeks work)
+- ✅ One developer
+- ✅ No dependencies between components
 
 ---
 
-### KROK 3b: `/pm:epic-split feature-name` (ZŁOŻONY PROJEKT)
+### STEP 3b: `/pm:epic-split feature-name` (COMPLEX PROJECT)
 
-**Kiedy używać:** Duży projekt z wieloma komponentami
+**When to use:** Large project with multiple components
 
 ```bash
 /pm:epic-split ecommerce-platform
 ```
 
-**Co robi:**
-- Analizuje PRD pod kątem complexity
-- Dzieli na **WIELE EPICÓW**
-- Każdy epic = osobny folder
-- Struktura:
+**What it does:**
+- Analyzes PRD for complexity
+- Splits into **MULTIPLE EPICS**
+- Each epic = separate folder
+- Structure:
   ```
   .claude/epics/ecommerce-platform/
-  ├── meta.yaml                          # Metadata wszystkich epiców
+  ├── meta.yaml                          # Metadata of all epics
   ├── 01-infrastructure/
   │   └── epic.md                       # Epic: Infrastructure
   ├── 02-auth-backend/
@@ -109,7 +109,7 @@
       └── epic.md                       # Epic: Testing & CI/CD
   ```
 
-**Automatycznie wykrywa:**
+**Automatically detects:**
 - Infrastructure (Docker, DB, monitoring) → Epic 1 (P0)
 - Authentication Backend (JWT, users) → Epic 2 (P0)
 - Product API Services (catalog, orders) → Epic 3 (P0)
@@ -117,21 +117,21 @@
 - E-commerce UI (pages, cart) → Epic 5 (P1)
 - Testing & Deployment (CI/CD) → Epic 6 (P1)
 
-**Kiedy używać:**
-- ✅ Multi-komponent (frontend + backend + infra)
-- ✅ Duży projekt (2+ miesiące)
-- ✅ Wiele osób/teamów
-- ✅ Potrzeba równoległej pracy
+**When to use:**
+- ✅ Multi-component (frontend + backend + infra)
+- ✅ Large project (2+ months)
+- ✅ Multiple people/teams
+- ✅ Need for parallel work
 - ✅ Phased delivery (milestone tracking)
 
 ---
 
-### KROK 4: Decompose każdego epica
+### STEP 4: Decompose each epic
 
-**Po `/pm:epic-split` musisz decompose KAŻDY epic osobno:**
+**After `/pm:epic-split` you must decompose EACH epic separately:**
 
 ```bash
-# Decompose każdy epic na tasks
+# Decompose each epic into tasks
 /pm:epic-decompose ecommerce-platform/01-infrastructure
 /pm:epic-decompose ecommerce-platform/02-auth-backend
 /pm:epic-decompose ecommerce-platform/03-product-api
@@ -140,7 +140,7 @@
 /pm:epic-decompose ecommerce-platform/06-testing-deployment
 ```
 
-**Rezultat każdego decompose:**
+**Result of each decompose:**
 ```
 .claude/epics/ecommerce-platform/01-infrastructure/
 ├── epic.md
@@ -153,39 +153,39 @@
 
 ---
 
-### KROK 5: `/pm:epic-sync feature-name`
+### STEP 5: `/pm:epic-sync feature-name`
 
-**Co robi:** Synchronizuje z GitHub/Azure DevOps
+**What it does:** Synchronizes with GitHub/Azure DevOps
 
 ```bash
 /pm:epic-sync ecommerce-platform
 ```
 
 **GitHub:**
-- Tworzy Epic Issue (#1)
-- Tworzy Issue dla każdego taska (#2, #3, #4...)
-- Linkuje issues do epica
-- Dodaje labels (epic, P0, P1, frontend, backend)
+- Creates Epic Issue (#1)
+- Creates Issue for each task (#2, #3, #4...)
+- Links issues to epic
+- Adds labels (epic, P0, P1, frontend, backend)
 
 **Azure DevOps:**
-- Tworzy Epic
-- Tworzy User Stories
-- Tworzy Tasks
-- Linkuje hierarchicznie
+- Creates Epic
+- Creates User Stories
+- Creates Tasks
+- Links hierarchically
 
-**WAŻNE:** Jeśli użyłeś `/pm:epic-split`, sync synchronizuje **WSZYSTKIE epiki naraz**.
+**IMPORTANT:** If you used `/pm:epic-split`, sync synchronizes **ALL epics at once**.
 
 ---
 
-### KROK 6: `/pm:next`
+### STEP 6: `/pm:next`
 
-**Co robi:** Zwraca następny task do pracy
+**What it does:** Returns next task to work on
 
 ```bash
 /pm:next
 ```
 
-**Rezultat:**
+**Result:**
 ```
 📋 Next Task: #2 - Setup Docker Compose
 
@@ -199,39 +199,39 @@ File: .claude/epics/ecommerce-platform/01-infrastructure/001.md
 
 ---
 
-### KROK 7: `/pm:issue-start ISSUE-123`
+### STEP 7: `/pm:issue-start ISSUE-123`
 
-**Co robi:** Rozpoczyna pracę nad taskiem
+**What it does:** Starts work on task
 
 ```bash
 /pm:issue-start #2
 ```
 
-**Rezultat:**
+**Result:**
 - Status → "In Progress"
 - Assigned → You
-- Tworzy branch (opcjonalne): `feature/issue-2-setup-docker`
+- Creates branch (optional): `feature/issue-2-setup-docker`
 
 ---
 
-### KROK 8: `/pm:issue-close ISSUE-123`
+### STEP 8: `/pm:issue-close ISSUE-123`
 
-**Co robi:** Zamyka ukończony task
+**What it does:** Closes completed task
 
 ```bash
 /pm:issue-close #2
 ```
 
-**Rezultat:**
+**Result:**
 - Status → "Done"
-- Linkuje commits/PR
-- Aktualizuje progress epica
+- Links commits/PR
+- Updates epic progress
 
 ---
 
-## Tworzenie Wielu PRD
+## Creating Multiple PRDs
 
-**TAK - możesz tworzyć wiele PRD równocześnie:**
+**YES - you can create multiple PRDs simultaneously:**
 
 ```bash
 /pm:prd-new user-authentication
@@ -239,7 +239,7 @@ File: .claude/epics/ecommerce-platform/01-infrastructure/001.md
 /pm:prd-new notification-service
 ```
 
-**Rezultat:**
+**Result:**
 ```
 .claude/prds/
 ├── user-authentication.md
@@ -247,87 +247,87 @@ File: .claude/epics/ecommerce-platform/01-infrastructure/001.md
 └── notification-service.md
 ```
 
-**Każdy PRD to osobny feature** - przetwarzasz je niezależnie.
+**Each PRD is a separate feature** - process them independently.
 
 ---
 
-## Podział na Epiki - Decyzja
+## Epic Splitting - Decision
 
-### ❓ Kiedy używać `/pm:epic-decompose` (JEDEN epic)?
+### ❓ When to use `/pm:epic-decompose` (ONE epic)?
 
 ```bash
 /pm:prd-new simple-login
 /pm:prd-parse simple-login
-/pm:epic-decompose simple-login  # ← JEDEN EPIC
+/pm:epic-decompose simple-login  # ← ONE EPIC
 ```
 
-**Używaj gdy:**
-- ✅ Prosty login form (tylko frontend)
-- ✅ REST API endpoint (tylko backend)
-- ✅ Database migration (tylko DB)
-- ✅ Mały feature (1-2 tygodnie)
-- ✅ Jeden komponent
-- ✅ Jeden developer
+**Use when:**
+- ✅ Simple login form (frontend only)
+- ✅ REST API endpoint (backend only)
+- ✅ Database migration (DB only)
+- ✅ Small feature (1-2 weeks)
+- ✅ One component
+- ✅ One developer
 
-**Przykłady:**
-- "Add user profile page" → jeden epic
-- "Create REST API for products" → jeden epic
-- "Setup Redis caching" → jeden epic
+**Examples:**
+- "Add user profile page" → one epic
+- "Create REST API for products" → one epic
+- "Setup Redis caching" → one epic
 
 ---
 
-### ❓ Kiedy używać `/pm:epic-split` (WIELE epiców)?
+### ❓ When to use `/pm:epic-split` (MULTIPLE epics)?
 
 ```bash
 /pm:prd-new ecommerce-platform
 /pm:prd-parse ecommerce-platform
-/pm:epic-split ecommerce-platform  # ← WIELE EPICÓW
+/pm:epic-split ecommerce-platform  # ← MULTIPLE EPICS
 ```
 
-**Używaj gdy:**
+**Use when:**
 - ✅ Full-stack feature (frontend + backend + database + infra)
-- ✅ Duży projekt (2+ miesiące)
-- ✅ Potrzeba milestone tracking
-- ✅ Wiele zespołów/osób
-- ✅ Równoległa praca
+- ✅ Large project (2+ months)
+- ✅ Need milestone tracking
+- ✅ Multiple teams/people
+- ✅ Parallel work
 - ✅ Phased delivery
 
-**Przykłady:**
-- "E-commerce platform" → 6-8 epiców
-- "Social media dashboard" → 5-7 epiców
-- "Multi-tenant SaaS" → 8-10 epiców
+**Examples:**
+- "E-commerce platform" → 6-8 epics
+- "Social media dashboard" → 5-7 epics
+- "Multi-tenant SaaS" → 8-10 epics
 
 ---
 
-### 🎯 Kryteria Decyzji
+### 🎯 Decision Criteria
 
-| Cecha | epic-decompose (1 epic) | epic-split (wiele epiców) |
-|-------|------------------------|---------------------------|
-| **Komponenty** | 1 (tylko frontend LUB backend) | 2+ (frontend + backend + infra) |
-| **Czas** | 1-2 tygodnie | 2+ miesiące |
-| **Osoby** | 1 developer | 2+ zespoły |
-| **Dependencies** | Brak lub minimalne | Złożone (infra → backend → frontend) |
-| **Delivery** | Jedno release | Phased (milestones) |
-| **Complexity** | Niski/Średni | Wysoki |
+| Feature | epic-decompose (1 epic) | epic-split (multiple epics) |
+|---------|------------------------|------------------------------|
+| **Components** | 1 (only frontend OR backend) | 2+ (frontend + backend + infra) |
+| **Time** | 1-2 weeks | 2+ months |
+| **People** | 1 developer | 2+ teams |
+| **Dependencies** | None or minimal | Complex (infra → backend → frontend) |
+| **Delivery** | Single release | Phased (milestones) |
+| **Complexity** | Low/Medium | High |
 
 ---
 
-## Przetwarzanie Wielu Epiców
+## Processing Multiple Epics
 
-### Scenariusz 1: Jeden PRD → Wiele Epiców
+### Scenario 1: One PRD → Multiple Epics
 
 ```bash
-# 1. Utwórz PRD
+# 1. Create PRD
 /pm:prd-new fullstack-app
 
 # 2. Parse
 /pm:prd-parse fullstack-app
 
-# 3. Split na epiki (automatyczny)
+# 3. Split into epics (automatic)
 /pm:epic-split fullstack-app
-# Rezultat: 6 epiców utworzonych
+# Result: 6 epics created
 
-# 4. Decompose KAŻDY epic
+# 4. Decompose EACH epic
 /pm:epic-decompose fullstack-app/01-infrastructure
 /pm:epic-decompose fullstack-app/02-auth-backend
 /pm:epic-decompose fullstack-app/03-product-api
@@ -335,66 +335,66 @@ File: .claude/epics/ecommerce-platform/01-infrastructure/001.md
 /pm:epic-decompose fullstack-app/05-ecommerce-ui
 /pm:epic-decompose fullstack-app/06-testing-deployment
 
-# 5. Sync WSZYSTKIE epiki naraz
+# 5. Sync ALL epics at once
 /pm:epic-sync fullstack-app
 
-# 6. Rozpocznij pracę
-/pm:next  # Zwraca pierwszy P0 task z epic 01
+# 6. Start work
+/pm:next  # Returns first P0 task from epic 01
 ```
 
 ---
 
-### Scenariusz 2: Wiele PRD → Jeden Epic Każdy
+### Scenario 2: Multiple PRDs → One Epic Each
 
 ```bash
-# 1. Utwórz wiele PRD
+# 1. Create multiple PRDs
 /pm:prd-new login-page
 /pm:prd-new product-api
 /pm:prd-new docker-setup
 
-# 2. Parse każdy
+# 2. Parse each
 /pm:prd-parse login-page
 /pm:prd-parse product-api
 /pm:prd-parse docker-setup
 
-# 3. Decompose każdy (po jednym epicu)
+# 3. Decompose each (one epic each)
 /pm:epic-decompose login-page
 /pm:epic-decompose product-api
 /pm:epic-decompose docker-setup
 
-# 4. Sync każdy
+# 4. Sync each
 /pm:epic-sync login-page
 /pm:epic-sync product-api
 /pm:epic-sync docker-setup
 
-# 5. Rozpocznij pracę
-/pm:next  # Zwraca najwyższy priorytet ze wszystkich
+# 5. Start work
+/pm:next  # Returns highest priority from all
 ```
 
 ---
 
-### Scenariusz 3: Wiele PRD → Niektóre Split, Niektóre Nie
+### Scenario 3: Multiple PRDs → Some Split, Some Not
 
 ```bash
-# PRD 1: Złożony (split)
+# PRD 1: Complex (split)
 /pm:prd-new ecommerce-platform
 /pm:prd-parse ecommerce-platform
 /pm:epic-split ecommerce-platform
 /pm:epic-decompose ecommerce-platform/01-infrastructure
 /pm:epic-decompose ecommerce-platform/02-auth-backend
-# ... (decompose wszystkie epiki)
+# ... (decompose all epics)
 
-# PRD 2: Prosty (bez split)
+# PRD 2: Simple (no split)
 /pm:prd-new email-notifications
 /pm:prd-parse email-notifications
 /pm:epic-decompose email-notifications
 
-# PRD 3: Prosty (bez split)
+# PRD 3: Simple (no split)
 /pm:prd-new admin-dashboard
 /pm:prd-parse admin-dashboard
 /pm:epic-decompose admin-dashboard
 
-# Sync wszystko
+# Sync everything
 /pm:epic-sync ecommerce-platform
 /pm:epic-sync email-notifications
 /pm:epic-sync admin-dashboard
@@ -402,9 +402,9 @@ File: .claude/epics/ecommerce-platform/01-infrastructure/001.md
 
 ---
 
-## Przykłady Praktyczne
+## Practical Examples
 
-### Przykład 1: Prosty Feature (JEDEN epic)
+### Example 1: Simple Feature (ONE epic)
 
 **Feature:** User Profile Page
 
@@ -415,10 +415,10 @@ File: .claude/epics/ecommerce-platform/01-infrastructure/001.md
 # 2. Parse
 /pm:prd-parse user-profile
 
-# 3. Decompose (JEDEN epic, bo prosty feature)
+# 3. Decompose (ONE epic, because it's simple)
 /pm:epic-decompose user-profile
 
-# Rezultat:
+# Result:
 # .claude/epics/user-profile/
 # ├── epic.md
 # ├── 001.md  # Create profile component
@@ -438,7 +438,7 @@ File: .claude/epics/ecommerce-platform/01-infrastructure/001.md
 
 ---
 
-### Przykład 2: Złożony Projekt (WIELE epiców)
+### Example 2: Complex Project (MULTIPLE epics)
 
 **Feature:** E-commerce Platform
 
@@ -449,10 +449,10 @@ File: .claude/epics/ecommerce-platform/01-infrastructure/001.md
 # 2. Parse
 /pm:prd-parse ecommerce-platform
 
-# 3. Split (automatycznie wykrywa 6 epiców)
+# 3. Split (automatically detects 6 epics)
 /pm:epic-split ecommerce-platform
 
-# Rezultat:
+# Result:
 # ✓ Epic 1: Infrastructure (Docker, PostgreSQL, Redis) - P0, 1w
 # ✓ Epic 2: Auth Backend (JWT, users, RBAC) - P0, 2w
 # ✓ Epic 3: Product API (catalog, inventory, orders) - P0, 3w
@@ -460,7 +460,7 @@ File: .claude/epics/ecommerce-platform/01-infrastructure/001.md
 # ✓ Epic 5: E-commerce UI (pages, cart, checkout) - P1, 3w
 # ✓ Epic 6: Testing & Deployment (CI/CD, tests) - P1, 1w
 
-# 4. Decompose KAŻDY epic
+# 4. Decompose EACH epic
 /pm:epic-decompose ecommerce-platform/01-infrastructure
 # Creates 12 tasks (Docker, DB, Redis, monitoring...)
 
@@ -481,14 +481,14 @@ File: .claude/epics/ecommerce-platform/01-infrastructure/001.md
 
 # TOTAL: ~90 tasks across 6 epics
 
-# 5. Sync WSZYSTKO naraz
+# 5. Sync EVERYTHING at once
 /pm:epic-sync ecommerce-platform
 
 # GitHub:
 # - Epic #1 with 90 issues
 # - Issues grouped by labels (infrastructure, auth, api, frontend, ui, testing)
 
-# 6. Równoległa praca
+# 6. Parallel work
 /pm:next  # Returns infrastructure task (P0)
 # Team 1 works on infrastructure
 # Team 2 can work on auth backend (parallel)
@@ -496,12 +496,12 @@ File: .claude/epics/ecommerce-platform/01-infrastructure/001.md
 
 ---
 
-### Przykład 3: Wiele Małych Features
+### Example 3: Multiple Small Features
 
 **Features:** Login, Signup, Password Reset
 
 ```bash
-# Strategy 1: Osobne PRD (RECOMMENDED dla niezależnych features)
+# Strategy 1: Separate PRDs (RECOMMENDED for independent features)
 /pm:prd-new login-page
 /pm:prd-new signup-page
 /pm:prd-new password-reset
@@ -518,7 +518,7 @@ File: .claude/epics/ecommerce-platform/01-infrastructure/001.md
 /pm:epic-sync signup-page
 /pm:epic-sync password-reset
 
-# Strategy 2: Jeden PRD ze split (jeśli są powiązane)
+# Strategy 2: One PRD with split (if they're related)
 /pm:prd-new authentication-system
 /pm:prd-parse authentication-system
 /pm:epic-split authentication-system
@@ -535,76 +535,76 @@ File: .claude/epics/ecommerce-platform/01-infrastructure/001.md
 
 ---
 
-## 🎯 Decyzja Flow Chart
+## 🎯 Decision Flow Chart
 
 ```
-Start: Mam nowy feature
+Start: I have a new feature
        ↓
-   [Ile komponentów?]
+   [How many components?]
        ↓
    ┌────┴────┐
    │         │
    1         2+
    │         │
-   │         └→ [Jak duży?]
+   │         └→ [How big?]
    │             ↓
    │         ┌────┴────┐
    │         │         │
-   │       Mały     Duży
+   │       Small     Large
    │         │         │
    │         │         └→ /pm:epic-split
-   │         │            decompose każdy epic
-   │         │            sync wszystko
+   │         │            decompose each epic
+   │         │            sync everything
    │         │
-   │         └→ /pm:epic-decompose (jeden epic)
+   │         └→ /pm:epic-decompose (one epic)
    │             sync
    │
-   └→ /pm:epic-decompose (jeden epic)
+   └→ /pm:epic-decompose (one epic)
       sync
 ```
 
 ---
 
-## 📊 Podsumowanie Komend
+## 📊 Command Summary
 
-| Komenda | Co robi | Kiedy używać |
-|---------|---------|--------------|
-| `/pm:prd-new` | Tworzy PRD | Zawsze na początku |
-| `/pm:prd-parse` | Analizuje PRD | Po wypełnieniu PRD |
-| `/pm:epic-split` | Dzieli na WIELE epiców | Złożone, multi-komponent |
-| `/pm:epic-decompose` | Dzieli na tasks | ZAWSZE (jeden epic lub każdy po split) |
-| `/pm:epic-sync` | Sync z GitHub/Azure | Po decompose |
-| `/pm:next` | Następny task | Gotowy do pracy |
-| `/pm:issue-start` | Rozpocznij task | Przed rozpoczęciem |
-| `/pm:issue-close` | Zamknij task | Po ukończeniu |
+| Command | What it does | When to use |
+|---------|--------------|-------------|
+| `/pm:prd-new` | Creates PRD | Always at start |
+| `/pm:prd-parse` | Analyzes PRD | After filling PRD |
+| `/pm:epic-split` | Splits into MULTIPLE epics | Complex, multi-component |
+| `/pm:epic-decompose` | Splits into tasks | ALWAYS (one epic or each after split) |
+| `/pm:epic-sync` | Sync with GitHub/Azure | After decompose |
+| `/pm:next` | Next task | Ready to work |
+| `/pm:issue-start` | Start task | Before starting |
+| `/pm:issue-close` | Close task | After completion |
 
 ---
 
 ## ❓ FAQ
 
-**Q: Czy mogę mieć wiele PRD równocześnie?**
-A: TAK. Twórz ile chcesz. Każdy jest niezależny.
+**Q: Can I have multiple PRDs simultaneously?**
+A: YES. Create as many as you want. Each is independent.
 
-**Q: Czy mogę edytować PRD po parse?**
-A: TAK. Edytuj plik `.claude/prds/feature-name.md` i uruchom `/pm:prd-parse` ponownie.
+**Q: Can I edit PRD after parse?**
+A: YES. Edit file `.claude/prds/feature-name.md` and run `/pm:prd-parse` again.
 
-**Q: Co jeśli epic-split utworzy złą liczbę epiców?**
-A: Możesz ręcznie edytować epiki w `.claude/epics/feature-name/` i dostosować.
+**Q: What if epic-split creates wrong number of epics?**
+A: You can manually edit epics in `.claude/epics/feature-name/` and adjust.
 
-**Q: Czy muszę decompose WSZYSTKIE epiki po split?**
-A: Nie musisz od razu. Możesz decompose tylko te, nad którymi zaczniesz pracę. Ale przed sync musisz decompose wszystkie.
+**Q: Do I have to decompose ALL epics after split?**
+A: You don't have to immediately. You can decompose only those you'll start working on. But before sync you must decompose all.
 
-**Q: Co jeśli chcę pracować nad wieloma PRD równocześnie?**
-A: `/pm:next` automatycznie wybiera najwyższy priorytet ze WSZYSTKICH PRD/epiców.
+**Q: What if I want to work on multiple PRDs simultaneously?**
+A: `/pm:next` automatically picks highest priority from ALL PRDs/epics.
 
-**Q: Jak ustawić priority epiców?**
-A: epic-split automatycznie ustawia (P0 dla infra/core, P1 dla UI/features). Możesz edytować ręcznie w epic.md.
+**Q: How to set epic priorities?**
+A: epic-split automatically sets (P0 for infra/core, P1 for UI/features). You can edit manually in epic.md.
 
 ---
 
 ## 🚀 Quick Start Examples
 
-### Szybki Start: Mały Feature
+### Quick Start: Small Feature
 ```bash
 /pm:prd-new my-feature
 /pm:prd-parse my-feature
@@ -613,7 +613,7 @@ A: epic-split automatycznie ustawia (P0 dla infra/core, P1 dla UI/features). Mo�
 /pm:next
 ```
 
-### Szybki Start: Duży Projekt
+### Quick Start: Large Project
 ```bash
 /pm:prd-new big-project
 /pm:prd-parse big-project
@@ -621,7 +621,7 @@ A: epic-split automatycznie ustawia (P0 dla infra/core, P1 dla UI/features). Mo�
 /pm:epic-decompose big-project/01-infrastructure
 /pm:epic-decompose big-project/02-backend
 /pm:epic-decompose big-project/03-frontend
-# ... (decompose wszystkie)
+# ... (decompose all)
 /pm:epic-sync big-project
 /pm:next
 ```
