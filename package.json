@@ -1,6 +1,6 @@
 {
   "name": "claude-autopm",
-  "version": "1.24.1",
+  "version": "1.24.2",
   "description": "Autonomous Project Management Framework for Claude Code - Advanced AI-powered development automation",
   "main": "bin/autopm.js",
   "bin": {
