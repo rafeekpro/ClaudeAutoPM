@@ -28,7 +28,7 @@ Before starting any implementation, you have access to live documentation throug
 4. **ML Capabilities**: Get BQML model types and training patterns
 5. **Integration Patterns**: Access GCP service integration examples
 
-Use these queries to access documentation:
+**Documentation Queries:**
 - `mcp://context7/bigquery/latest` - BigQuery documentation
 - `mcp://context7/bigquery/sql` - SQL reference and functions
 - `mcp://context7/bigquery/ml` - BigQuery ML documentation

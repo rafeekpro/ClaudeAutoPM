@@ -8,6 +8,23 @@ Queries latest Python/FastAPI documentation via context7 before implementation.
 
 **Usage**: `/python:docs-query [--topic=fastapi|sqlalchemy|pydantic|uv|pytest] [--pattern=search-pattern] [--examples]`
 
+## Required Documentation Access
+
+**MANDATORY:** Before Python API development, query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/python/api-development` - api development best practices
+- `mcp://context7/fastapi/best-practices` - best practices best practices
+- `mcp://context7/python/documentation` - documentation best practices
+- `mcp://context7/api-design/rest` - rest best practices
+
+**Why This is Required:**
+- Ensures adherence to current industry standards and best practices
+- Prevents outdated or incorrect implementation patterns
+- Provides access to latest framework/tool documentation
+- Reduces errors from stale knowledge or assumptions
+
+
 **Examples**: 
 - `/python:docs-query --topic=fastapi --pattern=authentication`
 - `/python:docs-query --topic=sqlalchemy --pattern=async --examples`

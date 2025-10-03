@@ -11,6 +11,22 @@ Break epic into concrete, actionable tasks.
 /pm:epic-decompose <feature_name>
 ```
 
+## Required Documentation Access
+
+**MANDATORY:** Before decomposing epics, query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/agile/epic-decomposition` - Epic breakdown best practices
+- `mcp://context7/agile/task-sizing` - Task estimation and sizing
+- `mcp://context7/agile/user-stories` - User story formats (INVEST criteria)
+- `mcp://context7/project-management/task-breakdown` - Work breakdown structure
+
+**Why This is Required:**
+- Ensures tasks follow industry-standard decomposition patterns
+- Applies current best practices for task sizing and dependencies
+- Validates task structure against proven methodologies
+- Prevents common anti-patterns in task breakdown
+
 ## Required Rules
 
 **IMPORTANT:** Before executing this command, read and follow:

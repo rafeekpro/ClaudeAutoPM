@@ -30,6 +30,150 @@ This document defines MANDATORY standards for:
 - Naming conventions (prohibitions, required patterns)
 - Code quality standards (principles, anti-patterns, checklist)
 
+### 🔴 MANDATORY: Context7 Documentation Queries
+
+**CRITICAL REQUIREMENT**: Every agent AND every PM command (new or existing) MUST include a **Documentation Queries** section with Context7 MCP links.
+
+#### For Agents
+
+**Why This is Required:**
+- Ensures agents always use the latest documentation
+- Prevents hallucinations and outdated information
+- Provides consistent, reliable guidance
+- Reduces errors from stale knowledge
+
+**Required Format in Every Agent:**
+
+```markdown
+**Documentation Queries:**
+- `mcp://context7/<library-name>/<topic>` - Description of documentation
+- `mcp://context7/<framework>/<section>` - What this covers
+```
+
+**Example (from aws-cloud-architect.md):**
+
+```markdown
+**Documentation Queries:**
+- `mcp://context7/aws/compute` - EC2, EKS, Lambda documentation
+- `mcp://context7/aws/networking` - VPC, ELB, CloudFront
+- `mcp://context7/terraform/aws` - Terraform AWS provider patterns
+```
+
+#### For Commands
+
+**Why This is Required:**
+- Ensures all workflows follow industry best practices
+- Applies proven methodologies and frameworks for the specific domain
+- Validates operations against current standards
+- Prevents anti-patterns and outdated implementation patterns
+
+**Required Format in Every Command:**
+
+```markdown
+## Required Documentation Access
+
+**MANDATORY:** Before [action], query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/agile/<topic>` - Description
+- `mcp://context7/project-management/<section>` - What this covers
+
+**Why This is Required:**
+- [Specific reasons for this command]
+```
+
+**Examples:**
+
+From PM command (epic-decompose.md):
+```markdown
+**Documentation Queries:**
+- `mcp://context7/agile/epic-decomposition` - Epic breakdown best practices
+- `mcp://context7/agile/task-sizing` - Task estimation and sizing
+- `mcp://context7/agile/user-stories` - User story formats (INVEST criteria)
+```
+
+From Infrastructure command (ssh-security.md):
+```markdown
+**Documentation Queries:**
+- `mcp://context7/security/ssh-hardening` - SSH hardening best practices
+- `mcp://context7/security/authentication` - Authentication methods
+- `mcp://context7/infrastructure/security` - Infrastructure security patterns
+```
+
+From Azure command (feature-decompose.md):
+```markdown
+**Documentation Queries:**
+- `mcp://context7/agile/feature-breakdown` - Feature breakdown patterns
+- `mcp://context7/azure-devops/features` - Azure DevOps features
+- `mcp://context7/project-management/work-breakdown` - Work breakdown structure
+```
+
+#### Obligations
+
+1. **ALWAYS** query Context7 documentation before implementing solutions
+2. **NEVER** rely solely on training data for technical specifics
+3. **VERIFY** patterns and approaches against live documentation
+4. **UPDATE** implementation when documentation shows better approaches
+
+#### Enforcement
+
+- All agent PRs must include Documentation Queries section
+- All command PRs must include Required Documentation Access section
+- Existing agents/commands without this section must be updated
+- Reviews will check for Context7 usage in implementations
+
+#### Coverage Status
+
+As of the latest update:
+- **Agents**: 45/45 (100%) have Documentation Queries
+- **Commands**: 100/100 (100%) have Required Documentation Access
+- **Total Coverage**: 145/145 framework components (100%)
+
+#### Enforcement Implementation
+
+Context7 queries are enforced automatically through:
+
+**Rules-Based Enforcement:**
+- `.claude/rules/context7-enforcement.md` - Mandatory rule read by Claude on every session
+- Zero tolerance policy for implementations without Context7 verification
+- Highest priority in rule hierarchy (equal to TDD enforcement)
+
+**Automated Hooks:**
+- `.claude/hooks/pre-command-context7.js` - Intercepts ALL command executions
+  - Extracts Documentation Queries from command files
+  - Validates Context7 section presence
+  - Blocks execution if queries missing
+  - Reminds Claude to query Context7 before implementation
+
+- `.claude/hooks/pre-agent-context7.js` - Intercepts ALL agent invocations
+  - Extracts Documentation Queries from agent files
+  - Validates Context7 section presence
+  - Blocks invocation if queries missing
+  - Reminds Claude to query Context7 before work begins
+
+**Testing Hooks:**
+```bash
+# Test command hook
+node .claude/hooks/pre-command-context7.js "/pm:epic-decompose feature-name"
+
+# Test agent hook
+node .claude/hooks/pre-agent-context7.js "@aws-cloud-architect design VPC"
+```
+
+**What Hooks Do:**
+1. ✅ Parse command/agent invocation
+2. ✅ Locate corresponding .md file
+3. ✅ Extract Documentation Queries section
+4. ✅ Display required Context7 queries
+5. ✅ Block execution if section missing
+6. ✅ Remind Claude to query Context7 before proceeding
+
+**Integration with Claude Code:**
+- Hooks run automatically when commands/agents are invoked
+- Context7 MCP queries must be performed before implementation
+- Training data alone is NEVER sufficient for technical specifics
+- API signatures, patterns, and best practices MUST be verified against live docs
+
 ## 🚀 Development Methodology
 
 ### Test-Driven Development (TDD) is MANDATORY

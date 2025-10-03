@@ -32,6 +32,23 @@ Use the ssh-operations-expert agent to create comprehensive SSH security and ope
 
 ## Example Usage
 ```
+## Required Documentation Access
+
+**MANDATORY:** Before SSH security hardening, query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/security/ssh-hardening` - ssh hardening best practices
+- `mcp://context7/security/authentication` - authentication best practices
+- `mcp://context7/infrastructure/security` - security best practices
+- `mcp://context7/security/best-practices` - best practices best practices
+
+**Why This is Required:**
+- Ensures adherence to current industry standards and best practices
+- Prevents outdated or incorrect implementation patterns
+- Provides access to latest framework/tool documentation
+- Reduces errors from stale knowledge or assumptions
+
+
 Task: Set up secure SSH infrastructure with key rotation, jump hosts, and automated remote operations
 Agent: ssh-operations-expert
 Parameters: scope=both, security_level=advanced, key_management=automated, features=tunneling,jump-hosts,automation

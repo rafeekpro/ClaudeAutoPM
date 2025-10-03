@@ -22,6 +22,23 @@ AZURE_DEVOPS_ORG=<your-organization>
 AZURE_DEVOPS_PROJECT=<your-project>
 ```
 
+## Required Documentation Access
+
+**MANDATORY:** Before decomposing Azure features, query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/agile/feature-breakdown` - feature breakdown best practices
+- `mcp://context7/azure-devops/features` - features best practices
+- `mcp://context7/agile/task-sizing` - task sizing best practices
+- `mcp://context7/project-management/work-breakdown` - work breakdown best practices
+
+**Why This is Required:**
+- Ensures adherence to current industry standards and best practices
+- Prevents outdated or incorrect implementation patterns
+- Provides access to latest framework/tool documentation
+- Reduces errors from stale knowledge or assumptions
+
+
 ## Instructions
 
 ### 1. Feature Analysis

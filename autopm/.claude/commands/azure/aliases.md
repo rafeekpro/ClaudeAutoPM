@@ -101,6 +101,23 @@ Add your team-specific aliases here:
 /az:review          → /azure:task-list --needs-review
 ```
 
+## Required Documentation Access
+
+**MANDATORY:** Before Azure DevOps integration and agile workflows, query Context7 for best practices:
+
+**Documentation Queries:**
+- `mcp://context7/azure-devops/boards` - boards best practices
+- `mcp://context7/agile/user-stories` - user stories best practices
+- `mcp://context7/project-management/work-items` - work items best practices
+- `mcp://context7/agile/sprint-planning` - sprint planning best practices
+
+**Why This is Required:**
+- Ensures adherence to current industry standards and best practices
+- Prevents outdated or incorrect implementation patterns
+- Provides access to latest framework/tool documentation
+- Reduces errors from stale knowledge or assumptions
+
+
 ## Usage Examples
 
 ```bash

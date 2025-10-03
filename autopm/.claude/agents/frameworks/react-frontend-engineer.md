@@ -34,7 +34,7 @@ Before starting any implementation, you have access to live documentation throug
 3. **Performance Updates**: Verify latest performance optimization techniques
 4. **Accessibility Standards**: Access current a11y patterns and WCAG guidelines
 
-Use these queries to access documentation:
+**Documentation Queries:**
 - `mcp://context7/react/latest` - React documentation and patterns
 - `mcp://context7/nextjs/app-router` - Next.js App Router patterns
 - `mcp://context7/typescript/react` - TypeScript + React best practices

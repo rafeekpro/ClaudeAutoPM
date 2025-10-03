@@ -27,7 +27,7 @@ Before starting any integration work, you have access to live documentation thro
 3. **Feature Availability**: Confirm feature availability across different Azure DevOps tiers
 4. **Best Practices**: Access latest integration patterns and performance recommendations
 
-Use these queries to access documentation:
+**Documentation Queries:**
 - `mcp://context7/azure-devops/rest-api/latest` - REST API documentation
 - `mcp://context7/azure-devops/pipelines/yaml` - Pipeline YAML reference
 - `mcp://context7/azure-devops/work-items/api` - Work Items API reference
