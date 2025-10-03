@@ -7,6 +7,99 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.25.0] - 2025-10-03
+
+### 🚀 Major Improvement
+
+**Bash to JavaScript Migration**
+
+Replaced 9 problematic Bash scripts with 2 clean, testable JavaScript tools.
+
+### Added
+
+**New JavaScript Tools:**
+- `epicSync.js` - Complete epic synchronization workflow
+  - Replaces 4 Bash scripts in `epic-sync/`
+  - Creates epic and task GitHub issues
+  - Updates epic files with GitHub URLs
+  - Renames task files to match issue numbers
+  - 600 lines of clean, testable code
+
+- `issueSync.js` - Complete issue synchronization workflow
+  - Replaces 5 Bash scripts in `issue-sync/` (~2000 lines)
+  - Gathers updates from multiple sources
+  - Formats and posts GitHub comments
+  - Updates frontmatter after sync
+  - Preflight validation
+  - 700 lines of clean, testable code
+
+### Changed
+
+**Code Quality Improvements:**
+- 📉 50% code reduction (2500 → 1300 lines)
+- ✅ Zero parsing errors (eliminated heredoc/awk/sed complexity)
+- 🧪 Fully testable (all functions exported for unit tests)
+- 📖 More readable and maintainable
+- 🚀 Faster execution (no subprocess overhead)
+- 💾 Better error handling with try/catch
+- 🔍 Easier debugging with stack traces
+
+**Documentation:**
+- Added "Advanced Tools" section to README.md
+- Usage examples with correct `.claude/` paths
+- Feature descriptions for both tools
+- Migration rationale and benefits
+
+### Fixed
+
+- Bash parsing errors: `Error: (eval):1: parse error near `)`
+- Complex shell escaping issues in heredocs
+- awk/sed pattern complexity
+- Hard-to-debug Bash scripts
+
+### Deprecated
+
+**Bash scripts remain for backward compatibility but are deprecated:**
+- `autopm/.claude/scripts/pm/epic-sync/*.sh` (4 files)
+- `autopm/.claude/scripts/pm/issue-sync/*.sh` (5 files)
+
+**Recommendation:** Use new JavaScript tools for all new workflows.
+
+### Technical Details
+
+**epicSync.js Functions:**
+- `createEpicIssue()` - Create main epic issue
+- `createTaskIssues()` - Create all task issues
+- `updateEpicFile()` - Update epic.md with URLs
+- `updateTaskReferences()` - Rename and update task files
+- `syncEpic()` - Full workflow orchestration
+
+**issueSync.js Functions:**
+- `gatherUpdates()` - Collect updates from sources
+- `formatComment()` - Format GitHub comment
+- `postComment()` - Post to GitHub issue
+- `updateFrontmatterAfterSync()` - Update local files
+- `preflightValidation()` - Validate before sync
+- `syncIssue()` - Full workflow orchestration
+
+## [1.24.2] - 2025-10-03
+
+### Fixed
+- Epic sync task creation parsing errors
+
+## [1.24.1] - 2025-10-03
+
+### Fixed
+- Node.js epic sync tasks tool
+
+## [1.24.0] - 2025-10-03
+
+### Added
+- Context Management System (3 commands + 4 templates)
+- Context7 Zero Tolerance Enforcement
+- Agent Task Creation Enhancement (11 agents)
+- Documentation cleanup (fixed 33 invalid command references)
+
 ## [1.21.0] - 2025-01-10
 
 ### 📚 Documentation

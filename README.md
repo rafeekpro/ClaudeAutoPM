@@ -328,6 +328,79 @@ claude --dangerously-skip-permissions .
 
 ---
 
+## 🔧 Advanced Tools
+
+### Epic Sync (JavaScript)
+
+Complete epic synchronization workflow in one command:
+
+```bash
+# Full epic sync (create epic + tasks + update references)
+node .claude/lib/commands/pm/epicSync.js sync fullstack/01-infrastructure
+
+# Individual operations
+node .claude/lib/commands/pm/epicSync.js create-epic fullstack/01-infrastructure
+node .claude/lib/commands/pm/epicSync.js create-tasks fullstack/01-infrastructure 2
+node .claude/lib/commands/pm/epicSync.js update-epic fullstack/01-infrastructure 2
+```
+
+**Features:**
+- Creates GitHub epic issue with labels and stats
+- Creates task issues for all tasks in epic
+- Updates epic file with GitHub URLs
+- Renames task files to match issue numbers
+- Updates all cross-references automatically
+
+### Issue Sync (JavaScript)
+
+Synchronize local development progress with GitHub issues:
+
+```bash
+# Full sync workflow
+node .claude/lib/commands/pm/issueSync.js sync 123 .claude/epics/auth/updates/123
+
+# Mark task as complete
+node .claude/lib/commands/pm/issueSync.js sync 456 ./updates --complete
+
+# Dry run (preview without posting)
+node .claude/lib/commands/pm/issueSync.js sync 789 ./updates --dry-run
+
+# Individual operations
+node .claude/lib/commands/pm/issueSync.js gather 123 ./updates
+node .claude/lib/commands/pm/issueSync.js format 123 ./updates
+```
+
+**Features:**
+- Gathers updates from multiple sources (progress, notes, commits)
+- Formats professional GitHub comments
+- Posts updates to issues
+- Updates frontmatter with sync timestamps
+- Preflight validation (auth, issue exists, etc.)
+- Supports completion workflow
+
+**What gets synced:**
+- Progress updates and completion %
+- Technical notes and decisions
+- Recent commits (auto-detected or manual)
+- Acceptance criteria updates
+- Next steps and blockers
+
+### Why JavaScript Tools?
+
+**Replaced 9 Bash scripts** (~2500 lines) with **2 JavaScript tools** (~1300 lines):
+
+**Benefits:**
+- ✅ Zero parsing errors (no heredoc/awk/sed complexity)
+- 🧪 Fully testable (all functions exported)
+- 📖 More readable and maintainable
+- 🚀 50% less code
+- 💾 Better error handling
+- 🔍 Easier debugging
+
+**Backward compatible:** Old Bash scripts still work, but new JS tools are recommended.
+
+---
+
 ## 🤝 Contributing
 
 We welcome contributions! See [CONTRIBUTING.md](docs/development/contributing.md) for:
