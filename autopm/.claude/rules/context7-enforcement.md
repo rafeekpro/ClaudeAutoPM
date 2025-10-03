@@ -2,6 +2,41 @@
 
 > **CRITICAL**: This rule has HIGHEST PRIORITY. ALL commands and agents MUST query Context7 before execution.
 
+---
+
+## 🔴 VISUAL REMINDER FOR EVERY COMMAND/AGENT
+
+**WHEN YOU SEE:** User writes `/pm:epic-decompose` or `@aws-cloud-architect`
+
+**YOU MUST IMMEDIATELY:**
+
+1. 📖 **ANNOUNCE**: "I will now query Context7 for required documentation..."
+2. 🔍 **READ** the command/agent file to extract Documentation Queries
+3. 🌐 **QUERY** Context7 MCP for EACH listed topic using mcp__context7__get-library-docs
+4. 📝 **SUMMARIZE** key findings from Context7 results
+5. ✅ **CONFIRM**: "Context7 verification complete. Proceeding with [command/agent]..."
+
+**VISUAL OUTPUT FOR USER:**
+
+```
+🔒 Context7 Enforcement Active
+
+📋 Command: /pm:epic-decompose
+📚 Querying Context7 for required documentation...
+
+   ➜ mcp://context7/agile/epic-decomposition
+   ➜ mcp://context7/agile/task-sizing
+   ➜ mcp://context7/agile/user-stories
+   ➜ mcp://context7/project-management/task-breakdown
+
+✅ Context7 queries complete
+📖 Key findings: [summarize what you learned]
+
+Proceeding with epic decomposition using Context7 best practices...
+```
+
+---
+
 ## Core Context7 Philosophy
 
 **Prime Directive**: Query live documentation from Context7 MCP BEFORE implementing any solution.
