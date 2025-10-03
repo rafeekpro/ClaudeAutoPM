@@ -11,6 +11,21 @@ Push epic and tasks to GitHub as issues using modular scripts.
 /pm:epic-sync <feature_name>
 ```
 
+## Quick Start
+
+The simplest way to sync an epic to GitHub:
+
+```bash
+# Full automated sync (recommended)
+bash .claude/scripts/pm/epic-sync.sh "$ARGUMENTS"
+```
+
+This orchestration script automatically runs all 4 steps:
+1. Creates epic issue
+2. Creates task issues
+3. Renames files to issue numbers
+4. Updates all references
+
 ## Quick Check
 
 ```bash
@@ -32,7 +47,14 @@ If no tasks found: "❌ No tasks to sync. Run: /pm:epic-decompose $ARGUMENTS"
 
 ## Instructions
 
-The epic sync process is now modularized into 4 specialized scripts that handle different aspects of the synchronization. Each script is designed for reliability, testability, and maintainability.
+**⚡ Quick Command:**
+```bash
+bash .claude/scripts/pm/epic-sync.sh "$ARGUMENTS"
+```
+
+The epic sync process is modularized into 4 specialized scripts that handle different aspects of the synchronization. Each script is designed for reliability, testability, and maintainability.
+
+The orchestration script (`.claude/scripts/pm/epic-sync.sh`) automatically runs all 4 steps in sequence. The individual scripts are documented below for reference and debugging.
 
 ### Processing Mode Detection
 
@@ -158,13 +180,24 @@ echo "✅ Created branch: epic/$ARGUMENTS"
 
 ## Complete Workflow Examples
 
-### Single Epic Workflow
+### Single Epic Workflow (Automated - Recommended)
 
-Here's the complete modular epic sync workflow for a single epic:
+The **easiest way** is to use the orchestration script that handles everything:
+
+```bash
+# One command does it all!
+bash .claude/scripts/pm/epic-sync.sh "$ARGUMENTS"
+```
+
+This automatically runs all 4 steps and provides a complete summary.
+
+### Single Epic Workflow (Manual Steps)
+
+If you need to run steps individually for debugging:
 
 ```bash
 #!/bin/bash
-# Complete epic sync using modular scripts
+# Complete epic sync using modular scripts (manual)
 
 EPIC_NAME="$ARGUMENTS"
 
