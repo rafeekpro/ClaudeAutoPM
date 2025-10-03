@@ -129,6 +129,51 @@ As of the latest update:
 - **Commands**: 100/100 (100%) have Required Documentation Access
 - **Total Coverage**: 145/145 framework components (100%)
 
+#### Enforcement Implementation
+
+Context7 queries are enforced automatically through:
+
+**Rules-Based Enforcement:**
+- `.claude/rules/context7-enforcement.md` - Mandatory rule read by Claude on every session
+- Zero tolerance policy for implementations without Context7 verification
+- Highest priority in rule hierarchy (equal to TDD enforcement)
+
+**Automated Hooks:**
+- `.claude/hooks/pre-command-context7.js` - Intercepts ALL command executions
+  - Extracts Documentation Queries from command files
+  - Validates Context7 section presence
+  - Blocks execution if queries missing
+  - Reminds Claude to query Context7 before implementation
+
+- `.claude/hooks/pre-agent-context7.js` - Intercepts ALL agent invocations
+  - Extracts Documentation Queries from agent files
+  - Validates Context7 section presence
+  - Blocks invocation if queries missing
+  - Reminds Claude to query Context7 before work begins
+
+**Testing Hooks:**
+```bash
+# Test command hook
+node .claude/hooks/pre-command-context7.js "/pm:epic-decompose feature-name"
+
+# Test agent hook
+node .claude/hooks/pre-agent-context7.js "@aws-cloud-architect design VPC"
+```
+
+**What Hooks Do:**
+1. ✅ Parse command/agent invocation
+2. ✅ Locate corresponding .md file
+3. ✅ Extract Documentation Queries section
+4. ✅ Display required Context7 queries
+5. ✅ Block execution if section missing
+6. ✅ Remind Claude to query Context7 before proceeding
+
+**Integration with Claude Code:**
+- Hooks run automatically when commands/agents are invoked
+- Context7 MCP queries must be performed before implementation
+- Training data alone is NEVER sufficient for technical specifics
+- API signatures, patterns, and best practices MUST be verified against live docs
+
 ## 🚀 Development Methodology
 
 ### Test-Driven Development (TDD) is MANDATORY
