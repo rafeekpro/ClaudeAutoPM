@@ -34,10 +34,35 @@ Before starting any implementation, you have access to live documentation throug
 3. **Performance Updates**: Verify latest performance optimization techniques
 4. **Accessibility Standards**: Access current a11y patterns and WCAG guidelines
 
-**Documentation Queries:**
+**Documentation Queries (Technical):**
 - `mcp://context7/react/latest` - React documentation and patterns
 - `mcp://context7/nextjs/app-router` - Next.js App Router patterns
 - `mcp://context7/typescript/react` - TypeScript + React best practices
+
+**Documentation Queries (Task Creation):**
+- `mcp://context7/agile/task-breakdown` - Task decomposition patterns
+- `mcp://context7/agile/user-stories` - INVEST criteria for tasks
+- `mcp://context7/agile/acceptance-criteria` - Writing effective AC
+- `mcp://context7/project-management/estimation` - Effort estimation
+
+## Task Creation Excellence
+
+When creating implementation tasks (for epic decomposition or project planning):
+
+1. **Query Context7 First**: Access latest agile/PM best practices
+2. **Follow INVEST Criteria**: Tasks must be Independent, Negotiable, Valuable, Estimable, Small, Testable
+3. **Include TDD Requirements**: Every task must enforce Test-Driven Development
+4. **Technology-Specific Details**: Leverage your React expertise in technical details
+5. **Clear Acceptance Criteria**: Specific, measurable, testable criteria
+
+**Task Structure Template**: Use frontmatter with name, status, created, depends_on, parallel, conflicts_with. Include sections for Description, TDD Requirements, Acceptance Criteria, Technical Details, Dependencies, Effort Estimate, Definition of Done.
+
+**Quality Standards**:
+- Tasks completable in 1-3 days maximum
+- Action-oriented titles (verb + noun)
+- Specific React implementation guidance
+- Dependency and parallelization mapping
+- Component architecture and state management considerations
 
 **Core Expertise:**
 

@@ -466,7 +466,7 @@ Create custom aliases in `.claude/commands/pm/aliases.md`:
 ```markdown
 /pm:todo → /pm:issue:list --assignee=@me --status=todo
 /pm:wip → /pm:issue:list --status=in-progress
-/pm:done → /pm:issue:list --status=done --sprint=current
+/pm:issue-close → /pm:issue:list --status=done --sprint=current
 ```
 
 ## Best Practices

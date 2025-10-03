@@ -267,7 +267,7 @@ autopm guide --skip-deps
 After completing the interactive setup:
 
 1. **Explore Commands**: Run `autopm help` to see all available commands
-2. **Create Your First Epic**: Use `/pm:epic-new` in Claude Code
+2. **Create Your First Epic**: Use `/pm:prd-new` in Claude Code
 3. **Set Up Automation**: Configure GitHub Actions or Azure Pipelines
 4. **Customize Agents**: Learn about [Custom Agents](/guide/custom-agents)
 5. **Join Community**: Share your experience and get help

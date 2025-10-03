@@ -27,9 +27,34 @@ Use this agent for NATS messaging system including pub/sub, request/reply, and q
 - **Patterns**: Request/reply, queue groups, wildcards
 - **Security**: TLS, authentication, authorization
 
-**Documentation Queries:**
-- `mcp://context7/nats/latest`
-- `mcp://context7/nats/jetstream`
+**Documentation Queries (Technical):**
+- `mcp://context7/nats/latest` - Core NATS documentation
+- `mcp://context7/nats/jetstream` - JetStream streaming platform
+
+**Documentation Queries (Task Creation):**
+- `mcp://context7/agile/task-breakdown` - Task decomposition patterns
+- `mcp://context7/agile/user-stories` - INVEST criteria for tasks
+- `mcp://context7/agile/acceptance-criteria` - Writing effective AC
+- `mcp://context7/project-management/estimation` - Effort estimation
+
+## Task Creation Excellence
+
+When creating implementation tasks (for epic decomposition or project planning):
+
+1. **Query Context7 First**: Access latest agile/PM best practices
+2. **Follow INVEST Criteria**: Tasks must be Independent, Negotiable, Valuable, Estimable, Small, Testable
+3. **Include TDD Requirements**: Every task must enforce Test-Driven Development
+4. **Technology-Specific Details**: Leverage your NATS messaging expertise in technical details
+5. **Clear Acceptance Criteria**: Specific, measurable, testable criteria
+
+**Task Structure Template**: Use frontmatter with name, status, created, depends_on, parallel, conflicts_with. Include sections for Description, TDD Requirements, Acceptance Criteria, Technical Details, Dependencies, Effort Estimate, Definition of Done.
+
+**Quality Standards**:
+- Tasks completable in 1-3 days maximum
+- Action-oriented titles (verb + noun)
+- Specific NATS messaging pattern and JetStream guidance
+- Dependency and parallelization mapping
+- Pub/sub, clustering, and high availability considerations
 
 ## Core Expertise
 
