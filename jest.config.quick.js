@@ -17,7 +17,7 @@ module.exports = {
     '/test/installation/',
     '/test/scripts/',
     '/test/node-scripts/',
-    '/test/providers/',
+    '/test/providers/**/*.test.js',
     '/test/cli/basic-commands.test.js',
     '/test/cli/autopm-commands.test.js',
     '/test/cli/config-command.test.js',
