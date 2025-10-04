@@ -18,7 +18,7 @@ describe('GitHub Issue Show Provider', () => {
     originalEnv = { ...process.env };
 
     // Ensure mock mode is enabled for tests
-    delete process.env.AUTOPM_USE_REAL_API;
+    process.env.AUTOPM_USE_REAL_API = 'false';
   });
 
   afterEach(() => {
