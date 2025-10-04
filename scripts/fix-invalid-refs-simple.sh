@@ -13,19 +13,23 @@ safe_replace() {
   local old="$1"
   local new="$2"
   local desc="$3"
+  local count=0
 
   echo "Replacing: $old → $new ($desc)"
 
   # Find and replace (exclude our analysis docs)
-  find . -name "*.md" -type f ! -path "*/MISSING-COMMANDS-ANALYSIS.md" ! -path "*/node_modules/*" -exec grep -l "$old" {} \; 2>/dev/null | while read file; do
+  while IFS= read -r file; do
     if [[ "$OSTYPE" == "darwin"* ]]; then
       sed -i '' "s|$old|$new|g" "$file"
     else
       sed -i "s|$old|$new|g" "$file"
     fi
     echo "  ✓ $file"
-    ((total++)) || true
-  done
+    ((count++))
+  done < <(find . -name "*.md" -type f ! -path "*/MISSING-COMMANDS-ANALYSIS.md" ! -path "*/node_modules/*" -exec grep -l "$old" {} \; 2>/dev/null)
+
+  ((total += count))
+  echo "  Updated: $count file(s)"
 }
 
 # Replacements
@@ -39,6 +43,7 @@ safe_replace "/pm:prd-split" "/pm:epic-split" "split after parse"
 
 echo ""
 echo "✅ Replacements complete!"
+echo "📊 Total files updated: $total"
 echo ""
 echo "📝 Note: The following invalid commands still exist in docs:"
 echo "   - Azure commands (/pm:azure-*)"

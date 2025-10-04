@@ -71,11 +71,12 @@ remove_from_file() {
   local cmd="$2"
 
   if grep -q "$cmd" "$file" 2>/dev/null; then
-    # Remove lines containing the command
+    # Remove lines containing the command (with word boundary)
+    # Match only whole command tokens, not substrings
     if [[ "$OSTYPE" == "darwin"* ]]; then
-      sed -i '' "/$cmd/d" "$file"
+      sed -i '' -E "/([[:space:]]|^)${cmd}([[:space:]]|\$|[[:punct:]])/d" "$file"
     else
-      sed -i "/$cmd/d" "$file"
+      sed -i -E "/([[:space:]]|^)${cmd}([[:space:]]|\$|[[:punct:]])/d" "$file"
     fi
     echo "  ✗ $file: removed $cmd"
     ((total_changes++))
