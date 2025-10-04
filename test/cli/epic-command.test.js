@@ -32,7 +32,6 @@ describe('Epic Command', () => {
 
       // Mock epic-status.sh script execution
       if (cmd.includes('epic-status.sh')) {
-        console.log('Mocked epic status output');
         return '';
       }
 
