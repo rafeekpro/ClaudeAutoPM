@@ -169,7 +169,7 @@ This is the body content.
 
       const body = stripFrontmatter(testFile);
 
-      assert.strictEqual(body, '');
+      assert.strictEqual(body, '# Content\n\nJust content.');
     });
   });
 
