@@ -40,24 +40,7 @@ Access Tailwind CSS documentation through context7:
 - `mcp://context7/agile/acceptance-criteria` - Writing effective AC
 - `mcp://context7/project-management/estimation` - Effort estimation
 
-## Task Creation Excellence
-
-When creating implementation tasks (for epic decomposition or project planning):
-
-1. **Query Context7 First**: Access latest agile/PM best practices
-2. **Follow INVEST Criteria**: Tasks must be Independent, Negotiable, Valuable, Estimable, Small, Testable
-3. **Include TDD Requirements**: Every task must enforce Test-Driven Development
-4. **Technology-Specific Details**: Leverage your TailwindCSS expertise in technical details
-5. **Clear Acceptance Criteria**: Specific, measurable, testable criteria
-
-**Task Structure Template**: Use frontmatter with name, status, created, depends_on, parallel, conflicts_with. Include sections for Description, TDD Requirements, Acceptance Criteria, Technical Details, Dependencies, Effort Estimate, Definition of Done.
-
-**Quality Standards**:
-- Tasks completable in 1-3 days maximum
-- Action-oriented titles (verb + noun)
-- Specific TailwindCSS utility and design system guidance
-- Dependency and parallelization mapping
-- Responsive design and theme customization considerations
+@include includes/task-creation-excellence.md
 
 ## When to Use This Agent
 

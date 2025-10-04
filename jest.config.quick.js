@@ -16,8 +16,13 @@ module.exports = {
     '/test/integration/',
     '/test/installation/',
     '/test/scripts/',
+    '/test/node-scripts/',
+    '/test/providers/',
     '/test/cli/basic-commands.test.js',
-    '/test/cli/autopm-commands.test.js'
+    '/test/cli/autopm-commands.test.js',
+    '/test/cli/config-command.test.js',
+    '/test/cli/epic-command.test.js',
+    '/test/cli/mcp-command.test.js'
   ],
 
   // Coverage settings
