@@ -1,6 +1,7 @@
 const { describe, it, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
-const fs = require('fs-extra');
+const fs = require('fs').promises;
+const fsSync = require('fs');
 const path = require('path');
 const os = require('os');
 
@@ -14,7 +15,7 @@ describe('ConfigCommand', () => {
 
   beforeEach(async () => {
     // Create temp directory for tests
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'config-test-'));
+    tempDir = fsSync.mkdtempSync(path.join(os.tmpdir(), 'config-test-'));
 
     // Save original working directory and environment
     originalCwd = process.cwd();
@@ -24,7 +25,7 @@ describe('ConfigCommand', () => {
     process.chdir(tempDir);
 
     // Create .claude directory
-    await fs.ensureDir(path.join(tempDir, '.claude'));
+    await fs.mkdir(path.join(tempDir, '.claude'), { recursive: true });
 
     // Create new command instance
     cmd = new ConfigCommand();
@@ -36,8 +37,8 @@ describe('ConfigCommand', () => {
     process.chdir(originalCwd);
 
     // Clean up temp directory
-    if (tempDir && await fs.pathExists(tempDir)) {
-      await fs.remove(tempDir);
+    if (tempDir && fsSync.existsSync(tempDir)) {
+      await fs.rm(tempDir, { recursive: true, force: true });
     }
   });
 
@@ -58,7 +59,7 @@ describe('ConfigCommand', () => {
         }
       };
 
-      await fs.writeJson(cmd.configPath, testConfig);
+      await fs.writeFile(cmd.configPath, JSON.stringify(testConfig, null, 2));
 
       const config = await cmd.loadConfig();
       assert.deepStrictEqual(config, testConfig);
@@ -86,18 +87,18 @@ describe('ConfigCommand', () => {
 
       await cmd.saveConfig(testConfig);
 
-      const saved = await fs.readJson(cmd.configPath);
+      const saved = JSON.parse(await fs.readFile(cmd.configPath, 'utf8'));
       assert.deepStrictEqual(saved, testConfig);
     });
 
     it('should create directory if not exists', async () => {
       // Remove .claude directory
-      await fs.remove(path.join(tempDir, '.claude'));
+      await fs.rm(path.join(tempDir, '.claude'), { recursive: true, force: true });
 
       const testConfig = { provider: 'github' };
       await cmd.saveConfig(testConfig);
 
-      assert.ok(await fs.pathExists(cmd.configPath));
+      assert.ok(fsSync.existsSync(cmd.configPath));
     });
 
     it('should format JSON with 2 spaces', async () => {
@@ -234,8 +235,8 @@ describe('ConfigCommand', () => {
       process.env.GITHUB_TOKEN = 'test_token';
 
       // Create required directories
-      await fs.ensureDir(path.join(tempDir, '.claude', 'agents'));
-      await fs.ensureDir(path.join(tempDir, '.claude', 'commands'));
+      await fs.mkdir(path.join(tempDir, '.claude', 'agents'), { recursive: true });
+      await fs.mkdir(path.join(tempDir, '.claude', 'commands'), { recursive: true });
 
       const valid = await cmd.validate();
       assert.strictEqual(valid, true);
@@ -287,8 +288,8 @@ describe('ConfigCommand', () => {
 
       process.env.AZURE_DEVOPS_PAT = 'test_token';
 
-      await fs.ensureDir(path.join(tempDir, '.claude', 'agents'));
-      await fs.ensureDir(path.join(tempDir, '.claude', 'commands'));
+      await fs.mkdir(path.join(tempDir, '.claude', 'agents'), { recursive: true });
+      await fs.mkdir(path.join(tempDir, '.claude', 'commands'), { recursive: true });
 
       const valid = await cmd.validate();
       assert.strictEqual(valid, true);
