@@ -29,7 +29,12 @@ describe('ProviderRouter', () => {
   afterEach(() => {
     // Restore environment and working directory
     process.env = originalEnv;
-    process.chdir(originalCwd);
+    try {
+      process.chdir(originalCwd);
+    } catch (err) {
+      // Log the error or handle it as needed for the test environment
+      console.error('Failed to restore working directory:', err);
+    }
 
     // Clean up temp directory
     if (tempDir && fs.existsSync(tempDir)) {
