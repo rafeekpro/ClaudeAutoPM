@@ -21,14 +21,18 @@ const { parseFrontmatter } = require('../../autopm/.claude/lib/frontmatter');
 describe('Local PRD Management', () => {
   const testDir = path.join(__dirname, 'test-workspace-prd');
   const prdsDir = path.join(testDir, '.claude', 'prds');
+  let originalCwd;
 
   beforeEach(async () => {
     // Setup test directory structure
     await fs.mkdir(prdsDir, { recursive: true });
+    originalCwd = process.cwd();
     process.chdir(testDir);
   });
 
   afterEach(async () => {
+    // Restore original working directory before cleanup
+    process.chdir(originalCwd);
     // Cleanup
     await fs.rm(testDir, { recursive: true, force: true });
   });
