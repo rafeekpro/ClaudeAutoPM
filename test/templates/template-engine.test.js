@@ -24,10 +24,12 @@ describe('Template Engine - Comprehensive Jest Tests', () => {
   let builtInDir;
   let userDir;
   let engine;
+  const tempDirs = []; // Track all temp dirs for cleanup
 
   beforeEach(() => {
     // Create isolated test environment (NO process.chdir!)
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'template-engine-test-'));
+    tempDirs.push(tempDir); // Track for cleanup
 
     // Create user template directories with absolute paths
     userDir = path.join(tempDir, '.claude', 'templates');
@@ -45,11 +47,17 @@ describe('Template Engine - Comprehensive Jest Tests', () => {
     engine = new TemplateEngine(builtInDir, userDir);
   });
 
-  afterEach(() => {
-    // Clean up temp directory
-    if (fs.existsSync(tempDir)) {
-      fs.rmSync(tempDir, { recursive: true, force: true });
-    }
+  // Cleanup ALL temp dirs after all tests complete (safer than afterEach)
+  afterAll(() => {
+    tempDirs.forEach(dir => {
+      if (fs.existsSync(dir)) {
+        try {
+          fs.rmSync(dir, { recursive: true, force: true });
+        } catch (err) {
+          // Ignore cleanup errors
+        }
+      }
+    });
   });
 
   describe('Template Discovery', () => {
