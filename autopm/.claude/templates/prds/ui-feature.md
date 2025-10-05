@@ -54,10 +54,10 @@ Following INVEST principles (Independent, Negotiable, Valuable, Estimable, Small
 - **Responsive Breakpoints**: Mobile (320px+), Tablet (768px+), Desktop (1024px+)
 
 ### Design Assets
-- **Wireframes**: {{wireframe_link}}
-- **Mockups**: {{design_link}}
-- **Design System**: {{design_system}}
-- **Brand Guidelines**: {{brand_guidelines}}
+- **Wireframes**: {{wireframe_link}} <!-- e.g. https://figma.com/file/xyz or /assets/wireframes/homepage.png -->
+- **Mockups**: {{design_link}} <!-- e.g. https://invisionapp.com/mockup/abc or /assets/mockups/modal.jpg -->
+- **Design System**: {{design_system}} <!-- e.g. https://company.com/design-system or /docs/design-system.md -->
+- **Brand Guidelines**: {{brand_guidelines}} <!-- e.g. https://company.com/brand-guidelines.pdf or /assets/brand-guidelines.pdf -->
 
 ### Accessibility (WCAG 2.1 Level AA - 2025 Compliance)
 
