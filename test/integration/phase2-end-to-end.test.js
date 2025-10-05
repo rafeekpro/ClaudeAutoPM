@@ -115,7 +115,7 @@ status: pending
 priority: high
 estimated_hours: 4
 created: 2025-01-01
-dependencies: ['task-${firstEpic.id}-001']
+dependencies: [`task-${firstEpic.id}-001`]
 ---
 
 # Create login UI component
