@@ -44,7 +44,7 @@ Local PRD Management
     ✓ should accept custom author in options
     ✓ should accept custom priority in options
     ✓ should include template sections in body
-    ✓ should throw error if PRD already exists with same name
+    ✓ should allow duplicate PRD names by generating unique IDs and filenames
     ✓ should handle names with special characters
     ✓ should handle names with multiple spaces
     ✓ should validate required name parameter
