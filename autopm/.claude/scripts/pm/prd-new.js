@@ -1,16 +1,282 @@
 #!/usr/bin/env node
 /**
  * PRD New - Launch brainstorming for new product requirement
+ *
+ * Supports:
+ * - Template-based creation (--template flag)
+ * - Interactive template selection
+ * - Traditional brainstorming mode (backwards compatible)
  */
 
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 
+// Dynamically resolve template engine path
+// This works both in installed projects and during testing
+let TemplateEngine;
+try {
+  // Try relative path from .claude/scripts/pm/
+  TemplateEngine = require(path.join(__dirname, '..', '..', '..', '..', 'lib', 'template-engine'));
+} catch (err) {
+  try {
+    // Try from project root
+    TemplateEngine = require(path.join(process.cwd(), 'lib', 'template-engine'));
+  } catch (err2) {
+    // Fallback to relative
+    TemplateEngine = require('../../../../lib/template-engine');
+  }
+}
+
 class PrdCreator {
   constructor() {
     this.prdsDir = path.join('.claude', 'prds');
     this.templatesDir = path.join(__dirname, '..', '..', 'templates');
+    this.templateEngine = new TemplateEngine();
+  }
+
+  /**
+   * Create PRD from template
+   */
+  async createPrdFromTemplate(prdName, templateName) {
+    console.log(`\n🚀 Creating PRD from Template: ${templateName}`);
+    console.log(`${'═'.repeat(50)}\n`);
+
+    // Ensure PRDs directory exists
+    if (!fs.existsSync(this.prdsDir)) {
+      fs.mkdirSync(this.prdsDir, { recursive: true });
+    }
+
+    // Check if PRD already exists
+    const prdFile = path.join(this.prdsDir, `${prdName}.md`);
+    if (fs.existsSync(prdFile)) {
+      console.error(`❌ PRD already exists: ${prdName}`);
+      console.log(`💡 Edit file: .claude/prds/${prdName}.md`);
+      return false;
+    }
+
+    // Find template
+    const templatePath = this.templateEngine.findTemplate('prds', templateName);
+    if (!templatePath) {
+      console.error(`❌ Template not found: ${templateName}`);
+      console.log(`💡 List available templates: autopm template:list`);
+      return false;
+    }
+
+    // Read template to find required variables
+    const templateContent = fs.readFileSync(templatePath, 'utf8');
+    const requiredVars = this.extractTemplateVariables(templateContent);
+
+    // Prompt for variables
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+
+    const prompt = (question) => new Promise((resolve) => {
+      rl.question(question, resolve);
+    });
+
+    try {
+      console.log(`📋 Template: ${templateName}`);
+      console.log(`Fill in the following details:\n`);
+
+      const variables = {
+        title: prdName.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+        type: 'prd'
+      };
+
+      // Prompt for common variables
+      const title = await prompt(`Title [${variables.title}]: `);
+      if (title) variables.title = title;
+
+      const priority = await prompt('Priority (P0/P1/P2/P3) [P2]: ');
+      variables.priority = priority || 'P2';
+
+      const timeline = await prompt('Timeline [TBD]: ');
+      variables.timeline = timeline || 'TBD';
+
+      // Prompt for template-specific variables
+      const templateSpecific = this.getTemplateSpecificPrompts(templateName);
+      for (const varName of templateSpecific) {
+        if (!variables[varName]) {
+          const value = await prompt(`${varName.replace(/_/g, ' ')}: `);
+          variables[varName] = value || '';
+        }
+      }
+
+      // Render template
+      const rendered = this.templateEngine.renderFile(templatePath, variables);
+
+      // Write PRD file
+      fs.writeFileSync(prdFile, rendered);
+
+      console.log('\n✅ PRD created successfully!');
+      console.log(`📄 File: ${prdFile}`);
+
+      // Show next steps
+      this.showNextSteps(prdName);
+
+      return true;
+    } finally {
+      rl.close();
+    }
+  }
+
+  /**
+   * Extract variables from template
+   */
+  extractTemplateVariables(template) {
+    const varRegex = /\{\{(\w+)\}\}/g;
+    const vars = new Set();
+    let match;
+
+    while ((match = varRegex.exec(template)) !== null) {
+      vars.add(match[1]);
+    }
+
+    // Remove auto-generated variables
+    vars.delete('id');
+    vars.delete('timestamp');
+    vars.delete('date');
+    vars.delete('author');
+
+    return Array.from(vars);
+  }
+
+  /**
+   * Get template-specific prompts
+   */
+  getTemplateSpecificPrompts(templateName) {
+    const prompts = {
+      'api-feature': [
+        'api_purpose',
+        'problem',
+        'business_value',
+        'http_method',
+        'api_endpoint',
+        'auth_method',
+        'rate_limit',
+        'user_role',
+        'api_action',
+        'user_benefit'
+      ],
+      'ui-feature': [
+        'component_type',
+        'feature_purpose',
+        'problem',
+        'user_need',
+        'user_goal',
+        'user_role',
+        'user_action',
+        'user_benefit'
+      ],
+      'bug-fix': [
+        'bug_summary',
+        'severity',
+        'user_impact',
+        'step_1',
+        'step_2',
+        'step_3',
+        'expected_behavior',
+        'actual_behavior',
+        'root_cause',
+        'solution_approach'
+      ],
+      'data-migration': [
+        'migration_purpose',
+        'current_state',
+        'desired_state',
+        'affected_tables',
+        'data_volume',
+        'migration_strategy'
+      ],
+      'documentation': [
+        'doc_type',
+        'target_audience',
+        'documentation_scope',
+        'current_gaps'
+      ]
+    };
+
+    return prompts[templateName] || [];
+  }
+
+  /**
+   * Show interactive template selection
+   */
+  async selectTemplate() {
+    const templates = this.templateEngine.listTemplates('prds');
+
+    if (templates.length === 0) {
+      console.log('No templates available');
+      return null;
+    }
+
+    console.log('\n📋 Available Templates:');
+
+    const builtIn = templates.filter(t => !t.custom);
+    const custom = templates.filter(t => t.custom);
+
+    let index = 1;
+    const options = [];
+
+    builtIn.forEach(t => {
+      const description = this.getTemplateDescription(t.name);
+      console.log(`${index}. ${t.name.padEnd(20)} - ${description}`);
+      options.push(t.name);
+      index++;
+    });
+
+    if (custom.length > 0) {
+      console.log('\nCustom Templates:');
+      custom.forEach(t => {
+        console.log(`${index}. ${t.name.padEnd(20)} - [Custom]`);
+        options.push(t.name);
+        index++;
+      });
+    }
+
+    console.log(`${index}. none${' '.repeat(20)} - Create empty PRD\n`);
+    options.push('none');
+
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+
+    const prompt = (question) => new Promise((resolve) => {
+      rl.question(question, resolve);
+    });
+
+    try {
+      const selection = await prompt(`Select template (1-${options.length}): `);
+      const selectionNum = parseInt(selection, 10);
+
+      if (selectionNum < 1 || selectionNum > options.length) {
+        console.error('Invalid selection');
+        return null;
+      }
+
+      return options[selectionNum - 1];
+    } finally {
+      rl.close();
+    }
+  }
+
+  /**
+   * Get template description
+   */
+  getTemplateDescription(templateName) {
+    const descriptions = {
+      'api-feature': 'REST/GraphQL API development',
+      'ui-feature': 'Frontend component/page',
+      'bug-fix': 'Bug resolution workflow',
+      'data-migration': 'Database schema changes',
+      'documentation': 'Documentation updates'
+    };
+
+    return descriptions[templateName] || 'Template';
   }
 
   async createPrd(prdName) {
@@ -319,7 +585,19 @@ ${data.technical || 'Technical requirements to be specified...'}
   }
 
   async run(args) {
-    let prdName = args[0];
+    // Parse arguments
+    let prdName = null;
+    let templateName = null;
+
+    // Check for --template or -t flag
+    for (let i = 0; i < args.length; i++) {
+      if (args[i] === '--template' || args[i] === '-t') {
+        templateName = args[i + 1];
+        i++; // Skip next arg
+      } else if (!prdName) {
+        prdName = args[i];
+      }
+    }
 
     if (!prdName) {
       // Interactive mode
@@ -345,12 +623,24 @@ ${data.technical || 'Technical requirements to be specified...'}
         console.error('❌ Error: PRD name required');
         process.exit(1);
       }
+
+      // Ask for template if not provided
+      if (!templateName) {
+        templateName = await this.selectTemplate();
+      }
     }
 
     // Sanitize PRD name
     prdName = prdName.toLowerCase().replace(/[^a-z0-9-]/g, '-');
 
-    const success = await this.createPrd(prdName);
+    // Create PRD from template or traditional mode
+    let success;
+    if (templateName && templateName !== 'none') {
+      success = await this.createPrdFromTemplate(prdName, templateName);
+    } else {
+      success = await this.createPrd(prdName);
+    }
+
     process.exit(success ? 0 : 1);
   }
 }
