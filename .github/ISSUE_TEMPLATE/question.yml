@@ -1,0 +1,66 @@
+name: ❓ Question
+description: Ask a question about ClaudeAutoPM
+title: "[Question]: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have a question? We're here to help!
+
+        **Tip**: Check our [documentation](https://github.com/rafeekpro/ClaudeAutoPM#readme) first.
+
+  - type: dropdown
+    id: topic
+    attributes:
+      label: Topic
+      description: What is your question about?
+      options:
+        - Installation & Setup
+        - GitHub Sync Usage
+        - Task Management
+        - Epic Decomposition
+        - PRD Management
+        - Configuration
+        - CLI Commands
+        - Best Practices
+        - Troubleshooting
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: What would you like to know?
+      placeholder: "How do I..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Provide any relevant context (what you've tried, your setup, etc.)
+      placeholder: |
+        I'm trying to...
+        I've already tried...
+        My setup is...
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: What version are you using?
+      placeholder: "e.g., 1.27.0"
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have checked the documentation
+          required: false
+        - label: I have searched existing issues
+          required: true

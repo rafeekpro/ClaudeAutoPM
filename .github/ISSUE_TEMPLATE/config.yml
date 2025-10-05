@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Documentation
+    url: https://github.com/rafeekpro/ClaudeAutoPM#readme
+    about: Read the full documentation
+  - name: 💬 Discussions
+    url: https://github.com/rafeekpro/ClaudeAutoPM/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 📦 npm Package
+    url: https://www.npmjs.com/package/claude-autopm
+    about: View package on npm
