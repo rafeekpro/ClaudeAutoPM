@@ -290,9 +290,9 @@ All performance tests passed with significant margin:
 
 ```json
 {
-  "yaml": "^2.3.4",        // Frontmatter parsing (Context7 verified)
+  "yaml": "^2.8.1",        // Frontmatter parsing (Context7 verified)
   "yargs": "^17.7.2",      // CLI argument parsing
-  "markdown-it": "^13.0.2" // Markdown parsing for PRD sections
+  "markdown-it": "^14.1.0" // Markdown parsing for PRD sections
 }
 ```
 
