@@ -39,10 +39,6 @@ module.exports = {
   // Timeouts
   testTimeout: 10000,
 
-  // TEMPORARY: Run tests serially to avoid process.chdir() race conditions
-  // TODO: Remove after implementing basePath parameter pattern
-  maxWorkers: 1,
-
   // Clear mocks between tests
   clearMocks: true,
   restoreMocks: true,
