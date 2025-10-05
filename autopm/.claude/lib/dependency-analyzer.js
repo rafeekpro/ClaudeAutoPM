@@ -113,7 +113,9 @@ function topologicalSort(graph) {
   // Calculate in-degree
   for (const deps of graph.values()) {
     for (const dep of deps) {
-      inDegree.set(dep, (inDegree.get(dep) || 0) + 1);
+      if (graph.has(dep)) {
+        inDegree.set(dep, (inDegree.get(dep) || 0) + 1);
+      }
     }
   }
 
