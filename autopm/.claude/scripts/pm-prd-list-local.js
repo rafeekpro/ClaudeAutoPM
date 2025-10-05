@@ -39,9 +39,6 @@ async function listLocalPRDs(options = {}) {
   const files = await fs.readdir(prdsDir);
   const mdFiles = files.filter(f => f.endsWith('.md'));
 
-  // Parse frontmatter for each PRD
-  const prds = [];
-
   // Parallelize file reading/parsing with Promise.allSettled
   const prdPromises = mdFiles.map(async (file) => {
     try {
