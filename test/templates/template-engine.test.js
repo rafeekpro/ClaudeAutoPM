@@ -21,33 +21,32 @@ const TemplateEngine = require('../../lib/template-engine');
 
 describe('Template Engine - Comprehensive Jest Tests', () => {
   let tempDir;
-  let originalCwd;
+  let builtInDir;
+  let userDir;
   let engine;
 
   beforeEach(() => {
-    // Create isolated test environment
-    originalCwd = process.cwd();
+    // Create isolated test environment (NO process.chdir!)
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'template-engine-test-'));
-    process.chdir(tempDir);
 
-    // Create template directories
-    fs.mkdirSync('.claude/templates/prds', { recursive: true });
-    fs.mkdirSync('.claude/templates/epics', { recursive: true });
-    fs.mkdirSync('.claude/templates/tasks', { recursive: true });
+    // Create user template directories with absolute paths
+    userDir = path.join(tempDir, '.claude', 'templates');
+    fs.mkdirSync(path.join(userDir, 'prds'), { recursive: true });
+    fs.mkdirSync(path.join(userDir, 'epics'), { recursive: true });
+    fs.mkdirSync(path.join(userDir, 'tasks'), { recursive: true });
 
-    // Create a mock built-in templates directory
-    const builtInDir = path.join(tempDir, 'autopm', '.claude', 'templates');
+    // Create built-in templates directory with absolute paths
+    builtInDir = path.join(tempDir, 'autopm', '.claude', 'templates');
     fs.mkdirSync(path.join(builtInDir, 'prds'), { recursive: true });
     fs.mkdirSync(path.join(builtInDir, 'epics'), { recursive: true });
     fs.mkdirSync(path.join(builtInDir, 'tasks'), { recursive: true });
 
-    // Initialize engine with custom paths for testing
-    engine = new TemplateEngine(builtInDir);
+    // Initialize engine with custom paths for testing (both builtInDir and userDir)
+    engine = new TemplateEngine(builtInDir, userDir);
   });
 
   afterEach(() => {
-    // Restore environment
-    process.chdir(originalCwd);
+    // Clean up temp directory
     if (fs.existsSync(tempDir)) {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
@@ -66,9 +65,9 @@ describe('Template Engine - Comprehensive Jest Tests', () => {
     });
 
     test('2. should find user custom template (overrides built-in)', () => {
-      // Create both templates
-      const builtInPath = path.join(tempDir, 'autopm', '.claude', 'templates', 'prds', 'api-feature.md');
-      const userPath = path.join(tempDir, '.claude', 'templates', 'prds', 'api-feature.md');
+      // Create both templates using absolute paths
+      const builtInPath = path.join(builtInDir, 'prds', 'api-feature.md');
+      const userPath = path.join(userDir, 'prds', 'api-feature.md');
 
       fs.writeFileSync(builtInPath, '# Built-in');
       fs.writeFileSync(userPath, '# User Custom');
@@ -87,18 +86,18 @@ describe('Template Engine - Comprehensive Jest Tests', () => {
     });
 
     test('4. should list all templates (built-in + user)', () => {
-      // Create built-in templates
+      // Create built-in templates using absolute paths
       fs.writeFileSync(
-        path.join(tempDir, 'autopm', '.claude', 'templates', 'prds', 'api-feature.md'),
+        path.join(builtInDir, 'prds', 'api-feature.md'),
         'built-in'
       );
       fs.writeFileSync(
-        path.join(tempDir, 'autopm', '.claude', 'templates', 'prds', 'ui-feature.md'),
+        path.join(builtInDir, 'prds', 'ui-feature.md'),
         'built-in'
       );
 
-      // Create user templates
-      fs.writeFileSync('.claude/templates/prds/custom-feature.md', 'user');
+      // Create user templates using absolute paths
+      fs.writeFileSync(path.join(userDir, 'prds', 'custom-feature.md'), 'user');
 
       const templates = engine.listTemplates('prds');
 
@@ -109,7 +108,7 @@ describe('Template Engine - Comprehensive Jest Tests', () => {
     });
 
     test('5. should list only user templates when no built-in exist', () => {
-      fs.writeFileSync('.claude/templates/prds/my-template.md', 'user only');
+      fs.writeFileSync(path.join(userDir, 'prds', 'my-template.md'), 'user only');
 
       const templates = engine.listTemplates('prds');
 
@@ -119,7 +118,7 @@ describe('Template Engine - Comprehensive Jest Tests', () => {
 
     test('6. should list only built-in templates when no user templates exist', () => {
       fs.writeFileSync(
-        path.join(tempDir, 'autopm', '.claude', 'templates', 'prds', 'bug-fix.md'),
+        path.join(builtInDir, 'prds', 'bug-fix.md'),
         'built-in'
       );
 
@@ -162,22 +161,25 @@ describe('Template Engine - Comprehensive Jest Tests', () => {
     });
 
     test('9. should generate sequential IDs (prd-001, prd-002)', () => {
-      // Create some existing PRDs
-      fs.mkdirSync('.claude/prds', { recursive: true });
-      fs.writeFileSync('.claude/prds/prd-001.md', 'content');
-      fs.writeFileSync('.claude/prds/prd-002.md', 'content');
+      // Create some existing PRDs using absolute paths
+      const prdsDir = path.join(tempDir, '.claude', 'prds');
+      fs.mkdirSync(prdsDir, { recursive: true });
+      fs.writeFileSync(path.join(prdsDir, 'prd-001.md'), 'content');
+      fs.writeFileSync(path.join(prdsDir, 'prd-002.md'), 'content');
 
-      const id = engine.generateId('prd', '.claude/prds');
+      const id = engine.generateId('prd', prdsDir);
 
       expect(id).toBe('prd-003');
     });
 
     test('10. should generate ID for different types (epic-001, task-001)', () => {
-      fs.mkdirSync('.claude/epics', { recursive: true });
-      fs.mkdirSync('.claude/tasks', { recursive: true });
+      const epicsDir = path.join(tempDir, '.claude', 'epics');
+      const tasksDir = path.join(tempDir, '.claude', 'tasks');
+      fs.mkdirSync(epicsDir, { recursive: true });
+      fs.mkdirSync(tasksDir, { recursive: true });
 
-      const epicId = engine.generateId('epic', '.claude/epics');
-      const taskId = engine.generateId('task', '.claude/tasks');
+      const epicId = engine.generateId('epic', epicsDir);
+      const taskId = engine.generateId('task', tasksDir);
 
       expect(epicId).toBe('epic-001');
       expect(taskId).toBe('task-001');
@@ -329,7 +331,7 @@ id: {{id}}
 
   describe('Error Handling', () => {
     test('24. should create template directory if not exists', () => {
-      const newDir = path.join(tempDir, '.claude', 'templates', 'new-type');
+      const newDir = path.join(userDir, 'new-type');
       expect(fs.existsSync(newDir)).toBe(false);
 
       engine.ensureTemplateDir('new-type');
