@@ -127,7 +127,7 @@ describe('Local PRD Management', () => {
 
       // Filenames should be different due to unique IDs
       expect(prd1.filepath).not.toBe(prd2.filepath);
-    });
+      expect(result.filepath).toMatch(/prd-\d{3}-users-admins-dashboard\.md$/);
 
     test('should handle names with special characters', async () => {
       const result = await createLocalPRD('User\'s & Admin\'s Dashboard!');
