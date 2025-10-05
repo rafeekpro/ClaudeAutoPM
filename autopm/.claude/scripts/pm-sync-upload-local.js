@@ -64,6 +64,17 @@ async function syncPRDToGitHub(prdPath, repo, octokit, syncMap, dryRun = false) 
 
     console.log(`  ✅ Updated PRD: ${title} (#${existingIssue})`);
 
+    // Ensure sync map is up-to-date
+    syncMap[frontmatter.id] = existingIssue;
+
+    // Update frontmatter if github_issue is missing or differs
+    if (frontmatter.github_issue !== existingIssue) {
+      frontmatter.github_issue = existingIssue;
+      frontmatter.updated = new Date().toISOString().split('T')[0];
+      const updatedContent = stringifyFrontmatter(frontmatter, body);
+      await fs.writeFile(prdPath, updatedContent);
+    }
+
     return {
       action: 'updated',
       issueNumber: existingIssue,
@@ -141,6 +152,17 @@ async function syncEpicToGitHub(epicPath, repo, octokit, syncMap, dryRun = false
 
     console.log(`  ✅ Updated Epic: ${title} (#${existingIssue})`);
 
+    // Ensure sync map is up-to-date
+    syncMap[frontmatter.id] = existingIssue;
+
+    // Update frontmatter if github_issue is missing or differs
+    if (frontmatter.github_issue !== existingIssue) {
+      frontmatter.github_issue = existingIssue;
+      frontmatter.updated = new Date().toISOString().split('T')[0];
+      const updatedContent = stringifyFrontmatter(frontmatter, body);
+      await fs.writeFile(epicPath, updatedContent);
+    }
+
     return {
       action: 'updated',
       issueNumber: existingIssue,
@@ -214,6 +236,17 @@ async function syncTaskToGitHub(taskPath, repo, octokit, syncMap, dryRun = false
     });
 
     console.log(`  ✅ Updated Task: ${title} (#${existingIssue})`);
+
+    // Ensure sync map is up-to-date
+    syncMap[frontmatter.id] = existingIssue;
+
+    // Update frontmatter if github_issue is missing or differs
+    if (frontmatter.github_issue !== existingIssue) {
+      frontmatter.github_issue = existingIssue;
+      frontmatter.updated = new Date().toISOString().split('T')[0];
+      const updatedContent = stringifyFrontmatter(frontmatter, body);
+      await fs.writeFile(taskPath, updatedContent);
+    }
 
     return {
       action: 'updated',

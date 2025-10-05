@@ -388,6 +388,132 @@ created: 2025-01-01
     });
   });
 
+  describe('Sync Map and Frontmatter Persistence on Update', () => {
+    test('should persist sync map when updating PRD sourced from syncMap', async () => {
+      // Create PRD without github_issue in frontmatter
+      const prdContent = `---
+id: prd-001
+title: Test Feature
+status: draft
+priority: high
+created: 2025-01-01
+---
+
+# Test Feature
+`;
+
+      await fs.writeFile('.claude/prds/prd-001-test.md', prdContent);
+
+      const mockOctokit = {
+        issues: {
+          update: jest.fn()
+        }
+      };
+
+      const { syncPRDToGitHub } = require('../../autopm/.claude/scripts/pm-sync-upload-local');
+
+      // Sync map has the issue number, but frontmatter doesn't
+      const syncMap = { 'prd-001': 123 };
+
+      await syncPRDToGitHub(
+        '.claude/prds/prd-001-test.md',
+        { owner: 'test', repo: 'repo' },
+        mockOctokit,
+        syncMap,
+        false
+      );
+
+      // Verify sync map is still set
+      expect(syncMap['prd-001']).toBe(123);
+
+      // Verify frontmatter was updated
+      const updatedContent = await fs.readFile('.claude/prds/prd-001-test.md', 'utf8');
+      expect(updatedContent).toContain('github_issue: 123');
+    });
+
+    test('should persist sync map when updating Epic sourced from syncMap', async () => {
+      await fs.mkdir('.claude/epics/epic-001-test', { recursive: true });
+      const epicContent = `---
+id: epic-001
+prd_id: prd-001
+title: Test Epic
+status: pending
+priority: high
+created: 2025-01-01
+---
+
+# Test Epic
+`;
+
+      await fs.writeFile('.claude/epics/epic-001-test/epic.md', epicContent);
+
+      const mockOctokit = {
+        issues: {
+          update: jest.fn()
+        }
+      };
+
+      const { syncEpicToGitHub } = require('../../autopm/.claude/scripts/pm-sync-upload-local');
+
+      const syncMap = { 'epic-001': 456 };
+
+      await syncEpicToGitHub(
+        '.claude/epics/epic-001-test/epic.md',
+        { owner: 'test', repo: 'repo' },
+        mockOctokit,
+        syncMap,
+        false
+      );
+
+      expect(syncMap['epic-001']).toBe(456);
+
+      const updatedContent = await fs.readFile('.claude/epics/epic-001-test/epic.md', 'utf8');
+      expect(updatedContent).toContain('github_issue: 456');
+    });
+
+    test('should persist sync map when updating Task sourced from syncMap', async () => {
+      await fs.mkdir('.claude/epics/epic-001-test', { recursive: true });
+      const taskContent = `---
+id: task-epic-001-001
+epic_id: epic-001
+title: Test Task
+status: pending
+priority: high
+estimated_hours: 4
+created: 2025-01-01
+dependencies: []
+---
+
+# Test Task
+`;
+
+      await fs.writeFile('.claude/epics/epic-001-test/task-001.md', taskContent);
+
+      const mockOctokit = {
+        issues: {
+          update: jest.fn()
+        }
+      };
+
+      const { syncTaskToGitHub } = require('../../autopm/.claude/scripts/pm-sync-upload-local');
+
+      const syncMap = { 'task-epic-001-001': 789 };
+
+      await syncTaskToGitHub(
+        '.claude/epics/epic-001-test/task-001.md',
+        { owner: 'test', repo: 'repo' },
+        mockOctokit,
+        syncMap,
+        false
+      );
+
+      expect(syncMap['task-epic-001-001']).toBe(789);
+
+      const updatedContent = await fs.readFile('.claude/epics/epic-001-test/task-001.md', 'utf8');
+      expect(updatedContent).toContain('github_issue: 789');
+    });
+  });
+
   describe('Dry Run Mode', () => {
     test('should preview changes without creating issues in dry-run mode', async () => {
       const prdContent = `---
