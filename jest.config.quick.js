@@ -6,7 +6,8 @@ module.exports = {
   testMatch: [
     '**/test/teams/*.test.js',
     '**/test/cli/*.test.js',
-    '**/test/local-mode/*.test.js'
+    '**/test/local-mode/*.test.js',
+    '**/test/templates/*.test.js'
   ],
 
   // Ignore everything else
