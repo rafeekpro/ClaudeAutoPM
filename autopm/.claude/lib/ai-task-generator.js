@@ -37,7 +37,7 @@ class TaskGenerator {
     } = options;
 
     if (!this.provider) {
-      throw new Error('AI provider not configured. Use TaskGenerator(provider) or set via setProvider()');
+      throw new Error('AI provider not configured. Use TaskGenerator(provider) or set via setProvider');
     }
 
     // Generate tasks using AI provider
