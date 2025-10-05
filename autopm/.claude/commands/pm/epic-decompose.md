@@ -10,13 +10,13 @@ Break epic into concrete, actionable tasks.
 
 **Single Epic:**
 ```bash
-/pm:epic-decompose <feature_name>
+/pm:epic-decompose <feature_name> [--local]
 ```
 
 **Multi-Epic (decomposes ALL epics at once):**
 ```bash
-/pm:epic-decompose <feature_name>
-# Example: /pm:epic-decompose ecommerce-platform
+/pm:epic-decompose <feature_name> [--local]
+# Example: /pm:epic-decompose ecommerce-platform --local
 # This will automatically decompose ALL epics:
 #   - 01-infrastructure
 #   - 02-auth-backend
@@ -26,8 +26,22 @@ Break epic into concrete, actionable tasks.
 
 **Single Epic from Multi-Epic structure:**
 ```bash
-/pm:epic-decompose <feature_name>/<epic_folder>
-# Example: /pm:epic-decompose ecommerce-platform/01-infrastructure
+/pm:epic-decompose <feature_name>/<epic_folder> [--local]
+# Example: /pm:epic-decompose ecommerce-platform/01-infrastructure --local
+```
+
+## Flags
+
+`--local`, `-l`
+: Use local mode (offline workflow)
+: Creates task files in `.claude/epics/` directory structure
+: No GitHub/Azure synchronization
+: Task files remain local-only until manually synced
+: Ideal for offline work or projects without remote tracking
+
+Example:
+```
+/pm:epic-decompose user-authentication --local
 ```
 
 ## Required Documentation Access

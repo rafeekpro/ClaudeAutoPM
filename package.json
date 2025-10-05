@@ -123,11 +123,13 @@
     "glob": "^11.0.3",
     "inquirer": "^12.9.6",
     "js-yaml": "^4.1.0",
+    "markdown-it": "^14.1.0",
     "moment": "^2.29.4",
     "ora": "^5.4.1",
     "simple-git": "^3.20.0",
     "table": "^6.8.1",
     "which": "^4.0.0",
+    "yaml": "^2.8.1",
     "yargs": "^17.7.2"
   },
   "devDependencies": {
@@ -149,8 +151,8 @@
     "sinon": "^21.0.0"
   },
   "optionalDependencies": {
-    "@upstash/context7-mcp": "^1.0.0",
-    "@playwright/mcp": "^0.0.40"
+    "@playwright/mcp": "^0.0.40",
+    "@upstash/context7-mcp": "^1.0.0"
   },
   "publishConfig": {
     "access": "public",

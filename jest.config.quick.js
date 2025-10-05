@@ -5,7 +5,8 @@ module.exports = {
   // Only stable, fast tests
   testMatch: [
     '**/test/teams/*.test.js',
-    '**/test/cli/*.test.js'
+    '**/test/cli/*.test.js',
+    '**/test/local-mode/*.test.js'
   ],
 
   // Ignore everything else
