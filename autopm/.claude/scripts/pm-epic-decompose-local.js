@@ -83,7 +83,7 @@ async function decomposeLocalEpic(epicId, options = {}) {
       priority: task.priority || 'medium',
       estimated_hours: task.estimated_hours || 4,
       dependencies: task.dependencies || [],
-      created: new Date().toISOString().split('T')[0]
+      created: getCurrentDateISO()
     };
 
     // Build task body
