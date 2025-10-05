@@ -1,0 +1,358 @@
+/**
+ * GitHub Sync Upload - Local Mode
+ *
+ * Uploads local PRDs, Epics, and Tasks to GitHub Issues
+ * with bidirectional mapping and intelligent sync.
+ *
+ * Usage:
+ *   const { syncToGitHub } = require('./pm-sync-upload-local');
+ *
+ *   await syncToGitHub({
+ *     basePath: '.claude',
+ *     owner: 'user',
+ *     repo: 'repository',
+ *     octokit: octokitInstance,
+ *     dryRun: false
+ *   });
+ */
+
+const fs = require('fs').promises;
+const path = require('path');
+const { parseFrontmatter, stringifyFrontmatter } = require('../lib/frontmatter');
+
+/**
+ * Sync PRD to GitHub Issue
+ *
+ * @param {string} prdPath - Path to PRD markdown file
+ * @param {Object} repo - Repository info {owner, repo}
+ * @param {Object} octokit - Octokit instance
+ * @param {Object} syncMap - Sync mapping object
+ * @param {boolean} dryRun - Dry run mode
+ * @returns {Promise<Object>} Sync result
+ */
+async function syncPRDToGitHub(prdPath, repo, octokit, syncMap, dryRun = false) {
+  const content = await fs.readFile(prdPath, 'utf8');
+  const { frontmatter, body } = parseFrontmatter(content);
+
+  const title = `[PRD] ${frontmatter.title}`;
+  const labels = ['prd'];
+
+  if (frontmatter.priority) {
+    labels.push(frontmatter.priority);
+  }
+
+  const issueBody = buildPRDBody(frontmatter, body);
+
+  if (dryRun) {
+    console.log(`  [DRY-RUN] Would create/update: ${title}`);
+    return { action: 'dry-run', title };
+  }
+
+  // Check if issue already exists
+  const existingIssue = frontmatter.github_issue || syncMap[frontmatter.id];
+
+  if (existingIssue) {
+    // Update existing issue
+    await octokit.issues.update({
+      owner: repo.owner,
+      repo: repo.repo,
+      issue_number: existingIssue,
+      title,
+      body: issueBody,
+      labels
+    });
+
+    console.log(`  ✅ Updated PRD: ${title} (#${existingIssue})`);
+
+    return {
+      action: 'updated',
+      issueNumber: existingIssue,
+      title
+    };
+  } else {
+    // Create new issue
+    const response = await octokit.issues.create({
+      owner: repo.owner,
+      repo: repo.repo,
+      title,
+      body: issueBody,
+      labels
+    });
+
+    const issueNumber = response.data.number;
+
+    // Update local frontmatter
+    frontmatter.github_issue = issueNumber;
+    const updatedContent = stringifyFrontmatter(frontmatter, body);
+    await fs.writeFile(prdPath, updatedContent);
+
+    // Update sync map
+    syncMap[frontmatter.id] = issueNumber;
+
+    console.log(`  ✅ Created PRD: ${title} (#${issueNumber})`);
+
+    return {
+      action: 'created',
+      issueNumber,
+      title
+    };
+  }
+}
+
+/**
+ * Sync Epic to GitHub Issue
+ *
+ * @param {string} epicPath - Path to epic.md file
+ * @param {Object} repo - Repository info
+ * @param {Object} octokit - Octokit instance
+ * @param {Object} syncMap - Sync mapping
+ * @param {boolean} dryRun - Dry run mode
+ * @returns {Promise<Object>} Sync result
+ */
+async function syncEpicToGitHub(epicPath, repo, octokit, syncMap, dryRun = false) {
+  const content = await fs.readFile(epicPath, 'utf8');
+  const { frontmatter, body } = parseFrontmatter(content);
+
+  const title = `[EPIC] ${frontmatter.title}`;
+  const labels = ['epic'];
+
+  if (frontmatter.priority) {
+    labels.push(frontmatter.priority);
+  }
+
+  const issueBody = buildEpicBody(frontmatter, body, syncMap);
+
+  if (dryRun) {
+    console.log(`  [DRY-RUN] Would create/update: ${title}`);
+    return { action: 'dry-run', title };
+  }
+
+  const existingIssue = frontmatter.github_issue || syncMap[frontmatter.id];
+
+  if (existingIssue) {
+    await octokit.issues.update({
+      owner: repo.owner,
+      repo: repo.repo,
+      issue_number: existingIssue,
+      title,
+      body: issueBody,
+      labels
+    });
+
+    console.log(`  ✅ Updated Epic: ${title} (#${existingIssue})`);
+
+    return {
+      action: 'updated',
+      issueNumber: existingIssue,
+      title
+    };
+  } else {
+    const response = await octokit.issues.create({
+      owner: repo.owner,
+      repo: repo.repo,
+      title,
+      body: issueBody,
+      labels
+    });
+
+    const issueNumber = response.data.number;
+
+    frontmatter.github_issue = issueNumber;
+    const updatedContent = stringifyFrontmatter(frontmatter, body);
+    await fs.writeFile(epicPath, updatedContent);
+
+    syncMap[frontmatter.id] = issueNumber;
+
+    console.log(`  ✅ Created Epic: ${title} (#${issueNumber})`);
+
+    return {
+      action: 'created',
+      issueNumber,
+      title
+    };
+  }
+}
+
+/**
+ * Sync Task to GitHub Issue
+ *
+ * @param {string} taskPath - Path to task.md file
+ * @param {Object} repo - Repository info
+ * @param {Object} octokit - Octokit instance
+ * @param {Object} syncMap - Sync mapping
+ * @param {boolean} dryRun - Dry run mode
+ * @returns {Promise<Object>} Sync result
+ */
+async function syncTaskToGitHub(taskPath, repo, octokit, syncMap, dryRun = false) {
+  const content = await fs.readFile(taskPath, 'utf8');
+  const { frontmatter, body } = parseFrontmatter(content);
+
+  const title = `[TASK] ${frontmatter.title}`;
+  const labels = ['task'];
+
+  if (frontmatter.priority) {
+    labels.push(frontmatter.priority);
+  }
+
+  const issueBody = buildTaskBody(frontmatter, body, syncMap);
+
+  if (dryRun) {
+    console.log(`  [DRY-RUN] Would create/update: ${title}`);
+    return { action: 'dry-run', title };
+  }
+
+  const existingIssue = frontmatter.github_issue || syncMap[frontmatter.id];
+
+  if (existingIssue) {
+    await octokit.issues.update({
+      owner: repo.owner,
+      repo: repo.repo,
+      issue_number: existingIssue,
+      title,
+      body: issueBody,
+      labels
+    });
+
+    console.log(`  ✅ Updated Task: ${title} (#${existingIssue})`);
+
+    return {
+      action: 'updated',
+      issueNumber: existingIssue,
+      title
+    };
+  } else {
+    const response = await octokit.issues.create({
+      owner: repo.owner,
+      repo: repo.repo,
+      title,
+      body: issueBody,
+      labels
+    });
+
+    const issueNumber = response.data.number;
+
+    frontmatter.github_issue = issueNumber;
+    const updatedContent = stringifyFrontmatter(frontmatter, body);
+    await fs.writeFile(taskPath, updatedContent);
+
+    syncMap[frontmatter.id] = issueNumber;
+
+    console.log(`  ✅ Created Task: ${title} (#${issueNumber})`);
+
+    return {
+      action: 'created',
+      issueNumber,
+      title
+    };
+  }
+}
+
+/**
+ * Build PRD issue body
+ */
+function buildPRDBody(frontmatter, body) {
+  let issueBody = '';
+
+  // Metadata
+  issueBody += `**Status:** ${frontmatter.status}\n`;
+  issueBody += `**Priority:** ${frontmatter.priority}\n`;
+  issueBody += `**Created:** ${frontmatter.created}\n`;
+  issueBody += `\n---\n\n`;
+
+  // Body content
+  issueBody += body;
+
+  return issueBody;
+}
+
+/**
+ * Build Epic issue body
+ */
+function buildEpicBody(frontmatter, body, syncMap) {
+  let issueBody = '';
+
+  // Link to parent PRD
+  if (frontmatter.prd_id && syncMap[frontmatter.prd_id]) {
+    issueBody += `**Parent PRD:** #${syncMap[frontmatter.prd_id]}\n`;
+  }
+
+  // Metadata
+  issueBody += `**Status:** ${frontmatter.status}\n`;
+  issueBody += `**Priority:** ${frontmatter.priority}\n`;
+
+  if (frontmatter.tasks_total) {
+    const completion = frontmatter.tasks_completed || 0;
+    const total = frontmatter.tasks_total;
+    const percent = total > 0 ? Math.round((completion / total) * 100) : 0;
+    issueBody += `**Progress:** ${completion}/${total} tasks (${percent}%)\n`;
+  }
+
+  issueBody += `\n---\n\n`;
+
+  // Body content
+  issueBody += body;
+
+  return issueBody;
+}
+
+/**
+ * Build Task issue body
+ */
+function buildTaskBody(frontmatter, body, syncMap) {
+  let issueBody = '';
+
+  // Link to parent epic
+  if (frontmatter.epic_id && syncMap[frontmatter.epic_id]) {
+    issueBody += `**Parent Epic:** #${syncMap[frontmatter.epic_id]}\n`;
+  }
+
+  // Metadata
+  issueBody += `**Status:** ${frontmatter.status}\n`;
+  issueBody += `**Priority:** ${frontmatter.priority}\n`;
+  issueBody += `**Estimated Hours:** ${frontmatter.estimated_hours}\n`;
+
+  if (frontmatter.dependencies && frontmatter.dependencies.length > 0) {
+    issueBody += `**Dependencies:** ${frontmatter.dependencies.join(', ')}\n`;
+  }
+
+  issueBody += `\n---\n\n`;
+
+  // Body content
+  issueBody += body;
+
+  return issueBody;
+}
+
+/**
+ * Load sync map from file
+ *
+ * @param {string} syncMapPath - Path to sync-map.json
+ * @returns {Promise<Object>} Sync map object
+ */
+async function loadSyncMap(syncMapPath) {
+  try {
+    const content = await fs.readFile(syncMapPath, 'utf8');
+    return JSON.parse(content);
+  } catch (err) {
+    return {}; // New sync map
+  }
+}
+
+/**
+ * Save sync map to file
+ *
+ * @param {string} syncMapPath - Path to sync-map.json
+ * @param {Object} syncMap - Sync map object
+ * @returns {Promise<void>}
+ */
+async function saveSyncMap(syncMapPath, syncMap) {
+  await fs.writeFile(syncMapPath, JSON.stringify(syncMap, null, 2), 'utf8');
+}
+
+module.exports = {
+  syncPRDToGitHub,
+  syncEpicToGitHub,
+  syncTaskToGitHub,
+  loadSyncMap,
+  saveSyncMap
+};
