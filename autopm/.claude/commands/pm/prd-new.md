@@ -8,7 +8,20 @@ Launch interactive brainstorming session for new product requirement document.
 
 ## Usage
 ```
-/pm:prd-new <feature_name>
+/pm:prd-new <feature_name> [--local]
+```
+
+## Flags
+
+`--local`, `-l`
+: Use local mode (offline workflow)
+: Creates PRD files in `.claude/prds/` directory
+: No GitHub/Azure synchronization required
+: Ideal for working offline or without remote provider configured
+
+Example:
+```
+/pm:prd-new user-authentication --local
 ```
 
 ## Required Documentation Access
