@@ -28,7 +28,7 @@ function parseFrontmatter(content) {
 
   // Check for frontmatter delimiters
   // Handles both empty (---\n---\n) and non-empty frontmatter
-  const frontmatterRegex = /^---\n([\s\S]*?)^---\n?([\s\S]*)$/m;
+  const frontmatterRegex = /^---\r?\n([\s\S]*?)^---\r?\n?([\s\S]*)$/m;
   const match = content.match(frontmatterRegex);
 
   if (!match) {
