@@ -219,8 +219,8 @@ function parseUserStories(text) {
   for (const line of lines) {
     const trimmed = line.trim();
 
-    // Check if line starts a new user story
-    if (trimmed.startsWith('As a') || trimmed.startsWith('**As a')) {
+    // Check if line starts a new user story (matches "As a" or "As an", with optional bold)
+    if (/^\*\*As an?\b/i.test(trimmed) || /^As an?\b/i.test(trimmed)) {
       // Save previous story
       if (currentStory) {
         stories.push(currentStory);
