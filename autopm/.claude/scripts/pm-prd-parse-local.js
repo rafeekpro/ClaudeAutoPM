@@ -28,7 +28,8 @@ const { showLocalPRD } = require('./pm-prd-show-local');
 async function parseLocalPRD(prdId) {
   // 1. Load PRD
   const prd = await showLocalPRD(prdId);
-  const { frontmatter: prdMeta, body: prdBody } = parseFrontmatter(prd.content);
+  const prdMeta = prd.frontmatter;
+  const prdBody = prd.body;
 
   // 2. Parse markdown sections
   const sections = extractSections(prdBody);
