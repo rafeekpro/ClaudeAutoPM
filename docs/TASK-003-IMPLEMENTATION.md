@@ -232,7 +232,7 @@ All PM commands can now accept the `--local` flag:
 The cli-parser integrates seamlessly with frontmatter utilities:
 ```javascript
 const { parsePMCommand } = require('./.claude/lib/cli-parser');
-const { parseFrontmatter } = require('./.claude/lib/frontmatter-utils');
+const { parseFrontmatter } = require('./.claude/lib/frontmatter');
 
 const args = process.argv;
 const parsed = parsePMCommand(args);
