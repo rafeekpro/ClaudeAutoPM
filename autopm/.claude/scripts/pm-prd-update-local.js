@@ -103,7 +103,15 @@ async function updateMultipleFields(id, updates) {
   }
 
   const prdsDir = path.join(process.cwd(), '.claude', 'prds');
-  const files = await fs.readdir(prdsDir);
+  let files;
+  try {
+    files = await fs.readdir(prdsDir);
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      throw new Error(`PRD not found: ${id}`);
+    }
+    throw err;
+  }
 
   for (const file of files) {
     if (!file.endsWith('.md')) continue;
