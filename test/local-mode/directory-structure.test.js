@@ -86,36 +86,45 @@ describe('Local Mode Directory Structure', () => {
     });
 
     it('should work on macOS (Darwin)', async () => {
-      if (process.platform === 'darwin') {
-        await setupLocalDirectories();
-
-        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'prds'))).toBe(true);
-        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'epics'))).toBe(true);
-        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'context'))).toBe(true);
-        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'logs'))).toBe(true);
+      if (process.platform !== 'darwin') {
+        expect(true).toBe(true); // Skip on non-Darwin platforms
+        return;
       }
+
+      await setupLocalDirectories();
+
+      expect(fsSync.existsSync(path.join(tempDir, '.claude', 'prds'))).toBe(true);
+      expect(fsSync.existsSync(path.join(tempDir, '.claude', 'epics'))).toBe(true);
+      expect(fsSync.existsSync(path.join(tempDir, '.claude', 'context'))).toBe(true);
+      expect(fsSync.existsSync(path.join(tempDir, '.claude', 'logs'))).toBe(true);
     });
 
     it('should work on Linux', async () => {
-      if (process.platform === 'linux') {
-        await setupLocalDirectories();
-
-        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'prds'))).toBe(true);
-        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'epics'))).toBe(true);
-        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'context'))).toBe(true);
-        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'logs'))).toBe(true);
+      if (process.platform !== 'linux') {
+        expect(true).toBe(true); // Skip on non-Linux platforms
+        return;
       }
+
+      await setupLocalDirectories();
+
+      expect(fsSync.existsSync(path.join(tempDir, '.claude', 'prds'))).toBe(true);
+      expect(fsSync.existsSync(path.join(tempDir, '.claude', 'epics'))).toBe(true);
+      expect(fsSync.existsSync(path.join(tempDir, '.claude', 'context'))).toBe(true);
+      expect(fsSync.existsSync(path.join(tempDir, '.claude', 'logs'))).toBe(true);
     });
 
     it('should work on Windows', async () => {
-      if (process.platform === 'win32') {
-        await setupLocalDirectories();
-
-        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'prds'))).toBe(true);
-        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'epics'))).toBe(true);
-        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'context'))).toBe(true);
-        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'logs'))).toBe(true);
+      if (process.platform !== 'win32') {
+        expect(true).toBe(true); // Skip on non-Windows platforms
+        return;
       }
+
+      await setupLocalDirectories();
+
+      expect(fsSync.existsSync(path.join(tempDir, '.claude', 'prds'))).toBe(true);
+      expect(fsSync.existsSync(path.join(tempDir, '.claude', 'epics'))).toBe(true);
+      expect(fsSync.existsSync(path.join(tempDir, '.claude', 'context'))).toBe(true);
+      expect(fsSync.existsSync(path.join(tempDir, '.claude', 'logs'))).toBe(true);
     });
 
     it('should not fail if directories already exist', async () => {
