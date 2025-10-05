@@ -221,7 +221,7 @@ PRDs are stored in:
     └── dashboard-redesign.md
 ```
 
-Filename format: `<name-kebab-case>.md`
+Filename format: `prd-<id>-<name-kebab-case>.md`
 
 ## Integration with Frontmatter Utilities
 
