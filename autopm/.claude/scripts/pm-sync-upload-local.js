@@ -5,15 +5,26 @@
  * with bidirectional mapping and intelligent sync.
  *
  * Usage:
- *   const { syncToGitHub } = require('./pm-sync-upload-local');
+ *   const { syncPRDToGitHub, syncEpicToGitHub, syncTaskToGitHub,
+ *           loadSyncMap, saveSyncMap } = require('./pm-sync-upload-local');
+ *   const { Octokit } = require('@octokit/rest');
  *
- *   await syncToGitHub({
- *     basePath: '.claude',
- *     owner: 'user',
- *     repo: 'repository',
- *     octokit: octokitInstance,
- *     dryRun: false
- *   });
+ *   // Initialize
+ *   const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+ *   const repo = { owner: 'user', repo: 'repository' };
+ *   const syncMap = await loadSyncMap('.claude/sync-map.json');
+ *
+ *   // Sync a PRD
+ *   await syncPRDToGitHub('.claude/prds/prd-001.md', repo, octokit, syncMap);
+ *
+ *   // Sync an Epic
+ *   await syncEpicToGitHub('.claude/epics/epic-001/epic.md', repo, octokit, syncMap);
+ *
+ *   // Sync a Task
+ *   await syncTaskToGitHub('.claude/epics/epic-001/task-001.md', repo, octokit, syncMap);
+ *
+ *   // Save sync map
+ *   await saveSyncMap('.claude/sync-map.json', syncMap);
  */
 
 const fs = require('fs').promises;
@@ -287,9 +298,15 @@ function buildPRDBody(frontmatter, body) {
   let issueBody = '';
 
   // Metadata
-  issueBody += `**Status:** ${frontmatter.status}\n`;
-  issueBody += `**Priority:** ${frontmatter.priority}\n`;
-  issueBody += `**Created:** ${frontmatter.created}\n`;
+  if (frontmatter.status != null) {
+    issueBody += `**Status:** ${frontmatter.status}\n`;
+  }
+  if (frontmatter.priority != null) {
+    issueBody += `**Priority:** ${frontmatter.priority}\n`;
+  }
+  if (frontmatter.created != null) {
+    issueBody += `**Created:** ${frontmatter.created}\n`;
+  }
   issueBody += `\n---\n\n`;
 
   // Body content
@@ -310,8 +327,12 @@ function buildEpicBody(frontmatter, body, syncMap) {
   }
 
   // Metadata
-  issueBody += `**Status:** ${frontmatter.status}\n`;
-  issueBody += `**Priority:** ${frontmatter.priority}\n`;
+  if (frontmatter.status != null) {
+    issueBody += `**Status:** ${frontmatter.status}\n`;
+  }
+  if (frontmatter.priority != null) {
+    issueBody += `**Priority:** ${frontmatter.priority}\n`;
+  }
 
   if (frontmatter.tasks_total) {
     const completion = frontmatter.tasks_completed || 0;
@@ -340,9 +361,15 @@ function buildTaskBody(frontmatter, body, syncMap) {
   }
 
   // Metadata
-  issueBody += `**Status:** ${frontmatter.status}\n`;
-  issueBody += `**Priority:** ${frontmatter.priority}\n`;
-  issueBody += `**Estimated Hours:** ${frontmatter.estimated_hours}\n`;
+  if (frontmatter.status != null) {
+    issueBody += `**Status:** ${frontmatter.status}\n`;
+  }
+  if (frontmatter.priority != null) {
+    issueBody += `**Priority:** ${frontmatter.priority}\n`;
+  }
+  if (frontmatter.estimated_hours != null) {
+    issueBody += `**Estimated Hours:** ${frontmatter.estimated_hours}\n`;
+  }
 
   if (frontmatter.dependencies && frontmatter.dependencies.length > 0) {
     issueBody += `**Dependencies:** ${frontmatter.dependencies.join(', ')}\n`;
