@@ -80,9 +80,10 @@ function detectCircularDependencies(graph) {
 
     const dependencies = graph.get(node) || [];
     for (const dep of dependencies) {
-      dfs(dep, [...path]);
+      dfs(dep, path);
     }
 
+    path.pop(); // Cleanup: remove node from path after exploring
     recursionStack.delete(node);
   }
 
