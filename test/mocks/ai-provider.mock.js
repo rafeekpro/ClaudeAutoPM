@@ -26,7 +26,7 @@ class MockAIProvider {
   async generateTasks(epicContent, options = {}) {
     this.lastRequest = { epicContent, options };
 
-    const response = Array.isArray(this.responses[this.callCount])
+    const response = (this.responses[this.callCount] !== undefined && Array.isArray(this.responses[this.callCount]))
       ? this.responses[this.callCount]
       : this.responses.default;
 
