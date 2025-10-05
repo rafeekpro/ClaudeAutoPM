@@ -42,26 +42,31 @@ async function listLocalPRDs(options = {}) {
   // Parse frontmatter for each PRD
   const prds = [];
 
-  for (const file of mdFiles) {
+  // Parallelize file reading/parsing with Promise.allSettled
+  const prdPromises = mdFiles.map(async (file) => {
     try {
       const filepath = path.join(prdsDir, file);
       const content = await fs.readFile(filepath, 'utf8');
       const { frontmatter } = parseFrontmatter(content);
-
       // Only include files with valid frontmatter containing required fields
       // A valid PRD must have at least an 'id' field
       if (frontmatter && typeof frontmatter === 'object' && frontmatter.id) {
-        prds.push({
+        return {
           filename: file,
           ...frontmatter
-        });
+        };
       }
     } catch (err) {
       // Skip files that can't be parsed
       console.warn(`Warning: Could not parse ${file}:`, err.message);
     }
-  }
+    return null;
+  });
 
+  const settled = await Promise.allSettled(prdPromises);
+  const prds = settled
+    .filter(r => r.status === 'fulfilled' && r.value)
+    .map(r => r.value);
   // Filter by status if specified
   let filtered = prds;
   if (options.status) {
