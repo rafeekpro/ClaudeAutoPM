@@ -44,6 +44,29 @@ PRD → Epic Decomposition → Parallel Development → Testing → Production
 
 ## ✨ Key Features
 
+### 🆕 **NEW in v1.27.0: Phase 2 Complete!**
+
+**GitHub Sync (Bidirectional)**
+- 📤 **Upload to GitHub Issues** - Sync PRDs/Epics/Tasks with smart conflict detection
+- 📥 **Download from GitHub** - Pull Issues back to local files with reverse mapping
+- 🔄 **Bidirectional Mapping** - Maintain consistency with `sync-map.json`
+- ⚡ **Conflict Resolution** - Choose merge/local/github modes
+- 🧪 **Dry-run Mode** - Test before executing
+
+**Task Management**
+- ✅ **Complete Task Lifecycle** - List, show, update tasks within epics
+- 🔗 **Dependency Tracking** - Validate task dependencies automatically
+- 📊 **Progress Auto-update** - Epic progress updates on task completion
+- 🎯 **Smart Filtering** - Filter by status, epic, priority
+
+**AI-Powered Epic Decomposition**
+- 🤖 **Auto-generate Tasks** - AI analyzes epics and creates tasks
+- 📝 **User Story Parsing** - Extract user stories from PRDs
+- 🎨 **Progress Calculation** - Track completed vs total tasks
+- ✨ **Status Validation** - Ensure proper workflow transitions
+
+**205 Tests Passing** - Production-ready with comprehensive test coverage!
+
 ### 🤖 **39 Specialized AI Agents**
 
 Organized into dynamic teams that load based on your work context:
