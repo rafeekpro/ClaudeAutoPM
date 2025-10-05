@@ -1,5 +1,4 @@
-const { describe, it, beforeEach, afterEach } = require('node:test');
-const assert = require('node:assert');
+const { describe, it, beforeEach, afterEach, expect } = require('@jest/globals');
 const fs = require('fs').promises;
 const fsSync = require('fs');
 const path = require('path');
@@ -37,13 +36,13 @@ describe('Local Mode Directory Structure', () => {
       await setupLocalDirectories();
 
       const dir = path.join(tempDir, '.claude', 'prds');
-      assert.ok(fsSync.existsSync(dir));
+      expect(fsSync.existsSync(dir)).toBe(true);
 
       // Check permissions (skip on Windows)
       if (process.platform !== 'win32') {
         const stats = await fs.stat(dir);
         const mode = (stats.mode & parseInt('777', 8)).toString(8);
-        assert.strictEqual(mode, '755');
+        expect(mode).toBe('755');
       }
     });
 
@@ -51,12 +50,12 @@ describe('Local Mode Directory Structure', () => {
       await setupLocalDirectories();
 
       const dir = path.join(tempDir, '.claude', 'epics');
-      assert.ok(fsSync.existsSync(dir));
+      expect(fsSync.existsSync(dir)).toBe(true);
 
       if (process.platform !== 'win32') {
         const stats = await fs.stat(dir);
         const mode = (stats.mode & parseInt('777', 8)).toString(8);
-        assert.strictEqual(mode, '755');
+        expect(mode).toBe('755');
       }
     });
 
@@ -64,12 +63,12 @@ describe('Local Mode Directory Structure', () => {
       await setupLocalDirectories();
 
       const dir = path.join(tempDir, '.claude', 'context');
-      assert.ok(fsSync.existsSync(dir));
+      expect(fsSync.existsSync(dir)).toBe(true);
 
       if (process.platform !== 'win32') {
         const stats = await fs.stat(dir);
         const mode = (stats.mode & parseInt('777', 8)).toString(8);
-        assert.strictEqual(mode, '755');
+        expect(mode).toBe('755');
       }
     });
 
@@ -77,12 +76,12 @@ describe('Local Mode Directory Structure', () => {
       await setupLocalDirectories();
 
       const dir = path.join(tempDir, '.claude', 'logs');
-      assert.ok(fsSync.existsSync(dir));
+      expect(fsSync.existsSync(dir)).toBe(true);
 
       if (process.platform !== 'win32') {
         const stats = await fs.stat(dir);
         const mode = (stats.mode & parseInt('777', 8)).toString(8);
-        assert.strictEqual(mode, '755');
+        expect(mode).toBe('755');
       }
     });
 
@@ -90,10 +89,10 @@ describe('Local Mode Directory Structure', () => {
       if (process.platform === 'darwin') {
         await setupLocalDirectories();
 
-        assert.ok(fsSync.existsSync(path.join(tempDir, '.claude', 'prds')));
-        assert.ok(fsSync.existsSync(path.join(tempDir, '.claude', 'epics')));
-        assert.ok(fsSync.existsSync(path.join(tempDir, '.claude', 'context')));
-        assert.ok(fsSync.existsSync(path.join(tempDir, '.claude', 'logs')));
+        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'prds'))).toBe(true);
+        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'epics'))).toBe(true);
+        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'context'))).toBe(true);
+        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'logs'))).toBe(true);
       }
     });
 
@@ -101,10 +100,10 @@ describe('Local Mode Directory Structure', () => {
       if (process.platform === 'linux') {
         await setupLocalDirectories();
 
-        assert.ok(fsSync.existsSync(path.join(tempDir, '.claude', 'prds')));
-        assert.ok(fsSync.existsSync(path.join(tempDir, '.claude', 'epics')));
-        assert.ok(fsSync.existsSync(path.join(tempDir, '.claude', 'context')));
-        assert.ok(fsSync.existsSync(path.join(tempDir, '.claude', 'logs')));
+        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'prds'))).toBe(true);
+        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'epics'))).toBe(true);
+        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'context'))).toBe(true);
+        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'logs'))).toBe(true);
       }
     });
 
@@ -112,10 +111,10 @@ describe('Local Mode Directory Structure', () => {
       if (process.platform === 'win32') {
         await setupLocalDirectories();
 
-        assert.ok(fsSync.existsSync(path.join(tempDir, '.claude', 'prds')));
-        assert.ok(fsSync.existsSync(path.join(tempDir, '.claude', 'epics')));
-        assert.ok(fsSync.existsSync(path.join(tempDir, '.claude', 'context')));
-        assert.ok(fsSync.existsSync(path.join(tempDir, '.claude', 'logs')));
+        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'prds'))).toBe(true);
+        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'epics'))).toBe(true);
+        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'context'))).toBe(true);
+        expect(fsSync.existsSync(path.join(tempDir, '.claude', 'logs'))).toBe(true);
       }
     });
 
@@ -124,24 +123,22 @@ describe('Local Mode Directory Structure', () => {
       await setupLocalDirectories();
 
       // Second run should not throw
-      await assert.doesNotReject(async () => {
-        await setupLocalDirectories();
-      });
+      await expect(setupLocalDirectories()).resolves.not.toThrow();
 
       // Verify directories still exist
-      assert.ok(fsSync.existsSync(path.join(tempDir, '.claude', 'prds')));
-      assert.ok(fsSync.existsSync(path.join(tempDir, '.claude', 'epics')));
+      expect(fsSync.existsSync(path.join(tempDir, '.claude', 'prds'))).toBe(true);
+      expect(fsSync.existsSync(path.join(tempDir, '.claude', 'epics'))).toBe(true);
     });
 
     it('should create parent directories if needed', async () => {
       // .claude/ doesn't exist yet
-      assert.ok(!fsSync.existsSync(path.join(tempDir, '.claude')));
+      expect(fsSync.existsSync(path.join(tempDir, '.claude'))).toBe(false);
 
       await setupLocalDirectories();
 
       // Both parent and child directories created
-      assert.ok(fsSync.existsSync(path.join(tempDir, '.claude')));
-      assert.ok(fsSync.existsSync(path.join(tempDir, '.claude', 'prds')));
+      expect(fsSync.existsSync(path.join(tempDir, '.claude'))).toBe(true);
+      expect(fsSync.existsSync(path.join(tempDir, '.claude', 'prds'))).toBe(true);
     });
   });
 
@@ -150,12 +147,12 @@ describe('Local Mode Directory Structure', () => {
       await updateGitignore();
 
       const gitignorePath = path.join(tempDir, '.gitignore');
-      assert.ok(fsSync.existsSync(gitignorePath));
+      expect(fsSync.existsSync(gitignorePath)).toBe(true);
 
       const content = await fs.readFile(gitignorePath, 'utf8');
-      assert.ok(content.includes('.claude/logs/*.log'));
-      assert.ok(content.includes('.claude/context/.context-version'));
-      assert.ok(content.includes('.claude/prds/drafts/'));
+      expect(content).toContain('.claude/logs/*.log');
+      expect(content).toContain('.claude/context/.context-version');
+      expect(content).toContain('.claude/prds/drafts/');
     });
 
     it('should append to existing .gitignore if present', async () => {
@@ -168,8 +165,8 @@ describe('Local Mode Directory Structure', () => {
       const content = await fs.readFile(gitignorePath, 'utf8');
 
       // Should contain both old and new content
-      assert.ok(content.includes('node_modules/'));
-      assert.ok(content.includes('.claude/logs/*.log'));
+      expect(content).toContain('node_modules/');
+      expect(content).toContain('.claude/logs/*.log');
     });
 
     it('should not duplicate entries if run multiple times', async () => {
@@ -181,14 +178,14 @@ describe('Local Mode Directory Structure', () => {
 
       // Count occurrences
       const matches = content.match(/\.claude\/logs\/\*\.log/g);
-      assert.strictEqual(matches ? matches.length : 0, 1);
+      expect(matches ? matches.length : 0).toBe(1);
     });
 
     it('should include comment header', async () => {
       await updateGitignore();
 
       const content = await fs.readFile(path.join(tempDir, '.gitignore'), 'utf8');
-      assert.ok(content.includes('# ClaudeAutoPM Local Mode'));
+      expect(content).toContain('# ClaudeAutoPM Local Mode');
     });
   });
 
@@ -198,14 +195,14 @@ describe('Local Mode Directory Structure', () => {
       await updateGitignore();
 
       // Verify all directories exist
-      assert.ok(fsSync.existsSync(path.join(tempDir, '.claude', 'prds')));
-      assert.ok(fsSync.existsSync(path.join(tempDir, '.claude', 'epics')));
-      assert.ok(fsSync.existsSync(path.join(tempDir, '.claude', 'context')));
-      assert.ok(fsSync.existsSync(path.join(tempDir, '.claude', 'logs')));
+      expect(fsSync.existsSync(path.join(tempDir, '.claude', 'prds'))).toBe(true);
+      expect(fsSync.existsSync(path.join(tempDir, '.claude', 'epics'))).toBe(true);
+      expect(fsSync.existsSync(path.join(tempDir, '.claude', 'context'))).toBe(true);
+      expect(fsSync.existsSync(path.join(tempDir, '.claude', 'logs'))).toBe(true);
 
       // Verify .gitignore exists with entries
       const gitignore = await fs.readFile(path.join(tempDir, '.gitignore'), 'utf8');
-      assert.ok(gitignore.includes('.claude/logs/*.log'));
+      expect(gitignore).toContain('.claude/logs/*.log');
     });
   });
 });
