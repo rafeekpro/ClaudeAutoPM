@@ -286,8 +286,11 @@ created: 2025-01-01
       const endTime = Date.now();
       const duration = endTime - startTime;
 
-      // Should complete in reasonable time (< 5 seconds)
-      expect(duration).toBeLessThan(5000);
+      // Should complete in reasonable time (< threshold, default 5 seconds)
+      const PERFORMANCE_THRESHOLD_MS = process.env.E2E_PERFORMANCE_THRESHOLD_MS
+        ? parseInt(process.env.E2E_PERFORMANCE_THRESHOLD_MS, 10)
+        : 5000;
+      expect(duration).toBeLessThan(PERFORMANCE_THRESHOLD_MS);
 
       // Verify all items created
       const { listLocalEpics } = require('../../autopm/.claude/scripts/pm-epic-list-local');
