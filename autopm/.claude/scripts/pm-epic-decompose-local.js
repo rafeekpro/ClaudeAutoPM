@@ -20,6 +20,7 @@ const { updateLocalEpic } = require('./pm-epic-update-local');
 const { stringifyFrontmatter } = require('../lib/frontmatter');
 const { TaskGenerator } = require('../lib/ai-task-generator');
 const { analyzeDependencies } = require('../lib/dependency-analyzer');
+const { generateTaskId, generateTaskNumber, generateTaskFilename } = require('../lib/task-utils');
 
 /**
  * Decompose epic into tasks using AI
@@ -69,9 +70,8 @@ async function decomposeLocalEpic(epicId, options = {}) {
   const taskIds = [];
   for (let i = 0; i < tasks.length; i++) {
     const task = tasks[i];
-    const taskNum = String(i + 1).padStart(3, '0');
-    const taskId = `task-${epicId}-${taskNum}`;
-    const taskFilename = `task-${taskNum}.md`;
+    const taskId = generateTaskId(epicId, i + 1);
+    const taskFilename = generateTaskFilename(i + 1);
     const taskPath = path.join(epicDir, taskFilename);
 
     // Build task frontmatter

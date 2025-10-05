@@ -13,6 +13,8 @@
  *   }
  */
 
+const { generateShortTaskId } = require('./task-utils');
+
 /**
  * Analyze task dependencies
  *
@@ -42,7 +44,7 @@ function buildDependencyGraph(tasks) {
   const graph = new Map();
 
   tasks.forEach((task, index) => {
-    const taskId = `task-${String(index + 1).padStart(3, '0')}`;
+    const taskId = generateShortTaskId(index + 1);
     const dependencies = task.dependencies || [];
 
     graph.set(taskId, dependencies);
@@ -66,7 +68,7 @@ function detectCircularDependencies(graph) {
     if (recursionStack.has(node)) {
       // Found a cycle
       const cycleStart = path.indexOf(node);
-      cycles.push(path.slice(cycleStart).concat(node));
+      cycles.push(path.slice(cycleStart));
       return;
     }
 
@@ -80,9 +82,10 @@ function detectCircularDependencies(graph) {
 
     const dependencies = graph.get(node) || [];
     for (const dep of dependencies) {
-      dfs(dep, [...path]);
+      dfs(dep, path);
     }
 
+    path.pop(); // Cleanup: remove node from path after exploring
     recursionStack.delete(node);
   }
 
@@ -113,7 +116,9 @@ function topologicalSort(graph) {
   // Calculate in-degree
   for (const deps of graph.values()) {
     for (const dep of deps) {
-      inDegree.set(dep, (inDegree.get(dep) || 0) + 1);
+      if (graph.has(dep)) {
+        inDegree.set(dep, (inDegree.get(dep) || 0) + 1);
+      }
     }
   }
 
