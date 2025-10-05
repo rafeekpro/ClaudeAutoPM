@@ -122,23 +122,18 @@ describe('Local PRD Management', () => {
       // Check both files exist
       await expect(fs.access(result1.filepath)).resolves.toBeUndefined();
       await expect(fs.access(result2.filepath)).resolves.toBeUndefined();
-      expect(prd2.id).toBeTruthy();
-      expect(prd1.id).not.toBe(prd2.id);
-
-      // Filenames should be different due to unique IDs
-      expect(prd1.filepath).not.toBe(prd2.filepath);
-      expect(result.filepath).toMatch(/prd-\d{3}-users-admins-dashboard\.md$/);
+    });
 
     test('should handle names with special characters', async () => {
       const result = await createLocalPRD('User\'s & Admin\'s Dashboard!');
 
-      expect(result.filepath).toMatch(/users-admins-dashboard\.md$/);
-      expect(result.filepath).toMatch(/prd-\d{3}-feature-with-spaces\.md$/);
+      expect(result.filepath).toMatch(/prd-\d{3}-users-admins-dashboard\.md$/);
+    });
 
     test('should handle names with multiple spaces', async () => {
       const result = await createLocalPRD('Feature   With    Spaces');
 
-      expect(result.filepath).toMatch(/feature-with-spaces\.md$/);
+      expect(result.filepath).toMatch(/prd-\d{3}-feature-with-spaces\.md$/);
     });
 
     test('should validate required name parameter', async () => {
