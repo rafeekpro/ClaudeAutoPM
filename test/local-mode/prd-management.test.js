@@ -66,7 +66,7 @@ describe('Local PRD Management', () => {
     test('should use correct filename format', async () => {
       const result = await createLocalPRD('User Authentication');
 
-      expect(result.filepath).toMatch(/user-authentication\.md$/);
+      expect(result.filepath).toMatch(/prd-\d{3}-user-authentication\.md$/);
     });
 
     test('should generate unique ID if not provided', async () => {
