@@ -349,10 +349,65 @@ async function saveSyncMap(syncMapPath, syncMap) {
   await fs.writeFile(syncMapPath, JSON.stringify(syncMap, null, 2), 'utf8');
 }
 
+/**
+ * Orchestrator: Sync all PRDs, Epics, and Tasks to GitHub
+ *
+ * @param {Object} options
+ *   - basePath: string, root directory containing PRDs, Epics, Tasks
+ *   - owner: string, GitHub repo owner
+ *   - repo: string, GitHub repo name
+ *   - octokit: Octokit instance
+ *   - dryRun: boolean, if true, do not write to GitHub
+ */
+async function syncToGitHub({ basePath, owner, repo, octokit, dryRun = false }) {
+  const syncMapPath = path.join(basePath, 'sync-map.json');
+  let syncMap = await loadSyncMap(syncMapPath);
+
+  // Sync PRDs
+  const prdDir = path.join(basePath, 'prds');
+  let prdFiles = [];
+  try {
+    prdFiles = (await fs.readdir(prdDir))
+      .filter(f => f.endsWith('.md'))
+      .map(f => path.join(prdDir, f));
+  } catch (e) {}
+  for (const prdPath of prdFiles) {
+    await syncPRDToGitHub(prdPath, { owner, repo }, octokit, syncMap, dryRun);
+  }
+
+  // Sync Epics
+  const epicDir = path.join(basePath, 'epics');
+  let epicFiles = [];
+  try {
+    epicFiles = (await fs.readdir(epicDir))
+      .filter(f => f.endsWith('.md'))
+      .map(f => path.join(epicDir, f));
+  } catch (e) {}
+  for (const epicPath of epicFiles) {
+    await syncEpicToGitHub(epicPath, { owner, repo }, octokit, syncMap, dryRun);
+  }
+
+  // Sync Tasks
+  const taskDir = path.join(basePath, 'tasks');
+  let taskFiles = [];
+  try {
+    taskFiles = (await fs.readdir(taskDir))
+      .filter(f => f.endsWith('.md'))
+      .map(f => path.join(taskDir, f));
+  } catch (e) {}
+  for (const taskPath of taskFiles) {
+    await syncTaskToGitHub(taskPath, { owner, repo }, octokit, syncMap, dryRun);
+  }
+
+  // Save sync map
+  await saveSyncMap(syncMapPath, syncMap);
+}
+
 module.exports = {
   syncPRDToGitHub,
   syncEpicToGitHub,
   syncTaskToGitHub,
   loadSyncMap,
-  saveSyncMap
+  saveSyncMap,
+  syncToGitHub
 };
