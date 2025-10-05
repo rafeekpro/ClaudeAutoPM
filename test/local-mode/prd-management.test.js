@@ -112,12 +112,16 @@ describe('Local PRD Management', () => {
       expect(body).toContain('## 7. Timeline');
     });
 
-    test('should allow creating PRDs with same name (unique IDs prevent conflicts)', async () => {
-      const prd1 = await createLocalPRD('Duplicate Test');
-      const prd2 = await createLocalPRD('Duplicate Test');
+    test('should allow duplicate names, producing different IDs and files', async () => {
+      const result1 = await createLocalPRD('Duplicate Test');
+      const result2 = await createLocalPRD('Duplicate Test');
 
-      // Both should succeed with different IDs
-      expect(prd1.id).toBeTruthy();
+      expect(result1.frontmatter.id).not.toBe(result2.frontmatter.id);
+      expect(result1.filepath).not.toBe(result2.filepath);
+
+      // Check both files exist
+      await expect(fs.access(result1.filepath)).resolves.toBeUndefined();
+      await expect(fs.access(result2.filepath)).resolves.toBeUndefined();
       expect(prd2.id).toBeTruthy();
       expect(prd1.id).not.toBe(prd2.id);
 
