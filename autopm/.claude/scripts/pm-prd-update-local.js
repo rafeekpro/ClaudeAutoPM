@@ -94,6 +94,10 @@ async function updateLocalPRD(id, field, value) {
  * @returns {Promise<Object>} Updated PRD data
  */
 async function updateMultipleFields(id, updates) {
+  // Validate parameters
+  if (!id || typeof id !== 'string' || id.trim().length === 0) {
+    throw new Error('PRD ID is required');
+  }
   if (!updates || typeof updates !== 'object') {
     throw new Error('Updates must be an object');
   }
