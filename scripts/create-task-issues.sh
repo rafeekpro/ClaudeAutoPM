@@ -16,7 +16,7 @@ for task_file in task-*.md; do
     issue_url=$(gh issue create \
       --title "[TASK-$task_num] $task_title" \
       --body-file "$task_file" \
-      --label "task,enhancement")
+      --label "task" --label "enhancement")
 
     echo "  ✅ Created: $issue_url"
     echo ""
