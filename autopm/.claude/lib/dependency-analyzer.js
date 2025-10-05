@@ -66,7 +66,7 @@ function detectCircularDependencies(graph) {
     if (recursionStack.has(node)) {
       // Found a cycle
       const cycleStart = path.indexOf(node);
-      cycles.push(path.slice(cycleStart).concat(node));
+      cycles.push(path.slice(cycleStart));
       return;
     }
 
