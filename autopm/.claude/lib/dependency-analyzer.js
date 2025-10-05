@@ -13,6 +13,8 @@
  *   }
  */
 
+const { generateShortTaskId } = require('./task-utils');
+
 /**
  * Analyze task dependencies
  *
@@ -42,7 +44,7 @@ function buildDependencyGraph(tasks) {
   const graph = new Map();
 
   tasks.forEach((task, index) => {
-    const taskId = `task-${String(index + 1).padStart(3, '0')}`;
+    const taskId = generateShortTaskId(index + 1);
     const dependencies = task.dependencies || [];
 
     graph.set(taskId, dependencies);
