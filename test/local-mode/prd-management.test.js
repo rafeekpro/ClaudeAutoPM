@@ -133,7 +133,7 @@ describe('Local PRD Management', () => {
       const result = await createLocalPRD('User\'s & Admin\'s Dashboard!');
 
       expect(result.filepath).toMatch(/users-admins-dashboard\.md$/);
-    });
+      expect(result.filepath).toMatch(/prd-\d{3}-feature-with-spaces\.md$/);
 
     test('should handle names with multiple spaces', async () => {
       const result = await createLocalPRD('Feature   With    Spaces');
