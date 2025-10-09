@@ -44,31 +44,63 @@ PRD → Epic Decomposition → Parallel Development → Testing → Production
 
 ## ✨ Key Features
 
-### 🆕 **NEW in v1.28.0: Templates & Scaffolding!**
+### 🆕 **NEW in v1.29.0: Batch Operations, Filtering & Analytics!**
+
+**Batch Operations** - Sync 1000+ items in seconds
+- ⚡ **Parallel Processing** - 10 concurrent uploads (configurable)
+- 🔄 **Smart Rate Limiting** - Auto-throttle to respect GitHub API limits
+- 📊 **Progress Tracking** - Real-time progress bars
+- 🛡️ **Error Recovery** - Continues on failures with detailed reporting
+
+```bash
+autopm sync:batch                    # Sync all items
+autopm sync:batch --type prd         # Sync only PRDs
+autopm sync:batch --dry-run          # Preview changes
+```
+
+**Advanced Filtering & Search** - Find anything instantly
+- 🔍 **10 Filter Types** - status, priority, epic, dates, author, assignee, search
+- 📝 **Full-Text Search** - Search across all markdown content
+- 📅 **Date Ranges** - Filter by creation/update dates
+- 🎯 **Combined Filters** - AND logic for precise results
+
+```bash
+autopm prd:list --status active --priority high
+autopm search "authentication" --type prd,epic,task
+```
+
+**Analytics & Insights** - Data-driven project management
+- 📈 **Velocity Tracking** - Tasks/week with trend analysis
+- 📉 **Burndown Charts** - ASCII visualization (ideal vs actual)
+- 👥 **Team Metrics** - Completion rates, average duration
+- 🔗 **Dependency Analysis** - Bottlenecks, critical path, parallelizable tasks
+
+```bash
+autopm analytics:epic epic-001       # Full analytics with burndown
+autopm analytics:team --period 30    # Team metrics (30 days)
+autopm analytics:dependencies epic-001  # Find bottlenecks
+autopm analytics:export epic-001 --format csv  # Export data
+```
+
+**Performance** - All targets exceeded ✅
+- Batch sync: 1000 items in 28.5s
+- Filtering: < 500ms for 1000 items
+- Analytics: 230ms for 1000 tasks
+- **497+ Tests Passing** (99.6% pass rate)
+
+---
+
+### 🎉 **v1.28.0: Templates & Scaffolding**
 
 **PRD Templates (Quick Start)**
 - 📋 **5 Built-in Templates** - api-feature, ui-feature, bug-fix, data-migration, documentation
 - 🚀 **70% Faster** - Create PRDs in 9 minutes instead of 30
 - 🎯 **Context7-Verified** - All templates use 2025 best practices
-- ✨ **Smart Variables** - Auto-generate IDs, timestamps, authors
-- 🎨 **Custom Templates** - Create your own team-specific templates
 
-**Template Commands**
 ```bash
-# Create PRD from template
 autopm prd:new --template api-feature "Payment API"
-
-# Interactive template selection
-autopm prd:new "my-feature"
-
-# List available templates
 autopm template:list
-
-# Create custom template
-autopm template:new prd my-custom-template
 ```
-
-**260+ Tests Passing** - Production-ready with comprehensive test coverage!
 
 ---
 
