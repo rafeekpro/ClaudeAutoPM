@@ -584,11 +584,13 @@ describe('ConflictHistory - Constructor and Configuration', () => {
   });
 
   test('should create instance with custom storage path', () => {
+    const path = require('path');
     const history = new ConflictHistory({
       storagePath: 'custom/conflict-history.json'
     });
 
-    expect(history.options.storagePath).toBe('custom/conflict-history.json');
+    // After merge, storagePath is resolved to absolute path
+    expect(history.options.storagePath).toBe(path.resolve(process.cwd(), 'custom/conflict-history.json'));
   });
 
   test('should support in-memory storage mode', () => {
