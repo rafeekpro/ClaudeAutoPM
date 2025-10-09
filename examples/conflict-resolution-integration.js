@@ -307,7 +307,7 @@ if (require.main === module) {
 
     // Example 1: Review conflict history
     console.log('Example 1: Reviewing Conflict History');
-    console.log('=' .repeat(80));
+    console.log('='.repeat(80));
     await reviewConflictHistory();
 
     console.log('\n\nExample 2: Visual Diff Demo');
