@@ -26,10 +26,31 @@ try {
     // Fallback: try from AutoPM global installation
     try {
       const { execSync } = require('child_process');
-      const npmRoot = execSync('npm root -g', { encoding: 'utf-8' }).trim();
+      const os = require('os');
+      // Check if npm is available
+      let npmExists = false;
+      try {
+        if (os.platform() === 'win32') {
+          execSync('where npm', { stdio: 'ignore' });
+        } else {
+          execSync('which npm', { stdio: 'ignore' });
+        }
+        npmExists = true;
+      } catch (checkErr) {
+        npmExists = false;
+      }
+      if (!npmExists) {
+        throw new Error('npm is not installed or not found in PATH. Please install npm to use global template-engine.');
+      }
+      let npmRoot;
+      try {
+        npmRoot = execSync('npm root -g', { encoding: 'utf-8' }).trim();
+      } catch (npmErr) {
+        throw new Error('Failed to execute "npm root -g". Please check your npm installation.');
+      }
       TemplateEngine = require(path.join(npmRoot, 'claude-autopm', 'lib', 'template-engine'));
     } catch (err3) {
-      throw new Error('Cannot find template-engine module. Please ensure lib/ directory is installed.');
+      throw new Error('Cannot find template-engine module. Please ensure lib/ directory is installed. Details: ' + err3.message);
     }
   }
 }
