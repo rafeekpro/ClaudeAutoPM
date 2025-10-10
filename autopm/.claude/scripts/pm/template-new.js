@@ -24,10 +24,24 @@ try {
   } catch (err2) {
     // Fallback: try from AutoPM global installation
     try {
-      const npmRoot = execSync('npm root -g', { encoding: 'utf-8' }).trim();
+      let npmRoot;
+      try {
+        // Check if npm is available
+        execSync('npm --version', { stdio: 'ignore' });
+      } catch (npmErr) {
+        throw new Error('npm is not available in your environment. Please install npm and try again.');
+      }
+      try {
+        npmRoot = execSync('npm root -g', { encoding: 'utf-8' }).trim();
+      } catch (rootErr) {
+        throw new Error('Failed to execute "npm root -g": ' + rootErr.message);
+      }
+      if (!npmRoot || !fs.existsSync(npmRoot)) {
+        throw new Error('The npm global root directory could not be determined or does not exist: "' + npmRoot + '"');
+      }
       TemplateEngine = require(path.join(npmRoot, 'claude-autopm', 'lib', 'template-engine'));
     } catch (err3) {
-      throw new Error('Cannot find template-engine module. Please ensure lib/ directory is installed.');
+      throw new Error('Cannot find template-engine module. Please ensure lib/ directory is installed. Details: ' + err3.message);
     }
   }
 }
