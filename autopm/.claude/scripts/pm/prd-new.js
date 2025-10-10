@@ -16,15 +16,21 @@ const readline = require('readline');
 // This works both in installed projects and during testing
 let TemplateEngine;
 try {
-  // Try relative path from .claude/scripts/pm/
-  TemplateEngine = require(path.join(__dirname, '..', '..', '..', '..', 'lib', 'template-engine'));
+  // Try from project root (where lib/ is installed)
+  TemplateEngine = require(path.join(process.cwd(), 'lib', 'template-engine'));
 } catch (err) {
   try {
-    // Try from project root
-    TemplateEngine = require(path.join(process.cwd(), 'lib', 'template-engine'));
+    // Try relative path from .claude/scripts/pm/ (during development)
+    TemplateEngine = require(path.join(__dirname, '..', '..', '..', '..', 'lib', 'template-engine'));
   } catch (err2) {
-    // Fallback to relative
-    TemplateEngine = require('../../../../lib/template-engine');
+    // Fallback: try from AutoPM global installation
+    try {
+      const { execSync } = require('child_process');
+      const npmRoot = execSync('npm root -g', { encoding: 'utf-8' }).trim();
+      TemplateEngine = require(path.join(npmRoot, 'claude-autopm', 'lib', 'template-engine'));
+    } catch (err3) {
+      throw new Error('Cannot find template-engine module. Please ensure lib/ directory is installed.');
+    }
   }
 }
 

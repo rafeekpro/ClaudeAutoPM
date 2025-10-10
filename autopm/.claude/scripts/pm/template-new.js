@@ -15,12 +15,20 @@ const { execSync } = require('child_process');
 // Dynamically resolve template engine path
 let TemplateEngine;
 try {
-  TemplateEngine = require(path.join(__dirname, '..', '..', '..', '..', 'lib', 'template-engine'));
+  // Try from project root (where lib/ is installed)
+  TemplateEngine = require(path.join(process.cwd(), 'lib', 'template-engine'));
 } catch (err) {
   try {
-    TemplateEngine = require(path.join(process.cwd(), 'lib', 'template-engine'));
+    // Try relative path from .claude/scripts/pm/ (during development)
+    TemplateEngine = require(path.join(__dirname, '..', '..', '..', '..', 'lib', 'template-engine'));
   } catch (err2) {
-    TemplateEngine = require('../../../lib/template-engine');
+    // Fallback: try from AutoPM global installation
+    try {
+      const npmRoot = execSync('npm root -g', { encoding: 'utf-8' }).trim();
+      TemplateEngine = require(path.join(npmRoot, 'claude-autopm', 'lib', 'template-engine'));
+    } catch (err3) {
+      throw new Error('Cannot find template-engine module. Please ensure lib/ directory is installed.');
+    }
   }
 }
 

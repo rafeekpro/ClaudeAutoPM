@@ -46,7 +46,8 @@ class Installer {
       '.claude/mcp-servers.json',
       '.claude/.env.example',
       '.claude/teams.json',
-      '.claude-code'
+      '.claude-code',
+      'lib'  // Template engine and other utilities
     ];
 
     // Parse command line arguments
