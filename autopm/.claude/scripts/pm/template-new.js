@@ -15,12 +15,34 @@ const { execSync } = require('child_process');
 // Dynamically resolve template engine path
 let TemplateEngine;
 try {
-  TemplateEngine = require(path.join(__dirname, '..', '..', '..', '..', 'lib', 'template-engine'));
+  // Try from project root (where lib/ is installed)
+  TemplateEngine = require(path.join(process.cwd(), 'lib', 'template-engine'));
 } catch (err) {
   try {
-    TemplateEngine = require(path.join(process.cwd(), 'lib', 'template-engine'));
+    // Try relative path from .claude/scripts/pm/ (during development)
+    TemplateEngine = require(path.join(__dirname, '..', '..', '..', '..', 'lib', 'template-engine'));
   } catch (err2) {
-    TemplateEngine = require('../../../lib/template-engine');
+    // Fallback: try from AutoPM global installation
+    try {
+      let npmRoot;
+      try {
+        // Check if npm is available
+        execSync('npm --version', { stdio: 'ignore' });
+      } catch (npmErr) {
+        throw new Error('npm is not available in your environment. Please install npm and try again.');
+      }
+      try {
+        npmRoot = execSync('npm root -g', { encoding: 'utf-8' }).trim();
+      } catch (rootErr) {
+        throw new Error('Failed to execute "npm root -g": ' + rootErr.message);
+      }
+      if (!npmRoot || !fs.existsSync(npmRoot)) {
+        throw new Error('The npm global root directory could not be determined or does not exist: "' + npmRoot + '"');
+      }
+      TemplateEngine = require(path.join(npmRoot, 'claude-autopm', 'lib', 'template-engine'));
+    } catch (err3) {
+      throw new Error('Cannot find template-engine module. Please ensure lib/ directory is installed. Details: ' + err3.message);
+    }
   }
 }
 

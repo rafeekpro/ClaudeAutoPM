@@ -16,15 +16,42 @@ const readline = require('readline');
 // This works both in installed projects and during testing
 let TemplateEngine;
 try {
-  // Try relative path from .claude/scripts/pm/
-  TemplateEngine = require(path.join(__dirname, '..', '..', '..', '..', 'lib', 'template-engine'));
+  // Try from project root (where lib/ is installed)
+  TemplateEngine = require(path.join(process.cwd(), 'lib', 'template-engine'));
 } catch (err) {
   try {
-    // Try from project root
-    TemplateEngine = require(path.join(process.cwd(), 'lib', 'template-engine'));
+    // Try relative path from .claude/scripts/pm/ (during development)
+    TemplateEngine = require(path.join(__dirname, '..', '..', '..', '..', 'lib', 'template-engine'));
   } catch (err2) {
-    // Fallback to relative
-    TemplateEngine = require('../../../../lib/template-engine');
+    // Fallback: try from AutoPM global installation
+    try {
+      const { execSync } = require('child_process');
+      const os = require('os');
+      // Check if npm is available
+      let npmExists = false;
+      try {
+        if (os.platform() === 'win32') {
+          execSync('where npm', { stdio: 'ignore' });
+        } else {
+          execSync('which npm', { stdio: 'ignore' });
+        }
+        npmExists = true;
+      } catch (checkErr) {
+        npmExists = false;
+      }
+      if (!npmExists) {
+        throw new Error('npm is not installed or not found in PATH. Please install npm to use global template-engine.');
+      }
+      let npmRoot;
+      try {
+        npmRoot = execSync('npm root -g', { encoding: 'utf-8' }).trim();
+      } catch (npmErr) {
+        throw new Error('Failed to execute "npm root -g". Please check your npm installation.');
+      }
+      TemplateEngine = require(path.join(npmRoot, 'claude-autopm', 'lib', 'template-engine'));
+    } catch (err3) {
+      throw new Error('Cannot find template-engine module. Please ensure lib/ directory is installed. Details: ' + err3.message);
+    }
   }
 }
 
