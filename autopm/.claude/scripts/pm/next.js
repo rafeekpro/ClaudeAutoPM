@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { logError } = require('./lib/logger');
+const { findAllEpicDirs } = require('./lib/epic-discovery');
 
 /**
  * PM Next Script (Node.js version)
@@ -106,69 +107,66 @@ function displayTddReminder(addMessage) {
 async function findAvailableTasks() {
   const availableTasks = [];
 
-  if (!fs.existsSync('.claude/epics')) {
-    return availableTasks;
-  }
+  // Use shared epic discovery utility
+  const epicDirs = findAllEpicDirs();
 
-  try {
-    const epicDirs = fs.readdirSync('.claude/epics', { withFileTypes: true })
-      .filter(dirent => dirent.isDirectory())
-      .map(dirent => dirent.name);
+  for (const epicDir of epicDirs) {
+    const { name: epicName, path: epicPath } = epicDir;
 
-    for (const epicName of epicDirs) {
-      const epicPath = path.join('.claude/epics', epicName);
+    try {
+      const taskFiles = fs.readdirSync(epicPath)
+        .filter(file => /^\d+.*\.md$/.test(file))
+        .sort();
 
-      try {
-        const taskFiles = fs.readdirSync(epicPath)
-          .filter(file => /^[0-9].*\.md$/.test(file))
-          .sort();
+      for (const taskFile of taskFiles) {
+        const taskPath = path.join(epicPath, taskFile);
 
-        for (const taskFile of taskFiles) {
-          const taskPath = path.join(epicPath, taskFile);
+        try {
+          const content = fs.readFileSync(taskPath, 'utf8');
 
-          try {
-            const content = fs.readFileSync(taskPath, 'utf8');
+          // Check if task is open (case-insensitive)
+          const statusMatch = content.match(/^status:\s*(.+)$/m);
+          const status = statusMatch ? statusMatch[1].trim().toLowerCase() : '';
 
-            // Check if task is open
-            const statusMatch = content.match(/^status:\s*(.+)$/m);
-            const status = statusMatch ? statusMatch[1].trim() : '';
+          // Skip non-open tasks (only open tasks or tasks without status are available)
+          if (status !== 'open' && status !== '') {
+            continue;
+          }
 
-            // Skip non-open tasks (only open tasks or tasks without status are available)
-            if (status !== 'open' && status !== '') {
-              continue;
-            }
+          // Check dependencies
+          const depsMatch = content.match(/^depends_on:\s*\[(.*?)\]/m);
+          const depsStr = depsMatch ? depsMatch[1].trim() : '';
 
-            // Check dependencies
-            const depsMatch = content.match(/^depends_on:\s*\[(.*?)\]/m);
-            const depsStr = depsMatch ? depsMatch[1].trim() : '';
+          // If no dependencies or empty dependencies, task is available
+          if (!depsStr || depsStr === '') {
+            const nameMatch = content.match(/^name:\s*(.+)$/m);
+            const name = nameMatch ? nameMatch[1].trim() : 'Unnamed Task';
 
-            // If no dependencies or empty dependencies, task is available
-            if (!depsStr || depsStr === '') {
-              const nameMatch = content.match(/^name:\s*(.+)$/m);
-              const name = nameMatch ? nameMatch[1].trim() : 'Unnamed Task';
+            const parallelMatch = content.match(/^parallel:\s*(.+)$/m);
+            const parallel = parallelMatch ? parallelMatch[1].trim() === 'true' : false;
 
-              const parallelMatch = content.match(/^parallel:\s*(.+)$/m);
-              const parallel = parallelMatch ? parallelMatch[1].trim() === 'true' : false;
+            const taskNum = path.basename(taskFile, '.md');
 
-              const taskNum = path.basename(taskFile, '.md');
-
-              availableTasks.push({
-                taskNum,
-                name,
-                epicName,
-                parallel
-              });
-            }
-          } catch (err) {
-            // Skip files we can't read
+            availableTasks.push({
+              taskNum,
+              name,
+              epicName,
+              parallel
+            });
+          }
+        } catch (err) {
+          // Log file read errors in DEBUG mode
+          if (process.env.DEBUG) {
+            console.error(`Error reading task file ${taskPath}:`, err.message);
           }
         }
-      } catch (err) {
-        // Skip directories we can't read
+      }
+    } catch (err) {
+      // Log directory read errors in DEBUG mode
+      if (process.env.DEBUG) {
+        console.error(`Error reading epic directory ${epicPath}:`, err.message);
       }
     }
-  } catch (err) {
-    // Silently handle errors
   }
 
   return availableTasks;
