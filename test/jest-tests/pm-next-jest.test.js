@@ -295,6 +295,119 @@ depends_on: []`);
       expect(tasks.map(t => t.name).sort()).toEqual(['Epic1 Task1', 'Epic2 Task1']);
     });
 
+    test('should find tasks in nested multi-epic structure (1 level deep)', async () => {
+      // Create multi-epic structure with parent directory
+      fs.mkdirSync('.claude/epics/ecommerce-platform/01-infrastructure', { recursive: true });
+      fs.mkdirSync('.claude/epics/ecommerce-platform/02-auth-backend', { recursive: true });
+
+      // Add epic.md to identify as epic directories
+      fs.writeFileSync('.claude/epics/ecommerce-platform/01-infrastructure/epic.md', 'Epic: Infrastructure');
+      fs.writeFileSync('.claude/epics/ecommerce-platform/02-auth-backend/epic.md', 'Epic: Auth Backend');
+
+      // Add tasks
+      fs.writeFileSync('.claude/epics/ecommerce-platform/01-infrastructure/1.md', `name: Setup VPC
+status: open
+depends_on: []`);
+
+      fs.writeFileSync('.claude/epics/ecommerce-platform/02-auth-backend/1.md', `name: Create user model
+status: open
+depends_on: []`);
+
+      const tasks = await findAvailableTasks();
+
+      expect(tasks).toHaveLength(2);
+      expect(tasks.map(t => t.epicName).sort()).toEqual([
+        'ecommerce-platform/01-infrastructure',
+        'ecommerce-platform/02-auth-backend'
+      ]);
+      expect(tasks.map(t => t.name).sort()).toEqual(['Create user model', 'Setup VPC']);
+    });
+
+    test('should find tasks in nested multi-epic structure (2 levels deep)', async () => {
+      // Create deeper nested structure
+      fs.mkdirSync('.claude/epics/platform/backend/auth', { recursive: true });
+      fs.mkdirSync('.claude/epics/platform/backend/api', { recursive: true });
+
+      // Add epic.md to identify as epic directories
+      fs.writeFileSync('.claude/epics/platform/backend/auth/epic.md', 'Epic: Auth');
+      fs.writeFileSync('.claude/epics/platform/backend/api/epic.md', 'Epic: API');
+
+      // Add tasks
+      fs.writeFileSync('.claude/epics/platform/backend/auth/1.md', `name: Auth task
+status: open
+depends_on: []`);
+
+      fs.writeFileSync('.claude/epics/platform/backend/api/1.md', `name: API task
+status: open
+depends_on: []`);
+
+      const tasks = await findAvailableTasks();
+
+      expect(tasks).toHaveLength(2);
+      expect(tasks.map(t => t.epicName).sort()).toEqual([
+        'platform/backend/api',
+        'platform/backend/auth'
+      ]);
+    });
+
+    test('should handle mixed flat and nested epic structures', async () => {
+      // Flat epic
+      fs.mkdirSync('.claude/epics/simple-epic', { recursive: true });
+      fs.writeFileSync('.claude/epics/simple-epic/1.md', `name: Simple task
+status: open
+depends_on: []`);
+
+      // Nested epic
+      fs.mkdirSync('.claude/epics/complex/sub-epic', { recursive: true });
+      fs.writeFileSync('.claude/epics/complex/sub-epic/epic.md', 'Epic: Sub Epic');
+      fs.writeFileSync('.claude/epics/complex/sub-epic/1.md', `name: Nested task
+status: open
+depends_on: []`);
+
+      const tasks = await findAvailableTasks();
+
+      expect(tasks).toHaveLength(2);
+      expect(tasks.map(t => t.epicName).sort()).toEqual([
+        'complex/sub-epic',
+        'simple-epic'
+      ]);
+    });
+
+    test('should respect depth limit to prevent infinite recursion', async () => {
+      // Create very deep nesting (5 levels: a/b/c/d/e - exceeds max depth of 3)
+      fs.mkdirSync('.claude/epics/a/b/c/d/e', { recursive: true });
+      fs.writeFileSync('.claude/epics/a/b/c/d/e/epic.md', 'Epic: Too Deep');
+      fs.writeFileSync('.claude/epics/a/b/c/d/e/1.md', `name: Deep task
+status: open
+depends_on: []`);
+
+      const tasks = await findAvailableTasks();
+
+      // Should not find tasks beyond depth limit (3 levels from first non-epic parent)
+      expect(tasks).toHaveLength(0);
+    });
+
+    test('should handle case-insensitive status matching', async () => {
+      fs.mkdirSync('.claude/epics/test-epic', { recursive: true });
+
+      fs.writeFileSync('.claude/epics/test-epic/1.md', `name: Open Task
+status: Open
+depends_on: []`);
+
+      fs.writeFileSync('.claude/epics/test-epic/2.md', `name: OPEN Task
+status: OPEN
+depends_on: []`);
+
+      fs.writeFileSync('.claude/epics/test-epic/3.md', `name: open Task
+status: open
+depends_on: []`);
+
+      const tasks = await findAvailableTasks();
+
+      expect(tasks).toHaveLength(3);
+      expect(tasks.map(t => t.name).sort()).toEqual(['OPEN Task', 'Open Task', 'open Task']);
+    });
+
     test('should handle mix of available and unavailable tasks across epics', async () => {
       fs.mkdirSync('.claude/epics/epic1', { recursive: true });
       fs.mkdirSync('.claude/epics/epic2', { recursive: true });
@@ -430,7 +543,9 @@ depends_on: []`);
 status: open
 depends_on: []`);
 
-      fs.writeFileSync('.claude/epics/unreadable-epic/1.md', 'name: Unreadable Task');
+      fs.writeFileSync('.claude/epics/unreadable-epic/1.md', `name: Unreadable Task
+status: open
+depends_on: []`);
 
       // Make epic directory unreadable (skip on Windows)
       if (process.platform !== 'win32') {
