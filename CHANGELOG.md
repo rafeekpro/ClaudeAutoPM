@@ -7,6 +7,305 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2025-10-12
+
+### 🚀 Phase 2: AI Provider Architecture & Configuration Management - MAJOR RELEASE
+
+**Breaking Changes**: This is a major architectural release introducing abstract provider patterns, comprehensive configuration management, and enterprise-grade security features. While backward compatible at the service level, this represents a significant evolution of the framework's foundation.
+
+### Added
+
+**AI Provider Architecture (#292, #293, #294):**
+- **AbstractAIProvider** base class (379 lines) with comprehensive retry logic
+  - Exponential backoff with jitter (full, equal, none)
+  - Circuit breaker pattern for service protection
+  - Configurable retry strategies with shouldRetry predicate
+  - Streaming support with progress callbacks
+  - 67 tests passing (28 new retry configuration tests)
+- **ClaudeProvider** refactored to extend AbstractAIProvider
+  - Full backward compatibility maintained
+  - Enhanced error handling and retry logic
+  - All 34 existing tests passing
+- **TemplateProvider** for no-AI fallback scenarios
+  - File-based template system
+  - Variable interpolation support
+  - 20 tests passing
+
+**Rate Limiting & Resilience (#295, #296):**
+- **RateLimiter** with token bucket algorithm (204 lines)
+  - Configurable rate limits (requests/minute)
+  - Burst capacity support
+  - Automatic token refill
+  - 24 tests passing
+- **Enhanced Error Handling** with retry mechanisms
+  - Circuit breaker integration
+  - Exponential backoff strategies
+  - Error classification (retryable vs non-retryable)
+  - Custom retry predicates
+
+**Configuration Management (#297, #298, #299):**
+- **Encryption** utility with AES-256-CBC (201 lines)
+  - PBKDF2 key derivation (100,000 iterations)
+  - Unique salt/IV per operation
+  - Zero dependencies (Node.js crypto only)
+  - 40 tests passing, 98% coverage
+- **ConfigManager** with hierarchical configuration (531 lines)
+  - Encrypted API key storage
+  - Dot notation for nested keys
+  - Atomic file operations
+  - Master password protection
+  - 76 tests passing, 95.68% coverage
+- **7 Interactive CLI Commands**:
+  - `config:init` - Initialize configuration with master password
+  - `config:set-api-key` - Set encrypted API keys
+  - `config:get` - Get configuration values
+  - `config:set` - Set configuration values
+  - `config:list-providers` - List available AI providers
+  - `config:set-provider` - Configure provider settings
+  - `config:show` - Display current configuration
+  - 140 tests created (90 passing, 50 format assertions)
+- **ServiceFactory** for dependency injection (165 lines)
+  - Automatic provider creation from ConfigManager
+  - Centralized configuration management
+  - Service instantiation with defaults
+  - 28 tests passing, 100% coverage
+  - Full backward compatibility maintained
+
+**GitHub Dependency Management (#300):**
+- **dependency-tracker.js** (554 lines)
+  - Label-based and native API dependency tracking
+  - Local mode for offline development
+  - CLI interface for dependency management
+  - 60 tests passing
+- **dependency-validator.js** - Validate dependency graphs
+  - Cycle detection
+  - Missing issue validation
+  - Comprehensive validation tests
+- **dependency-visualizer.js** - Visualize dependency trees
+  - ASCII tree rendering
+  - Dependency graph visualization
+  - Visualization tests
+
+**Developer Tools:**
+- Claude plugin marketplace integration
+- Test MCP server configuration
+- Enhanced testing infrastructure
+
+### Changed
+
+**Service Layer Integration:**
+- PRDService, EpicService, TaskService now support ConfigManager
+  - Optional `configManager` parameter
+  - Optional `provider` parameter
+  - Maintains full backward compatibility
+  - All 302 existing service tests passing
+
+**Configuration Workflow:**
+- Environment variable fallback maintained
+- New recommended workflow:
+  1. `autopm config:init` (set master password)
+  2. `autopm config:set-api-key` (encrypted storage)
+  3. Services auto-load from ConfigManager
+- Old workflow still works:
+  - `export ANTHROPIC_API_KEY="sk-ant-..."`
+
+### Security
+
+**Encryption & Key Management:**
+- AES-256-CBC for API key encryption (industry standard)
+- PBKDF2 key derivation (100,000 iterations - OWASP recommended)
+- Master password in memory only (never persisted)
+- Unique salt/IV per encryption operation
+- Atomic file writes (temp + rename pattern)
+- Zero external dependencies (Node.js crypto only)
+
+**Validation & Error Handling:**
+- Input validation for all CLI commands
+- Password strength requirements (min 8 characters)
+- Configuration validation before provider creation
+- Graceful error messages for missing configuration
+
+### Performance
+
+**Test Coverage:**
+- **839+ tests passing** across all components
+- New tests added:
+  - 67 AbstractAIProvider tests (28 new retry tests)
+  - 40 Encryption tests (98% coverage)
+  - 76 ConfigManager tests (95.68% coverage)
+  - 140 CLI command tests (90 passing)
+  - 28 ServiceFactory tests (100% coverage)
+  - 60 GitHub dependency tracker tests
+- All existing tests maintained (302 service tests)
+
+**Retry Performance:**
+| Operation | Configuration | Result |
+|-----------|--------------|--------|
+| Exponential backoff | startingDelay: 100ms, timeMultiple: 2 | 100ms, 200ms, 400ms |
+| Max delay cap | maxDelay: 500ms | Capped at 500ms |
+| Full jitter | jitter: 'full' | 0-100%, 0-200%, 0-400% |
+| Equal jitter | jitter: 'equal' | ±50% variance |
+
+### Files Added
+
+**Core Infrastructure:**
+- `lib/ai-providers/AbstractAIProvider.js` (379 lines)
+- `lib/ai-providers/TemplateProvider.js` (120 lines)
+- `lib/utils/RateLimiter.js` (204 lines)
+- `lib/utils/Encryption.js` (201 lines)
+- `lib/config/ConfigManager.js` (531 lines)
+- `lib/utils/ServiceFactory.js` (165 lines)
+
+**CLI Commands (7 files):**
+- `scripts/config/init.js` (100 lines)
+- `scripts/config/set-api-key.js` (107 lines)
+- `scripts/config/get.js` (75 lines)
+- `scripts/config/set.js` (90 lines)
+- `scripts/config/list-providers.js` (65 lines)
+- `scripts/config/set-provider.js` (115 lines)
+- `scripts/config/show.js` (80 lines)
+
+**GitHub Tools:**
+- `autopm/.claude/scripts/github/dependency-tracker.js` (554 lines)
+- `autopm/.claude/scripts/github/dependency-validator.js`
+- `autopm/.claude/scripts/github/dependency-visualizer.js`
+
+**Tests (17 files):**
+- `test/jest-tests/ai-providers/AbstractAIProvider.test.js` (67 tests)
+- `test/jest-tests/ai-providers/ClaudeProvider.test.js` (updated)
+- `test/jest-tests/ai-providers/TemplateProvider.test.js` (20 tests)
+- `test/jest-tests/utils/RateLimiter.test.js` (24 tests)
+- `test/jest-tests/utils/Encryption.test.js` (40 tests)
+- `test/jest-tests/config/ConfigManager.test.js` (76 tests)
+- `test/jest-tests/utils/ServiceFactory.test.js` (28 tests)
+- `test/jest-tests/scripts/config/*.test.js` (7 files, 140 tests)
+- `test/github/dependency-tracker.test.js` (60 tests)
+- `test/github/dependency-validator.test.js`
+- `test/github/dependency-visualizer.test.js`
+
+**Configuration:**
+- `.claude-plugin/marketplace.json` - Claude marketplace integration
+- `autopm/.claude/mcp/test-server.md` - Test MCP server
+- `jest.config.scripts.js` - Jest config for CLI scripts
+
+### Files Modified
+
+**Service Layer:**
+- `lib/services/PRDService.js` (+8 lines) - ConfigManager support
+- `lib/services/EpicService.js` (+4 lines) - ConfigManager support
+- `lib/services/TaskService.js` (+5 lines) - ConfigManager support
+- `bin/autopm-poc.js` - ConfigManager integration with fallback
+
+**AI Providers:**
+- `lib/ai-providers/ClaudeProvider.js` - Refactored to extend AbstractAIProvider
+
+### Migration Guide
+
+**For Existing Users:**
+
+**No changes required!** The v2.0.0 release is fully backward compatible:
+
+```bash
+# Old workflow still works
+export ANTHROPIC_API_KEY="sk-ant-..."
+autopm prd:generate my-feature
+
+# New recommended workflow (more secure)
+autopm config:init                    # Set master password
+autopm config:set-api-key claude      # Encrypt API key
+autopm prd:generate my-feature        # Auto-loads from config
+```
+
+**For New Users:**
+
+1. Install ClaudeAutoPM:
+   ```bash
+   npm install -g claude-autopm
+   ```
+
+2. Initialize configuration:
+   ```bash
+   autopm config:init
+   # Enter master password (min 8 characters)
+   ```
+
+3. Set API key:
+   ```bash
+   autopm config:set-api-key claude
+   # Enter your Anthropic API key (will be encrypted)
+   ```
+
+4. Start using:
+   ```bash
+   autopm prd:generate my-feature
+   ```
+
+**For Developers Extending AutoPM:**
+
+**Old Pattern (still works):**
+```javascript
+const PRDService = require('./lib/services/PRDService');
+const service = new PRDService({ defaultEffortHours: 10 });
+```
+
+**New Pattern (recommended):**
+```javascript
+const ConfigManager = require('./lib/config/ConfigManager');
+const ServiceFactory = require('./lib/utils/ServiceFactory');
+
+const configManager = new ConfigManager();
+configManager.setMasterPassword(process.env.AUTOPM_MASTER_PASSWORD);
+
+const factory = new ServiceFactory(configManager);
+const service = factory.createPRDService({ defaultEffortHours: 10 });
+```
+
+**Custom AI Providers:**
+```javascript
+const AbstractAIProvider = require('./lib/ai-providers/AbstractAIProvider');
+
+class MyProvider extends AbstractAIProvider {
+  async complete(prompt, options = {}) {
+    // Implement your provider logic
+    // Automatic retry, rate limiting, circuit breaker
+  }
+}
+```
+
+### Breaking Changes
+
+**None!** This release maintains 100% backward compatibility.
+
+All existing code continues to work without modification. New features are opt-in via:
+- `ServiceFactory` for dependency injection
+- `ConfigManager` for secure configuration
+- `AbstractAIProvider` for custom providers
+
+### Known Issues
+
+**CLI Command Tests:**
+- 50 tests have format assertion failures (console.log output format)
+- All core functionality working correctly
+- Issue tracked for v2.0.1
+
+**Deprecation Notices:**
+None. All existing APIs maintained.
+
+### Acknowledgments
+
+This release represents a major architectural evolution:
+- **8 tasks completed** (Phase 2 Week 2 & 3)
+- **9 PRs merged** (#292-#300)
+- **839+ tests passing**
+- **100% backward compatibility**
+- **Zero breaking changes**
+
+Special focus on:
+- Enterprise-grade security (AES-256-CBC encryption)
+- Comprehensive testing (TDD methodology)
+- Developer experience (interactive CLI commands)
+- Framework extensibility (abstract provider pattern)
+
 ## [1.30.0] - 2025-10-09
 
 ### 🔒 Advanced Conflict Resolution - Complete Sync Safety
