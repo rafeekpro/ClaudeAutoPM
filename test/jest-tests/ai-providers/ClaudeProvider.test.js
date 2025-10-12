@@ -1210,4 +1210,256 @@ describe('ClaudeProvider', () => {
       );
     });
   });
+
+  // ============================================================
+  // RATE LIMITING
+  // ============================================================
+
+  describe('Rate Limiting', () => {
+    test('should work without rate limit configuration', async () => {
+      mockCreate.mockResolvedValue({
+        content: [{ text: 'Response' }]
+      });
+
+      const provider = new ClaudeProvider({
+        apiKey: 'test-key'
+      });
+
+      expect(provider.rateLimiter).toBeNull();
+
+      const result = await provider.complete('Test');
+      expect(result).toBe('Response');
+    });
+
+    test('should initialize rate limiter when configured', () => {
+      const provider = new ClaudeProvider({
+        apiKey: 'test-key',
+        rateLimit: {
+          tokensPerInterval: 50,
+          interval: 'minute'
+        }
+      });
+
+      expect(provider.rateLimiter).toBeDefined();
+      expect(provider.rateLimiter).not.toBeNull();
+    });
+
+    test('should apply rate limiting to complete()', async () => {
+      mockCreate.mockResolvedValue({
+        content: [{ text: 'Response' }]
+      });
+
+      const provider = new ClaudeProvider({
+        apiKey: 'test-key',
+        rateLimit: {
+          tokensPerInterval: 2,
+          interval: 100
+        }
+      });
+
+      // Check that rate limiter is initialized
+      expect(provider.rateLimiter).not.toBeNull();
+      expect(provider.rateLimiter.getTokensRemaining()).toBe(2);
+
+      // Make 2 rapid requests to exhaust tokens
+      for (let i = 0; i < 2; i++) {
+        await provider.complete('Test');
+      }
+
+      // Tokens should be exhausted
+      expect(provider.rateLimiter.getTokensRemaining()).toBe(0);
+
+      // Next request should wait for refill
+      const startTime = Date.now();
+      await provider.complete('Test');
+      const elapsed = Date.now() - startTime;
+
+      // Should have waited for at least one refill (half interval for 1 token)
+      expect(elapsed).toBeGreaterThanOrEqual(45);
+    });
+
+    test('should apply rate limiting to stream()', async () => {
+      const mockStream = {
+        async *[Symbol.asyncIterator]() {
+          yield { type: 'content_block_delta', delta: { type: 'text_delta', text: 'chunk' } };
+        }
+      };
+
+      mockCreate.mockResolvedValue(mockStream);
+
+      const provider = new ClaudeProvider({
+        apiKey: 'test-key',
+        rateLimit: {
+          tokensPerInterval: 2,
+          interval: 100
+        }
+      });
+
+      // Check that rate limiter is initialized
+      expect(provider.rateLimiter).not.toBeNull();
+      expect(provider.rateLimiter.getTokensRemaining()).toBe(2);
+
+      // Make 2 rapid stream requests to exhaust tokens
+      for (let i = 0; i < 2; i++) {
+        const generator = provider.stream('Test');
+        for await (const chunk of generator) {
+          // Consume
+        }
+      }
+
+      // Tokens should be exhausted
+      expect(provider.rateLimiter.getTokensRemaining()).toBe(0);
+
+      // Next request should wait for refill
+      const startTime = Date.now();
+      const generator = provider.stream('Test');
+      for await (const chunk of generator) {
+        // Consume
+      }
+      const elapsed = Date.now() - startTime;
+
+      // Should have waited for rate limit
+      expect(elapsed).toBeGreaterThanOrEqual(45);
+    });
+
+    test('should apply rate limiting to chat()', async () => {
+      mockCreate.mockResolvedValue({
+        content: [{ text: 'Response' }]
+      });
+
+      const provider = new ClaudeProvider({
+        apiKey: 'test-key',
+        rateLimit: {
+          tokensPerInterval: 2,
+          interval: 100
+        }
+      });
+
+      const messages = [{ role: 'user', content: 'Hello' }];
+
+      // Check that rate limiter is initialized
+      expect(provider.rateLimiter).not.toBeNull();
+      expect(provider.rateLimiter.getTokensRemaining()).toBe(2);
+
+      // Make 2 rapid chat requests to exhaust tokens
+      for (let i = 0; i < 2; i++) {
+        await provider.chat(messages);
+      }
+
+      // Tokens should be exhausted
+      expect(provider.rateLimiter.getTokensRemaining()).toBe(0);
+
+      // Next request should wait for refill
+      const startTime = Date.now();
+      await provider.chat(messages);
+      const elapsed = Date.now() - startTime;
+
+      // Should have waited for rate limit
+      expect(elapsed).toBeGreaterThanOrEqual(45);
+    });
+
+    test('should support fireImmediately mode', async () => {
+      mockCreate.mockResolvedValue({
+        content: [{ text: 'Response' }]
+      });
+
+      const provider = new ClaudeProvider({
+        apiKey: 'test-key',
+        rateLimit: {
+          tokensPerInterval: 5,
+          interval: 1000,
+          fireImmediately: true
+        }
+      });
+
+      // Make 5 requests to exhaust limit
+      for (let i = 0; i < 5; i++) {
+        await provider.complete('Test');
+      }
+
+      // Next requests should still work (go negative)
+      const startTime = Date.now();
+      await provider.complete('Test');
+      const elapsed = Date.now() - startTime;
+
+      // Should NOT wait in fireImmediately mode
+      expect(elapsed).toBeLessThan(50);
+    });
+
+    test('should support burst configuration', async () => {
+      mockCreate.mockResolvedValue({
+        content: [{ text: 'Response' }]
+      });
+
+      const provider = new ClaudeProvider({
+        apiKey: 'test-key',
+        rateLimit: {
+          tokensPerInterval: 10,
+          interval: 100,
+          bucketSize: 20  // Allow burst
+        }
+      });
+
+      // Should allow burst of 20 requests immediately
+      const startTime = Date.now();
+      for (let i = 0; i < 20; i++) {
+        await provider.complete('Test');
+      }
+      const elapsed = Date.now() - startTime;
+
+      // All 20 should complete quickly (no waiting)
+      expect(elapsed).toBeLessThan(50);
+    });
+
+    test('should respect different rate limits per instance', async () => {
+      mockCreate.mockResolvedValue({
+        content: [{ text: 'Response' }]
+      });
+
+      const provider1 = new ClaudeProvider({
+        apiKey: 'test-key',
+        rateLimit: {
+          tokensPerInterval: 10,
+          interval: 1000
+        }
+      });
+
+      const provider2 = new ClaudeProvider({
+        apiKey: 'test-key',
+        rateLimit: {
+          tokensPerInterval: 50,
+          interval: 1000
+        }
+      });
+
+      // Each provider should have its own rate limiter
+      expect(provider1.rateLimiter).not.toBe(provider2.rateLimiter);
+
+      // Provider 1 should be limited after 10 requests
+      for (let i = 0; i < 10; i++) {
+        await provider1.complete('Test');
+      }
+
+      // Provider 2 should still have tokens available
+      expect(provider2.rateLimiter.getTokensRemaining()).toBe(50);
+    });
+
+    test('should handle rate limiting with retries', async () => {
+      mockCreate.mockResolvedValue({
+        content: [{ text: 'Response' }]
+      });
+
+      const provider = new ClaudeProvider({
+        apiKey: 'test-key',
+        rateLimit: {
+          tokensPerInterval: 5,
+          interval: 100
+        }
+      });
+
+      // Rate limiter should work with generateWithRetry
+      const result = await provider.generateWithRetry('Test', {}, 3);
+      expect(result).toBe('Response');
+    });
+  });
 });
