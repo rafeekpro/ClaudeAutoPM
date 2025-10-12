@@ -588,6 +588,494 @@ describe('AbstractAIProvider', () => {
     });
   });
 
+  describe('generateWithRetry() - Enhanced Configuration', () => {
+    // Helper to capture setTimeout calls
+    function captureDelays(fn) {
+      const delays = [];
+      const originalSetTimeout = global.setTimeout;
+      global.setTimeout = jest.fn((callback, delay) => {
+        delays.push(delay);
+        return originalSetTimeout(callback, 0);
+      });
+
+      return {
+        execute: async () => {
+          try {
+            await fn();
+          } finally {
+            global.setTimeout = originalSetTimeout;
+          }
+        },
+        getDelays: () => delays
+      };
+    }
+
+    test('Should support config object parameter', async () => {
+      // Arrange
+      const provider = new TestProvider({ apiKey: 'test' });
+
+      // Act
+      const result = await provider.generateWithRetry('test', {}, {
+        maxAttempts: 3,
+        startingDelay: 100
+      });
+
+      // Assert
+      expect(result).toBe('Response to: test');
+    });
+
+    test('Should maintain backward compatibility with number parameter', async () => {
+      // Arrange
+      const provider = new TestProvider({ apiKey: 'test' });
+
+      // Act
+      const result = await provider.generateWithRetry('test', {}, 5);
+
+      // Assert
+      expect(result).toBe('Response to: test');
+    });
+
+    test('Should use exponential backoff with default config', async () => {
+      // Arrange
+      let attempts = 0;
+      class FailProvider extends TestProvider {
+        async complete() {
+          attempts++;
+          if (attempts <= 3) {
+            throw new AIProviderError('RATE_LIMIT', 'Rate limit');
+          }
+          return 'Success';
+        }
+      }
+      const provider = new FailProvider({ apiKey: 'test' });
+
+      const capture = captureDelays(async () => {
+        await provider.generateWithRetry('test', {}, {
+          maxAttempts: 5,
+          startingDelay: 100,
+          timeMultiple: 2,
+          jitter: 'none'
+        });
+      });
+
+      // Act
+      await capture.execute();
+      const delays = capture.getDelays();
+
+      // Assert - Exponential: 100ms, 200ms, 400ms
+      expect(delays.length).toBe(3);
+      expect(delays[0]).toBe(100);
+      expect(delays[1]).toBe(200);
+      expect(delays[2]).toBe(400);
+    });
+
+    test('Should cap delay at maxDelay', async () => {
+      // Arrange
+      let attempts = 0;
+      class FailProvider extends TestProvider {
+        async complete() {
+          attempts++;
+          if (attempts <= 5) {
+            throw new AIProviderError('RATE_LIMIT', 'Rate limit');
+          }
+          return 'Success';
+        }
+      }
+      const provider = new FailProvider({ apiKey: 'test' });
+
+      const capture = captureDelays(async () => {
+        await provider.generateWithRetry('test', {}, {
+          maxAttempts: 7,
+          startingDelay: 100,
+          timeMultiple: 2,
+          maxDelay: 500,
+          jitter: 'none'
+        });
+      });
+
+      // Act
+      await capture.execute();
+      const delays = capture.getDelays();
+
+      // Assert - Should cap at 500ms: 100, 200, 400, 500, 500
+      expect(delays.length).toBe(5);
+      expect(delays[0]).toBe(100);
+      expect(delays[1]).toBe(200);
+      expect(delays[2]).toBe(400);
+      expect(delays[3]).toBe(500); // Capped
+      expect(delays[4]).toBe(500); // Capped
+    });
+
+    test('Should apply full jitter', async () => {
+      // Arrange
+      let attempts = 0;
+      class FailProvider extends TestProvider {
+        async complete() {
+          attempts++;
+          if (attempts <= 3) {
+            throw new AIProviderError('RATE_LIMIT', 'Rate limit');
+          }
+          return 'Success';
+        }
+      }
+      const provider = new FailProvider({ apiKey: 'test' });
+
+      const capture = captureDelays(async () => {
+        await provider.generateWithRetry('test', {}, {
+          maxAttempts: 5,
+          startingDelay: 100,
+          timeMultiple: 2,
+          jitter: 'full'
+        });
+      });
+
+      // Act
+      await capture.execute();
+      const delays = capture.getDelays();
+
+      // Assert - Full jitter: random between 0 and calculated delay
+      expect(delays.length).toBe(3);
+      expect(delays[0]).toBeGreaterThanOrEqual(0);
+      expect(delays[0]).toBeLessThanOrEqual(100);
+      expect(delays[1]).toBeGreaterThanOrEqual(0);
+      expect(delays[1]).toBeLessThanOrEqual(200);
+      expect(delays[2]).toBeGreaterThanOrEqual(0);
+      expect(delays[2]).toBeLessThanOrEqual(400);
+    });
+
+    test('Should apply equal jitter', async () => {
+      // Arrange
+      let attempts = 0;
+      class FailProvider extends TestProvider {
+        async complete() {
+          attempts++;
+          if (attempts <= 2) {
+            throw new AIProviderError('RATE_LIMIT', 'Rate limit');
+          }
+          return 'Success';
+        }
+      }
+      const provider = new FailProvider({ apiKey: 'test' });
+
+      const capture = captureDelays(async () => {
+        await provider.generateWithRetry('test', {}, {
+          maxAttempts: 5,
+          startingDelay: 100,
+          timeMultiple: 2,
+          jitter: 'equal'
+        });
+      });
+
+      // Act
+      await capture.execute();
+      const delays = capture.getDelays();
+
+      // Assert - Equal jitter: calculated ± 50%
+      expect(delays.length).toBe(2);
+      expect(delays[0]).toBeGreaterThanOrEqual(50);  // 100 - 50%
+      expect(delays[0]).toBeLessThanOrEqual(150);    // 100 + 50%
+      expect(delays[1]).toBeGreaterThanOrEqual(100); // 200 - 50%
+      expect(delays[1]).toBeLessThanOrEqual(300);    // 200 + 50%
+    });
+
+    test('Should support delayFirstAttempt option', async () => {
+      // Arrange
+      let attempts = 0;
+      class FailProvider extends TestProvider {
+        async complete() {
+          attempts++;
+          if (attempts <= 2) {
+            throw new AIProviderError('RATE_LIMIT', 'Rate limit');
+          }
+          return 'Success';
+        }
+      }
+      const provider = new FailProvider({ apiKey: 'test' });
+
+      const capture = captureDelays(async () => {
+        await provider.generateWithRetry('test', {}, {
+          maxAttempts: 4,
+          startingDelay: 100,
+          timeMultiple: 2,
+          jitter: 'none',
+          delayFirstAttempt: true
+        });
+      });
+
+      // Act
+      await capture.execute();
+      const delays = capture.getDelays();
+
+      // Assert - Should include delay before first attempt
+      expect(delays.length).toBe(3); // First attempt + 2 retries
+      expect(delays[0]).toBe(100); // Delay before first attempt
+    });
+
+    test('Should not delay first attempt by default', async () => {
+      // Arrange
+      let attempts = 0;
+      class FailProvider extends TestProvider {
+        async complete() {
+          attempts++;
+          if (attempts === 1) {
+            throw new AIProviderError('RATE_LIMIT', 'Rate limit');
+          }
+          return 'Success';
+        }
+      }
+      const provider = new FailProvider({ apiKey: 'test' });
+
+      const capture = captureDelays(async () => {
+        await provider.generateWithRetry('test', {}, {
+          maxAttempts: 3,
+          startingDelay: 100,
+          jitter: 'none'
+        });
+      });
+
+      // Act
+      await capture.execute();
+      const delays = capture.getDelays();
+
+      // Assert - Should only delay between attempts (not before first)
+      expect(delays.length).toBe(1); // Only one delay (between 1st and 2nd attempt)
+    });
+  });
+
+  describe('generateWithRetry() - Error Classification', () => {
+    test('Should not retry INVALID_API_KEY errors', async () => {
+      // Arrange
+      let attempts = 0;
+      class InvalidKeyProvider extends TestProvider {
+        async complete() {
+          attempts++;
+          throw new AIProviderError('INVALID_API_KEY', 'Invalid API key');
+        }
+      }
+      const provider = new InvalidKeyProvider({ apiKey: 'test' });
+
+      // Act & Assert
+      await expect(provider.generateWithRetry('test', {}, 5))
+        .rejects.toThrow('Invalid API key');
+      expect(attempts).toBe(1); // Should not retry
+    });
+
+    test('Should not retry INVALID_REQUEST errors', async () => {
+      // Arrange
+      let attempts = 0;
+      class InvalidRequestProvider extends TestProvider {
+        async complete() {
+          attempts++;
+          throw new AIProviderError('INVALID_REQUEST', 'Bad request');
+        }
+      }
+      const provider = new InvalidRequestProvider({ apiKey: 'test' });
+
+      // Act & Assert
+      await expect(provider.generateWithRetry('test', {}, 5))
+        .rejects.toThrow('Bad request');
+      expect(attempts).toBe(1); // Should not retry
+    });
+
+    test('Should not retry CONTENT_POLICY_VIOLATION errors', async () => {
+      // Arrange
+      let attempts = 0;
+      class PolicyViolationProvider extends TestProvider {
+        async complete() {
+          attempts++;
+          throw new AIProviderError('CONTENT_POLICY_VIOLATION', 'Policy violation');
+        }
+      }
+      const provider = new PolicyViolationProvider({ apiKey: 'test' });
+
+      // Act & Assert
+      await expect(provider.generateWithRetry('test', {}, 5))
+        .rejects.toThrow('Policy violation');
+      expect(attempts).toBe(1); // Should not retry
+    });
+
+    test('Should retry RATE_LIMIT errors', async () => {
+      // Arrange
+      let attempts = 0;
+      class RateLimitProvider extends TestProvider {
+        async complete() {
+          attempts++;
+          if (attempts <= 2) {
+            throw new AIProviderError('RATE_LIMIT', 'Rate limited');
+          }
+          return 'Success';
+        }
+      }
+      const provider = new RateLimitProvider({ apiKey: 'test' });
+
+      // Act
+      const result = await provider.generateWithRetry('test', {}, 5);
+
+      // Assert
+      expect(result).toBe('Success');
+      expect(attempts).toBe(3); // Retried twice
+    });
+
+    test('Should retry NETWORK_ERROR errors', async () => {
+      // Arrange
+      let attempts = 0;
+      class NetworkErrorProvider extends TestProvider {
+        async complete() {
+          attempts++;
+          if (attempts <= 2) {
+            throw new AIProviderError('NETWORK_ERROR', 'Network error');
+          }
+          return 'Success';
+        }
+      }
+      const provider = new NetworkErrorProvider({ apiKey: 'test' });
+
+      // Act
+      const result = await provider.generateWithRetry('test', {}, 5);
+
+      // Assert
+      expect(result).toBe('Success');
+      expect(attempts).toBe(3); // Retried twice
+    });
+
+    test('Should retry SERVICE_UNAVAILABLE errors', async () => {
+      // Arrange
+      let attempts = 0;
+      class ServiceUnavailableProvider extends TestProvider {
+        async complete() {
+          attempts++;
+          if (attempts <= 2) {
+            throw new AIProviderError('SERVICE_UNAVAILABLE', 'Service unavailable');
+          }
+          return 'Success';
+        }
+      }
+      const provider = new ServiceUnavailableProvider({ apiKey: 'test' });
+
+      // Act
+      const result = await provider.generateWithRetry('test', {}, 5);
+
+      // Assert
+      expect(result).toBe('Success');
+      expect(attempts).toBe(3); // Retried twice
+    });
+
+    test('Should support custom shouldRetry predicate', async () => {
+      // Arrange
+      let attempts = 0;
+      class CustomErrorProvider extends TestProvider {
+        async complete() {
+          attempts++;
+          throw new AIProviderError('CUSTOM_ERROR', 'Custom error');
+        }
+      }
+      const provider = new CustomErrorProvider({ apiKey: 'test' });
+
+      // Act & Assert - Custom predicate that never retries
+      await expect(provider.generateWithRetry('test', {}, {
+        maxAttempts: 5,
+        shouldRetry: (error, attempt) => false
+      })).rejects.toThrow('Custom error');
+      expect(attempts).toBe(1); // Should not retry
+    });
+
+    test('Should pass error and attempt to shouldRetry predicate', async () => {
+      // Arrange
+      const retryLog = [];
+      let attempts = 0;
+      class LoggingProvider extends TestProvider {
+        async complete() {
+          attempts++;
+          if (attempts <= 3) {
+            throw new AIProviderError('RATE_LIMIT', 'Rate limited');
+          }
+          return 'Success';
+        }
+      }
+      const provider = new LoggingProvider({ apiKey: 'test' });
+
+      // Act
+      await provider.generateWithRetry('test', {}, {
+        maxAttempts: 5,
+        shouldRetry: (error, attempt) => {
+          retryLog.push({ code: error.code, attempt });
+          return true;
+        }
+      });
+
+      // Assert
+      expect(retryLog).toEqual([
+        { code: 'RATE_LIMIT', attempt: 2 },
+        { code: 'RATE_LIMIT', attempt: 3 },
+        { code: 'RATE_LIMIT', attempt: 4 }
+      ]);
+    });
+
+    test('Should stop retrying when shouldRetry returns false', async () => {
+      // Arrange
+      let attempts = 0;
+      class ConditionalProvider extends TestProvider {
+        async complete() {
+          attempts++;
+          throw new AIProviderError('RATE_LIMIT', 'Rate limited');
+        }
+      }
+      const provider = new ConditionalProvider({ apiKey: 'test' });
+
+      // Act & Assert - Stop after 2 attempts
+      await expect(provider.generateWithRetry('test', {}, {
+        maxAttempts: 10,
+        shouldRetry: (error, attempt) => attempt < 3
+      })).rejects.toThrow('Rate limited');
+      expect(attempts).toBe(2);
+    });
+  });
+
+  describe('generateWithRetry() - Configuration Defaults', () => {
+    test('Should use default maxAttempts when not specified', async () => {
+      // Arrange
+      let attempts = 0;
+      class CountingProvider extends TestProvider {
+        async complete() {
+          attempts++;
+          if (attempts <= 2) {
+            throw new AIProviderError('RATE_LIMIT', 'Rate limit');
+          }
+          return 'Success';
+        }
+      }
+      const provider = new CountingProvider({ apiKey: 'test' });
+
+      // Act
+      await provider.generateWithRetry('test', {}, {});
+
+      // Assert - Default should be 3
+      expect(attempts).toBe(3);
+    });
+
+    test('Should use default backoff configuration', async () => {
+      // Arrange
+      let attempts = 0;
+      class DefaultsProvider extends TestProvider {
+        async complete() {
+          attempts++;
+          if (attempts <= 2) {
+            throw new AIProviderError('RATE_LIMIT', 'Rate limit');
+          }
+          return 'Success';
+        }
+      }
+      const provider = new DefaultsProvider({ apiKey: 'test' });
+
+      // Act - No config provided
+      const result = await provider.generateWithRetry('test', {}, {});
+
+      // Assert
+      expect(result).toBe('Success');
+      expect(attempts).toBe(3);
+    });
+  });
+
   describe('streamWithProgress()', () => {
     test('Should stream chunks and call progress callback', async () => {
       // Arrange
