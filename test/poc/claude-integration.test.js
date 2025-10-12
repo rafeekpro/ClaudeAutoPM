@@ -41,11 +41,11 @@ describe('POC: Claude API Integration', () => {
         return;
       }
 
-      const result = await provider.complete('Say exactly: "Hello, POC!"');
+      const result = await provider.complete('What is 2+2? Answer with just the number.');
 
       expect(result).toBeDefined();
       expect(typeof result).toBe('string');
-      expect(result.toLowerCase()).toContain('hello');
+      expect(result.toLowerCase()).toContain('4');
       expect(result.length).toBeGreaterThan(0);
     }, 30000);
 
