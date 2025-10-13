@@ -7,6 +7,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2025-01-13
+
+### ✨ New Features - Complete PRD Management
+
+This minor release adds comprehensive PRD (Product Requirements Document) management commands to the standalone CLI, completing the CRUD operations suite.
+
+### Added
+
+**New PRD Commands:**
+- `autopm prd list` - List all PRDs with priority and status
+- `autopm prd new <name>` - Create new PRD interactively with template support
+  - Templates: api-feature, ui-feature, bug-fix, data-migration, documentation
+  - Interactive wizard with template selection
+  - Smart variable prompting based on template
+- `autopm prd show <name>` - Display complete PRD content
+- `autopm prd edit <name>` - Open PRD in editor ($EDITOR, VS Code, vim, nano)
+- `autopm prd status <name>` - Show detailed PRD status report
+  - Metadata (title, priority, status, timeline, author)
+  - Completeness percentage with progress bar
+  - Section checklist (Problem Statement, User Stories, etc.)
+  - Statistics (lines, words, characters)
+
+**Enhanced PRD Workflow:**
+```bash
+# Complete workflow now available
+autopm prd new my-feature -t api-feature  # Create
+autopm prd list                            # Read (all)
+autopm prd show my-feature                 # Read (one)
+autopm prd status my-feature               # Status
+autopm prd edit my-feature                 # Update
+autopm prd parse my-feature --ai           # AI analysis
+```
+
+### Changed
+
+- Enhanced `autopm prd --help` with all 9 commands
+- Improved error messages for missing PRDs
+- Better visual output with color-coded priorities and statuses
+
+### Technical
+
+- Added 5 new handler functions to `lib/cli/commands/prd.js`:
+  - `prdList()` - PRD listing with metadata extraction
+  - `prdNew()` - Interactive PRD creation via script spawn
+  - `prdShow()` - Content display
+  - `prdEdit()` - Editor integration
+  - `prdStatus()` - Comprehensive status analysis
+- Integration with existing prd-new.js script for template-based creation
+- Priority-based sorting (P0 > P1 > P2 > P3)
+- Frontmatter parsing for metadata
+
+### Improved
+
+- **User Experience** - Complete PRD lifecycle management from CLI
+- **Discoverability** - All PRD operations in one consistent interface
+- **Flexibility** - Support for multiple editors via $EDITOR environment variable
+- **Visual Feedback** - Color-coded output, progress bars, formatted lists
+
 ## [2.1.1] - 2025-10-13
 
 ### 📝 Documentation & UX Improvements
