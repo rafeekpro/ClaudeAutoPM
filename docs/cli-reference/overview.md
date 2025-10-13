@@ -6,7 +6,7 @@ Complete reference for all ClaudeAutoPM CLI commands.
 
 ## Command Categories
 
-ClaudeAutoPM provides **109 CLI commands** organized into logical categories:
+ClaudeAutoPM provides **112 CLI commands** organized into logical categories:
 
 | Category | Commands | Purpose |
 |----------|----------|---------|
@@ -15,7 +15,7 @@ ClaudeAutoPM provides **109 CLI commands** organized into logical categories:
 | **Team Management** | 15 | Agent team operations |
 | **MCP Management** | 14 | Model Context Protocol servers |
 | **Epic Management** | 8 | Epic-level operations |
-| **Project Management** | 22 | General PM commands |
+| **Project Management** | 25 | General PM commands (3 new STANDALONE in v2.1.0) |
 | **Azure DevOps** | 20 | Azure-specific operations |
 
 ---
@@ -762,6 +762,263 @@ Tasks:
 ⏳ Monitoring (#11)
 ⏳ Production deploy (#12)
 ```
+
+---
+
+## STANDALONE Commands (v2.1.0)
+
+### `autopm prd`
+
+**NEW in v2.1.0** - Direct PRD management without AI overhead.
+
+PRD management commands with direct service layer access for fast, deterministic operations.
+
+**Usage:**
+```bash
+autopm prd <action> <name> [options]
+```
+
+**Actions:**
+
+#### `parse` - Parse PRD content
+```bash
+autopm prd parse <name> [options]
+```
+
+**Options:**
+- `--ai` - Use AI for parsing (default: basic parsing)
+- `--stream` - Enable streaming output for real-time results
+- `--output <file>` - Save parsed output to file
+
+**Examples:**
+```bash
+# Basic parsing (no AI)
+autopm prd parse my-prd
+
+# AI-powered parsing
+autopm prd parse my-prd --ai
+
+# Streaming output
+autopm prd parse my-prd --ai --stream
+
+# Save to file
+autopm prd parse my-prd --ai --output parsed.json
+```
+
+#### `extract-epics` - Extract epics from PRD
+```bash
+autopm prd extract-epics <name> [options]
+```
+
+**Options:**
+- `--stream` - Enable streaming output
+- `--output <file>` - Save epics to file
+
+**Examples:**
+```bash
+# Extract epics
+autopm prd extract-epics my-prd
+
+# With streaming
+autopm prd extract-epics my-prd --stream
+```
+
+#### `summarize` - Generate PRD summary
+```bash
+autopm prd summarize <name> [options]
+```
+
+**Options:**
+- `--stream` - Enable streaming output
+- `--length <short|medium|long>` - Summary length
+
+**Examples:**
+```bash
+# Generate summary
+autopm prd summarize my-prd
+
+# Streaming summary
+autopm prd summarize my-prd --stream
+
+# Short summary
+autopm prd summarize my-prd --length short
+```
+
+#### `validate` - Validate PRD structure
+```bash
+autopm prd validate <name> [options]
+```
+
+**Options:**
+- `--fix` - Attempt to fix validation issues
+- `--verbose` - Show detailed validation results
+
+**Examples:**
+```bash
+# Validate PRD
+autopm prd validate my-prd
+
+# Validate and fix
+autopm prd validate my-prd --fix
+
+# Verbose validation
+autopm prd validate my-prd --verbose
+```
+
+**Features:**
+- 🎯 Deterministic operations (no AI for basic parsing)
+- 🎨 Color-coded output (green=success, red=error)
+- 🔄 Progress spinners for long operations
+- 📡 Streaming support for real-time output
+- ❌ Comprehensive error handling
+
+---
+
+### `autopm task`
+
+**NEW in v2.1.0** - Direct task management operations.
+
+Task management commands with direct service layer access.
+
+**Usage:**
+```bash
+autopm task <action> <epic> [options]
+```
+
+**Actions:**
+
+#### `list` - List tasks from epic
+```bash
+autopm task list <epic> [options]
+```
+
+**Options:**
+- `--status <status>` - Filter by status (pending, in-progress, completed)
+- `--json` - Output as JSON
+- `--verbose` - Show detailed task information
+
+**Examples:**
+```bash
+# List all tasks
+autopm task list epic-001
+
+# List only pending tasks
+autopm task list epic-001 --status pending
+
+# JSON output
+autopm task list epic-001 --json
+```
+
+#### `prioritize` - AI-powered task prioritization
+```bash
+autopm task prioritize <epic> [options]
+```
+
+**Options:**
+- `--criteria <criteria>` - Prioritization criteria (complexity, dependencies, risk)
+- `--output <file>` - Save prioritized list to file
+
+**Examples:**
+```bash
+# Prioritize tasks
+autopm task prioritize epic-001
+
+# Prioritize by dependencies
+autopm task prioritize epic-001 --criteria dependencies
+```
+
+**Features:**
+- 🎯 Fast list operations
+- 🤖 AI-powered prioritization
+- 📊 Status filtering
+- 🎨 Color-coded output
+
+---
+
+### `autopm agent`
+
+**NEW in v2.1.0** - Direct agent invocation.
+
+Agent management and invocation commands with streaming support.
+
+**Usage:**
+```bash
+autopm agent <action> [options]
+```
+
+**Actions:**
+
+#### `list` - List available agents
+```bash
+autopm agent list [options]
+```
+
+**Options:**
+- `--category <category>` - Filter by category (core, languages, frameworks, cloud, devops, data)
+- `--team <team>` - Show agents in specific team
+- `--json` - Output as JSON
+
+**Examples:**
+```bash
+# List all agents
+autopm agent list
+
+# List cloud agents
+autopm agent list --category cloud
+
+# List fullstack team agents
+autopm agent list --team fullstack
+```
+
+#### `search` - Search agents by keyword
+```bash
+autopm agent search <query> [options]
+```
+
+**Options:**
+- `--category <category>` - Limit search to category
+- `--verbose` - Show agent descriptions
+
+**Examples:**
+```bash
+# Search for Kubernetes agents
+autopm agent search kubernetes
+
+# Search in cloud category
+autopm agent search aws --category cloud
+
+# Verbose output
+autopm agent search react --verbose
+```
+
+#### `invoke` - Invoke agent with task
+```bash
+autopm agent invoke <agent-name> <task> [options]
+```
+
+**Options:**
+- `--stream` - Enable streaming output
+- `--context <file>` - Provide additional context file
+- `--output <file>` - Save agent response to file
+
+**Examples:**
+```bash
+# Invoke agent
+autopm agent invoke aws-cloud-architect "Design VPC architecture"
+
+# Streaming invocation
+autopm agent invoke python-backend-engineer "Create FastAPI endpoint" --stream
+
+# With context file
+autopm agent invoke react-frontend-engineer "Build login form" --context requirements.md
+```
+
+**Features:**
+- 🤖 Direct agent invocation without Claude Code
+- 📡 Streaming support for real-time responses
+- 🔍 Powerful search capabilities
+- 🎨 Color-coded output
+- 📋 Context file support
 
 ---
 
