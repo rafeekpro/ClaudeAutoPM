@@ -1,0 +1,1 @@
+/Users/rafal.lagowski/ClaudeAutoPM/test/fixtures/agents/malformed-agent.md
