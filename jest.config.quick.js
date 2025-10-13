@@ -7,7 +7,8 @@ module.exports = {
     '**/test/teams/*.test.js',
     '**/test/cli/*.test.js',
     '**/test/local-mode/*.test.js',
-    '**/test/templates/*.test.js'
+    '**/test/templates/*.test.js',
+    '**/test/services/*.test.js'
   ],
 
   // Ignore everything else
