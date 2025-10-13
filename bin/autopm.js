@@ -182,6 +182,12 @@ function main() {
     .command(require('./commands/mcp'))
     // Epic management command
     .command(require('./commands/epic'))
+    // PRD management command (STANDALONE)
+    .command(require('../lib/cli/commands/prd'))
+    // Task management command (STANDALONE)
+    .command(require('../lib/cli/commands/task'))
+    // Agent management command (STANDALONE)
+    .command(require('../lib/cli/commands/agent'))
     // Validation command
     .command('validate', 'Validate ClaudeAutoPM configuration and setup',
       (yargs) => {
