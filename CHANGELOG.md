@@ -7,6 +7,67 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2025-10-13
+
+### 🚀 Phase 1: STANDALONE Mode - CLI Refactoring & Service Layer
+
+This release completes Phase 1 STANDALONE implementation, introducing three new CLI commands with full service layer integration, comprehensive test coverage, and modern user experience features.
+
+### Added
+
+**CLI Commands (#314):**
+- **`autopm prd` command** - PRD management (245 lines)
+  - `parse` - AI-powered PRD parsing with streaming support
+  - `extract-epics` - Extract epics from PRD content
+  - `summarize` - Generate comprehensive PRD summaries
+  - `validate` - Validate PRD structure and quality
+  - 16 tests passing, comprehensive coverage
+- **`autopm task` command** - Task management
+  - `list` - Display all tasks from epic
+  - `prioritize` - AI-powered task prioritization
+  - 5 tests passing
+- **`autopm agent` command** - Agent invocation
+  - `list` - Display available agents
+  - `search` - Search agents by keyword
+  - `invoke` - Invoke agent with task (streaming support)
+  - 7 tests passing
+
+**User Experience Enhancements:**
+- Progress indicators with `ora` spinners
+- Color-coded output with `chalk` (green=success, red=error)
+- Streaming support for real-time AI responses
+- Comprehensive error handling with user-friendly messages
+- Consistent CLI patterns across all commands
+
+### Changed
+
+**Service Layer Extensions:**
+- Extended **PRDService** with 4 non-streaming methods:
+  - `parse()` - Non-streaming PRD parsing
+  - `extractEpics()` - Non-streaming epic extraction
+  - `summarize()` - Non-streaming summarization
+  - `validate()` - Structure and quality validation
+- All services now support both streaming and non-streaming modes
+
+### Fixed
+
+- **CommonJS Compatibility**: Downgraded `chalk` from 5.3.0 to 4.1.2 for CommonJS support
+- Resolved ESM import issues in CLI commands
+
+### Testing
+
+- **28 new tests** across 3 CLI command suites
+- **65 total CLI tests** passing (100% pass rate)
+- Full TDD methodology applied
+- Comprehensive coverage of success, error, and streaming scenarios
+
+### Technical Details
+
+- All commands use service layer (PRDService, TaskService, AgentService)
+- Proper separation of concerns (CLI → Service → Provider)
+- Backward compatibility maintained throughout
+- Zero breaking changes to existing functionality
+
 ## [2.0.0] - 2025-10-12
 
 ### 🚀 Phase 2: AI Provider Architecture & Configuration Management - MAJOR RELEASE
