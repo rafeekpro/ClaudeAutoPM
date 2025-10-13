@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.1] - 2025-10-13
+
+### 📝 Documentation & UX Improvements
+
+This patch release improves documentation and user experience for the v2.1.0 STANDALONE features.
+
+### Changed
+
+**Documentation Updates (#319):**
+- **README.md** - Added prominent v2.1.0 STANDALONE section
+  - Featured new prd, task, and agent commands
+  - Updated command count from 109 to 112
+  - Added STANDALONE mode to architecture diagram
+  - Comprehensive usage examples and feature lists
+- **CLI Reference** - Complete documentation for STANDALONE commands
+  - docs/cli-reference/overview.md expanded by 256 lines
+  - Detailed usage examples for all commands
+  - Options, flags, and features documented
+
+**CLI Help Message (#320):**
+- Redesigned help output with elegant box design
+- Reduced help text by 50% (450 → 200 lines) while improving clarity
+- Featured v2.1.0 STANDALONE commands prominently
+- Added Quick Start (3-step guide)
+- Added practical usage examples
+- Improved visual hierarchy with better organization
+- Added Pro Tips section
+- Removed verbose, repetitive sections
+
+### Improved
+
+- **User Experience** - Cleaner, more discoverable CLI help
+- **Documentation Quality** - Complete reference for all features
+- **First-Time User Experience** - Clear onboarding with quick start guide
+
+### Notes
+
+All functionality from v2.1.0 remains unchanged. This release only improves documentation and help messaging.
+
 ## [2.1.0] - 2025-10-13
 
 ### 🚀 Phase 1: STANDALONE Mode - CLI Refactoring & Service Layer
