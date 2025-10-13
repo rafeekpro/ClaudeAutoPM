@@ -7,6 +7,70 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.1] - 2025-10-13
+
+### 🐛 Bug Fixes - Enhanced Error Handling
+
+This patch release significantly improves error handling across all PRD commands, providing clear, actionable error messages when things go wrong.
+
+### Fixed
+
+**Enhanced Error Reporting:**
+- **prdNew**: Added detailed debugging output and directory status checks
+  - Shows exact file paths when framework not installed
+  - Displays directory existence status for troubleshooting
+  - Clear instructions for fixing missing installations
+  - Better process error handling with exit codes
+- **prdParse**: Enhanced error categorization with API key detection
+  - Specific error for missing ANTHROPIC_API_KEY
+  - Clear instructions for configuring .env file
+  - File path details when PRD not found
+- **prdExtractEpics**: Improved error messages with context
+  - Shows full file paths in error messages
+  - Actionable suggestions (use `autopm prd list`)
+- **prdSummarize**: Added debug mode support
+  - Stack traces available with DEBUG=1
+  - Better error categorization
+- **prdValidate**: Better validation failure reporting
+  - Clear distinction between validation failures and errors
+  - Proper exit codes for CI/CD integration
+
+**User Experience Improvements:**
+- Color-coded error output (red for errors, yellow for warnings, cyan for info)
+- Emoji indicators for better visual scanning (✗ for errors, 💡 for tips)
+- Consistent error format across all commands
+- DEBUG environment variable support for troubleshooting
+
+### Example Error Output
+
+**Before:**
+```
+✗ Failed to create PRD
+Error: PRD creation failed
+```
+
+**After:**
+```
+✗ PRD creation script not found
+
+Error: .claude/scripts/pm/prd-new.js not found
+Expected location: /home/user/project/.claude/scripts/pm/prd-new.js
+
+Solution: Run "autopm install" to install the framework
+
+Directory status:
+  .claude/ exists: false
+  .claude/scripts/ exists: false
+  .claude/scripts/pm/ exists: false
+```
+
+### Technical
+
+- Exit codes properly set for all error conditions
+- Improved error propagation from child processes
+- Better handling of missing files and directories
+- Debug mode with stack traces for troubleshooting
+
 ## [2.2.0] - 2025-01-13
 
 ### ✨ New Features - Complete PRD Management
