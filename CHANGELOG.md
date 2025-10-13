@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.2] - 2025-10-13
+
+### 🐛 Critical Bug Fix - PRD Commands Now Work
+
+This patch release fixes a critical routing issue that prevented all PRD commands from executing.
+
+### Fixed
+
+**Command Routing Issue:**
+- **Root Cause**: Conflicting yargs configuration mixing positional parameters with subcommands
+- **Impact**: ALL 9 PRD commands were non-functional (silent failures)
+- **Solution**: Restructured to proper yargs subcommand architecture
+
+**What Was Broken:**
+```bash
+$ autopm prd new my-feature
+# (complete silence - no output, no error)
+```
+
+**Now Works:**
+```bash
+$ autopm prd new my-feature
+🚀 Starting PRD wizard for: my-feature
+🚀 Creating New PRD: my-feature
+══════════════════════════════════
+```
+
+### Technical Changes
+
+- Changed command structure from `prd <action> [name]` to `prd` with proper subcommands
+- Added handler parameter to all .command() definitions (required by yargs)
+- Removed conflicting positional parameter routing
+- Each subcommand now has dedicated handler function
+
+### Verified Working
+
+All 9 PRD commands now functional:
+- ✅ `list` - Lists all PRDs
+- ✅ `new <name>` - Interactive wizard
+- ✅ `show <name>` - Display content
+- ✅ `edit <name>` - Open in editor
+- ✅ `status <name>` - Status report
+- ✅ `parse <name>` - AI analysis
+- ✅ `extract-epics <name>` - Epic extraction
+- ✅ `summarize <name>` - Generate summary
+- ✅ `validate <name>` - Structure validation
+
 ## [2.2.1] - 2025-10-13
 
 ### 🐛 Bug Fixes - Enhanced Error Handling
