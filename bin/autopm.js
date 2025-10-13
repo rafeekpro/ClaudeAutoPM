@@ -232,12 +232,35 @@ function main() {
     .wrap(cli.terminalWidth())
     // Enhanced help epilogue
     .epilogue(`
-📖 Quick Start:
-   autopm install                    # Install ClaudeAutoPM in current directory
-   autopm validate                   # Check configuration status
-   autopm update                     # Update to latest framework version
-   autopm team load frontend         # Load React/UI development agents
-   claude --dangerously-skip-permissions .     # Open Claude Code
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    ClaudeAutoPM v${VERSION} - Quick Reference                    ║
+║         AI-Powered Project Management for Claude Code                      ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+🚀 Quick Start (3 Steps):
+   1. autopm install                    # Install framework in project
+   2. autopm config set provider github # Configure your provider
+   3. claude --dangerously-skip-permissions .  # Open Claude Code
+
+🆕 NEW in v2.1.0 - STANDALONE Commands:
+   autopm prd parse <name>              # Parse PRD without AI overhead
+   autopm prd extract-epics <name>      # Extract epics from PRD
+   autopm prd summarize <name>          # Generate PRD summary
+   autopm prd validate <name>           # Validate PRD structure
+
+   autopm task list <epic>              # List tasks from epic
+   autopm task prioritize <epic>        # AI-powered prioritization
+
+   autopm agent list                    # List available agents
+   autopm agent search <keyword>        # Search agents
+   autopm agent invoke <name> <task>    # Invoke agent directly
+
+📋 Common Commands:
+   autopm validate                      # Check configuration status
+   autopm update                        # Update to latest version
+   autopm team load fullstack           # Load development agents
+   autopm mcp enable context7           # Enable documentation access
+   autopm config show                   # View current configuration
 
 🔧 Configuration Setup:
    # View current configuration
@@ -289,187 +312,76 @@ function main() {
 
 🤖 Team Management:
    autopm team list                 # See all available agent teams
-   autopm team load frontend        # Load React/UI agents
-   autopm team load backend         # Load Python/Node.js agents
-   autopm team load fullstack       # Load complete development stack
-   autopm team load devops          # Load Docker/K8s/CI-CD agents
+   autopm team load <name>          # Load specific team (frontend/backend/fullstack/devops)
    autopm team current              # Check currently active team
-   autopm team reset                # Reset to default team
 
-💡 Claude Code PM Commands:
-   /pm:what-next                    # ⭐ Smart suggestions for what to do next
+💡 Claude Code Workflows (In-Editor Commands):
+   /pm:what-next                    # ⭐ Smart suggestions for next steps
    /pm:status                       # Project overview and health
-   /pm:context                      # Show current project context and progress
-   /pm:validate                     # Validate configuration
-   /pm:prd-new feature-name         # Create new Product Requirements Document
-   /pm:prd-parse feature-name       # Parse PRD into epic structure
-   /pm:epic-decompose feature-name  # Break PRD into actionable tasks
-   /pm:epic-sync feature-name       # Sync epic with provider (GitHub/Azure)
-   /pm:next                         # Get next priority task to work on
-   /pm:issue-start TASK-123         # Start working on specific task
-   /pm:issue-show TASK-123          # View task details
-   /pm:issue-close TASK-123         # Close completed task
-   /pm:standup                      # Generate daily standup summary
-   /pm:search keyword               # Search across PRDs and epics
-   /pm:help                         # Show all PM commands
+   /pm:prd-new <name>               # Create new PRD
+   /pm:epic-decompose <name>        # Break PRD into tasks
+   /pm:epic-sync <name>             # Sync to GitHub/Azure
+   /pm:next                         # Get next priority task
+   /pm:issue-start <id>             # Start working on task
+   /pm:issue-close <id>             # Complete task
+   /pm:standup                      # Generate daily summary
 
-📋 PM Workflow Decision Guide:
+📋 Quick Workflow Examples:
 
-   WHEN TO USE ONE EPIC (/pm:epic-decompose):
-   ✅ Simple feature (1-2 weeks)
-   ✅ Single component (frontend OR backend)
-   ✅ One developer
-   Examples: "User profile page", "REST API endpoint"
+   SIMPLE FEATURE (Use this for most tasks):
+   1. /pm:prd-new user-login        # Create PRD
+   2. /pm:epic-decompose user-login # Break into tasks
+   3. /pm:epic-sync user-login      # Push to GitHub/Azure
+   4. /pm:next                      # Start working
 
-   WHEN TO USE MULTIPLE EPICS (/pm:epic-split):
-   ✅ Complex project (2+ months)
-   ✅ Multiple components (frontend + backend + infra)
-   ✅ Multiple teams working in parallel
-   Examples: "E-commerce platform", "Social dashboard"
+   COMPLEX PROJECT (Multiple epics):
+   1. /pm:prd-new ecommerce         # Create PRD
+   2. /pm:epic-split ecommerce      # Split into multiple epics
+   3. /pm:epic-decompose ecommerce/01-backend  # Decompose each epic
+   4. /pm:epic-sync ecommerce       # Sync all epics
 
-   SIMPLE FEATURE FLOW:
-   /pm:prd-new feature → /pm:prd-parse feature → /pm:epic-decompose feature
+🔍 Using STANDALONE Commands:
 
-   COMPLEX PROJECT FLOW:
-   /pm:prd-new project → /pm:prd-parse project → /pm:epic-split project
-   → /pm:epic-decompose project/01-epic1 → /pm:epic-decompose project/02-epic2 ...
+   # Parse PRD without AI (fast, deterministic)
+   autopm prd parse my-feature
 
-   📖 Full Guide: See PM-WORKFLOW-GUIDE.md
+   # AI-powered parsing with streaming output
+   autopm prd parse my-feature --ai --stream
 
-🚀 Complete Workflows:
+   # Extract and validate
+   autopm prd extract-epics my-feature
+   autopm prd validate my-feature --fix
 
-   === GITHUB WORKFLOW (PRD → Epic → Issues) ===
-   1. autopm install               # Setup project framework
-   2. autopm config set provider github  # Set provider
-      autopm config set github.owner <username>
-      autopm config set github.repo <repository>
-      export GITHUB_TOKEN=<your-token>
-   3. autopm team load fullstack   # Load appropriate agents
-   4. claude --dangerously-skip-permissions . # Open Claude Code
-   5. /pm:validate                 # Verify GitHub integration
+   # Task management
+   autopm task list epic-001
+   autopm task prioritize epic-001
 
-   6. /pm:prd-new user-auth        # Create Product Requirements Document
-   7. /pm:prd-parse user-auth      # Parse PRD into structured format
-   8. /pm:epic-split user-auth     # [OPTIONAL] Split complex PRD into multiple epics
-   9. /pm:epic-decompose user-auth # Break PRD/Epic into Issues
-   10. /pm:epic-sync user-auth     # Create GitHub Epic + Issues
-   11. /pm:next                    # Get next priority issue
-   12. /pm:issue-start ISSUE-123   # Start working on specific issue
-   13. # ... development work ...
-   14. /pm:issue-close ISSUE-123   # Close completed issue
-   15. /pm:standup                 # Generate progress summary
-
-   === AZURE DEVOPS WORKFLOW (PRD → User Stories → Tasks) ===
-   1. autopm install               # Setup project framework
-   2. autopm config set provider azure  # Set provider
-      autopm config set azure.organization <org>
-      autopm config set azure.project <project>
-      export AZURE_DEVOPS_PAT=<your-pat>
-   3. autopm team load fullstack   # Load appropriate agents
-   4. claude --dangerously-skip-permissions . # Open Claude Code
-   5. /pm:validate                 # Verify Azure DevOps integration
-
-   6. /pm:prd-new user-auth        # Create Product Requirements Document
-   7. /pm:prd-parse user-auth      # Parse PRD into structured format
-   8. /pm:epic-split user-auth     # [OPTIONAL] Split complex PRD into multiple epics
-   9. /pm:epic-decompose user-auth # Break PRD/Epic into User Stories + Tasks
-   10. /pm:epic-sync user-auth     # Create Azure Epic + User Stories + Tasks
-   11. /pm:next                    # Get next priority task
-   12. /pm:issue-start TASK-123    # Start working on specific task
-   13. # ... development work ...
-   14. /pm:issue-close TASK-123    # Close completed task
-   15. /pm:standup                 # Generate sprint summary
-
-   === COMPLEX PROJECT WORKFLOW (Multi-Epic Split) ===
-   Example: Full-stack e-commerce platform
-
-   6. /pm:prd-new ecommerce-platform
-   7. /pm:prd-parse ecommerce-platform
-   8. /pm:epic-split ecommerce-platform # → Creates 6 epics automatically
-      → Epic 1: Infrastructure Foundation (Docker, DB, monitoring)
-      → Epic 2: Authentication Backend (JWT, users, RBAC)
-      → Epic 3: Product API Services (catalog, inventory, orders)
-      → Epic 4: Frontend Foundation (React setup, state management)
-      → Epic 5: E-commerce UI (product pages, cart, checkout)
-      → Epic 6: Testing & Deployment (CI/CD, quality gates)
-   9. /pm:epic-decompose ecommerce-platform/01-infrastructure # Decompose each epic
-   10. /pm:epic-decompose ecommerce-platform/02-auth-backend
-   11. ... (repeat for each epic)
-   12. /pm:epic-sync ecommerce-platform # Sync all epics to provider
-   13. /pm:next                         # Start with P0 infrastructure epic
-
-📋 Detailed Step-by-Step Examples:
-
-   STEP 6 - Creating PRD:
-   /pm:prd-new user-authentication
-   → Creates: .claude/prds/user-authentication.md
-   → Contains: Problem statement, user stories, acceptance criteria
-
-   STEP 7 - Parsing PRD:
-   /pm:prd-parse user-authentication
-   → Analyzes PRD content and structure
-   → Prepares for epic decomposition
-
-   STEP 8 - Epic Split (Optional for Complex Projects):
-   /pm:epic-split user-authentication
-   → Analyzes PRD complexity and identifies logical divisions
-   → Splits into multiple epics: Infrastructure, Backend, Frontend, UI, etc.
-   → Creates structured epic hierarchy with dependencies
-   → Example: 6 epics identified (Infrastructure, Auth Backend, Frontend, etc.)
-   → Use when: Multi-component projects, large teams, parallel work needed
-
-   STEP 9 - Epic Decomposition:
-   /pm:epic-decompose user-authentication
-   → GitHub: Creates Epic with linked Issues
-   → Azure: Creates Epic with User Stories and child Tasks
-   → File: .claude/epics/user-authentication.md (or multiple epic folders if split)
-
-   STEP 10 - Sync with Provider:
-   /pm:epic-sync user-authentication
-   → GitHub: Creates Epic + Issues in repository
-   → Azure: Creates Epic + User Stories + Tasks in project
-   → Links local files with remote work items
-
-   STEP 11 - Get Next Work:
-   /pm:next
-   → Returns highest priority unassigned item
-   → GitHub: Next issue to work on
-   → Azure: Next task to work on
-
-   STEP 12 - Start Development:
-   /pm:issue-start USER-AUTH-001
-   → Assigns work item to you
-   → Updates status to "In Progress"
-   → Creates development branch (if configured)
-
-   STEP 13 - Complete Work:
-   /pm:issue-close USER-AUTH-001
-   → Updates status to "Done/Closed"
-   → Links commits and PR (if available)
-   → Updates epic progress tracking
+   # Agent invocation
+   autopm agent search kubernetes
+   autopm agent invoke aws-architect "Design VPC" --stream
 
 🛠️  Troubleshooting:
-   # Check installation and configuration
-   autopm validate                  # Comprehensive status check
-   ls -la .claude/                  # Should show: agents/, commands/, config.json
-
-   # Verify configuration
-   /pm:validate                     # In Claude Code
-   autopm team current              # Check active team
-
-   # Reset if needed
+   autopm validate                  # Check installation & config
+   autopm validate --fix            # Auto-fix common issues
+   autopm mcp diagnose              # Check MCP server health
    autopm install --force           # Reinstall framework
-   autopm team reset                # Reset to default agents
 
-📋 Documentation Generation:
-   autopm guide config              # Generate configuration docs
-   autopm guide tutorial            # Create tutorials
-   autopm guide examples            # Generate code examples
+📚 Resources & Help:
+   📖 Documentation:  https://github.com/rafeekpro/ClaudeAutoPM
+   🐛 Report Issues:  https://github.com/rafeekpro/ClaudeAutoPM/issues
+   💬 Discussions:    https://github.com/rafeekpro/ClaudeAutoPM/discussions
+   📦 npm Package:    https://www.npmjs.com/package/claude-autopm
 
-📚 Resources:
-   Documentation: https://github.com/rafeekpro/ClaudeAutoPM
-   Report Issues: https://github.com/rafeekpro/ClaudeAutoPM/issues
-   Agent Registry: autopm/.claude/agents/AGENT-REGISTRY.md
+💡 Pro Tips:
+   • Use \`autopm --help\` to see this guide anytime
+   • Run \`autopm validate\` after configuration changes
+   • Use \`--stream\` flag for real-time AI responses
+   • Check \`autopm mcp status\` to verify documentation access
+   • Load appropriate team before starting work (frontend/backend/fullstack)
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║  Need more help? Run: autopm <command> --help for detailed command docs   ║
+╚════════════════════════════════════════════════════════════════════════════╝
 `)
     .fail((msg, err, yargs) => {
       if (err) {
