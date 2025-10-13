@@ -7,7 +7,7 @@
  * - summarizeStream() - Stream summary generation
  */
 
-const PRDService = require('../../lib/services/PRDService');
+const PRDService = require('../../../lib/services/PRDService');
 
 describe('PRDService Streaming Methods', () => {
   let prdService;
