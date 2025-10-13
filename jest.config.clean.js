@@ -8,7 +8,8 @@ module.exports = {
     '**/test/unit/*-jest.test.js',
     '**/test/integration/*-jest.test.js',
     '**/test/teams/*.test.js',
-    '**/test/cli/*.test.js'
+    '**/test/cli/*.test.js',
+    '**/test/services/*.test.js'
     // Installation tests excluded - they timeout (>2 min)
     // Run separately: npm run test:install
   ],
