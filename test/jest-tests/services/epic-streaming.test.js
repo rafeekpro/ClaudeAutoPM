@@ -6,8 +6,8 @@
  * - analyzeStream() - Stream PRD analysis for epic breakdown
  */
 
-const EpicService = require('../../lib/services/EpicService');
-const PRDService = require('../../lib/services/PRDService');
+const EpicService = require('../../../lib/services/EpicService');
+const PRDService = require('../../../lib/services/PRDService');
 
 describe('EpicService Streaming Methods', () => {
   let epicService;
