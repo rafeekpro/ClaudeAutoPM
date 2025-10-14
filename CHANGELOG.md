@@ -7,6 +7,150 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.5.0] - 2025-01-14
+
+### ✨ New Features - Core Issue Management Commands
+
+This minor release adds core issue management CLI commands following the same TDD and architectural patterns established in v2.3.0 (PRD) and v2.4.0 (Epic). Issue lifecycle operations are now available as fast, deterministic CLI commands.
+
+### Added
+
+**New Issue Commands (6 core commands):**
+
+**Issue Operations:**
+- `autopm issue show <number>` - Display issue details
+  - Shows complete metadata (ID, title, status, assignee, labels)
+  - Displays issue content with formatted markdown
+  - Shows local file path for reference
+  - Duration tracking if issue is started
+  - Color-coded status indicators
+- `autopm issue start <number>` - Start working on issue
+  - Updates status to "in-progress"
+  - Automatically adds started timestamp
+  - Validates issue exists before starting
+  - Displays next steps and available actions
+- `autopm issue close <number>` - Close and complete issue
+  - Updates status to "closed"
+  - Automatically adds completed timestamp
+  - Calculates and displays work duration
+  - Shows completion summary
+- `autopm issue status <number>` - Check issue status and progress
+  - Comprehensive status report with timeline
+  - Shows related task files
+  - Displays dependencies (blocking issues)
+  - Lists sub-issues if any
+  - Duration tracking (ongoing vs completed)
+- `autopm issue edit <number>` - Edit issue in default editor
+  - Opens issue in user's preferred editor (EDITOR env var)
+  - Supports VS Code, nano, vim, etc.
+  - Confirms save after editing
+  - Easy frontmatter and content editing
+- `autopm issue sync <number>` - Sync with GitHub/Azure DevOps
+  - Placeholder for provider integration
+  - Ready for Phase 2 implementation
+  - Foundation for bidirectional sync
+
+### Enhanced
+
+**IssueService - New Service Layer (433 lines, 15 methods):**
+- `parseIssueMetadata()` - Parse YAML frontmatter from issue files
+- `getLocalIssue()` - Read local issue file with metadata
+- `getIssueStatus()` - Get current status of an issue
+- `updateIssueStatus()` - Update status with automatic timestamps
+- `validateIssue()` - Validate issue structure and required fields
+- `getIssueFiles()` - Find all files related to an issue
+- `getSubIssues()` - Get child issues
+- `getDependencies()` - Get blocking issues
+- `syncIssueToProvider()` - Push local changes to GitHub/Azure
+- `syncIssueFromProvider()` - Pull updates from provider
+- `listIssues()` - List all issues with optional filtering
+- `categorizeStatus()` - Categorize status into standard buckets
+- `isIssueClosed()` - Check if issue is closed
+- `formatIssueDuration()` - Format time duration
+- `getIssuePath()` - Get file path for issue
+
+### Technical
+
+**Test-Driven Development:**
+- 54 service unit tests in `test/unit/services/IssueService.test.js` (741 lines)
+- 92.85% statement coverage
+- 84% branch coverage
+- 100% function coverage
+- All tests passing
+
+**Architecture:**
+- New `lib/cli/commands/issue.js` (550 lines) following epic.js pattern
+- New `lib/services/IssueService.js` (433 lines) with pure service layer
+- Integration with `bin/autopm.js` (added issue command)
+- Context7 documentation queries applied for best practices
+- Yargs command structure with subcommands
+- Interactive UX with ora spinners and chalk colors
+- Comprehensive error handling with helpful messages
+
+**Files Changed:**
+- `bin/autopm.js` - Added issue command integration
+- `lib/services/IssueService.js` - New service layer (433 lines)
+- `lib/cli/commands/issue.js` - New CLI commands (550 lines)
+- `test/unit/services/IssueService.test.js` - Comprehensive tests (741 lines)
+- `IMPLEMENTATION-CHECKLIST.md` - Project roadmap and tracking
+
+Total: 5 files changed, 2,200 insertions(+)
+
+### Usage Examples
+
+```bash
+# Display issue details
+autopm issue show 123
+
+# Start working on issue
+autopm issue start 123
+
+# Check issue status with dependencies
+autopm issue status 123
+
+# Edit issue in your editor
+autopm issue edit 123
+
+# Close issue when done
+autopm issue close 123
+
+# Sync with GitHub/Azure (Phase 2)
+autopm issue sync 123
+```
+
+### Features
+
+- **Fast & Deterministic**: No AI overhead for basic operations
+- **Status Lifecycle**: Open → In Progress → Closed workflow
+- **Automatic Timestamps**: Started and completed dates tracked
+- **Duration Tracking**: Automatic calculation of work time
+- **Dependency Management**: Track blocking issues and sub-issues
+- **File Discovery**: Find related task files automatically
+- **Validation**: Structure validation with helpful error messages
+- **Editor Integration**: Opens issues in default editor (EDITOR env)
+- **Colorized Output**: Beautiful terminal UX with chalk
+- **Error Handling**: Helpful error messages with suggestions
+
+### Breaking Changes
+
+None. This is a new feature addition that adds issue management commands. All existing commands continue to work unchanged.
+
+### Future Enhancements (Phase 2)
+
+- CLI integration tests
+- `autopm issue reopen <number>` - Reopen closed issues
+- `autopm issue analyze <number>` - AI-powered complexity analysis
+- `autopm issue list` - List all issues with filtering
+- `autopm issue new` - Create new issues from templates
+- Full GitHub/Azure provider integration for bidirectional sync
+
+### Related
+
+- Follows pattern from v2.3.0 PRD commands
+- Follows pattern from v2.4.0 Epic commands
+- Part of comprehensive CLI implementation roadmap (24 commands total)
+- Foundation for v2.6.0 workflow commands
+
 ## [2.4.0] - 2025-01-14
 
 ### ✨ New Features - Comprehensive Epic Management
