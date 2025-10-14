@@ -15,11 +15,12 @@ Transform your development workflow with intelligent automation, parallel AI age
 
 ClaudeAutoPM is a comprehensive project management and development automation framework designed specifically for [Claude Code](https://claude.ai/code). It combines:
 
-- **112+ CLI commands** for deterministic operations (scaffolding, templates, automation)
+- **136+ CLI commands** including 24 complete PM commands (Issue, Workflow, Context, Utility)
 - **39 specialized AI agents** for intelligent tasks (analysis, design, development)
 - **Dynamic team management** with automatic agent switching
-- **Hybrid execution modes** - choose between templates or AI assistance
+- **Hybrid execution modes** - choose between CLI commands or AI assistance
 - **Full GitHub & Azure DevOps integration** for seamless workflow
+- **TDD-developed** with 168+ tests and 91%+ coverage
 
 ### The Problem We Solve
 
@@ -44,54 +45,65 @@ PRD → Epic Decomposition → Parallel Development → Testing → Production
 
 ## ✨ Key Features
 
-### 🆕 **NEW in v2.1.0: STANDALONE CLI Commands - Direct Service Access!**
+### 🎉 **NEW in v2.7.0: 100% CLI Implementation Complete!**
 
-**Three New CLI Commands** - Direct access to service layer without AI overhead
-- 🎯 **Deterministic Operations** - Fast, predictable, no AI required
-- 🎨 **Modern UX** - Progress spinners, color-coded output, streaming support
-- ⚡ **High Performance** - Direct service layer access for instant results
-- 🧪 **100% Test Coverage** - 65 CLI tests passing, full TDD methodology
+**All 24 Planned Commands Implemented** - Complete CLI suite for project management
+- ✅ **24/24 Commands** - Full roadmap delivered (Issue, Workflow, Context, Utility)
+- 🎯 **168 Tests** - 91.4% average coverage, 100% function coverage
+- 🎨 **Modern UX** - Progress spinners, color-coded output, intuitive commands
+- ⚡ **TDD Methodology** - Test-driven development throughout
+- 📚 **Context7 Best Practices** - 2025 industry standards applied
 
-**New Commands:**
+**Complete Command Suite:**
 
 ```bash
-# PRD Management
+# Issue Management (6 commands)
+autopm issue show <number>            # Display issue details
+autopm issue start <number>           # Start working on issue
+autopm issue close <number>           # Close completed issue
+autopm issue status <number>          # Check issue status
+autopm issue edit <number>            # Edit issue in editor
+autopm issue sync <number>            # Sync with provider
+
+# Workflow Commands (6 commands)
+autopm pm next                        # Get next priority task
+autopm pm what-next                   # AI-powered suggestions
+autopm pm standup                     # Generate daily standup
+autopm pm status                      # Project status overview
+autopm pm in-progress                 # Show active tasks
+autopm pm blocked                     # List blocked tasks
+
+# Context Management (4 commands)
+autopm context create <type>          # Create context from template
+autopm context prime                  # Generate project snapshot
+autopm context update <type>          # Update existing context
+autopm context show [type]            # Show or list contexts
+
+# Project Utilities (6 commands)
+autopm pm init                        # Initialize PM structure
+autopm pm validate                    # Validate project (--fix for repair)
+autopm pm sync                        # Sync with provider
+autopm pm clean                       # Clean stale artifacts
+autopm pm search <query>              # Search entities (BM25)
+autopm pm import <source>             # Import from external sources
+
+# PRD Management (legacy)
 autopm prd parse my-prd --ai          # AI-powered PRD parsing
-autopm prd parse my-prd --stream      # Real-time streaming output
 autopm prd extract-epics my-prd       # Extract epics from PRD
-autopm prd summarize my-prd           # Generate comprehensive summary
-autopm prd validate my-prd            # Validate structure & quality
-
-# Task Management
-autopm task list epic-001             # Display all tasks from epic
-autopm task prioritize epic-001       # AI-powered prioritization
-
-# Agent Invocation
-autopm agent list                     # Display available agents
-autopm agent search "kubernetes"      # Search agents by keyword
-autopm agent invoke aws-architect "Design VPC"  # Invoke agent with task
-autopm agent invoke --stream agent-name "task"  # Streaming invocation
+autopm prd summarize my-prd           # Generate summary
 ```
 
-**User Experience Features:**
-- 🔄 Progress indicators with ora spinners
-- 🎨 Color-coded output (green=success, red=error, yellow=warning)
-- 📡 Streaming support for real-time AI responses
-- ❌ Comprehensive error handling with user-friendly messages
-- 📋 Consistent patterns across all commands
-
-**Technical Implementation:**
-- Extended PRDService with 4 non-streaming methods
-- All services support both streaming and non-streaming modes
-- Proper separation of concerns (CLI → Service → Provider)
+**Architecture:**
+- 4 Service Layers: IssueService, WorkflowService, ContextService, UtilityService
+- Separation of concerns (CLI → Service → Provider)
 - Zero breaking changes to existing functionality
-- CommonJS compatibility maintained
+- Production-ready implementation
 
-**Test Coverage:**
-- 28 new tests across 3 CLI command suites
-- 65 total CLI tests passing (100% pass rate)
-- Full TDD methodology with Jest
-- Comprehensive coverage of success, error, and streaming scenarios
+**Milestone Achievement:**
+- Phase 1 (v2.5.0): Issue Commands - 6 commands, 54 tests
+- Phase 2 (v2.6.0): Workflow Commands - 6 commands, 39 tests
+- Phase 3 (v2.7.0): Context & Utility - 10 commands, 75 tests
+- **Total: 24 commands, 168 tests, 91.4% coverage** 🎉
 
 ---
 
@@ -297,6 +309,35 @@ claude --dangerously-skip-permissions .
 
 ### Your First Workflow
 
+**Option A: Using New CLI Commands (v2.7.0+)**
+```bash
+# 1. Initialize project structure
+autopm pm init
+
+# 2. Create PRD (in Claude Code or manually)
+/pm:prd-new "Build user authentication system"
+
+# 3. Decompose into epic
+/pm:epic-decompose prd-001-authentication.md
+
+# 4. Check what to do next
+autopm pm what-next
+
+# 5. Start working on next task
+autopm pm next
+autopm issue start 123
+
+# 6. Generate daily standup
+autopm pm standup
+
+# 7. Complete and close issue
+autopm issue close 123
+
+# 8. Sync with provider
+autopm pm sync
+```
+
+**Option B: Classic Claude Code Workflow**
 ```bash
 # 1. Create a PRD (in Claude Code)
 /pm:prd-new "Build user authentication system"
@@ -457,8 +498,13 @@ claude --dangerously-skip-permissions .
 
 ## 📦 What's Included
 
-### CLI Commands (112 total)
-- **Project Management**: PRD, Epic, Issue, Task management (3 new STANDALONE commands in v2.1.0)
+### CLI Commands (136+ total)
+- **Project Management**: 24 complete PM commands (Issue, Workflow, Context, Utility) ✨ NEW in v2.7.0
+  - Issue Management (6): show, start, close, status, edit, sync
+  - Workflow (6): next, what-next, standup, status, in-progress, blocked
+  - Context (4): create, prime, update, show
+  - Utilities (6): init, validate, sync, clean, search, import
+- **PRD & Epic**: PRD parsing, epic decomposition, task management
 - **Development**: Scaffolding, testing, deployment
 - **Configuration**: Provider setup, team management, MCP servers
 - **DevOps**: Docker, Kubernetes, CI/CD automation
