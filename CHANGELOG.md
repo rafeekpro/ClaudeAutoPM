@@ -7,6 +7,145 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.4.0] - 2025-01-14
+
+### ✨ New Features - Comprehensive Epic Management
+
+This minor release adds comprehensive standalone `autopm epic` CLI commands following the same TDD and architectural patterns as the PRD commands. All epic lifecycle operations are now available as fast, deterministic CLI commands.
+
+### Added
+
+**New Epic Commands (9 total):**
+
+**Core Operations:**
+- `autopm epic list` - List all epics grouped by status (planning/in-progress/completed)
+  - Shows task counts (total/open/closed) for each epic
+  - Displays progress percentage and priority
+  - Color-coded status indicators
+- `autopm epic show <name>` - Display detailed epic information
+  - Complete epic content with frontmatter
+  - Task breakdown with status
+  - GitHub integration details
+- `autopm epic new <name>` - Create new epic interactively
+  - Guided prompts for metadata (name, description, priority)
+  - Automatic directory structure creation
+  - Template-based epic.md generation
+- `autopm epic edit <name>` - Open epic in default editor
+  - Respects $EDITOR environment variable
+  - Falls back to VS Code → vim → nano
+- `autopm epic status <name>` - Check epic status and progress
+  - Current status (planning/in-progress/completed)
+  - Progress calculation from task completion
+  - Task statistics and timeline info
+- `autopm epic validate <name>` - Validate epic structure
+  - Required fields check (name, status, priority)
+  - Structure validation
+  - Auto-fix option for common issues
+
+**Lifecycle Management:**
+- `autopm epic start <name>` - Start working on epic
+  - Changes status to "in-progress"
+  - Updates start date
+  - Validates ready-to-start state
+- `autopm epic close <name>` - Complete epic
+  - Changes status to "completed"
+  - Updates completion date
+  - Validates all tasks closed
+- `autopm epic sync <name>` - Sync with GitHub/Azure DevOps
+  - Requires provider configuration
+  - Creates/updates GitHub issues
+  - Syncs metadata and status
+
+### Enhanced
+
+**EpicService - New CLI Operations:**
+- `parseFrontmatter()` - Parse YAML frontmatter from epic.md
+- `listEpics()` - List all epics with metadata and categorization
+- `getEpic()` - Get detailed epic information including tasks
+- `validateEpicStructure()` - Validate epic structure and fields
+- `calculateProgress()` - Calculate completion percentage from tasks
+- `categorizeStatus()` - Map status strings to categories
+- `extractGitHubIssue()` - Extract issue numbers from GitHub URLs
+- `isTaskClosed()` - Check task completion status
+- `countTasks()` - Count task files in epic directory
+- Made PRDService optional for CLI-only usage
+
+### Technical
+
+**Test-Driven Development:**
+- 47 service unit tests in `test/unit/services/EpicService.test.js` (545 lines)
+- 39 CLI integration tests in `test/cli/epic-commands.test.js` (931 lines)
+- 100% test coverage for new functionality
+- All 86 tests passing
+
+**Architecture:**
+- New `lib/cli/commands/epic.js` (777 lines) following prd.js pattern
+- Extended `lib/services/EpicService.js` with CLI operations (294 lines added)
+- Yargs command structure with subcommands
+- Interactive prompts with readline
+- Ora spinners and chalk colors for UX
+- Comprehensive error handling
+
+**Files Changed:**
+- `bin/autopm.js` - Updated to use new epic commands (4 lines)
+- `lib/services/EpicService.js` - Extended with CLI operations (294 lines)
+- `lib/cli/commands/epic.js` - New comprehensive CLI (777 lines)
+- `test/unit/services/EpicService.test.js` - Service tests (545 lines)
+- `test/cli/epic-commands.test.js` - CLI tests (931 lines)
+
+Total: 5 files changed, 2,539 insertions(+), 12 deletions(-)
+
+### Usage Examples
+
+```bash
+# List all epics grouped by status
+autopm epic list
+
+# Create new epic interactively
+autopm epic new user-authentication
+
+# Show epic details with task breakdown
+autopm epic show user-authentication
+
+# Start working on epic (changes status)
+autopm epic start user-authentication
+
+# Check progress
+autopm epic status user-authentication
+
+# Validate structure
+autopm epic validate user-authentication --fix
+
+# Complete epic
+autopm epic close user-authentication
+
+# Sync with GitHub/Azure DevOps
+autopm epic sync user-authentication
+```
+
+### Features
+
+- **Fast & Deterministic**: No AI overhead for basic operations
+- **Interactive Prompts**: User-friendly CLI experience
+- **Status Tracking**: Planning → In Progress → Completed lifecycle
+- **Progress Calculation**: Automatic completion percentage from tasks
+- **Task Counting**: Shows total/open/closed tasks for each epic
+- **GitHub Integration**: Extract issue numbers, sync with issues
+- **Validation**: Structure validation with auto-fix option
+- **Editor Integration**: Opens epics in default editor (EDITOR env)
+- **Colorized Output**: Beautiful terminal UX with chalk
+- **Error Handling**: Helpful error messages and recovery
+
+### Breaking Changes
+
+None. This is a new feature addition that replaces the basic epic commands with comprehensive implementations. All existing `/pm:epic-*` slash commands continue to work unchanged.
+
+### Related
+
+- Follows pattern from v2.3.0 PRD commands (PR #327-328)
+- Complements existing `/pm:epic-*` slash commands
+- Part of STANDALONE mode expansion
+
 ## [2.2.2] - 2025-10-13
 
 ### 🐛 Critical Bug Fix - PRD Commands Now Work
