@@ -180,8 +180,8 @@ function main() {
     .command(require('./commands/config'))
     // MCP management command
     .command(require('./commands/mcp'))
-    // Epic management command
-    .command(require('./commands/epic'))
+    // Epic management command (STANDALONE)
+    .command(require('../lib/cli/commands/epic'))
     // PRD management command (STANDALONE)
     .command(require('../lib/cli/commands/prd'))
     // Task management command (STANDALONE)
