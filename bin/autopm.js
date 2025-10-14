@@ -184,6 +184,8 @@ function main() {
     .command(require('../lib/cli/commands/epic'))
     // Issue management command (STANDALONE)
     .command(require('../lib/cli/commands/issue'))
+    // PM workflow commands (STANDALONE)
+    .command(require('../lib/cli/commands/pm'))
     // PRD management command (STANDALONE)
     .command(require('../lib/cli/commands/prd'))
     // Task management command (STANDALONE)

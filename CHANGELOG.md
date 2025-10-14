@@ -7,6 +7,173 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.6.0] - 2025-10-14
+
+### ✨ New Features - PM Workflow Commands
+
+This minor release adds comprehensive project management workflow commands following the same TDD and architectural patterns established in v2.5.0 (Issue) and v2.4.0 (Epic). Workflow orchestration operations are now available as fast, intelligent CLI commands that integrate IssueService, EpicService, and PRDService.
+
+### Added
+
+**New PM Workflow Commands (6 commands):**
+
+**Task Management:**
+- `autopm pm next` - Get next priority task with reasoning
+  - Priority-based selection (P0 > P1 > P2 > P3)
+  - Automatic dependency resolution (skips blocked tasks)
+  - Oldest-first within same priority
+  - Provides reasoning for task selection
+  - Suggests command to start the task
+- `autopm pm what-next` - AI-powered contextual suggestions
+  - Analyzes current project state
+  - Suggests appropriate next actions
+  - Context-aware recommendations based on:
+    - Existing PRDs (none → create first PRD)
+    - Epics status (no epics → parse PRD)
+    - Available tasks (tasks ready → start working)
+  - Provides actionable command suggestions
+
+**Project Reporting:**
+- `autopm pm standup` - Generate daily standup report
+  - Yesterday: Tasks completed in last 24h
+  - Today: Currently in-progress tasks
+  - Blockers: Blocked tasks with reasons
+  - Velocity: Recent completion rate (tasks/day)
+  - Sprint progress: Overall completion metrics
+- `autopm pm status` - Project status and health overview
+  - Epic counts (planning/in-progress/completed)
+  - Issue counts (open/in-progress/closed)
+  - Overall progress percentage
+  - Health assessment (ON_TRACK vs AT_RISK)
+  - Actionable recommendations
+- `autopm pm in-progress` - Show all active tasks
+  - Lists all tasks with status "in-progress"
+  - Duration tracking (days in progress)
+  - Stale task detection (>3 days)
+  - Color-coded output with warnings
+- `autopm pm blocked` - Show blocked tasks with resolution
+  - Lists all blocked tasks
+  - Shows blocking reasons
+  - Calculates days blocked
+  - Suggests resolution actions
+
+### Enhanced
+
+**WorkflowService - New Service Layer (685 lines, 10 methods):**
+- `getNextTask()` - Priority-based task selection with dependency validation
+- `getWhatNext()` - AI-powered contextual suggestions based on project state
+- `generateStandup()` - Daily standup report generation
+- `getProjectStatus()` - Comprehensive project health overview
+- `getInProgressTasks()` - Active task tracking with stale detection (>3 days)
+- `getBlockedTasks()` - Bottleneck identification with resolution suggestions
+- `calculateVelocity()` - Team velocity metrics (tasks/day over time period)
+- `analyzeBottlenecks()` - Workflow bottleneck detection (blocked + stale tasks)
+- `prioritizeTasks()` - Multi-criteria prioritization (P0-P3, then oldest first)
+- `resolveDependencies()` - Dependency chain validation (checks if blockers are closed)
+
+### Technical
+
+**Test-Driven Development:**
+- 39 service unit tests in `test/unit/services/WorkflowService.test.js` (580 lines)
+- 92.95% statement coverage
+- All tests passing
+- Comprehensive coverage of:
+  - Task prioritization algorithm
+  - Dependency resolution logic
+  - Project health assessment
+  - Velocity calculations
+  - Bottleneck detection
+  - Edge cases and error handling
+
+**Architecture:**
+- New `lib/cli/commands/pm.js` (683 lines) following epic.js/issue.js pattern
+- New `lib/services/WorkflowService.js` (685 lines) with pure service layer
+- Integration with `bin/autopm.js` (added pm command)
+- Cross-service orchestration (IssueService + EpicService + PRDService)
+- Context7 documentation queries for workflow best practices
+- Yargs command structure with 6 subcommands
+- Interactive UX with ora spinners and chalk colors
+- Comprehensive error handling with helpful messages
+
+**Files Changed:**
+- `bin/autopm.js` - Added pm workflow command integration
+- `lib/services/WorkflowService.js` - New workflow service (685 lines)
+- `lib/cli/commands/pm.js` - New CLI workflow commands (683 lines)
+- `test/unit/services/WorkflowService.test.js` - Comprehensive tests (580 lines)
+- `IMPLEMENTATION-CHECKLIST.md` - Updated Phase 2 complete (50% progress)
+
+Total: 5 files changed, 1,916 insertions(+)
+
+### Usage Examples
+
+```bash
+# Get next priority task with reasoning
+autopm pm next
+
+# Get AI-powered suggestions for next action
+autopm pm what-next
+
+# Generate daily standup report
+autopm pm standup
+
+# Check overall project status and health
+autopm pm status
+
+# See all tasks currently in progress
+autopm pm in-progress
+
+# Identify and resolve blocked tasks
+autopm pm blocked
+```
+
+### Features
+
+**Intelligent Task Selection:**
+- Multi-criteria prioritization (P0 > P1 > P2 > P3)
+- Automatic dependency resolution
+- Oldest-first tiebreaker within same priority
+- Reasoning explanation for selections
+
+**Project Health Monitoring:**
+- Real-time progress tracking
+- Velocity calculations (tasks/day)
+- Health assessment (ON_TRACK vs AT_RISK)
+- Bottleneck detection (blocked + stale tasks >3 days)
+
+**Daily Standup Generation:**
+- Yesterday's completed tasks (last 24h)
+- Today's planned work (in-progress tasks)
+- Blockers with reasons and durations
+- Team velocity metrics
+
+**Workflow Optimization:**
+- Identifies blocked tasks with resolution suggestions
+- Detects stale in-progress tasks (>3 days warning)
+- Analyzes workflow bottlenecks
+- Provides actionable recommendations
+
+### Breaking Changes
+
+None. This is a new feature addition that adds workflow management commands. All existing commands continue to work unchanged.
+
+### Future Enhancements (Phase 3)
+
+- CLI integration tests for pm commands
+- `autopm pm burndown` - Burndown chart visualization
+- `autopm pm forecast` - Sprint completion forecasting
+- `autopm pm assign <task> <user>` - Task assignment
+- Enhanced AI suggestions with Claude integration
+- Sprint planning automation
+
+### Related
+
+- Integrates with v2.5.0 Issue commands (IssueService)
+- Integrates with v2.4.0 Epic commands (EpicService)
+- Integrates with v2.3.0 PRD commands (PRDService)
+- Part of comprehensive CLI implementation roadmap (24 commands total)
+- Phase 2 complete: 12/24 commands (50% overall progress)
+- Next: Phase 3 - Context & Utility Commands (v2.7.0)
+
 ## [2.5.0] - 2025-01-14
 
 ### ✨ New Features - Core Issue Management Commands
