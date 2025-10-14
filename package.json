@@ -1,6 +1,6 @@
 {
   "name": "claude-autopm",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "description": "Autonomous Project Management Framework for Claude Code - Advanced AI-powered development automation",
   "main": "bin/autopm.js",
   "bin": {
@@ -49,6 +49,11 @@
     "test:comprehensive:quick": "TEST_TIMEOUT=30000 node test/run-all-tests.js",
     "test:comprehensive:ci": "CI=true CI_TEST_TIMEOUT=600000 node test/run-all-tests.js",
     "test:azure": "node --test test/providers/azure/*.test.js",
+    "test:github:integration": "jest test/integration/github-sync-integration.test.js --testTimeout=30000",
+    "test:github:integration:verbose": "jest test/integration/github-sync-integration.test.js --testTimeout=30000 --verbose",
+    "test:integration:azure": "jest test/integration/azure-sync-integration.test.js --testTimeout=30000 --runInBand",
+    "test:integration:azure:verbose": "jest test/integration/azure-sync-integration.test.js --testTimeout=30000 --runInBand --verbose",
+    "test:azure:quick": "node test/integration/test-azure-manual.js",
     "test:unit": "node --test $(find test/unit -name '*.test.js' ! -name '*-jest.test.js')",
     "test:unit:coverage": "c8 node --test $(find test/unit -name '*.test.js' ! -name '*-jest.test.js')",
     "test:e2e": "jest test/e2e",
