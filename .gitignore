@@ -130,3 +130,4 @@ __pycache__/
 *$py.class
 *.so
 .mcp.json
+.claude/templates/
