@@ -192,6 +192,8 @@ function main() {
     .command(require('../lib/cli/commands/task'))
     // Agent management command (STANDALONE)
     .command(require('../lib/cli/commands/agent'))
+    // Context management command (STANDALONE)
+    .command(require('../lib/cli/commands/context'))
     // Validation command
     .command('validate', 'Validate ClaudeAutoPM configuration and setup',
       (yargs) => {
