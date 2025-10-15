@@ -1,0 +1,68 @@
+{
+  "name": "@claudeautopm/plugin-languages",
+  "version": "1.0.0",
+  "displayName": "Programming Languages",
+  "description": "JavaScript, TypeScript, Python, Node.js, and language-specific experts",
+  "category": "languages",
+  "agents": [
+    {
+      "name": "bash-scripting-expert",
+      "file": "agents/bash-scripting-expert.md",
+      "description": "Bash Scripting Expert specialist",
+      "tags": [
+        "bash",
+        "scripting",
+        "expert"
+      ]
+    },
+    {
+      "name": "javascript-frontend-engineer",
+      "file": "agents/javascript-frontend-engineer.md",
+      "description": "Javascript Frontend Engineer specialist",
+      "tags": [
+        "javascript",
+        "frontend",
+        "engineer"
+      ]
+    },
+    {
+      "name": "nodejs-backend-engineer",
+      "file": "agents/nodejs-backend-engineer.md",
+      "description": "Nodejs Backend Engineer specialist",
+      "tags": [
+        "nodejs",
+        "backend",
+        "engineer"
+      ]
+    },
+    {
+      "name": "python-backend-engineer",
+      "file": "agents/python-backend-engineer.md",
+      "description": "Python Backend Engineer specialist",
+      "tags": [
+        "python",
+        "backend",
+        "engineer"
+      ]
+    },
+    {
+      "name": "python-backend-expert",
+      "file": "agents/python-backend-expert.md",
+      "description": "Python Backend Expert specialist",
+      "tags": [
+        "python",
+        "backend",
+        "expert"
+      ]
+    }
+  ],
+  "keywords": [
+    "javascript",
+    "typescript",
+    "python",
+    "nodejs",
+    "programming"
+  ],
+  "mcpServers": [],
+  "compatibleWith": ">=2.8.0"
+}

@@ -1,0 +1,36 @@
+# Test files
+test/
+*.test.js
+*.test.md
+*.spec.js
+coverage/
+
+# Development files
+*.log
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Build artifacts
+dist/
+build/
+*.tmp
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# Git
+.git/
+.gitignore
+
+# Node
+node_modules/
+
+# Only include essentials
+# - agents/
+# - plugin.json
+# - README.md
+# - package.json (auto-included)

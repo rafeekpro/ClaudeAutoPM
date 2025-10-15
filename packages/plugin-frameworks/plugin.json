@@ -1,0 +1,81 @@
+{
+  "name": "@claudeautopm/plugin-frameworks",
+  "version": "1.0.0",
+  "displayName": "Frontend & Backend Frameworks",
+  "description": "React, Next.js, Vue, Angular, Django, FastAPI, and NestJS framework experts",
+  "category": "frameworks",
+  "agents": [
+    {
+      "name": "e2e-test-engineer",
+      "file": "agents/e2e-test-engineer.md",
+      "description": "E2e Test Engineer specialist",
+      "tags": [
+        "e2e",
+        "test",
+        "engineer"
+      ]
+    },
+    {
+      "name": "nats-messaging-expert",
+      "file": "agents/nats-messaging-expert.md",
+      "description": "Nats Messaging Expert specialist",
+      "tags": [
+        "nats",
+        "messaging",
+        "expert"
+      ]
+    },
+    {
+      "name": "react-frontend-engineer",
+      "file": "agents/react-frontend-engineer.md",
+      "description": "React Frontend Engineer specialist",
+      "tags": [
+        "react",
+        "frontend",
+        "engineer"
+      ]
+    },
+    {
+      "name": "react-ui-expert",
+      "file": "agents/react-ui-expert.md",
+      "description": "React Ui Expert specialist",
+      "tags": [
+        "react",
+        "expert"
+      ]
+    },
+    {
+      "name": "tailwindcss-expert",
+      "file": "agents/tailwindcss-expert.md",
+      "description": "Tailwindcss Expert specialist",
+      "tags": [
+        "tailwindcss",
+        "expert"
+      ]
+    },
+    {
+      "name": "ux-design-expert",
+      "file": "agents/ux-design-expert.md",
+      "description": "Ux Design Expert specialist",
+      "tags": [
+        "design",
+        "expert"
+      ]
+    }
+  ],
+  "keywords": [
+    "react",
+    "nextjs",
+    "vue",
+    "angular",
+    "django",
+    "fastapi",
+    "nestjs",
+    "frameworks"
+  ],
+  "mcpServers": [
+    "react-docs",
+    "vue-docs"
+  ],
+  "compatibleWith": ">=2.8.0"
+}

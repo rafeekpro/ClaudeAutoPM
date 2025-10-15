@@ -283,16 +283,66 @@ autopm template:list
 - 🔗 **Dependency Tracking** - Validate task dependencies automatically
 - 📊 **Progress Auto-update** - Epic progress updates on task completion
 
-### 🤖 **39 Specialized AI Agents**
+### 🎉 **NEW in v2.8.1: Plugin Architecture!**
 
-Organized into dynamic teams that load based on your work context:
+**Modular Agent System** - Agents organized into installable plugins
+- 📦 **7 Official Plugins** - 35 specialized agents in thematic packages
+- 🔌 **npm Workspaces** - Monorepo architecture with scoped packages
+- 🏗️ **Context7-Driven** - Built on best practices from unplugin & npm
+- ⚡ **Install on Demand** - Only load the agents you need
+- 🔍 **Smart Discovery** - Automatic plugin detection and validation
 
-- **Core Agents**: agent-manager, code-analyzer, file-analyzer, test-runner
-- **Language Agents**: python-backend-engineer, nodejs-backend-engineer, javascript-frontend-engineer, bash-scripting-expert
-- **Framework Agents**: react-frontend-engineer, react-ui-expert, tailwindcss-expert, e2e-test-engineer
-- **Cloud Agents**: aws-cloud-architect, azure-cloud-architect, gcp-cloud-architect, kubernetes-orchestrator
-- **DevOps Agents**: docker-containerization-expert, github-operations-specialist, terraform-infrastructure-expert
-- **Data Agents**: postgresql-expert, mongodb-expert, redis-expert, bigquery-expert
+**Available Plugins:**
+
+| Plugin | Agents | Description |
+|--------|--------|-------------|
+| **@claudeautopm/plugin-cloud** | 8 | AWS, Azure, GCP, Terraform, Kubernetes |
+| **@claudeautopm/plugin-devops** | 7 | Docker, GitHub Actions, Azure DevOps, SSH |
+| **@claudeautopm/plugin-frameworks** | 6 | React, Vue, Tailwind CSS, UX Design |
+| **@claudeautopm/plugin-databases** | 5 | PostgreSQL, MongoDB, Redis, BigQuery |
+| **@claudeautopm/plugin-languages** | 5 | JavaScript, TypeScript, Python, Node.js, Bash |
+| **@claudeautopm/plugin-data** | 3 | Airflow, Kedro, LangGraph workflows |
+| **@claudeautopm/plugin-testing** | 1 | Frontend testing, E2E, accessibility |
+
+**Quick Start:**
+
+```bash
+# Install a plugin
+npm install -g @claudeautopm/plugin-cloud
+autopm plugin install cloud
+
+# List available plugins
+autopm plugin list
+
+# Search for specific agents
+autopm plugin search docker
+
+# Get plugin info
+autopm plugin info cloud
+```
+
+**Architecture:**
+- **PluginManager** - Context7-verified plugin system (unplugin patterns)
+- **Factory Pattern** - Dynamic plugin instantiation
+- **Event-Driven** - Hook system for extensibility
+- **Version Compatibility** - Peer dependency validation (semver)
+- **Persistent Registry** - Track installed/enabled state
+
+📖 **[Plugin Architecture Guide](docs/PLUGIN-ARCHITECTURE.md)** - Complete documentation
+
+### 🤖 **35 Specialized AI Agents** (Now in Plugins!)
+
+Previously monolithic, now organized into installable plugins:
+
+- **Core Agents** (4): agent-manager, code-analyzer, file-analyzer, test-runner
+- **Cloud & Infrastructure** (8): AWS, Azure, GCP, Kubernetes, Terraform specialists
+- **DevOps & CI/CD** (7): Docker, GitHub Actions, Azure DevOps, SSH, observability
+- **Frontend & Frameworks** (6): React, Vue, Tailwind, UX design, E2E testing
+- **Databases** (5): PostgreSQL, MongoDB, Redis, BigQuery, Cosmos DB
+- **Programming Languages** (5): JavaScript, TypeScript, Python, Node.js, Bash
+- **Data Engineering** (3): Airflow, Kedro, LangGraph workflow orchestration
+
+**Migration:** Existing projects continue to work. New projects can use plugins for modular installation.
 
 ### 🔄 **Hybrid Execution Model**
 

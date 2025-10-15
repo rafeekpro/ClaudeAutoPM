@@ -1,0 +1,40 @@
+{
+  "name": "@claudeautopm/plugin-languages",
+  "version": "1.0.0",
+  "description": "JavaScript, TypeScript, Python, Node.js, and language-specific development experts",
+  "keywords": [
+    "claudeautopm",
+    "plugin",
+    "languages"
+  ],
+  "author": {
+    "name": "ClaudeAutoPM Team",
+    "email": "autopm@example.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rafeekpro/ClaudeAutoPM.git",
+    "directory": "packages/plugin-languages"
+  },
+  "homepage": "https://github.com/rafeekpro/ClaudeAutoPM/tree/main/packages/plugin-languages#readme",
+  "bugs": {
+    "url": "https://github.com/rafeekpro/ClaudeAutoPM/issues"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "agents/",
+    "plugin.json",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "claude-autopm": ">=2.8.0"
+  }
+}

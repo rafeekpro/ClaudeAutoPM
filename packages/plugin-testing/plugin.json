@@ -1,0 +1,28 @@
+{
+  "name": "@claudeautopm/plugin-testing",
+  "version": "1.0.0",
+  "displayName": "Testing & QA",
+  "description": "Testing frameworks, E2E testing, and quality assurance specialists",
+  "category": "testing",
+  "agents": [
+    {
+      "name": "frontend-testing-engineer",
+      "file": "agents/frontend-testing-engineer.md",
+      "description": "Frontend Testing Engineer specialist",
+      "tags": [
+        "frontend",
+        "testing",
+        "engineer"
+      ]
+    }
+  ],
+  "keywords": [
+    "testing",
+    "qa",
+    "e2e",
+    "unit-testing",
+    "integration-testing"
+  ],
+  "mcpServers": [],
+  "compatibleWith": ">=2.8.0"
+}
