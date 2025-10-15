@@ -103,6 +103,7 @@ PROJECT_STRUCTURE_ANALYSIS.md
 DIRECTORY_ANALYSIS.md
 MIGRATION*.md
 test-mcp-setup.js
+src/
 
 # Backup Folders
 # --------------
