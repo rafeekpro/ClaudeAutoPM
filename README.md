@@ -296,13 +296,33 @@ Organized into dynamic teams that load based on your work context:
 
 ### 🔄 **Hybrid Execution Model**
 
-Choose the best approach for each task:
+ClaudeAutoPM provides two distinct interfaces optimized for different operations:
 
-| Mode | When to Use | Example |
-|------|-------------|---------|
-| **Deterministic** | Scaffolding, templates, known patterns | `autopm install --preset fullstack` |
-| **AI-Powered** | Analysis, design, complex decisions | `/pm:epic-decompose` |
-| **Hybrid** | Flexible workflows | `autopm config` (CLI) or `/pm:config` (AI) |
+#### 🔧 CLI (`autopm`) - Non-AI Utilities
+Fast, deterministic operations that don't require AI:
+```bash
+autopm install                    # Framework installation
+autopm config set provider github # Configuration management
+autopm team load fullstack        # Load agent teams
+autopm mcp enable context7        # Manage MCP servers
+autopm epic status auth           # View epic progress (read-only)
+```
+
+**When to use:** Setup, configuration, read-only utilities, CI/CD scripts
+
+#### 🤖 Claude Code (`/pm:*`) - AI-Powered Operations
+Intelligent operations leveraging Claude's AI:
+```bash
+/pm:prd-new user-auth            # Create PRD with AI assistance
+/pm:epic-decompose user-auth     # Intelligent task breakdown
+/pm:next                         # Smart task prioritization
+/pm:standup                      # Generate progress summary
+/pm:what-next                    # AI suggests next actions
+```
+
+**When to use:** Creation, modification, intelligent analysis, development workflow
+
+📖 **[Full CLI vs Claude Code Guide](docs/CLI-vs-CLAUDE-CODE.md)**
 
 ### 🎭 **Dynamic Team Management**
 
@@ -442,6 +462,7 @@ autopm pm sync
 
 ### Core Concepts
 - [Architecture Overview](docs/core-concepts/architecture.md)
+- [CLI vs Claude Code](docs/CLI-vs-CLAUDE-CODE.md) ⭐ **Essential reading**
 - [Hybrid Execution](docs/core-concepts/hybrid-execution.md)
 - [Agent System](docs/core-concepts/agent-system.md)
 - [Team Management](docs/core-concepts/team-management.md)
