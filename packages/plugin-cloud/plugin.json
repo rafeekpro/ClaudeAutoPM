@@ -1,0 +1,74 @@
+{
+  "name": "@claudeautopm/plugin-cloud",
+  "version": "1.0.0",
+  "displayName": "Cloud Providers",
+  "description": "Cloud architecture agents for AWS, Azure, GCP, and infrastructure as code with Terraform",
+  "category": "cloud",
+  "agents": [
+    {
+      "name": "aws-cloud-architect",
+      "file": "agents/aws-cloud-architect.md",
+      "description": "AWS cloud architecture and design patterns",
+      "tags": ["aws", "cloud", "architecture", "design"]
+    },
+    {
+      "name": "azure-cloud-architect",
+      "file": "agents/azure-cloud-architect.md",
+      "description": "Azure cloud architecture and design patterns",
+      "tags": ["azure", "cloud", "architecture", "design"]
+    },
+    {
+      "name": "gcp-cloud-architect",
+      "file": "agents/gcp-cloud-architect.md",
+      "description": "Google Cloud Platform architecture and design",
+      "tags": ["gcp", "google-cloud", "architecture", "design"]
+    },
+    {
+      "name": "gcp-cloud-functions-engineer",
+      "file": "agents/gcp-cloud-functions-engineer.md",
+      "description": "Google Cloud Functions and serverless development",
+      "tags": ["gcp", "cloud-functions", "serverless"]
+    },
+    {
+      "name": "gemini-api-expert",
+      "file": "agents/gemini-api-expert.md",
+      "description": "Google Gemini API integration and development",
+      "tags": ["gemini", "google", "ai", "api"]
+    },
+    {
+      "name": "kubernetes-orchestrator",
+      "file": "agents/kubernetes-orchestrator.md",
+      "description": "Kubernetes orchestration and container management",
+      "tags": ["kubernetes", "k8s", "containers", "orchestration"]
+    },
+    {
+      "name": "openai-python-expert",
+      "file": "agents/openai-python-expert.md",
+      "description": "OpenAI API integration with Python",
+      "tags": ["openai", "python", "ai", "api"]
+    },
+    {
+      "name": "terraform-infrastructure-expert",
+      "file": "agents/terraform-infrastructure-expert.md",
+      "description": "Terraform infrastructure as code for multi-cloud deployments",
+      "tags": ["terraform", "iac", "infrastructure", "multi-cloud"]
+    }
+  ],
+  "keywords": [
+    "aws",
+    "azure",
+    "gcp",
+    "cloud",
+    "terraform",
+    "serverless",
+    "infrastructure",
+    "iac",
+    "architecture"
+  ],
+  "mcpServers": [
+    "aws",
+    "azure-cli",
+    "terraform"
+  ],
+  "compatibleWith": ">=2.8.0"
+}

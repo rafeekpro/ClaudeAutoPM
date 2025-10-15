@@ -1,0 +1,395 @@
+/**
+ * Plugin Command for autopm CLI
+ * Manages ClaudeAutoPM plugins
+ *
+ * Commands:
+ * - list: List installed plugins
+ * - search: Search for plugins by keyword
+ * - install: Install a plugin
+ * - uninstall: Remove a plugin
+ * - info: Show plugin details
+ * - enable: Enable a plugin
+ * - disable: Disable a plugin
+ */
+
+const PluginManager = require('../../lib/plugins/PluginManager');
+const chalk = require('chalk');
+
+module.exports = {
+  command: 'plugin <action> [name]',
+  describe: 'Manage ClaudeAutoPM plugins',
+
+  builder: (yargs) => {
+    return yargs
+      .positional('action', {
+        describe: 'Plugin action to perform',
+        type: 'string',
+        choices: ['list', 'search', 'install', 'uninstall', 'info', 'enable', 'disable']
+      })
+      .positional('name', {
+        describe: 'Plugin name (without @claudeautopm/plugin- prefix)',
+        type: 'string'
+      })
+      .option('verbose', {
+        alias: 'v',
+        describe: 'Show detailed output',
+        type: 'boolean',
+        default: false
+      })
+      .example('autopm plugin list', 'List installed plugins')
+      .example('autopm plugin search cloud', 'Search for cloud-related plugins')
+      .example('autopm plugin install cloud', 'Install cloud plugin')
+      .example('autopm plugin uninstall cloud', 'Remove cloud plugin')
+      .example('autopm plugin info cloud', 'Show cloud plugin details')
+      .epilogue(`
+📦 Plugin Management
+
+Plugins extend ClaudeAutoPM with specialized agents for different technologies.
+
+Available Official Plugins:
+  • cloud       - AWS, Azure, GCP cloud architecture (9 agents)
+  • devops      - Docker, K8s, CI/CD, monitoring (8 agents)
+  • frameworks  - React, Next.js, Vue, Django (7 agents)
+  • databases   - PostgreSQL, MongoDB, Redis (6 agents)
+  • languages   - Node.js, Python, TypeScript (6 agents)
+  • data        - Data engineering, ML, ETL (3 agents)
+  • decisions   - Architecture advisors (3 agents)
+
+Installation:
+  1. Install plugin package: npm install -g @claudeautopm/plugin-<name>
+  2. Install plugin agents: autopm plugin install <name>
+
+Usage:
+  After installation, use 'autopm team load' to include plugin agents
+  or manually add @include directives to CLAUDE.md
+      `);
+  },
+
+  handler: async (argv) => {
+    const manager = new PluginManager();
+
+    try {
+      switch (argv.action) {
+        case 'list':
+          await handleList(manager, argv);
+          break;
+        case 'search':
+          if (!argv.name) {
+            console.error(chalk.red('Error: Search keyword required'));
+            console.log('Usage: autopm plugin search <keyword>');
+            process.exit(1);
+          }
+          await handleSearch(manager, argv.name, argv);
+          break;
+        case 'install':
+          if (!argv.name) {
+            console.error(chalk.red('Error: Plugin name required'));
+            console.log('Usage: autopm plugin install <name>');
+            process.exit(1);
+          }
+          await handleInstall(manager, argv.name, argv);
+          break;
+        case 'uninstall':
+          if (!argv.name) {
+            console.error(chalk.red('Error: Plugin name required'));
+            console.log('Usage: autopm plugin uninstall <name>');
+            process.exit(1);
+          }
+          await handleUninstall(manager, argv.name, argv);
+          break;
+        case 'info':
+          if (!argv.name) {
+            console.error(chalk.red('Error: Plugin name required'));
+            console.log('Usage: autopm plugin info <name>');
+            process.exit(1);
+          }
+          await handleInfo(manager, argv.name, argv);
+          break;
+        case 'enable':
+          if (!argv.name) {
+            console.error(chalk.red('Error: Plugin name required'));
+            console.log('Usage: autopm plugin enable <name>');
+            process.exit(1);
+          }
+          await handleEnable(manager, argv.name, argv);
+          break;
+        case 'disable':
+          if (!argv.name) {
+            console.error(chalk.red('Error: Plugin name required'));
+            console.log('Usage: autopm plugin disable <name>');
+            process.exit(1);
+          }
+          await handleDisable(manager, argv.name, argv);
+          break;
+        default:
+          console.error(chalk.red(`Unknown action: ${argv.action}`));
+          process.exit(1);
+      }
+    } catch (error) {
+      console.error(chalk.red(`Error: ${error.message}`));
+      if (argv.verbose || argv.debug) {
+        console.error(error.stack);
+      }
+      process.exit(1);
+    }
+  }
+};
+
+/**
+ * Handle 'list' command
+ */
+async function handleList(manager, argv) {
+  const installed = manager.getInstalledPlugins();
+  const enabled = manager.getEnabledPlugins();
+
+  console.log(chalk.bold('\n📦 Installed Plugins\n'));
+
+  if (installed.length === 0) {
+    console.log('No plugins installed.\n');
+    console.log('💡 Tip: Run ' + chalk.cyan('autopm plugin search <keyword>') + ' to find plugins');
+    console.log('   Or install directly: ' + chalk.cyan('autopm plugin install <name>'));
+    return;
+  }
+
+  for (const pluginName of installed) {
+    try {
+      const metadata = await manager.loadPluginMetadata(pluginName);
+      const isEnabled = enabled.includes(pluginName);
+      const statusIcon = isEnabled ? chalk.green('✓') : chalk.gray('○');
+      const statusText = isEnabled ? chalk.green('enabled') : chalk.gray('disabled');
+
+      console.log(`${statusIcon} ${chalk.bold(metadata.displayName)} ${chalk.gray(`(@claudeautopm/${pluginName})`)}`);
+      console.log(`  ${metadata.description}`);
+      console.log(`  ${chalk.gray(`Category: ${metadata.category} | Agents: ${metadata.agents.length} | Status: ${statusText}`)}`);
+
+      if (argv.verbose) {
+        console.log(`  ${chalk.gray(`Version: ${metadata.version}`)}`);
+        console.log(`  ${chalk.gray(`Agents: ${metadata.agents.map(a => a.name).join(', ')}`)}`);
+      }
+
+      console.log('');
+    } catch (error) {
+      console.log(`${chalk.red('✗')} ${chalk.bold(pluginName)} ${chalk.red('(error loading)')}`);
+      if (argv.verbose) {
+        console.log(`  ${chalk.red(error.message)}`);
+      }
+      console.log('');
+    }
+  }
+
+  console.log(chalk.gray(`Total: ${installed.length} installed, ${enabled.length} enabled`));
+  console.log('');
+}
+
+/**
+ * Handle 'search' command
+ */
+async function handleSearch(manager, keyword, argv) {
+  console.log(chalk.bold(`\n🔍 Searching for: "${keyword}"\n`));
+
+  const results = await manager.searchPlugins(keyword);
+
+  if (results.length === 0) {
+    console.log('No plugins found matching your search.\n');
+    console.log('💡 Tip: Try different keywords or check available plugins:');
+    console.log('   ' + chalk.cyan('autopm plugin list --all'));
+    return;
+  }
+
+  for (const plugin of results) {
+    const isInstalled = manager.isInstalled(plugin.pluginName);
+    const installIcon = isInstalled ? chalk.green('✓ installed') : chalk.gray('not installed');
+
+    console.log(`${chalk.bold(plugin.displayName)} ${chalk.gray(`(@claudeautopm/${plugin.pluginName})`)}`);
+    console.log(`  ${plugin.description}`);
+    console.log(`  ${chalk.gray(`Category: ${plugin.category} | Agents: ${plugin.agents.length} | ${installIcon}`)}`);
+
+    if (argv.verbose && plugin.agents.length > 0) {
+      console.log(`  ${chalk.gray(`Agents: ${plugin.agents.map(a => a.name).join(', ')}`)}`);
+    }
+
+    console.log('');
+  }
+
+  console.log(chalk.gray(`Found ${results.length} plugin(s)`));
+  console.log('');
+}
+
+/**
+ * Handle 'install' command
+ */
+async function handleInstall(manager, pluginName, argv) {
+  const fullPluginName = pluginName.startsWith('plugin-') ? pluginName : `plugin-${pluginName}`;
+
+  console.log(chalk.bold(`\n📦 Installing plugin: ${pluginName}\n`));
+
+  // Check if already installed
+  if (manager.isInstalled(fullPluginName)) {
+    console.log(chalk.yellow(`⚠ Plugin ${pluginName} is already installed`));
+    console.log('');
+    console.log('To reinstall, first uninstall:');
+    console.log(`  ${chalk.cyan(`autopm plugin uninstall ${pluginName}`)}`);
+    return;
+  }
+
+  // Check if npm package exists
+  const { execSync } = require('child_process');
+  let packageInstalled = false;
+
+  try {
+    execSync(`npm list -g @claudeautopm/${fullPluginName}`, { stdio: 'ignore' });
+    packageInstalled = true;
+  } catch {
+    // Package not installed
+  }
+
+  // Install npm package if needed
+  if (!packageInstalled) {
+    console.log(chalk.gray('Installing npm package...'));
+    try {
+      execSync(`npm install -g @claudeautopm/${fullPluginName}`, { stdio: 'inherit' });
+      console.log('');
+    } catch (error) {
+      console.error(chalk.red(`\n✗ Failed to install npm package: @claudeautopm/${fullPluginName}`));
+      console.error(chalk.gray('Make sure the package exists on npm'));
+      process.exit(1);
+    }
+  } else {
+    console.log(chalk.gray(`npm package already installed: @claudeautopm/${fullPluginName}`));
+  }
+
+  // Install plugin agents
+  console.log(chalk.gray('Installing plugin agents...'));
+  const result = await manager.installPlugin(fullPluginName);
+
+  console.log(chalk.green(`\n✓ Plugin installed successfully!`));
+  console.log('');
+  console.log(`  ${chalk.bold(result.displayName)}`);
+  console.log(`  Category: ${result.category}`);
+  console.log(`  Agents installed: ${result.agentsInstalled}`);
+
+  if (argv.verbose) {
+    console.log('');
+    console.log('  Installed agents:');
+    for (const agent of result.agents) {
+      console.log(`    • ${agent.name}`);
+    }
+  }
+
+  console.log('');
+  console.log(chalk.bold('Next steps:'));
+  console.log(`  1. Load agents: ${chalk.cyan('autopm team load <team>')}`);
+  console.log(`  2. Or manually add to CLAUDE.md:`);
+  console.log(`     ${chalk.gray(`- @include .claude/agents/${result.category}/<agent>.md`)}`);
+  console.log('');
+}
+
+/**
+ * Handle 'uninstall' command
+ */
+async function handleUninstall(manager, pluginName, argv) {
+  const fullPluginName = pluginName.startsWith('plugin-') ? pluginName : `plugin-${pluginName}`;
+
+  console.log(chalk.bold(`\n📦 Uninstalling plugin: ${pluginName}\n`));
+
+  // Check if installed
+  if (!manager.isInstalled(fullPluginName)) {
+    console.log(chalk.yellow(`⚠ Plugin ${pluginName} is not installed`));
+    return;
+  }
+
+  // Uninstall plugin agents
+  const result = await manager.uninstallPlugin(fullPluginName);
+
+  console.log(chalk.green(`✓ Plugin uninstalled successfully!`));
+  console.log('');
+  console.log(`  Agents removed: ${result.agentsRemoved}`);
+
+  if (argv.verbose && result.agents.length > 0) {
+    console.log('');
+    console.log('  Removed agents:');
+    for (const agentName of result.agents) {
+      console.log(`    • ${agentName}`);
+    }
+  }
+
+  console.log('');
+  console.log(chalk.gray('Note: npm package not removed. To remove completely:'));
+  console.log(`  ${chalk.cyan(`npm uninstall -g @claudeautopm/${fullPluginName}`)}`);
+  console.log('');
+}
+
+/**
+ * Handle 'info' command
+ */
+async function handleInfo(manager, pluginName, argv) {
+  const fullPluginName = pluginName.startsWith('plugin-') ? pluginName : `plugin-${pluginName}`;
+
+  try {
+    const info = await manager.getPluginInfo(fullPluginName);
+
+    console.log(chalk.bold(`\n📦 ${info.displayName}\n`));
+    console.log(`${info.description}\n`);
+
+    console.log(chalk.bold('Details:'));
+    console.log(`  Package: ${chalk.cyan(`@claudeautopm/${fullPluginName}`)}`);
+    console.log(`  Version: ${info.version}`);
+    console.log(`  Category: ${info.category}`);
+    console.log(`  Status: ${info.installed ? chalk.green('installed') : chalk.gray('not installed')}`);
+    if (info.installed) {
+      console.log(`  Enabled: ${info.enabled ? chalk.green('yes') : chalk.gray('no')}`);
+    }
+
+    console.log('');
+    console.log(chalk.bold(`Agents (${info.agents.length}):`));
+    for (const agent of info.agents) {
+      console.log(`  • ${chalk.bold(agent.name)}`);
+      console.log(`    ${chalk.gray(agent.description)}`);
+      if (argv.verbose) {
+        console.log(`    ${chalk.gray(`File: ${agent.file}`)}`);
+      }
+    }
+
+    if (info.keywords && info.keywords.length > 0) {
+      console.log('');
+      console.log(`Keywords: ${chalk.gray(info.keywords.join(', '))}`);
+    }
+
+    console.log('');
+  } catch (error) {
+    console.error(chalk.red(`\n✗ Plugin not found: ${pluginName}`));
+    console.error(chalk.gray(`Package @claudeautopm/${fullPluginName} not installed`));
+    console.log('');
+    console.log('To install:');
+    console.log(`  ${chalk.cyan(`autopm plugin install ${pluginName}`)}`);
+    console.log('');
+    process.exit(1);
+  }
+}
+
+/**
+ * Handle 'enable' command
+ */
+async function handleEnable(manager, pluginName, argv) {
+  const fullPluginName = pluginName.startsWith('plugin-') ? pluginName : `plugin-${pluginName}`;
+
+  try {
+    manager.enablePlugin(fullPluginName);
+    console.log(chalk.green(`\n✓ Plugin enabled: ${pluginName}\n`));
+  } catch (error) {
+    console.error(chalk.red(`\n✗ ${error.message}\n`));
+    process.exit(1);
+  }
+}
+
+/**
+ * Handle 'disable' command
+ */
+async function handleDisable(manager, pluginName, argv) {
+  const fullPluginName = pluginName.startsWith('plugin-') ? pluginName : `plugin-${pluginName}`;
+
+  manager.disablePlugin(fullPluginName);
+  console.log(chalk.yellow(`\n⚠ Plugin disabled: ${pluginName}\n`));
+  console.log(chalk.gray('Note: Agents remain in .claude/agents/ but plugin is marked as disabled'));
+  console.log('');
+}
