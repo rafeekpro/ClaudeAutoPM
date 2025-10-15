@@ -7,6 +7,205 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 🎉 NEW: Plugin Architecture - Modular Agent System (v2.8.1)
+
+This release introduces a complete plugin-based architecture, transforming ClaudeAutoPM from a monolithic agent system into a modular, extensible framework. Built on Context7-verified best practices from **unplugin** (9.7/10 trust) and **npm workspaces** (7.5/10 trust).
+
+#### Added
+
+**7 Official Plugin Packages**
+- `@claudeautopm/plugin-cloud` (1.0.0) - 8 cloud architecture agents (AWS, Azure, GCP, Terraform, Kubernetes)
+- `@claudeautopm/plugin-devops` (1.0.0) - 7 DevOps agents (Docker, GitHub Actions, Azure DevOps, SSH)
+- `@claudeautopm/plugin-frameworks` (1.0.0) - 6 framework agents (React, Next.js, NestJS, Vue, Angular, Laravel)
+- `@claudeautopm/plugin-databases` (1.0.0) - 5 database agents (PostgreSQL, MongoDB, Redis, MySQL, Elasticsearch)
+- `@claudeautopm/plugin-languages` (1.0.0) - 5 language agents (Python, Go, Rust, TypeScript, Java)
+- `@claudeautopm/plugin-data` (1.0.0) - 3 data engineering agents (Apache Spark, Airflow, ETL)
+- `@claudeautopm/plugin-testing` (1.0.0) - 1 testing agent (E2E Test Engineer)
+
+**Enhanced PluginManager** (`lib/plugins/PluginManager.js`)
+- EventEmitter-based lifecycle events (`init:complete`, `discover:found`, `load:complete`, `install:agent`)
+- Registry persistence to `~/.claudeautopm/plugins/registry.json`
+- Plugin enable/disable functionality
+- Smart plugin search across metadata
+- Hook system for extensibility
+- Version compatibility checking (semver)
+- Comprehensive error handling and logging
+
+**Plugin Management CLI** (`bin/commands/plugin.js`)
+```bash
+autopm plugin list                    # List installed plugins
+autopm plugin search docker           # Search by keyword
+autopm plugin install cloud           # Install from npm
+autopm plugin info cloud              # Detailed plugin information
+autopm plugin enable/disable cloud    # Toggle activation
+```
+
+**npm Workspaces Monorepo**
+- All plugins in `packages/` directory
+- Scoped packages: `@claudeautopm/plugin-*`
+- Independent versioning per plugin
+- Shared development tooling
+
+**Publishing Infrastructure**
+- `scripts/publish-plugins.sh` - Automated npm publishing script with:
+  - Pre-flight checks (npm authentication, directory validation)
+  - Dry-run mode support (`--dry-run`)
+  - Color-coded output and progress tracking
+  - Success/failure reporting
+  - Registry verification
+- `.npmignore` files for all plugins (exclude tests, dev files)
+- `PUBLISH-GUIDE.md` - Comprehensive npm publishing guide
+
+**Comprehensive Documentation**
+- `docs/PLUGIN-ARCHITECTURE.md` (900 lines) - Complete architecture guide:
+  - Context7 research foundation
+  - Plugin structure and schema
+  - PluginManager API reference
+  - Creating custom plugins
+  - Best practices and troubleshooting
+  - Migration guide
+- `PR-DESCRIPTION.md` - Detailed PR description with implementation phases
+- `README.md` - Updated with plugin architecture section
+- Plugin READMEs - Usage examples, agent capabilities, MCP integration
+
+**Testing**
+- `test/core/PluginManager.test.js` - Comprehensive test suite (~350 lines):
+  - Constructor & initialization
+  - Plugin discovery and validation
+  - Plugin loading and agent registration
+  - Installation workflow
+  - Listing & filtering
+  - Hook system
+  - Event emissions
+  - Statistics
+
+#### Changed
+
+**Refactored Monolithic Structure**
+- Extracted 35 agents from monolithic structure into 7 thematic plugins
+- Maintained backward compatibility (existing projects unaffected)
+- Updated CLI integration for plugin commands
+
+**Architecture Patterns** (Context7-driven)
+- **Factory Pattern** - Dynamic plugin instantiation (from unplugin)
+- **Registry Pattern** - Persistent state management
+- **Observer Pattern** - Event-driven lifecycle (EventEmitter)
+- **Dependency Injection** - Flexible configuration
+
+#### Benefits
+
+**For Users:**
+- 📦 Modular installation - Install only needed plugins
+- 🔍 Easier discovery - Search and browse by category
+- ⚡ Faster setup - Smaller package sizes
+- 🎯 Better organization - Thematic grouping
+
+**For Developers:**
+- 🔌 Extensibility - Hook system for customization
+- 🧪 Testability - Each plugin independently testable
+- 📖 Maintainability - Separated concerns
+- 🚀 Scalability - Easy to add new plugins
+
+**For Contributors:**
+- 📐 Clear structure - Plugin templates and standards
+- 📚 Documentation - Complete guides and examples
+- 🎨 Standards - Consistent patterns across plugins
+- 🤖 Automation - Scaffolding and publishing tools
+
+#### Installation
+
+```bash
+# Install specific plugin
+npm install -g @claudeautopm/plugin-cloud
+autopm plugin install cloud
+
+# Install multiple plugins
+npm install -g @claudeautopm/plugin-cloud @claudeautopm/plugin-devops
+autopm plugin install cloud
+autopm plugin install devops
+
+# List and search
+autopm plugin list
+autopm plugin search kubernetes
+```
+
+#### Technical Details
+
+**Package Information:**
+- Total: 7 packages, 35 agents
+- Compressed size: ~183KB total (~5-15KB per plugin)
+- No external dependencies (peer dependency on core)
+- Published to npm under `@claudeautopm` scope
+
+**Context7 Research:**
+1. **unplugin** (`/unjs/unplugin`)
+   - Trust Score: 9.7/10
+   - Code Snippets: 12
+   - Patterns: Factory-based instantiation, unified hook system
+
+2. **npm workspaces** (`/websites/npmjs`)
+   - Trust Score: 7.5/10
+   - Code Snippets: 1,174
+   - Patterns: Scoped packages, peer dependencies, monorepo management
+
+**Backward Compatibility:**
+- ✅ No breaking changes
+- ✅ Existing projects continue to work
+- ✅ All tests passing
+- ✅ CLI commands unchanged (plugin commands are additive)
+
+#### Migration
+
+**For New Projects:**
+```bash
+autopm install
+npm install -g @claudeautopm/plugin-cloud
+autopm plugin install cloud
+```
+
+**For Existing Projects:**
+- No action needed
+- Agents already in `.claude/agents/` continue working
+- Optional: Migrate to plugin-based system for modular updates
+
+#### Files Changed
+
+```
+24,119 additions, 8 deletions
+
+New Files:
+- packages/plugin-cloud/        (8 agents, plugin.json, README.md)
+- packages/plugin-devops/       (7 agents, plugin.json, README.md)
+- packages/plugin-frameworks/   (6 agents, plugin.json, README.md)
+- packages/plugin-databases/    (5 agents, plugin.json, README.md)
+- packages/plugin-languages/    (5 agents, plugin.json, README.md)
+- packages/plugin-data/         (3 agents, plugin.json, README.md)
+- packages/plugin-testing/      (1 agent, plugin.json, README.md)
+- lib/plugins/PluginManager.js  (Enhanced with Context7 patterns)
+- bin/commands/plugin.js        (CLI integration)
+- scripts/publish-plugins.sh    (npm publishing automation)
+- docs/PLUGIN-ARCHITECTURE.md   (900-line guide)
+- PR-DESCRIPTION.md             (Comprehensive PR description)
+- PUBLISH-GUIDE.md              (npm publishing guide)
+- test/core/PluginManager.test.js (Test suite)
+```
+
+#### Commits
+
+```
+8cabb5d docs: Add PR description and npm publish automation
+7a7f392 docs: Add comprehensive plugin architecture documentation
+5aa6232 feat: Enhance PluginManager with Context7 best practices - Phase 4
+cc99fa4 feat: Extract all plugins from monolithic structure - Phase 3
+c0ed125 feat: Phase 2 - Cloud plugin extraction with npm workspaces
+8bce203 feat: Implement plugin architecture Phase 1 - Foundation
+```
+
+**Pull Request:** #345
+**Status:** ✅ Ready for npm publication
+
+---
+
 ### 🎉 New Features - Azure DevOps Integration (Phase 2)
 
 This release completes the second phase of the v2.8.0 Provider Integration milestone, adding full bidirectional synchronization with Azure DevOps Work Items. The implementation mirrors the GitHub integration pattern and includes a comprehensive Azure DevOps REST API wrapper, issue/epic synchronization with conflict resolution, and 183 comprehensive tests (158 unit + 25 integration).
