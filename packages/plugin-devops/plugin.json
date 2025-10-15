@@ -1,0 +1,94 @@
+{
+  "name": "@claudeautopm/plugin-devops",
+  "version": "1.0.0",
+  "displayName": "DevOps & Infrastructure",
+  "description": "DevOps, CI/CD, containers, and infrastructure automation specialists",
+  "category": "devops",
+  "agents": [
+    {
+      "name": "azure-devops-specialist",
+      "file": "agents/azure-devops-specialist.md",
+      "description": "Azure Devops Specialist specialist",
+      "tags": [
+        "azure",
+        "devops",
+        "specialist"
+      ]
+    },
+    {
+      "name": "docker-containerization-expert",
+      "file": "agents/docker-containerization-expert.md",
+      "description": "Docker Containerization Expert specialist",
+      "tags": [
+        "docker",
+        "containerization",
+        "expert"
+      ]
+    },
+    {
+      "name": "github-operations-specialist",
+      "file": "agents/github-operations-specialist.md",
+      "description": "Github Operations Specialist specialist",
+      "tags": [
+        "github",
+        "operations",
+        "specialist"
+      ]
+    },
+    {
+      "name": "mcp-context-manager",
+      "file": "agents/mcp-context-manager.md",
+      "description": "Mcp Context Manager specialist",
+      "tags": [
+        "mcp",
+        "context",
+        "manager"
+      ]
+    },
+    {
+      "name": "observability-engineer",
+      "file": "agents/observability-engineer.md",
+      "description": "Observability Engineer specialist",
+      "tags": [
+        "observability",
+        "engineer"
+      ]
+    },
+    {
+      "name": "ssh-operations-expert",
+      "file": "agents/ssh-operations-expert.md",
+      "description": "Ssh Operations Expert specialist",
+      "tags": [
+        "ssh",
+        "operations",
+        "expert"
+      ]
+    },
+    {
+      "name": "traefik-proxy-expert",
+      "file": "agents/traefik-proxy-expert.md",
+      "description": "Traefik Proxy Expert specialist",
+      "tags": [
+        "traefik",
+        "proxy",
+        "expert"
+      ]
+    }
+  ],
+  "keywords": [
+    "devops",
+    "docker",
+    "kubernetes",
+    "cicd",
+    "github",
+    "azure-devops",
+    "ssh",
+    "traefik"
+  ],
+  "mcpServers": [
+    "docker",
+    "kubernetes",
+    "github"
+  ],
+  "compatibleWith": ">=2.8.0"
+}

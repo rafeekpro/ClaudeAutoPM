@@ -1,0 +1,40 @@
+{
+  "name": "@claudeautopm/plugin-frameworks",
+  "version": "1.0.0",
+  "description": "React, Next.js, Vue, Angular, Django, FastAPI, and NestJS framework experts",
+  "keywords": [
+    "claudeautopm",
+    "plugin",
+    "frameworks"
+  ],
+  "author": {
+    "name": "ClaudeAutoPM Team",
+    "email": "autopm@example.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rafeekpro/ClaudeAutoPM.git",
+    "directory": "packages/plugin-frameworks"
+  },
+  "homepage": "https://github.com/rafeekpro/ClaudeAutoPM/tree/main/packages/plugin-frameworks#readme",
+  "bugs": {
+    "url": "https://github.com/rafeekpro/ClaudeAutoPM/issues"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "agents/",
+    "plugin.json",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "claude-autopm": ">=2.8.0"
+  }
+}

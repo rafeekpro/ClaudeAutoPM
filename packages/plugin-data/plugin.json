@@ -1,0 +1,48 @@
+{
+  "name": "@claudeautopm/plugin-data",
+  "version": "1.0.0",
+  "displayName": "Data Engineering & ML",
+  "description": "Data engineering, machine learning, and ETL pipeline specialists",
+  "category": "data",
+  "agents": [
+    {
+      "name": "airflow-orchestration-expert",
+      "file": "agents/airflow-orchestration-expert.md",
+      "description": "Airflow Orchestration Expert specialist",
+      "tags": [
+        "airflow",
+        "orchestration",
+        "expert"
+      ]
+    },
+    {
+      "name": "kedro-pipeline-expert",
+      "file": "agents/kedro-pipeline-expert.md",
+      "description": "Kedro Pipeline Expert specialist",
+      "tags": [
+        "kedro",
+        "pipeline",
+        "expert"
+      ]
+    },
+    {
+      "name": "langgraph-workflow-expert",
+      "file": "agents/langgraph-workflow-expert.md",
+      "description": "Langgraph Workflow Expert specialist",
+      "tags": [
+        "langgraph",
+        "workflow",
+        "expert"
+      ]
+    }
+  ],
+  "keywords": [
+    "data-engineering",
+    "ml",
+    "machine-learning",
+    "etl",
+    "analytics"
+  ],
+  "mcpServers": [],
+  "compatibleWith": ">=2.8.0"
+}
