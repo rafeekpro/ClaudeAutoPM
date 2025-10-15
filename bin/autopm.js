@@ -180,6 +180,8 @@ function main() {
     .command(require('./commands/config'))
     // MCP management command
     .command(require('./commands/mcp'))
+    // Plugin management command
+    .command(require('./commands/plugin'))
     // Epic management command (STANDALONE)
     .command(require('../lib/cli/commands/epic'))
     // Issue management command (STANDALONE)
