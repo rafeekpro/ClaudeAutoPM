@@ -1,6 +1,15 @@
 /**
  * Epic Command for autopm CLI
- * Manages epic status, breakdown, and analysis
+ * Read-only utility for viewing epic status and breakdown
+ *
+ * NOTE: This is a READ-ONLY utility command for viewing epics.
+ * To CREATE or MODIFY epics, use Claude Code commands:
+ *   /pm:prd-new <name>           - Create new PRD
+ *   /pm:epic-decompose <name>    - Decompose PRD into epic
+ *   /pm:epic-sync <name>         - Sync epic with provider
+ *   /pm:epic-edit <name>         - Edit existing epic
+ *
+ * This CLI command is for quick status checks outside of Claude Code.
  */
 
 const path = require('path');
@@ -9,7 +18,7 @@ const fs = require('fs');
 
 module.exports = {
   command: 'epic <action> [name]',
-  describe: 'Manage epics and view epic status',
+  describe: 'View epic status and breakdown (read-only utility)',
 
   builder: (yargs) => {
     return yargs
@@ -30,7 +39,18 @@ module.exports = {
       })
       .example('autopm epic list', 'List all available epics')
       .example('autopm epic status fullstack', 'Show status of fullstack epic')
-      .example('autopm epic breakdown fullstack', 'Show detailed task breakdown');
+      .example('autopm epic breakdown fullstack', 'Show detailed task breakdown')
+      .epilogue(`
+📝 Note: This is a READ-ONLY command for viewing epics.
+
+To create or modify epics, use Claude Code:
+  /pm:prd-new <name>           - Create new PRD
+  /pm:epic-decompose <name>    - Decompose PRD into epic
+  /pm:epic-sync <name>         - Sync epic with provider
+  /pm:epic-edit <name>         - Edit existing epic
+
+Use this CLI command for quick status checks outside Claude Code.
+      `);
   },
 
   handler: async (argv) => {

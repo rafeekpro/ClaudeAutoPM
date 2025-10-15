@@ -321,8 +321,15 @@ function main() {
    autopm team load <name>          # Load specific team (frontend/backend/fullstack/devops)
    autopm team current              # Check currently active team
 
-💡 Claude Code Workflows (In-Editor Commands):
-   /pm:what-next                    # ⭐ Smart suggestions for next steps
+📊 Epic Status (Read-Only Utilities):
+   autopm epic list                 # List all available epics
+   autopm epic status <name>        # Show epic progress and metrics
+   autopm epic breakdown <name>     # Show detailed task breakdown
+
+   💡 Note: To CREATE or MODIFY epics, use Claude Code /pm:* commands
+
+💡 Claude Code PM Commands (AI-Powered):
+   /pm:what-next                    # ⭐ Smart suggestions for what to do next
    /pm:status                       # Project overview and health
    /pm:prd-new <name>               # Create new PRD
    /pm:epic-decompose <name>        # Break PRD into tasks
