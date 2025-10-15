@@ -1,0 +1,67 @@
+{
+  "name": "@claudeautopm/plugin-databases",
+  "version": "1.0.0",
+  "displayName": "Database & Data Storage",
+  "description": "PostgreSQL, MongoDB, Redis, and database architecture specialists",
+  "category": "databases",
+  "agents": [
+    {
+      "name": "bigquery-expert",
+      "file": "agents/bigquery-expert.md",
+      "description": "Bigquery Expert specialist",
+      "tags": [
+        "bigquery",
+        "expert"
+      ]
+    },
+    {
+      "name": "cosmosdb-expert",
+      "file": "agents/cosmosdb-expert.md",
+      "description": "Cosmosdb Expert specialist",
+      "tags": [
+        "cosmosdb",
+        "expert"
+      ]
+    },
+    {
+      "name": "mongodb-expert",
+      "file": "agents/mongodb-expert.md",
+      "description": "Mongodb Expert specialist",
+      "tags": [
+        "mongodb",
+        "expert"
+      ]
+    },
+    {
+      "name": "postgresql-expert",
+      "file": "agents/postgresql-expert.md",
+      "description": "Postgresql Expert specialist",
+      "tags": [
+        "postgresql",
+        "expert"
+      ]
+    },
+    {
+      "name": "redis-expert",
+      "file": "agents/redis-expert.md",
+      "description": "Redis Expert specialist",
+      "tags": [
+        "redis",
+        "expert"
+      ]
+    }
+  ],
+  "keywords": [
+    "postgresql",
+    "mongodb",
+    "redis",
+    "sql",
+    "nosql",
+    "database"
+  ],
+  "mcpServers": [
+    "postgresql",
+    "mongodb"
+  ],
+  "compatibleWith": ">=2.8.0"
+}

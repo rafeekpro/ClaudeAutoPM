@@ -1,0 +1,40 @@
+{
+  "name": "@claudeautopm/plugin-testing",
+  "version": "1.0.0",
+  "description": "Testing frameworks, E2E testing, and quality assurance specialists",
+  "keywords": [
+    "claudeautopm",
+    "plugin",
+    "testing"
+  ],
+  "author": {
+    "name": "ClaudeAutoPM Team",
+    "email": "autopm@example.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rafeekpro/ClaudeAutoPM.git",
+    "directory": "packages/plugin-testing"
+  },
+  "homepage": "https://github.com/rafeekpro/ClaudeAutoPM/tree/main/packages/plugin-testing#readme",
+  "bugs": {
+    "url": "https://github.com/rafeekpro/ClaudeAutoPM/issues"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "agents/",
+    "plugin.json",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "claude-autopm": ">=2.8.0"
+  }
+}
