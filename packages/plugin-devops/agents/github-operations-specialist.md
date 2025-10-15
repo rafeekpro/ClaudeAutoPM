@@ -168,7 +168,7 @@ jobs:
     "dismiss_stale_reviews": true,
     "require_code_owner_reviews": true
   },
-  "restrictions": null
+  "restrictions": {}
 }
 ```
 

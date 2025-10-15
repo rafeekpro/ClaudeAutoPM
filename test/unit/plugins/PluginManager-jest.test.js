@@ -112,15 +112,15 @@ describe('PluginManager', () => {
       expect(savedData.lastUpdate).toBeDefined();
     });
 
-    it('should update lastUpdate timestamp', (done) => {
+    it('should update lastUpdate timestamp', () => {
+      jest.useFakeTimers();
       const oldTimestamp = manager.registry.lastUpdate;
 
-      // Wait a bit to ensure timestamp changes
-      setTimeout(() => {
-        manager.saveRegistry();
-        expect(manager.registry.lastUpdate).not.toBe(oldTimestamp);
-        done();
-      }, 10);
+      // Simulate time passing
+      jest.advanceTimersByTime(10);
+      manager.saveRegistry();
+      expect(manager.registry.lastUpdate).not.toBe(oldTimestamp);
+      jest.useRealTimers();
     });
   });
 
