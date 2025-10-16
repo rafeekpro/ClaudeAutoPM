@@ -1,11 +1,41 @@
 {
   "name": "@claudeautopm/plugin-languages",
-  "version": "1.0.0",
-  "description": "JavaScript, TypeScript, Python, Node.js, and language-specific development experts",
+  "version": "2.0.0",
+  "description": "Complete programming languages plugin with Python, JavaScript, Node.js, Bash experts, language rules, and example scripts for ClaudeAutoPM",
+  "main": "plugin.json",
+  "type": "module",
+  "files": [
+    "agents/",
+    "commands/",
+    "rules/",
+    "scripts/",
+    "plugin.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "validate": "node -e \"require('./plugin.json')\" && echo 'plugin.json is valid'",
+    "lint:python": "find scripts/examples -name '*.py' -exec python3 -m py_compile {} \\;",
+    "lint:bash": "shellcheck scripts/examples/*.sh || true",
+    "lint:js": "eslint scripts/examples/*.js || true"
+  },
   "keywords": [
     "claudeautopm",
     "plugin",
-    "languages"
+    "languages",
+    "python",
+    "javascript",
+    "nodejs",
+    "bash",
+    "typescript",
+    "fastapi",
+    "express",
+    "backend",
+    "frontend",
+    "async",
+    "es6",
+    "type-hints"
   ],
   "author": {
     "name": "ClaudeAutoPM Team",
@@ -25,16 +55,11 @@
     "node": ">=16.0.0",
     "npm": ">=8.0.0"
   },
+  "peerDependencies": {
+    "@claudeautopm/plugin-core": "^2.0.0"
+  },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
-  },
-  "files": [
-    "agents/",
-    "plugin.json",
-    "README.md"
-  ],
-  "peerDependencies": {
-    "claude-autopm": ">=2.8.0"
   }
 }

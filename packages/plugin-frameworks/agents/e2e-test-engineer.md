@@ -343,6 +343,225 @@ const metrics = await page.evaluate(() => performance.toJSON());
 expect(metrics.timing.loadEventEnd).toBeLessThan(3000);
 ```
 
+## Context7-Verified Playwright Patterns
+
+**Source**: `/microsoft/playwright` (2,103 snippets, trust 9.9)
+
+### ✅ CORRECT: Web-First Assertions (Auto-Retry)
+
+Always use Playwright's web-first assertions that automatically retry:
+
+```javascript
+// ✅ Good: Automatically waits and retries until element is visible
+await expect(page.getByText('welcome')).toBeVisible();
+
+// ✅ Good: Automatically waits for text match
+await expect(page.getByTestId('status')).toHaveText('Success');
+
+// ❌ Bad: No waiting or retry - immediate check
+expect(await page.getByText('welcome').isVisible()).toBe(true);
+```
+
+### ✅ CORRECT: Mock Third-Party APIs
+
+Intercept external dependencies for reliable, fast tests:
+
+```javascript
+await page.route('**/api/fetch_data_third_party_dependency', route => route.fulfill({
+  status: 200,
+  body: testData,
+}));
+await page.goto('https://example.com');
+```
+
+### ✅ CORRECT: Test Isolation with beforeEach
+
+Use `test.beforeEach` for setup ensuring each test starts fresh:
+
+```javascript
+import { test } from '@playwright/test';
+
+test.beforeEach(async ({ page }) => {
+  // Runs before each test and signs in each page
+  await page.goto('https://github.com/login');
+  await page.getByLabel('Username or email address').fill('username');
+  await page.getByLabel('Password').fill('password');
+  await page.getByRole('button', { name: 'Sign in' }).click();
+});
+
+test('first', async ({ page }) => {
+  // page is signed in
+});
+
+test('second', async ({ page }) => {
+  // page is signed in (independent of first test)
+});
+```
+
+### ✅ CORRECT: Soft Assertions
+
+Continue test execution after assertion failures to collect all errors:
+
+```javascript
+// Make a few checks that won't stop test when failed...
+await expect.soft(page.getByTestId('status')).toHaveText('Success');
+await expect.soft(page.getByTestId('count')).toHaveText('5');
+
+// ... and continue the test to check more things
+await page.getByRole('link', { name: 'next page' }).click();
+```
+
+### ✅ CORRECT: User-Facing Locators (getByRole)
+
+Prefer user-facing attributes over DOM structure:
+
+```javascript
+// ✅ Good: Uses accessible roles - resilient to DOM changes
+page.getByRole('button', { name: 'submit' });
+page.getByRole('link', { name: 'Get started' });
+
+// ✅ Good: Filter within context
+const product = page.getByRole('listitem').filter({ hasText: 'Product 2' });
+
+// ❌ Avoid: Brittle CSS selectors tied to DOM structure
+page.locator('#submit-button');
+page.locator('.nav > li:nth-child(2) > a');
+```
+
+### ✅ CORRECT: Parallel Test Execution
+
+Configure tests to run in parallel for speed:
+
+```javascript
+import { test } from '@playwright/test';
+
+// Run tests within this file in parallel
+test.describe.configure({ mode: 'parallel' });
+
+test('runs in parallel 1', async ({ page }) => { /* ... */ });
+test('runs in parallel 2', async ({ page }) => { /* ... */ });
+```
+
+### ✅ CORRECT: Sharding for Multiple Machines
+
+Distribute test suite across multiple CI machines:
+
+```bash
+# Machine 1 of 3
+npx playwright test --shard=1/3
+
+# Machine 2 of 3
+npx playwright test --shard=2/3
+
+# Machine 3 of 3
+npx playwright test --shard=3/3
+```
+
+### ✅ CORRECT: Debug Mode
+
+Run tests in headed mode with Playwright Inspector:
+
+```bash
+# Debug all tests
+npx playwright test --debug
+
+# Debug specific test file
+npx playwright test auth.spec.ts --debug
+
+# Debug specific test by line number
+npx playwright test auth.spec.ts:42 --debug
+```
+
+### ✅ CORRECT: Page Fixture for Test Isolation
+
+Each test gets isolated `BrowserContext` through `page` fixture:
+
+```python
+# Python example
+from playwright.sync_api import Page
+
+def test_example_test(page: Page):
+    # "page" belongs to an isolated BrowserContext for this specific test
+    pass
+
+def test_another_test(page: Page):
+    # "page" in this second test is completely isolated from the first test
+    pass
+```
+
+```javascript
+// JavaScript/TypeScript example
+test('first test', async ({ page }) => {
+  // page is isolated
+});
+
+test('second test', async ({ page }) => {
+  // completely different page instance
+});
+```
+
+### ✅ CORRECT: Comprehensive Test Structure (C#)
+
+Complete test examples for different frameworks:
+
+```csharp
+// NUnit example
+using Microsoft.Playwright.NUnit;
+
+[Parallelizable(ParallelScope.Self)]
+[TestFixture]
+public class ExampleTest : PageTest
+{
+    [Test]
+    public async Task HasTitle()
+    {
+        await Page.GotoAsync("https://playwright.dev");
+        await Expect(Page).ToHaveTitleAsync(new Regex("Playwright"));
+    }
+
+    [Test]
+    public async Task GetStartedLink()
+    {
+        await Page.GotoAsync("https://playwright.dev");
+        await Page.GetByRole(AriaRole.Link, new() { Name = "Get started" }).ClickAsync();
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Installation" })).ToBeVisibleAsync();
+    }
+}
+```
+
+### Performance Best Practices
+
+1. **Mock External Dependencies**: Prevents flakiness and speeds up tests
+2. **Use Auto-Waiting**: Playwright waits automatically before actions
+3. **Parallel Execution**: Run tests concurrently where possible
+4. **Test Isolation**: Each test should be independent (use beforeEach)
+5. **Sharding**: Distribute tests across multiple CI machines
+6. **Soft Assertions**: Collect all failures in a single test run
+7. **User-Facing Locators**: More resilient to UI changes
+
+### Anti-Patterns to Avoid
+
+```javascript
+// ❌ Don't use manual isVisible() checks
+expect(await page.getByText('welcome').isVisible()).toBe(true);
+
+// ✅ Use web-first assertions instead
+await expect(page.getByText('welcome')).toBeVisible();
+
+// ❌ Don't use brittle CSS selectors
+page.locator('#submit');
+
+// ✅ Use accessible roles
+page.getByRole('button', { name: 'Submit' });
+
+// ❌ Don't use fixed delays
+await page.waitForTimeout(5000);
+
+// ✅ Use smart waits
+await page.waitForSelector('.loaded');
+await expect(page.getByTestId('status')).toHaveText('Ready');
+```
+
 ## Self-Verification Protocol
 
 Before delivering any solution, verify:

@@ -78,6 +78,182 @@ Before starting any implementation, you have access to live documentation throug
    - Design system implementation
    - Theme management and dark mode
 
+## Context7-Verified React Patterns
+
+**Source**: `/reactjs/react.dev` (2,404 snippets, trust 10.0)
+
+### ✅ CORRECT: Rules of Hooks
+
+Hooks MUST be called unconditionally at the top level:
+
+```javascript
+function Component({ isSpecial, shouldFetch, fetchPromise }) {
+  // ✅ Hooks at top level - ALWAYS called in same order
+  const [count, setCount] = useState(0);
+  const [name, setName] = useState('');
+
+  if (!isSpecial) {
+    return null; // Early return AFTER hooks is OK
+  }
+
+  if (shouldFetch) {
+    // ✅ `use` can be conditional (special case)
+    const data = use(fetchPromise);
+    return <div>{data}</div>;
+  }
+
+  return <div>{name}: {count}</div>;
+}
+```
+
+### ❌ INCORRECT: Hook Rule Violations
+
+```javascript
+// ❌ Hook in condition
+if (isLoggedIn) {
+  const [user, setUser] = useState(null); // WRONG!
+}
+
+// ❌ Hook after early return
+if (!data) return <Loading />;
+const [processed, setProcessed] = useState(data); // WRONG!
+
+// ❌ Hook in callback
+<button onClick={() => {
+  const [clicked, setClicked] = useState(false); // WRONG!
+}}/>
+```
+
+### ✅ CORRECT: Custom Hooks for Logic Reuse
+
+Extract repetitive logic into custom hooks:
+
+```javascript
+// ✅ Custom hook for data fetching
+function useData(url) {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    if (!url) return;
+
+    let ignore = false;
+    fetch(url)
+      .then(response => response.json())
+      .then(json => {
+        if (!ignore) setData(json);
+      });
+
+    return () => { ignore = true; };
+  }, [url]);
+
+  return data;
+}
+
+// Usage in component
+function ShippingForm({ country }) {
+  const cities = useData(`/api/cities?country=${country}`);
+  const [city, setCity] = useState(null);
+  const areas = useData(city ? `/api/areas?city=${city}` : null);
+  // ...
+}
+```
+
+### ✅ CORRECT: Component and Hook Naming
+
+```javascript
+// ✅ Component defined at module level
+function Component({ defaultValue }) {
+  // ...
+}
+
+// ✅ Custom hook at module level (starts with 'use')
+function useData(endpoint) {
+  // ...
+}
+
+// ✅ Regular function (NO 'use' prefix - doesn't use hooks)
+function getSorted(items) {
+  return items.slice().sort();
+}
+```
+
+### ❌ INCORRECT: Component/Hook Factories
+
+```javascript
+// ❌ Factory function creating components - causes re-creation
+function createComponent(defaultValue) {
+  return function Component() { /* ... */ };
+}
+
+// ❌ Component defined inside component - causes state loss
+function Parent() {
+  function Child() { /* ... */ }
+  return <Child />;
+}
+
+// ❌ Hook factory function - breaks memoization
+function createCustomHook(endpoint) {
+  return function useData() { /* ... */ };
+}
+```
+
+### ✅ CORRECT: Form Input Management
+
+Use custom hook to reduce repetition:
+
+```javascript
+// ✅ Custom hook for form fields
+function useFormField(initialValue) {
+  const [value, setValue] = useState(initialValue);
+
+  function handleChange(e) {
+    setValue(e.target.value);
+  }
+
+  return [value, handleChange];
+}
+
+// Usage
+function Form() {
+  const [firstName, handleFirstNameChange] = useFormField('Mary');
+  const [lastName, handleLastNameChange] = useFormField('Poppins');
+
+  return (
+    <>
+      <input value={firstName} onChange={handleFirstNameChange} />
+      <input value={lastName} onChange={handleLastNameChange} />
+      <p><b>Good morning, {firstName} {lastName}.</b></p>
+    </>
+  );
+}
+```
+
+### ✅ CORRECT: Web-First Assertions (Testing)
+
+Use Playwright's automatic retry assertions:
+
+```javascript
+// ✅ Web-first assertion - automatically waits
+await expect(page.getByText('welcome')).toBeVisible();
+
+// ❌ Manual check - no waiting or retry
+expect(await page.getByText('welcome').isVisible()).toBe(true);
+```
+
+### ✅ CORRECT: Hook Purity - Don't Mutate Arguments
+
+```javascript
+// ❌ Bad: Mutating hook argument after passing
+style = useIconStyle(icon);
+icon.enabled = false; // WRONG! Breaks memoization
+style = useIconStyle(icon); // Returns stale memoized result
+
+// ✅ Good: Create new object if changes needed
+style = useIconStyle(icon);
+const updatedIcon = { ...icon, enabled: false };
+style = useIconStyle(updatedIcon);
+```
+
 **Development Methodology:**
 
 1. **Requirements Analysis**: Understand UX needs and technical constraints

@@ -1,12 +1,34 @@
 {
   "name": "@claudeautopm/plugin-data",
-  "version": "1.0.0",
-  "description": "Data engineering, machine learning, and ETL pipeline specialists",
+  "version": "2.0.0",
+  "description": "Complete data engineering plugin with Airflow, Kedro, LangGraph, Kafka, dbt, pandas experts, data quality rules, and example scripts for ClaudeAutoPM",
+  "main": "plugin.json",
+  "type": "module",
   "keywords": [
     "claudeautopm",
     "plugin",
-    "data"
+    "data-engineering",
+    "ml",
+    "machine-learning",
+    "etl",
+    "analytics",
+    "airflow",
+    "kedro",
+    "langgraph",
+    "kafka",
+    "dbt",
+    "pandas",
+    "orchestration",
+    "workflow",
+    "streaming"
   ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "validate": "node -e \"require('./plugin.json')\" && echo 'plugin.json is valid'",
+    "lint:python": "find scripts/examples -name '*.py' -exec python3 -m py_compile {} \\;",
+    "lint:sql": "echo 'SQL linting not configured'",
+    "lint:all": "npm run lint:python && npm run lint:sql"
+  },
   "author": {
     "name": "ClaudeAutoPM Team",
     "email": "autopm@example.com"
@@ -31,10 +53,14 @@
   },
   "files": [
     "agents/",
+    "commands/",
+    "rules/",
+    "scripts/",
     "plugin.json",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "peerDependencies": {
-    "claude-autopm": ">=2.8.0"
+    "@claudeautopm/plugin-core": "^2.0.0"
   }
 }

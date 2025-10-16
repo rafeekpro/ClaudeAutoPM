@@ -1,0 +1,45 @@
+{
+  "name": "@claudeautopm/plugin-core",
+  "version": "2.0.0",
+  "description": "Core framework functionality for ClaudeAutoPM - universal agents, rules, hooks, and utilities",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "claude",
+    "autopm",
+    "core",
+    "framework",
+    "agents",
+    "tdd",
+    "context7",
+    "automation"
+  ],
+  "author": "ClaudeAutoPM Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rafeekpro/ClaudeAutoPM.git",
+    "directory": "packages/plugin-core"
+  },
+  "homepage": "https://github.com/rafeekpro/ClaudeAutoPM#readme",
+  "bugs": {
+    "url": "https://github.com/rafeekpro/ClaudeAutoPM/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "agents/",
+    "commands/",
+    "rules/",
+    "hooks/",
+    "scripts/",
+    "plugin.json",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

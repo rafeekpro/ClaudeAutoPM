@@ -1,6 +1,22 @@
 # @claudeautopm/plugin-cloud
 
-Cloud architecture agents for AWS, Azure, GCP, and infrastructure as code.
+> **Complete Cloud Infrastructure Plugin for ClaudeAutoPM Framework**
+
+[![npm version](https://img.shields.io/npm/v/@claudeautopm/plugin-cloud.svg)](https://www.npmjs.com/package/@claudeautopm/plugin-cloud)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+## 📋 Overview
+
+`@claudeautopm/plugin-cloud` provides comprehensive cloud infrastructure capabilities for the ClaudeAutoPM framework. This plugin includes agents for AWS, Azure, GCP, Kubernetes orchestration, Terraform infrastructure as code, AI API integrations, cloud deployment commands, infrastructure rules, and example scripts.
+
+### Package Information
+
+- **Package Name:** `@claudeautopm/plugin-cloud`
+- **Version:** 2.0.0
+- **Schema Version:** 2.0
+- **Category:** Cloud Infrastructure
+- **Size:** ~15 KB (gzipped)
+- **Total Resources:** 18 (8 agents + 4 commands + 1 rule + 5 scripts)
 
 ## 📦 Installation
 
@@ -12,13 +28,15 @@ npm install -g @claudeautopm/plugin-cloud
 autopm plugin install cloud
 ```
 
-## 🤖 Agents Included
+## 🎯 What's Included
 
-### AWS
-- **aws-cloud-architect** - AWS cloud architecture and design patterns
-  - VPC design, networking, security groups
-  - EC2, ECS, EKS, Lambda architecture
-  - S3, RDS, DynamoDB best practices
+### Cloud Architecture Agents (8 agents)
+
+#### AWS
+- **aws-cloud-architect** - AWS cloud architecture and infrastructure design patterns
+  - Tags: aws, cloud, architecture, ec2, s3, vpc
+  - Context7: AWS documentation, Terraform AWS provider
+  - MCP: aws, terraform
 
 ### Azure
 - **azure-cloud-architect** - Azure cloud architecture and design patterns

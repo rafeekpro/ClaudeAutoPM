@@ -2,15 +2,30 @@
 
 Frontend and backend framework specialists for React, Next.js, Vue, Angular, and more.
 
+**Version**: 2.0.0 | **Schema**: 2.0 | **Context7-Verified**: ✅
+
+Complete frontend and UX framework plugin with Context7-verified React, Tailwind CSS, and Playwright patterns. Production-ready agents with up-to-date best practices from official documentation.
+
 ## 📦 Installation
 
 ```bash
 # Install the plugin package
-npm install -g @claudeautopm/plugin-frameworks
+npm install @claudeautopm/plugin-frameworks
 
-# Install plugin agents to your project
-autopm plugin install frameworks
+# Or install globally
+npm install -g @claudeautopm/plugin-frameworks
 ```
+
+## Context7 Integration
+
+This plugin uses Context7 MCP server to ensure all patterns follow the latest official documentation:
+
+**Libraries Verified**:
+- **React**: `/reactjs/react.dev` (2,404 snippets, trust 10.0)
+- **Tailwind CSS**: `/tailwindlabs/tailwindcss.com` (1,769 snippets, trust 10.0)
+- **Playwright**: `/microsoft/playwright` (2,103 snippets, trust 9.9)
+
+All code examples, patterns, and best practices are verified against current official documentation to prevent outdated implementations.
 
 ## 🤖 Agents Included
 

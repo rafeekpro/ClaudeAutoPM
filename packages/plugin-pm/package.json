@@ -1,0 +1,56 @@
+{
+  "name": "@claudeautopm/plugin-pm",
+  "version": "2.0.0",
+  "description": "Complete project management plugin with PM workflows, epic management, issue tracking, and release automation for ClaudeAutoPM",
+  "main": "plugin.json",
+  "type": "module",
+  "files": [
+    "scripts/",
+    "plugin.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint scripts/pm/**/*.js",
+    "validate": "node -e \"require('./plugin.json')\" && echo 'plugin.json is valid'"
+  },
+  "keywords": [
+    "claudeautopm",
+    "plugin",
+    "project-management",
+    "agile",
+    "workflows",
+    "epic",
+    "issue-tracking",
+    "github",
+    "automation",
+    "release",
+    "prd",
+    "analytics",
+    "pm",
+    "scrum",
+    "kanban"
+  ],
+  "author": "ClaudeAutoPM Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rafeekpro/ClaudeAutoPM.git",
+    "directory": "packages/plugin-pm"
+  },
+  "bugs": {
+    "url": "https://github.com/rafeekpro/ClaudeAutoPM/issues"
+  },
+  "homepage": "https://github.com/rafeekpro/ClaudeAutoPM/tree/main/packages/plugin-pm#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "peerDependencies": {
+    "@claudeautopm/plugin-core": "^2.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

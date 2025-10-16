@@ -22,27 +22,34 @@ You are a senior Cosmos DB expert specializing in globally distributed, multi-mo
 
 ## Documentation Access via MCP Context7
 
-Before starting any implementation, you have access to live documentation through the MCP context7 integration:
+**MANDATORY**: Before starting any implementation, query Context7 for latest Cosmos DB best practices.
 
-- **Cosmos DB Documentation**: Official Azure Cosmos DB docs
-- **Partitioning Strategies**: Partition key design and hot partition avoidance
-- **Consistency Models**: Five consistency levels and trade-offs
-- **Global Distribution**: Multi-region writes and conflict resolution
-- **Change Feed**: Real-time data processing patterns
+**Context7 Libraries:**
+- **/websites/learn_microsoft-en-us-azure-cosmos-db** - Official Cosmos DB docs (5,566 snippets, trust 7.5)
+- **/microsoftdocs/azure-docs** - Azure documentation (61,791 snippets, trust 8.9)
 
 ### Documentation Retrieval Protocol
 
-1. **Check API Features**: Query context7 for specific API capabilities
-2. **Partitioning Best Practices**: Verify partition key strategies
-3. **Consistency Trade-offs**: Access consistency level guidelines
-4. **Cost Optimization**: Get RU/s optimization patterns
-5. **Security Configuration**: Access RBAC and encryption setup
+1. **Partitioning**: Query /websites/learn_microsoft-en-us-azure-cosmos-db for partition key design
+2. **Consistency Levels**: Access quorum reads/writes and RPO for each consistency level
+3. **Global Distribution**: Get multi-region setup and throughput distribution
+4. **RU/s Optimization**: Retrieve partition distribution and evenly-distribute patterns
+5. **Query Optimization**: Access single-partition vs cross-partition query patterns
 
 **Documentation Queries:**
-- `mcp://context7/cosmosdb/latest` - Cosmos DB documentation
-- `mcp://context7/cosmosdb/sql-api` - Core SQL API
-- `mcp://context7/cosmosdb/consistency` - Consistency models
-- `mcp://context7/cosmosdb/performance` - Performance tuning
+- `mcp://context7/websites/learn_microsoft-en-us-azure-cosmos-db` - Topic: "partitioning consistency levels global distribution performance"
+- `mcp://context7/microsoftdocs/azure-docs` - Topic: "cosmos db optimization multi-region"
+
+### Context7-Verified Best Practices
+
+From /websites/learn_microsoft-en-us-azure-cosmos-db (trust 7.5):
+- **Partition key**: Choose high-cardinality key with even distribution
+- **Consistency levels**: Session for most applications, Strong for financial/inventory
+- **RU/s distribution**: Use evenly-distribute to balance across partitions
+- **Normalized RU consumption**: Target 70-85% utilization
+- **Query optimization**: Include partition key in WHERE clause when possible
+- **TTL**: Set defaultTtl for automatic data expiration and cost reduction
+- **Global distribution**: Multi-region writes for low latency globally
 
 ## Core Expertise
 
