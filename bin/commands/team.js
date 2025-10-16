@@ -202,7 +202,7 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
 
 // Command handlers
 const commands = {
-  list: (argv) => {
+  list: async (argv) => {
     try {
       if (!fs.existsSync(teamsConfigPath)) {
         console.error('❌ Error: teams.json not found');
@@ -213,17 +213,100 @@ const commands = {
 
       console.log('\n📋 Available Teams:\n');
 
-      Object.entries(teamsConfig).forEach(([name, config]) => {
-        console.log(`  ▶️  ${name}:`);
+      // Initialize PluginManager if verbose mode
+      let pluginManager = null;
+      if (argv.verbose) {
+        const PluginManager = require('../../lib/plugins/PluginManager');
+        pluginManager = new PluginManager();
+      }
+
+      for (const [name, config] of Object.entries(teamsConfig)) {
+        // Resolve total agents (including inherited)
+        let totalAgents = 0;
+        let installedAgents = 0;
+        let missingAgents = [];
+
+        try {
+          const agents = resolveAgents(name, teamsConfig);
+          totalAgents = agents.length;
+
+          // Check installation status
+          const missing = validateAgentFiles(agents, projectRoot);
+          installedAgents = totalAgents - missing.length;
+          missingAgents = missing;
+        } catch (error) {
+          // Ignore errors in agent resolution for listing
+        }
+
+        // Status indicator
+        const statusIcon = missingAgents.length === 0 ? '✅' : '⚠️';
+        const statusText = missingAgents.length === 0
+          ? 'ready'
+          : `${missingAgents.length} missing`;
+
+        console.log(`  ${statusIcon} ${name}:`);
         console.log(`    ${config.description || 'No description'}`);
+
         if (config.inherits && config.inherits.length > 0) {
           console.log(`    ↳ Inherits from: ${config.inherits.join(', ')}`);
         }
-        console.log(`    Direct agents: ${config.agents ? config.agents.length : 0}`);
+
+        console.log(`    Agents: ${totalAgents} total (${installedAgents} installed, ${missingAgents.length} missing)`);
+
+        // Verbose mode: show which agents are missing
+        if (argv.verbose && missingAgents.length > 0) {
+          console.log(`    Missing agents:`);
+
+          if (pluginManager) {
+            const pluginMapping = await pluginManager.findPluginsForAgents(missingAgents);
+
+            // Group by plugin
+            const byPlugin = new Map();
+            for (const [agentName, pluginInfo] of pluginMapping.found.entries()) {
+              if (!pluginInfo.installed) {
+                if (!byPlugin.has(pluginInfo.pluginName)) {
+                  byPlugin.set(pluginInfo.pluginName, []);
+                }
+                byPlugin.get(pluginInfo.pluginName).push(agentName);
+              }
+            }
+
+            // Show plugins needed
+            if (byPlugin.size > 0) {
+              console.log(`    Install plugins:`);
+              for (const [pluginName, agents] of byPlugin.entries()) {
+                console.log(`      • ${pluginName} (${agents.length} agents)`);
+              }
+            }
+
+            // Show truly missing
+            if (pluginMapping.missing.length > 0) {
+              console.log(`    Custom/core agents: ${pluginMapping.missing.length}`);
+            }
+          } else {
+            // Non-verbose: just count
+            missingAgents.slice(0, 3).forEach(agent => {
+              console.log(`      • ${agent}`);
+            });
+            if (missingAgents.length > 3) {
+              console.log(`      ... and ${missingAgents.length - 3} more`);
+            }
+          }
+        }
+
         console.log();
-      });
+      }
+
+      // Show usage tip at the end
+      console.log('💡 Tip: Use "autopm team load <name>" to activate a team');
+      console.log('💡 Tip: Add --verbose to see missing agent details');
+      console.log();
+
     } catch (error) {
       console.error(`❌ Error listing teams: ${error.message}`);
+      if (argv.debug) {
+        console.error(error.stack);
+      }
       process.exit(1);
     }
   },
@@ -243,7 +326,7 @@ const commands = {
     }
   },
 
-  load: (argv) => {
+  load: async (argv) => {
     try {
       const teamName = argv.name;
 
@@ -273,11 +356,78 @@ const commands = {
 
       // Validate that agent files exist
       const missingAgents = validateAgentFiles(agents, projectRoot);
+
       if (missingAgents.length > 0) {
-        console.warn(`⚠️  Warning: The following agent files were not found:`);
-        missingAgents.forEach(agent => {
-          console.warn(`   - ${agent}`);
-        });
+        console.log(`\n🔍 Checking for missing agents in plugins...`);
+
+        // Use PluginManager to find which plugins contain the missing agents
+        const PluginManager = require('../../lib/plugins/PluginManager');
+        const pluginManager = new PluginManager();
+
+        const pluginMapping = await pluginManager.findPluginsForAgents(missingAgents);
+
+        // Separate agents into: can install from plugins vs truly missing
+        const installablePlugins = [];
+        const trulyMissing = [];
+
+        for (const [agentName, pluginInfo] of pluginMapping.found.entries()) {
+          if (!pluginInfo.installed) {
+            installablePlugins.push(pluginInfo);
+          }
+        }
+
+        trulyMissing.push(...pluginMapping.missing);
+
+        if (installablePlugins.length > 0) {
+          console.log('\n📦 Missing agents can be installed from plugins:\n');
+
+          // Group by plugin
+          const byPlugin = new Map();
+          for (const pluginInfo of installablePlugins) {
+            if (!byPlugin.has(pluginInfo.pluginName)) {
+              byPlugin.set(pluginInfo.pluginName, {
+                displayName: pluginInfo.displayName,
+                agents: []
+              });
+            }
+            byPlugin.get(pluginInfo.pluginName).agents.push(pluginInfo.agent.name);
+          }
+
+          for (const [pluginName, info] of byPlugin.entries()) {
+            console.log(`  ${info.displayName} (@claudeautopm/${pluginName}):`);
+            info.agents.forEach(agent => console.log(`    • ${agent}`));
+          }
+
+          // Offer to install
+          if (argv.autoInstall || argv.yes) {
+            console.log('\n🚀 Auto-installing required plugins...\n');
+
+            for (const [pluginName] of byPlugin.entries()) {
+              try {
+                console.log(`Installing ${pluginName}...`);
+                await pluginManager.installPlugin(`${pluginManager.options.scopePrefix}/${pluginName}`);
+                console.log(`✓ Installed ${pluginName}\n`);
+              } catch (error) {
+                console.error(`❌ Failed to install ${pluginName}: ${error.message}`);
+              }
+            }
+          } else {
+            console.log('\n💡 To install these plugins, run:');
+            for (const [pluginName] of byPlugin.entries()) {
+              console.log(`   autopm plugin install ${pluginName}`);
+            }
+            console.log('\n💡 Or run with --auto-install flag:');
+            console.log(`   autopm team load ${teamName} --auto-install\n`);
+          }
+        }
+
+        if (trulyMissing.length > 0) {
+          console.warn(`\n⚠️  Warning: The following agents were not found in any plugin:`);
+          trulyMissing.forEach(agent => {
+            console.warn(`   - ${agent}`);
+          });
+          console.warn('\n💡 These agents may be custom or from core. Check .claude/agents/ directory.\n');
+        }
       }
 
       // Validate MCP dependencies
@@ -320,6 +470,9 @@ const commands = {
       }
     } catch (error) {
       console.error(`❌ Error loading team: ${error.message}`);
+      if (argv.debug) {
+        console.error(error.stack);
+      }
       process.exit(1);
     }
   }
@@ -340,6 +493,27 @@ module.exports = {
         describe: 'Team name (for load action)',
         type: 'string'
       })
+      .option('auto-install', {
+        describe: 'Automatically install missing plugins when loading team',
+        type: 'boolean',
+        default: false,
+        alias: 'y'
+      })
+      .option('debug', {
+        describe: 'Show debug information',
+        type: 'boolean',
+        default: false
+      })
+      .option('verbose', {
+        describe: 'Show detailed information (for list command)',
+        type: 'boolean',
+        default: false
+      })
+      .example('autopm team list', 'List all available teams')
+      .example('autopm team list --verbose', 'List teams with missing agent details')
+      .example('autopm team load frontend', 'Load frontend team')
+      .example('autopm team load frontend --auto-install', 'Load and auto-install missing plugins')
+      .example('autopm team load fullstack -y', 'Load fullstack with auto-install (shorthand)')
       .check((argv) => {
         if (argv.action === 'load' && !argv.name) {
           throw new Error('Team name is required for load action');
