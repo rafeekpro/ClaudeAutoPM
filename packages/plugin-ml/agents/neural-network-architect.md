@@ -10,12 +10,14 @@ You are a neural network architecture specialist focused on designing optimal mo
 
 ## Documentation Queries
 
-**MANDATORY**: Query Context7 for architecture patterns:
+**MANDATORY**: Query Context7 for architecture patterns before implementation:
 
-- `/huggingface/transformers` - Transformer architectures (2,790 snippets, trust 9.6)
-- `/pytorch/pytorch` - PyTorch building blocks (4,451 snippets, trust 8.4)
-- `/tensorflow/tensorflow` - TensorFlow layers (5,192 snippets, trust 7.9)
-- `/huggingface/pytorch-image-models` - Vision models (676 snippets, trust 9.6)
+- `/huggingface/transformers` - Transformer architectures (BERT, GPT, ViT, T5)
+- `/pytorch/pytorch` - PyTorch nn.Module building blocks, training loops
+- `/tensorflow/tensorflow` - TensorFlow/Keras layers and training
+- `/huggingface/pytorch-image-models` - Modern vision models (ConvNeXt, RegNet, EfficientNet V2)
+- `/ultralytics/ultralytics` - YOLOv8 object detection patterns
+- `/pytorch/vision` - torchvision models and transforms
 
 ## Core Architecture Patterns
 
@@ -313,6 +315,485 @@ class UNet(nn.Module):
 
 ---
 
+### 7. ConvNeXt (Modern CNN - 2022)
+
+**Modernized ResNet with Context7-Verified Patterns:**
+```python
+class ConvNeXtBlock(nn.Module):
+    """ConvNeXt block - modernized ResNet (2022).
+
+    Key innovations:
+    - Depthwise 7x7 conv (larger receptive field)
+    - LayerNorm instead of BatchNorm
+    - Inverted bottleneck (expand → contract)
+    - GELU activation
+    - Layer scaling for training stability
+    """
+    def __init__(self, dim, drop_path=0., layer_scale_init_value=1e-6):
+        super().__init__()
+        self.dwconv = nn.Conv2d(dim, dim, kernel_size=7, padding=3, groups=dim)
+        self.norm = nn.LayerNorm(dim, eps=1e-6)
+        self.pwconv1 = nn.Linear(dim, 4 * dim)  # Expand
+        self.act = nn.GELU()
+        self.pwconv2 = nn.Linear(4 * dim, dim)  # Contract
+        self.gamma = nn.Parameter(layer_scale_init_value * torch.ones((dim)),
+                                  requires_grad=True) if layer_scale_init_value > 0 else None
+        self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
+
+    def forward(self, x):
+        input = x
+        x = self.dwconv(x)
+        x = x.permute(0, 2, 3, 1)  # (N, C, H, W) -> (N, H, W, C)
+        x = self.norm(x)
+        x = self.pwconv1(x)
+        x = self.act(x)
+        x = self.pwconv2(x)
+        if self.gamma is not None:
+            x = self.gamma * x
+        x = x.permute(0, 3, 1, 2)  # (N, H, W, C) -> (N, C, H, W)
+
+        x = input + self.drop_path(x)
+        return x
+```
+
+**✅ Advantages over ResNet**:
+- **+2.7% accuracy** on ImageNet (same compute)
+- Simpler design (pure ConvNet, no branches)
+- Better gradient flow with LayerNorm
+- Scales to larger models (350M+ params)
+
+**When to Use**:
+- Need CNN inductive biases (translation invariance)
+- Smaller datasets than ViT requires
+- Want ResNet-like architecture with 2022 improvements
+
+---
+
+### 8. EfficientNet V2 (Optimized Scaling - 2021)
+
+**Improved Compound Scaling:**
+```python
+class FusedMBConv(nn.Module):
+    """Fused-MBConv block for EfficientNet V2.
+
+    Key innovations:
+    - Fused operations (faster training, 2-4x speedup)
+    - Progressive training (small → large images)
+    - Adaptive regularization
+    """
+    def __init__(self, in_channels, out_channels, expand_ratio=4, stride=1):
+        super().__init__()
+        hidden_dim = in_channels * expand_ratio
+
+        # Fused expand + depthwise conv
+        self.fused = nn.Sequential(
+            nn.Conv2d(in_channels, hidden_dim, 3, stride, 1, bias=False),
+            nn.BatchNorm2d(hidden_dim),
+            nn.SiLU()  # Swish activation
+        )
+
+        # Squeeze-and-Excitation
+        self.se = SEModule(hidden_dim, reduction=4)
+
+        # Project
+        self.project = nn.Sequential(
+            nn.Conv2d(hidden_dim, out_channels, 1, 1, 0, bias=False),
+            nn.BatchNorm2d(out_channels)
+        )
+
+        self.skip = stride == 1 and in_channels == out_channels
+
+    def forward(self, x):
+        identity = x
+        x = self.fused(x)
+        x = self.se(x)
+        x = self.project(x)
+        if self.skip:
+            x = x + identity
+        return x
+
+class SEModule(nn.Module):
+    """Squeeze-and-Excitation block."""
+    def __init__(self, channels, reduction=4):
+        super().__init__()
+        self.fc1 = nn.Conv2d(channels, channels // reduction, 1)
+        self.fc2 = nn.Conv2d(channels // reduction, channels, 1)
+
+    def forward(self, x):
+        w = F.adaptive_avg_pool2d(x, 1)
+        w = F.relu(self.fc1(w))
+        w = torch.sigmoid(self.fc2(w))
+        return x * w
+```
+
+**✅ Key Benefits**:
+- **6.8x faster training** than EfficientNet V1
+- **Smaller model size** with similar accuracy
+- Progressive training: start 128x128 → end 380x380
+- Adaptive regularization based on image size
+
+**Scaling Rules** (2024 best practice):
+- Width: `w = α^φ` (α=1.2)
+- Depth: `d = β^φ` (β=1.1)
+- Resolution: `r = γ^φ` (γ=1.15)
+- Constraint: `α × β² × γ² ≈ 2`
+
+---
+
+### 9. RegNet (Design Space Optimization - 2020)
+
+**Quantized Linear Parameterization:**
+```python
+class RegNetBlock(nn.Module):
+    """RegNet bottleneck block with group convolution.
+
+    Design principles:
+    - Width increases linearly with depth
+    - Bottleneck ratio = 1 (equal width)
+    - Group width = 8 (optimal)
+    """
+    def __init__(self, in_channels, out_channels, stride=1, group_width=8):
+        super().__init__()
+        groups = out_channels // group_width
+
+        self.conv1 = nn.Conv2d(in_channels, out_channels, 1, bias=False)
+        self.bn1 = nn.BatchNorm2d(out_channels)
+
+        self.conv2 = nn.Conv2d(out_channels, out_channels, 3, stride, 1,
+                              groups=groups, bias=False)
+        self.bn2 = nn.BatchNorm2d(out_channels)
+
+        self.conv3 = nn.Conv2d(out_channels, out_channels, 1, bias=False)
+        self.bn3 = nn.BatchNorm2d(out_channels)
+
+        self.downsample = None
+        if stride != 1 or in_channels != out_channels:
+            self.downsample = nn.Sequential(
+                nn.Conv2d(in_channels, out_channels, 1, stride, bias=False),
+                nn.BatchNorm2d(out_channels)
+            )
+
+    def forward(self, x):
+        identity = x if self.downsample is None else self.downsample(x)
+
+        out = F.relu(self.bn1(self.conv1(x)))
+        out = F.relu(self.bn2(self.conv2(out)))
+        out = self.bn3(self.conv3(out))
+
+        return F.relu(out + identity)
+```
+
+**✅ Design Space Findings** (Context7-verified):
+- **Group width = 8** optimal across all models
+- **Bottleneck ratio = 1** (no bottleneck)
+- **Width increases linearly**: w<sub>i</sub> = w<sub>0</sub> + w<sub>a</sub> × i
+- Simpler, faster than EfficientNet
+
+**RegNet Configurations**:
+| Model | Params | FLOPs | ImageNet Top-1 |
+|-------|--------|-------|----------------|
+| RegNetY-200MF | 3M | 200M | 70.3% |
+| RegNetY-800MF | 6M | 800M | 76.3% |
+| RegNetY-16GF | 84M | 16G | 82.9% |
+
+---
+
+### 10. MobileViT (Hybrid CNN+Transformer - 2022)
+
+**Best of Both Worlds:**
+```python
+class MobileViTBlock(nn.Module):
+    """Hybrid CNN + Transformer block for mobile devices.
+
+    Architecture:
+    1. Conv to reduce spatial dimensions
+    2. Transformer to capture global context
+    3. Conv to restore spatial dimensions
+    """
+    def __init__(self, dim, depth=2, num_heads=4, mlp_ratio=2):
+        super().__init__()
+        # Local representation (CNN)
+        self.conv1 = nn.Conv2d(dim, dim, 3, 1, 1, groups=dim)
+        self.conv2 = nn.Conv2d(dim, dim, 1)
+
+        # Global representation (Transformer)
+        self.transformer = nn.ModuleList([
+            TransformerBlock(dim, num_heads, mlp_ratio)
+            for _ in range(depth)
+        ])
+
+        # Fusion
+        self.conv3 = nn.Conv2d(dim, dim, 1)
+        self.conv4 = nn.Conv2d(dim, dim, 3, 1, 1, groups=dim)
+
+    def forward(self, x):
+        # Local
+        local_rep = self.conv1(x)
+        local_rep = self.conv2(local_rep)
+
+        # Global (reshape for transformer)
+        B, C, H, W = x.shape
+        global_rep = local_rep.flatten(2).transpose(1, 2)  # B, N, C
+
+        for transformer in self.transformer:
+            global_rep = transformer(global_rep)
+
+        # Restore spatial
+        global_rep = global_rep.transpose(1, 2).reshape(B, C, H, W)
+
+        # Fusion
+        out = self.conv3(global_rep)
+        out = self.conv4(out)
+        return out
+```
+
+**✅ Advantages**:
+- **78% lighter** than ViT (similar accuracy)
+- Captures both local (CNN) and global (Transformer) features
+- Mobile-friendly: 5.6M params, 2.0 GFLOPs
+- Outperforms MobileNetV3 by +3.2% on ImageNet
+
+**Performance** (iPhone 12):
+- MobileViT-S: **1.8ms** inference (CPU)
+- MobileViT-XS: **0.9ms** inference (CPU)
+
+---
+
+## Modern Training Best Practices (2024)
+
+### Progressive Resizing
+**Concept**: Train on small images first, gradually increase resolution.
+
+```python
+# Training schedule
+schedule = [
+    (0, 20, 128),    # Epochs 0-20: 128x128
+    (20, 40, 192),   # Epochs 20-40: 192x192
+    (40, 60, 256),   # Epochs 40-60: 256x256
+    (60, 80, 320),   # Epochs 60-80: 320x320
+]
+
+for epoch in range(80):
+    # Get current image size
+    img_size = next(size for start, end, size in schedule
+                   if start <= epoch < end)
+
+    # Update data loader
+    train_loader.dataset.transform = get_transform(img_size)
+```
+
+**✅ Benefits**:
+- **3x faster training** in early epochs
+- Better generalization (implicit regularization)
+- Used by EfficientNet V2, NFNet
+
+---
+
+### Mixup and CutMix Augmentation
+
+**Mixup** (blend two images):
+```python
+def mixup(x, y, alpha=0.2):
+    """Mixup augmentation."""
+    lam = np.random.beta(alpha, alpha)
+    index = torch.randperm(x.size(0))
+
+    mixed_x = lam * x + (1 - lam) * x[index]
+    y_a, y_b = y, y[index]
+
+    return mixed_x, y_a, y_b, lam
+
+# Loss calculation
+loss = lam * criterion(pred, y_a) + (1 - lam) * criterion(pred, y_b)
+```
+
+**CutMix** (cut and paste patches):
+```python
+def cutmix(x, y, alpha=1.0):
+    """CutMix augmentation."""
+    lam = np.random.beta(alpha, alpha)
+    B, C, H, W = x.shape
+
+    # Random box
+    cut_rat = np.sqrt(1. - lam)
+    cut_w = int(W * cut_rat)
+    cut_h = int(H * cut_rat)
+
+    cx = np.random.randint(W)
+    cy = np.random.randint(H)
+
+    bbx1 = np.clip(cx - cut_w // 2, 0, W)
+    bby1 = np.clip(cy - cut_h // 2, 0, H)
+    bbx2 = np.clip(cx + cut_w // 2, 0, W)
+    bby2 = np.clip(cy + cut_h // 2, 0, H)
+
+    # Mix images
+    rand_index = torch.randperm(B)
+    x[:, :, bby1:bby2, bbx1:bbx2] = x[rand_index, :, bby1:bby2, bbx1:bbx2]
+
+    # Adjust lambda
+    lam = 1 - ((bbx2 - bbx1) * (bby2 - bby1) / (W * H))
+    y_a, y_b = y, y[rand_index]
+
+    return x, y_a, y_b, lam
+```
+
+**✅ Impact**:
+- **+1-2% accuracy** improvement
+- Better calibration (confidence matches accuracy)
+- Reduces overfitting
+
+---
+
+### Label Smoothing
+
+**Soft Labels**:
+```python
+class LabelSmoothingCrossEntropy(nn.Module):
+    """Label smoothing to prevent overconfidence."""
+    def __init__(self, smoothing=0.1):
+        super().__init__()
+        self.smoothing = smoothing
+        self.confidence = 1.0 - smoothing
+
+    def forward(self, pred, target):
+        log_probs = F.log_softmax(pred, dim=-1)
+        nll_loss = -log_probs.gather(dim=-1, index=target.unsqueeze(1))
+        nll_loss = nll_loss.squeeze(1)
+        smooth_loss = -log_probs.mean(dim=-1)
+        loss = self.confidence * nll_loss + self.smoothing * smooth_loss
+        return loss.mean()
+
+# Usage
+criterion = LabelSmoothingCrossEntropy(smoothing=0.1)
+```
+
+**✅ Benefits**:
+- Prevents model overconfidence
+- Better calibration
+- **+0.5% accuracy** on ImageNet
+- Used by ViT, EfficientNet
+
+---
+
+### Stochastic Depth (Drop Path)
+
+**Random Layer Dropping**:
+```python
+class DropPath(nn.Module):
+    """Drop paths (Stochastic Depth) per sample.
+
+    Randomly drops entire residual blocks during training.
+    """
+    def __init__(self, drop_prob=0.):
+        super().__init__()
+        self.drop_prob = drop_prob
+
+    def forward(self, x):
+        if self.drop_prob == 0. or not self.training:
+            return x
+
+        keep_prob = 1 - self.drop_prob
+        shape = (x.shape[0],) + (1,) * (x.ndim - 1)
+        random_tensor = keep_prob + torch.rand(shape, dtype=x.dtype, device=x.device)
+        random_tensor.floor_()
+
+        output = x.div(keep_prob) * random_tensor
+        return output
+
+# Usage in residual block
+class ResBlock(nn.Module):
+    def __init__(self, dim, drop_path=0.1):
+        super().__init__()
+        self.conv = ...
+        self.drop_path = DropPath(drop_path)
+
+    def forward(self, x):
+        return x + self.drop_path(self.conv(x))
+```
+
+**✅ Impact**:
+- **Faster training**: effective depth reduced during training
+- Better regularization
+- Critical for deep networks (200+ layers)
+- Used by ConvNeXt, Swin, EfficientNet V2
+
+**Drop Path Schedule**:
+```python
+# Linear schedule: 0 → 0.3 over training
+drop_path_rates = [x.item() for x in torch.linspace(0, 0.3, depth)]
+```
+
+---
+
+### Exponential Moving Average (EMA)
+
+**Model Averaging**:
+```python
+class EMA:
+    """Exponential Moving Average of model parameters."""
+    def __init__(self, model, decay=0.9999):
+        self.model = model
+        self.decay = decay
+        self.shadow = {}
+        self.backup = {}
+
+        # Initialize shadow parameters
+        for name, param in model.named_parameters():
+            if param.requires_grad:
+                self.shadow[name] = param.data.clone()
+
+    def update(self):
+        """Update EMA parameters."""
+        for name, param in self.model.named_parameters():
+            if param.requires_grad:
+                assert name in self.shadow
+                new_average = (1.0 - self.decay) * param.data + self.decay * self.shadow[name]
+                self.shadow[name] = new_average.clone()
+
+    def apply_shadow(self):
+        """Apply EMA weights to model."""
+        for name, param in self.model.named_parameters():
+            if param.requires_grad:
+                self.backup[name] = param.data
+                param.data = self.shadow[name]
+
+    def restore(self):
+        """Restore original weights."""
+        for name, param in self.model.named_parameters():
+            if param.requires_grad:
+                param.data = self.backup[name]
+        self.backup = {}
+
+# Usage
+model = MyModel()
+ema = EMA(model, decay=0.9999)
+
+for epoch in range(num_epochs):
+    for batch in train_loader:
+        loss = train_step(batch)
+        optimizer.step()
+        ema.update()  # Update EMA after each step
+
+    # Validate with EMA weights
+    ema.apply_shadow()
+    val_acc = validate(model, val_loader)
+    ema.restore()
+```
+
+**✅ Benefits**:
+- **+0.5-1.0% accuracy** improvement
+- More stable validation metrics
+- Smoother weight updates
+- Used by YOLO, EfficientDet, Stable Diffusion
+
+**Decay Rates**:
+- **0.9999**: Large datasets (ImageNet)
+- **0.999**: Medium datasets
+- **0.99**: Small datasets
+
+---
+
 ## Design Principles
 
 ### Layer Selection
@@ -357,16 +838,359 @@ class UNet(nn.Module):
 
 ---
 
-## Architecture Selection Guide
+## Architecture Selection Guide (2024 Updated)
 
-| Task | Architecture | Rationale |
-|------|--------------|-----------|
-| **Image Classification** | ResNet, EfficientNet, ViT | Proven performance, transfer learning |
-| **Object Detection** | YOLO, Faster R-CNN, DETR | Real-time or accuracy trade-offs |
-| **Semantic Segmentation** | U-Net, DeepLab, Mask R-CNN | Pixel-wise predictions |
-| **NLP** | BERT, GPT, T5 | Transformer-based, pre-training |
-| **Time Series** | LSTM, GRU, Temporal CNN | Sequential dependencies |
-| **Generative** | GAN, VAE, Diffusion | Image/text generation |
+### Quick Reference Table
+
+| Task | 2024 Best Choice | Alternative | Mobile/Edge | Rationale |
+|------|------------------|-------------|-------------|-----------|
+| **Image Classification** | ConvNeXt, EfficientNetV2 | ResNet-50, ViT | MobileViT, EfficientNet-Lite | Modern CNNs match ViT with less data |
+| **Object Detection** | YOLOv8, RT-DETR | Faster R-CNN | YOLO-NAS | Real-time vs accuracy trade-off |
+| **Semantic Segmentation** | Mask2Former, SegFormer | U-Net, DeepLabV3+ | MobileViT-S | Transformer-based SOTA |
+| **Instance Segmentation** | Mask R-CNN, Mask2Former | YOLACT | - | Mask R-CNN still strong |
+| **NLP (Text)** | GPT-4, Claude | BERT, T5 | DistilBERT | Pre-trained transformers |
+| **NLP (Code)** | Code Llama, StarCoder | GPT-3.5 | - | Code-specific pre-training |
+| **Time Series** | Temporal Fusion Transformer | LSTM, Prophet | - | Attention > RNNs |
+| **Generative (Image)** | Stable Diffusion, DALL-E | StyleGAN | - | Diffusion models dominate |
+| **Generative (Text)** | GPT-4, Claude, Llama 3 | GPT-2 | - | Large language models |
+| **Speech Recognition** | Whisper, Wav2Vec2 | DeepSpeech | - | Transformer-based |
+| **Video Understanding** | TimeSformer, VideoMAE | 3D-CNN | - | Spatial + temporal attention |
+
+---
+
+## Problem-Specific Decision Trees
+
+### 1. Image Classification - Which Architecture?
+
+**Decision Flow:**
+
+```
+START: Image Classification Task
+│
+├─ Dataset Size?
+│  │
+│  ├─ < 10K images
+│  │  └─ Use: Transfer Learning with EfficientNet V2 or ConvNeXt
+│  │     • Freeze backbone, train only head
+│  │     • Heavy augmentation (Mixup, CutMix, AutoAugment)
+│  │     • Small learning rate (1e-4)
+│  │
+│  ├─ 10K - 100K images
+│  │  └─ Use: RegNet or EfficientNet V2 (medium)
+│  │     • Progressive resizing
+│  │     • Moderate augmentation
+│  │     • Fine-tune from ImageNet
+│  │
+│  └─ > 100K images (or > 1M)
+│     └─ Use: ConvNeXt or ViT
+│        • Train from scratch or fine-tune
+│        • Progressive resizing
+│        • Full augmentation suite
+│
+├─ Compute Budget?
+│  │
+│  ├─ Limited (mobile/edge)
+│  │  └─ Use: MobileViT-XS or EfficientNet-Lite
+│  │     • Quantization (INT8)
+│  │     • Knowledge distillation from larger model
+│  │
+│  ├─ Moderate (single GPU)
+│  │  └─ Use: RegNet-Y-800MF or EfficientNet V2-S
+│  │
+│  └─ High (multi-GPU)
+│     └─ Use: ConvNeXt-Large or ViT-Large
+│
+├─ Inference Latency Requirements?
+│  │
+│  ├─ Real-time (<10ms)
+│  │  └─ Use: MobileNet V3 or EfficientNet-Lite
+│  │
+│  ├─ Interactive (<100ms)
+│  │  └─ Use: RegNet or EfficientNet V2-S
+│  │
+│  └─ Batch/Offline (>100ms)
+│     └─ Use: ConvNeXt or ViT for max accuracy
+│
+└─ Transfer Learning Available?
+   │
+   ├─ Yes (ImageNet pre-trained)
+   │  └─ Fine-tune: ConvNeXt, EfficientNet V2, ViT
+   │     • Freeze early layers, unfreeze progressively
+   │     • Lower learning rate (1e-5 to 1e-4)
+   │
+   └─ No (train from scratch)
+      └─ Use: RegNet (simpler), ConvNeXt (best performance)
+         • Longer training (200+ epochs)
+         • Learning rate warmup
+         • Strong regularization
+```
+
+### 2. Object Detection - Which Architecture?
+
+**Decision Flow:**
+
+```
+START: Object Detection Task
+│
+├─ Latency Requirements?
+│  │
+│  ├─ Real-time (<30ms per frame)
+│  │  └─ Use: YOLOv8-nano or YOLOv8-small
+│  │     • Single-stage detector
+│  │     • Optimized for speed
+│  │     • Good enough accuracy (35-42% mAP)
+│  │
+│  ├─ Interactive (<100ms)
+│  │  └─ Use: YOLOv8-medium or RT-DETR
+│  │     • Balance speed/accuracy
+│  │     • 45-50% mAP
+│  │
+│  └─ Offline (>100ms)
+│     └─ Use: YOLOv8-large or Faster R-CNN with ResNet-101
+│        • Maximum accuracy (50-55% mAP)
+│        • Two-stage detector for Faster R-CNN
+│
+├─ Dataset Size?
+│  │
+│  ├─ < 500 images
+│  │  └─ Use: Transfer learning from COCO
+│  │     • YOLOv8 pre-trained
+│  │     • Extensive augmentation (Mosaic, Mixup)
+│  │
+│  ├─ 500 - 10K images
+│  │  └─ Use: YOLOv8 or Faster R-CNN
+│  │     • Fine-tune from COCO
+│  │     • Moderate augmentation
+│  │
+│  └─ > 10K images
+│     └─ Use: Any architecture
+│        • Train from scratch or fine-tune
+│        • Less augmentation needed
+│
+└─ Object Characteristics?
+   │
+   ├─ Small objects (<32x32px)
+   │  └─ Use: Feature Pyramid Network (FPN) + YOLOv8
+   │     • Multi-scale detection
+   │     • Higher input resolution (1280px)
+   │
+   ├─ Large objects (>200x200px)
+   │  └─ Use: Standard YOLOv8 or Faster R-CNN
+   │     • Lower resolution (640px) for speed
+   │
+   └─ Variable sizes
+      └─ Use: RT-DETR or YOLOv8 with FPN
+         • Multi-scale feature extraction
+```
+
+### 3. Deployment Environment - Architecture Selection
+
+**Decision Matrix:**
+
+| Environment | Best Architecture | Optimization | Expected Performance |
+|-------------|-------------------|--------------|---------------------|
+| **Cloud (GPU)** | ConvNeXt-Large, ViT-Large | None or FP16 | Max accuracy, 100ms latency |
+| **Cloud (CPU)** | RegNet-Y-800MF | ONNX + quantization | 80% accuracy, 500ms latency |
+| **Edge (Jetson)** | EfficientNet V2-S | TensorRT FP16 | 85% accuracy, 50ms latency |
+| **Mobile (iOS)** | MobileViT-XS | Core ML INT8 | 75% accuracy, 20ms latency |
+| **Mobile (Android)** | EfficientNet-Lite | TFLite INT8 | 75% accuracy, 25ms latency |
+| **Browser (WASM)** | MobileNet V3 | ONNX.js + quantization | 70% accuracy, 100ms latency |
+
+---
+
+## Hyperparameter Recommendations (2024)
+
+### Learning Rate Schedules
+
+**Cosine Annealing with Warmup (RECOMMENDED):**
+```python
+from torch.optim.lr_scheduler import CosineAnnealingLR, LambdaLR
+
+def get_cosine_schedule_with_warmup(optimizer, num_warmup_steps, num_training_steps):
+    """Cosine LR schedule with linear warmup."""
+    def lr_lambda(current_step):
+        if current_step < num_warmup_steps:
+            # Linear warmup
+            return float(current_step) / float(max(1, num_warmup_steps))
+        # Cosine annealing
+        progress = float(current_step - num_warmup_steps) / float(max(1, num_training_steps - num_warmup_steps))
+        return max(0.0, 0.5 * (1.0 + math.cos(math.pi * progress)))
+
+    return LambdaLR(optimizer, lr_lambda)
+
+# Usage
+optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3, weight_decay=0.05)
+scheduler = get_cosine_schedule_with_warmup(
+    optimizer,
+    num_warmup_steps=5 * len(train_loader),  # 5 epochs warmup
+    num_training_steps=100 * len(train_loader)  # 100 epochs total
+)
+```
+
+**✅ Benefits**:
+- Smooth convergence
+- Avoids sudden drops
+- Works well with large models (ViT, ConvNeXt)
+
+**Peak Learning Rates** (2024 recommendations):
+
+| Model Size | Base LR | Batch Size | Weight Decay |
+|------------|---------|------------|--------------|
+| Small (<10M params) | 1e-3 | 256 | 0.01 |
+| Medium (10-50M) | 5e-4 | 512 | 0.05 |
+| Large (50-200M) | 3e-4 | 1024 | 0.05 |
+| Huge (>200M) | 1e-4 | 2048 | 0.1 |
+
+**Scaling Rule**: `LR = base_LR × (batch_size / 256)`
+
+---
+
+### Optimizer Selection
+
+**AdamW (RECOMMENDED for most tasks):**
+```python
+optimizer = torch.optim.AdamW(
+    model.parameters(),
+    lr=1e-3,
+    betas=(0.9, 0.999),
+    eps=1e-8,
+    weight_decay=0.05  # Decoupled weight decay
+)
+```
+
+**✅ Use When**:
+- Training Transformers (ViT, BERT)
+- Fine-tuning pre-trained models
+- Small to medium datasets
+- Default choice for 2024
+
+**SGD with Momentum (for CNNs):**
+```python
+optimizer = torch.optim.SGD(
+    model.parameters(),
+    lr=0.1,
+    momentum=0.9,
+    weight_decay=1e-4,
+    nesterov=True  # Nesterov momentum
+)
+```
+
+**✅ Use When**:
+- Training CNNs from scratch (ResNet, ConvNeXt)
+- Large batch sizes (>512)
+- Longer training schedules (300+ epochs)
+- Need best final accuracy
+
+**Optimizer Comparison:**
+
+| Optimizer | Speed | Memory | Accuracy | Best For |
+|-----------|-------|--------|----------|----------|
+| **AdamW** | Fast | High | Good | Transformers, fine-tuning |
+| **SGD** | Medium | Low | Best | CNNs from scratch |
+| **Lion** | Fastest | Low | Good | Large models, limited memory |
+| **LAMB** | Fast | High | Good | Very large batch (>8K) |
+
+---
+
+### Batch Size Guidelines
+
+**Effective Batch Size Formula:**
+```
+Effective_BS = batch_size × num_gpus × gradient_accumulation_steps
+```
+
+**Recommendations:**
+
+| Model Type | Optimal Batch Size | Memory/GPU | Gradient Acc. |
+|------------|-------------------|------------|---------------|
+| **ResNet-50** | 128-256 per GPU | 11GB | 1-2 |
+| **ConvNeXt-Base** | 64-128 per GPU | 16GB | 2-4 |
+| **ViT-Base** | 32-64 per GPU | 20GB | 4-8 |
+| **ViT-Large** | 16-32 per GPU | 32GB | 8-16 |
+
+**Large Batch Training Tips**:
+- Use learning rate warmup (5-10 epochs)
+- Scale LR linearly with batch size
+- Apply LARS or LAMB optimizer for BS > 4K
+- Consider Gradient Accumulation if memory limited
+
+---
+
+### Regularization
+
+**Weight Decay:**
+- **CNNs**: 1e-4 (SGD) or 0.05 (AdamW)
+- **Transformers**: 0.05-0.1 (AdamW)
+- **Fine-tuning**: 0.01-0.05 (lower than scratch)
+
+**Dropout:**
+- **CNNs**: 0.2-0.5 (in classifier head)
+- **Transformers**: 0.1 (attention, MLP)
+- **Fine-tuning**: 0.1-0.2 (lower than scratch)
+
+**Stochastic Depth (Drop Path):**
+- **Shallow (ResNet-18)**: 0.0-0.1
+- **Medium (ResNet-50)**: 0.1-0.2
+- **Deep (ConvNeXt, ViT)**: 0.2-0.4
+
+**Label Smoothing:**
+- **Standard**: 0.1
+- **Fine-tuning**: 0.0-0.05
+- **Small datasets**: 0.0 (can hurt)
+
+---
+
+### Data Augmentation
+
+**Basic Augmentation (always apply):**
+```python
+from torchvision import transforms
+
+train_transform = transforms.Compose([
+    transforms.RandomResizedCrop(224, scale=(0.08, 1.0)),
+    transforms.RandomHorizontalFlip(p=0.5),
+    transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.1),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
+```
+
+**Advanced Augmentation (for small datasets):**
+```python
+# Add these to basic augmentation
+transforms.RandomRotation(15),
+transforms.RandomAffine(degrees=0, translate=(0.1, 0.1)),
+transforms.RandomGrayscale(p=0.1),
+# Plus: Mixup, CutMix, AutoAugment, RandAugment
+```
+
+**Augmentation Strength by Dataset Size:**
+
+| Dataset Size | Augmentation Level | Techniques |
+|--------------|-------------------|------------|
+| **<1K** | Very Heavy | Basic + RandAugment + Mixup + CutMix + AutoAugment |
+| **1K-10K** | Heavy | Basic + RandAugment + Mixup/CutMix |
+| **10K-100K** | Moderate | Basic + RandAugment or Mixup/CutMix |
+| **>100K** | Light | Basic only |
+
+---
+
+### Training Duration
+
+**Epochs by Dataset Size:**
+
+| Dataset Size | From Scratch | Fine-tuning | Progressive Resizing |
+|--------------|--------------|-------------|---------------------|
+| **<1K** | N/A (use transfer) | 50-100 | 30-60 |
+| **1K-10K** | 200-300 | 30-50 | 60-100 |
+| **10K-100K** | 100-200 | 20-30 | 50-80 |
+| **>100K** | 90-120 | 10-20 | 40-60 |
+| **ImageNet scale** | 90-300 | - | 60-120 |
+
+**✅ Early Stopping**:
+- Patience: 10-20 epochs
+- Monitor: validation loss (not accuracy)
+- Save: best model + EMA model
 
 ---
 
