@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "schemaVersion": "2.0",
   "displayName": "AI & Machine Learning",
-  "description": "Complete AI/ML plugin with OpenAI, Gemini, LangChain agents, RAG systems, model deployment, prompt engineering, and MLOps patterns",
+  "description": "Complete AI/ML plugin with Claude, OpenAI, Azure OpenAI, Gemini, LangChain, HuggingFace, and A2A agents. Includes RAG systems, model deployment, prompt engineering, and MLOps patterns with Context7-verified best practices.",
   "category": "ai",
   "metadata": {
     "category": "AI & Machine Learning",
@@ -15,22 +15,49 @@
       "url": "git+https://github.com/rafeekpro/ClaudeAutoPM.git",
       "directory": "packages/plugin-ai"
     },
-    "size": "~22 KB (gzipped)",
+    "size": "~35 KB (gzipped)",
     "required": false,
     "tags": [
       "ai",
       "ml",
       "machine-learning",
+      "anthropic",
+      "claude",
       "openai",
+      "azure-openai",
       "gemini",
       "langchain",
+      "langgraph",
       "huggingface",
+      "a2a",
+      "vertex-ai",
       "mlflow",
       "rag",
       "llm"
     ]
   },
   "agents": [
+    {
+      "name": "anthropic-claude-expert",
+      "file": "agents/anthropic-claude-expert.md",
+      "category": "ai",
+      "description": "Anthropic Claude API integration with Messages API, tool use, prompt caching, vision, and streaming. Expert in cost optimization, async patterns, and production deployment.",
+      "version": "2.0.0",
+      "tags": [
+        "anthropic",
+        "claude",
+        "llm",
+        "tool-use",
+        "prompt-caching",
+        "vision"
+      ],
+      "mcp": [],
+      "context7": [
+        "/anthropic/anthropic-sdk-python",
+        "/anthropic/anthropic-sdk-typescript",
+        "/websites/docs_anthropic"
+      ]
+    },
     {
       "name": "openai-python-expert",
       "file": "agents/openai-python-expert.md",
@@ -47,6 +74,25 @@
       "mcp": [],
       "context7": [
         "/openai/openai-python"
+      ]
+    },
+    {
+      "name": "azure-openai-expert",
+      "file": "agents/azure-openai-expert.md",
+      "category": "ai",
+      "description": "Azure OpenAI Service integration with enterprise features, managed identities, private endpoints, and compliance. Expert in multi-tenant architecture, cost allocation, and hybrid deployments.",
+      "version": "2.0.0",
+      "tags": [
+        "azure",
+        "openai",
+        "enterprise",
+        "compliance",
+        "managed-identity"
+      ],
+      "mcp": [],
+      "context7": [
+        "/azure/azure-sdk-for-python/openai",
+        "/websites/azure/openai-service"
       ]
     },
     {
@@ -68,6 +114,26 @@
       ]
     },
     {
+      "name": "langchain-expert",
+      "file": "agents/langchain-expert.md",
+      "category": "ai",
+      "description": "LangChain framework expert with LCEL, chains, agents, memory, RAG, and tools. Expert in async patterns, structured outputs, and production optimization.",
+      "version": "2.0.0",
+      "tags": [
+        "langchain",
+        "lcel",
+        "chains",
+        "agents",
+        "rag",
+        "memory"
+      ],
+      "mcp": [],
+      "context7": [
+        "/langchain-ai/langchain",
+        "/websites/python_langchain"
+      ]
+    },
+    {
       "name": "langgraph-workflow-expert",
       "file": "agents/langgraph-workflow-expert.md",
       "category": "ai",
@@ -84,6 +150,46 @@
       "context7": [
         "/langchain-ai/langgraph",
         "/websites/langchain-ai_github_io_langgraph"
+      ]
+    },
+    {
+      "name": "google-a2a-expert",
+      "file": "agents/google-a2a-expert.md",
+      "category": "ai",
+      "description": "Google Agent-to-Agent (A2A) protocol expert with Vertex AI Agent Builder, multi-agent orchestration, and agent collaboration. Expert in A2A SDK, ADK workflows, and distributed agent systems.",
+      "version": "2.0.0",
+      "tags": [
+        "a2a",
+        "agent-to-agent",
+        "vertex-ai",
+        "multi-agent",
+        "google-cloud"
+      ],
+      "mcp": [],
+      "context7": [
+        "/googleapis/google-cloud-python/vertexai",
+        "/websites/cloud_google/vertex-ai",
+        "/websites/a2aprotocol"
+      ]
+    },
+    {
+      "name": "huggingface-expert",
+      "file": "agents/huggingface-expert.md",
+      "category": "ai",
+      "description": "HuggingFace ecosystem expert with Transformers, Datasets, Model Hub, quantization, and inference optimization. Expert in model deployment, fine-tuning, and production serving.",
+      "version": "2.0.0",
+      "tags": [
+        "huggingface",
+        "transformers",
+        "model-hub",
+        "quantization",
+        "inference"
+      ],
+      "mcp": [],
+      "context7": [
+        "/huggingface/transformers",
+        "/huggingface/datasets",
+        "/websites/huggingface/docs"
       ]
     }
   ],
@@ -154,6 +260,58 @@
       "context7": [
         "/openai/openai-python",
         "/google/generative-ai-python"
+      ]
+    },
+    {
+      "name": "anthropic-optimize",
+      "file": "commands/anthropic-optimize.md",
+      "description": "Optimize Claude API usage with prompt caching, multi-model routing, streaming, and async batching for 70-90% cost reduction",
+      "category": "optimization",
+      "tags": ["anthropic", "claude", "prompt-caching", "async", "streaming", "optimization"],
+      "requiredAgents": ["anthropic-claude-expert"],
+      "context7": [
+        "/anthropic/anthropic-sdk-python",
+        "/anthropic/prompt-caching",
+        "/anthropic/streaming"
+      ]
+    },
+    {
+      "name": "langchain-optimize",
+      "file": "commands/langchain-optimize.md",
+      "description": "Optimize LangChain chains with LCEL patterns, async batch processing, semantic caching, and RAG optimization for 60% cost reduction and 50x speedup",
+      "category": "optimization",
+      "tags": ["langchain", "lcel", "async", "caching", "rag", "optimization"],
+      "requiredAgents": ["langchain-expert"],
+      "context7": [
+        "/langchain-ai/langchain",
+        "/websites/python_langchain",
+        "/langchain/lcel-patterns"
+      ]
+    },
+    {
+      "name": "a2a-setup",
+      "file": "commands/a2a-setup.md",
+      "description": "Setup Google Agent-to-Agent (A2A) protocol with Vertex AI Agent Builder, multi-agent orchestration, and distributed agent systems",
+      "category": "setup",
+      "tags": ["a2a", "agent-to-agent", "vertex-ai", "multi-agent", "google-cloud"],
+      "requiredAgents": ["google-a2a-expert"],
+      "context7": [
+        "/googleapis/google-cloud-python/vertexai",
+        "/google-cloud/agent-builder",
+        "/google-cloud/a2a-protocol"
+      ]
+    },
+    {
+      "name": "huggingface-deploy",
+      "file": "commands/huggingface-deploy.md",
+      "description": "Deploy HuggingFace models to production with quantization, vLLM high-throughput serving, and Inference Endpoints for 75% memory savings and 6x speedup",
+      "category": "deployment",
+      "tags": ["huggingface", "deployment", "quantization", "vllm", "inference-endpoints"],
+      "requiredAgents": ["huggingface-expert"],
+      "context7": [
+        "/huggingface/transformers",
+        "/huggingface/inference-endpoints",
+        "/huggingface/quantization"
       ]
     }
   ],
@@ -266,25 +424,45 @@
     }
   ],
   "features": {
+    "anthropic_integration": {
+      "enabled": true,
+      "description": "Anthropic Claude API with prompt caching, tool use, and vision"
+    },
     "openai_integration": {
       "enabled": true,
       "description": "OpenAI GPT models, embeddings, and function calling"
+    },
+    "azure_openai_integration": {
+      "enabled": true,
+      "description": "Azure OpenAI Service with enterprise features and compliance"
     },
     "gemini_integration": {
       "enabled": true,
       "description": "Google Gemini multimodal AI with safety controls"
     },
+    "langchain_framework": {
+      "enabled": true,
+      "description": "LangChain LCEL, chains, agents, memory, and RAG patterns"
+    },
     "langgraph_workflows": {
       "enabled": true,
       "description": "LangGraph stateful AI workflows and multi-agent systems"
     },
+    "a2a_protocol": {
+      "enabled": true,
+      "description": "Google Agent-to-Agent protocol with Vertex AI Agent Builder"
+    },
+    "huggingface_ecosystem": {
+      "enabled": true,
+      "description": "HuggingFace Transformers, Datasets, quantization, and deployment"
+    },
     "rag_systems": {
       "enabled": true,
-      "description": "Retrieval-Augmented Generation with LangChain"
+      "description": "Retrieval-Augmented Generation with LangChain and optimization"
     },
     "model_deployment": {
       "enabled": true,
-      "description": "Production AI model deployment with MLflow and FastAPI"
+      "description": "Production AI model deployment with vLLM, TGI, and FastAPI"
     },
     "prompt_engineering": {
       "enabled": true,
@@ -311,18 +489,31 @@
     "ai",
     "ml",
     "machine-learning",
+    "anthropic",
+    "claude",
     "openai",
+    "azure-openai",
     "gemini",
     "langchain",
     "langgraph",
     "huggingface",
+    "transformers",
+    "a2a",
+    "agent-to-agent",
+    "vertex-ai",
     "mlflow",
     "rag",
     "llm",
     "gpt",
     "embeddings",
     "prompt-engineering",
-    "mlops"
+    "mlops",
+    "quantization",
+    "vllm",
+    "tool-use",
+    "function-calling",
+    "prompt-caching",
+    "context7"
   ],
   "compatibleWith": ">=3.0.0"
 }
