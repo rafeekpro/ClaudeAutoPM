@@ -5,57 +5,165 @@
 [![MIT License](https://img.shields.io/badge/License-MIT-28a745)](https://github.com/rafeekpro/ClaudeAutoPM/blob/main/LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/rafeekpro/ClaudeAutoPM?style=social)](https://github.com/rafeekpro/ClaudeAutoPM)
 
-**AI-Powered Project Management Framework for Claude Code**
+**AI-Powered Development Framework for Claude Code**
 
-Transform your development workflow with intelligent automation, parallel AI agent execution, and seamless integration with GitHub and Azure DevOps. From PRD to production in hours, not days.
+Transform your development workflow with intelligent automation, modular plugin architecture, and scenario-based installation. From minimal setups to enterprise-grade DevOps, ClaudeAutoPM adapts to your needs.
 
 ---
 
 ## 🎯 What is ClaudeAutoPM?
 
-ClaudeAutoPM is a comprehensive project management and development automation framework designed specifically for [Claude Code](https://claude.ai/code). It combines:
+ClaudeAutoPM is a **modular, plugin-based development framework** designed specifically for [Claude Code](https://claude.ai/code). It provides:
 
-- **136+ CLI commands** including 24 complete PM commands (Issue, Workflow, Context, Utility)
-- **39 specialized AI agents** for intelligent tasks (analysis, design, development)
-- **Dynamic team management** with automatic agent switching
-- **Hybrid execution modes** - choose between CLI commands or AI assistance
-- **Full GitHub & Azure DevOps integration** for seamless workflow
-- **TDD-developed** with 168+ tests and 91%+ coverage
+- **🔌 11+ Plugin System** - Modular architecture with scenario-based installation
+- **🎭 145+ AI Agents & Commands** - Specialized agents organized by domain
+- **🚀 Smart Installation** - 4 installation scenarios from minimal to full DevOps
+- **📦 Auto-Plugin Installation** - Automatically installs plugins based on your scenario
+- **🔄 Full Provider Integration** - GitHub & Azure DevOps synchronization
+- **⚡ TDD-Developed** - 64+ tests with comprehensive coverage
 
-### The Problem We Solve
+### 🎉 **NEW in v2.8.2: Intelligent Scenario-Based Installation**
 
-Traditional development workflows face:
-- ❌ Context loss between planning and execution
-- ❌ Blocking on sequential tasks
-- ❌ Manual coordination of multiple developers
-- ❌ Disconnect between PRDs, code, and production
+**Automatic Plugin Configuration** - Choose your scenario, plugins install automatically
 
-### Our Solution
+ClaudeAutoPM now automatically installs the right plugins for your development needs:
 
-ClaudeAutoPM creates an **end-to-end automated pipeline**:
+**Installation Scenarios:**
 
+```bash
+1. Minimal (3 plugins)
+   • Sequential execution, native tooling
+   • Plugins: core, languages, pm
+   • Best for: Learning, simple projects, debugging
+
+2. Docker-only (6 plugins)
+   • Adaptive execution with Docker
+   • Plugins: core, languages, frameworks, testing, devops, pm
+   • Best for: Modern web apps with containerization
+
+3. Full DevOps (9 plugins) ⭐ RECOMMENDED
+   • Adaptive execution with all cloud features
+   • Plugins: core, languages, frameworks, testing, devops, cloud, databases, pm, ai
+   • Best for: Production applications, cloud deployments
+
+4. Performance (11 plugins)
+   • Hybrid parallel execution with ALL capabilities
+   • Plugins: ALL (core, languages, frameworks, testing, devops, cloud, databases, data, pm, ai, ml)
+   • Best for: Data pipelines, ML workflows, power users
 ```
-PRD → Epic Decomposition → Parallel Development → Testing → Production
-  ↓         ↓                    ↓                   ↓          ↓
- AI      AI Agents          Multiple AI Agents    Automated   Auto-deploy
-         Analyze            Work Simultaneously    Testing     with CI/CD
+
+**What Happens During Installation:**
+
+1. **Choose Your Scenario** - Select the installation that matches your needs
+2. **Plugins Auto-Install** - System installs all plugins for that scenario
+3. **Configuration Saved** - `.claude/config.json` records what was installed
+4. **Agents Ready** - All agents from installed plugins are immediately available
+
+**Installation Results:**
+
+```bash
+✓ Scenario: Full DevOps selected
+✓ Installing 9 plugins...
+
+  ✓ Core Framework (4 agents, 3 commands, 17 rules)
+  ✓ Programming Languages (5 agents)
+  ✓ Web Frameworks (6 agents, 1 command)
+  ✓ Testing Tools (2 agents)
+  ✓ DevOps & CI/CD (7 agents)
+  ✓ Cloud Platforms (8 agents)
+  ✓ Databases (5 agents)
+  ✓ Project Management (87 commands)
+  ✓ AI Integration (2 agents)
+
+✅ Installation complete!
+📋 Config saved to .claude/config.json
+🎯 62 agents + 91 commands ready to use
+```
+
+**Configuration Persistence:**
+
+The installer creates `.claude/config.json` with full installation details:
+
+```json
+{
+  "version": "2.8.2",
+  "installed": "2025-01-15T10:30:00.000Z",
+  "execution_strategy": "adaptive",
+  "plugins": [
+    "plugin-core",
+    "plugin-languages",
+    "plugin-frameworks",
+    "plugin-testing",
+    "plugin-devops",
+    "plugin-cloud",
+    "plugin-databases",
+    "plugin-pm",
+    "plugin-ai"
+  ],
+  "installedPlugins": [
+    {
+      "name": "plugin-core",
+      "displayName": "Core Framework",
+      "agents": 4,
+      "commands": 3,
+      "rules": 17
+    }
+    // ... full details for all plugins
+  ]
+}
 ```
 
 ---
 
 ## ✨ Key Features
 
-### 🎉 **NEW in v2.8.0-alpha: Complete GitHub Integration!**
+### 🔌 Modular Plugin Architecture
 
-**Full Bidirectional GitHub Sync** - Seamless integration with GitHub Issues
-- ✅ **GitHubProvider** - Complete GitHub REST API wrapper with 99% test coverage
-- 🔄 **Issue Sync** - Push/pull issues with conflict detection and resolution
-- 📦 **Epic Sync** - Sync epics as GitHub issues with task checkboxes
-- 🎯 **84 Tests** - Comprehensive test coverage (45 + 39 tests)
-- ⚡ **Rate Limiting** - Smart rate limiting with exponential backoff
-- 🔀 **Conflict Resolution** - 5 strategies (local, remote, newest, manual, merge)
+**11 Official Plugins** - Mix and match capabilities:
 
-**New GitHub Sync Commands:**
+| Plugin | Agents | Commands | Description |
+|--------|--------|----------|-------------|
+| **@claudeautopm/plugin-core** | 4 | 3 | Framework essentials (agent-manager, code-analyzer, test-runner) |
+| **@claudeautopm/plugin-pm** | 0 | 87 | Complete PM workflow (epics, tasks, Azure DevOps, GitHub) |
+| **@claudeautopm/plugin-languages** | 5 | 0 | Programming languages (JavaScript, TypeScript, Python, Node.js, Bash) |
+| **@claudeautopm/plugin-frameworks** | 6 | 1 | Web frameworks (React, Vue, Tailwind CSS, UX Design) |
+| **@claudeautopm/plugin-testing** | 2 | 0 | Testing tools (E2E, frontend testing, accessibility) |
+| **@claudeautopm/plugin-devops** | 7 | 0 | DevOps & CI/CD (Docker, GitHub Actions, SSH, observability) |
+| **@claudeautopm/plugin-cloud** | 8 | 0 | Cloud platforms (AWS, Azure, GCP, Kubernetes, Terraform) |
+| **@claudeautopm/plugin-databases** | 5 | 0 | Databases (PostgreSQL, MongoDB, Redis, BigQuery, Cosmos DB) |
+| **@claudeautopm/plugin-data** | 3 | 0 | Data pipelines (Airflow, Kedro, message queues) |
+| **@claudeautopm/plugin-ai** | 2 | 0 | AI integration (OpenAI, Gemini) |
+| **@claudeautopm/plugin-ml** | 15 | 0 | Machine Learning (scikit-learn, PyTorch, TensorFlow, MLOps) |
+
+**Total Available:** 62+ specialized agents, 91 commands
+
+### 📦 Scenario-Based Installation (v2.8.2)
+
+**Smart Installation** - Automatically installs plugins based on your development needs:
+
+- **Minimal (3 plugins)** - Core, Languages, PM - Perfect for learning
+- **Docker-only (6 plugins)** - Adds Frameworks, Testing, DevOps - Modern web development
+- **Full DevOps (9 plugins)** ⭐ - Adds Cloud, Databases, AI - Production-ready (RECOMMENDED)
+- **Performance (11 plugins)** - ALL plugins including Data & ML - Maximum capability
+
+### 🤖 Intelligent Agent System
+
+**145+ AI Agents & Commands** organized by domain:
+
+- **Core Framework** (4 agents) - agent-manager, code-analyzer, test-runner, file-analyzer
+- **Programming Languages** (5 agents) - JavaScript, TypeScript, Python, Node.js, Bash experts
+- **Web Frameworks** (6 agents) - React, Vue, Tailwind, UX design, E2E testing
+- **DevOps & CI/CD** (7 agents) - Docker, GitHub Actions, Azure DevOps, SSH, observability
+- **Cloud Platforms** (8 agents) - AWS, Azure, GCP, Kubernetes, Terraform specialists
+- **Databases** (5 agents) - PostgreSQL, MongoDB, Redis, BigQuery, Cosmos DB
+- **Data Engineering** (3 agents) - Airflow, Kedro, LangGraph, message queues
+- **AI Integration** (2 agents) - OpenAI, Gemini API experts
+- **Machine Learning** (15 agents) - scikit-learn, PyTorch, TensorFlow, MLOps, AutoML
+- **Project Management** (87 commands) - Complete PM workflow suite
+
+### 🔄 Complete GitHub Integration
+
+**Full Bidirectional GitHub Sync** - Seamless integration with GitHub Issues:
 
 ```bash
 # Issue Synchronization
@@ -65,72 +173,18 @@ autopm issue sync <number> --pull       # Pull GitHub → local
 autopm issue sync-status <number>       # Check sync status
 autopm issue sync-resolve <number>      # Resolve conflicts
   --strategy newest|local|remote
-
-# What Gets Synced:
-# - Issue title, description, status
-# - Labels, assignees, milestones
-# - Comments and updates
-# - Task progress and completion
 ```
 
 **Features:**
-- **Smart Conflict Detection**: Timestamp-based with multiple resolution strategies
-- **Sync Mapping**: Bidirectional tracking in `.claude/sync-map.json`
-- **Epic Support**: Epics → GitHub issues with "epic" label, tasks → checkboxes
-- **Rate Limiting**: Respects 5,000 req/hour limit with exponential backoff
-- **Error Handling**: Comprehensive error messages and recovery
-- **Real API Testing**: 17 integration tests with actual GitHub API
+- Smart conflict detection with multiple resolution strategies
+- Sync mapping in `.claude/sync-map.json`
+- Epic support (epics → GitHub issues with checkboxes)
+- Rate limiting with exponential backoff
+- Real API testing with 99% test coverage
 
-**Conflict Resolution UI:**
-```bash
-⚠️  Sync Conflict Detected!
+### 📋 Complete CLI Command Suite (v2.7.0)
 
-Conflict Details:
-  Local newer:   false
-  Remote newer:  true
-
-Resolution Options:
-  1. Use local:    autopm issue sync-resolve 123 --strategy local
-  2. Use remote:   autopm issue sync-resolve 123 --strategy remote
-  3. Use newest:   autopm issue sync-resolve 123 --strategy newest
-```
-
-**Setup:**
-```bash
-# Configure GitHub credentials
-export GITHUB_TOKEN=ghp_your_personal_access_token
-export GITHUB_OWNER=your_username
-export GITHUB_REPO=your_repository
-
-# Verify connection
-node test/integration/test-github-manual.js
-
-# Start syncing!
-autopm issue sync 123
-```
-
-**Documentation:**
-- [GitHub Testing Guide](docs/GITHUB-TESTING-GUIDE.md) - Complete setup and testing
-- [Phase 1 Summary](docs/PHASE1-GITHUB-INTEGRATION-SUMMARY.md) - Technical details
-- [Phase 1 Complete](docs/PHASE1-COMPLETE.md) - Implementation summary
-
-**What's Next:**
-- Phase 2: Azure DevOps Integration (similar patterns)
-- Webhooks for real-time updates
-- Provider migration tools
-
----
-
-### 🎉 **v2.7.0: 100% CLI Implementation Complete!**
-
-**All 24 Planned Commands Implemented** - Complete CLI suite for project management
-- ✅ **24/24 Commands** - Full roadmap delivered (Issue, Workflow, Context, Utility)
-- 🎯 **168 Tests** - 91.4% average coverage, 100% function coverage
-- 🎨 **Modern UX** - Progress spinners, color-coded output, intuitive commands
-- ⚡ **TDD Methodology** - Test-driven development throughout
-- 📚 **Context7 Best Practices** - 2025 industry standards applied
-
-**Complete Command Suite:**
+**24 PM Commands** - Full project management workflow:
 
 ```bash
 # Issue Management (6 commands)
@@ -162,313 +216,22 @@ autopm pm sync                        # Sync with provider
 autopm pm clean                       # Clean stale artifacts
 autopm pm search <query>              # Search entities (BM25)
 autopm pm import <source>             # Import from external sources
-
-# PRD Management (legacy)
-autopm prd parse my-prd --ai          # AI-powered PRD parsing
-autopm prd extract-epics my-prd       # Extract epics from PRD
-autopm prd summarize my-prd           # Generate summary
 ```
 
-**Architecture:**
-- 4 Service Layers: IssueService, WorkflowService, ContextService, UtilityService
-- Separation of concerns (CLI → Service → Provider)
-- Zero breaking changes to existing functionality
-- Production-ready implementation
+### ⚡ Execution Strategies
 
-**Milestone Achievement:**
-- Phase 1 (v2.5.0): Issue Commands - 6 commands, 54 tests
-- Phase 2 (v2.6.0): Workflow Commands - 6 commands, 39 tests
-- Phase 3 (v2.7.0): Context & Utility - 10 commands, 75 tests
-- **Total: 24 commands, 168 tests, 91.4% coverage** 🎉
+**Adaptive by Default** - Choose your execution model:
 
----
+- **Sequential** - Safe, one agent at a time (minimal scenario)
+- **Adaptive** - Intelligent mode selection (docker-only, full-devops)
+- **Hybrid** - Maximum parallelization (performance scenario)
 
-### 🎉 **v1.30.0: Advanced Conflict Resolution - Complete Sync Safety!**
-
-**Three-Way Merge Conflict Resolution** - Safe GitHub synchronization
-- 🔒 **Intelligent Merge** - Three-way diff (local/remote/base) with conflict detection
-- 🎯 **5 Resolution Strategies** - newest, local, remote, rules-based, manual
-- 📜 **Conflict History** - Complete audit trail with undo/replay
-- 🔍 **Visual Diffs** - Side-by-side ASCII comparisons
-- 🛡️ **Security Hardened** - Path traversal prevention, robust error handling
-
-```bash
-# Sync with automatic conflict resolution
-autopm sync:download --conflict newest      # Use newest timestamp
-autopm sync:upload --conflict interactive   # Manual resolution
-
-# Manage conflict history
-autopm conflict:history                     # View all conflicts
-autopm conflict:undo <id>                   # Undo resolution
-autopm conflict:replay <id> --strategy local  # Replay with different strategy
-```
-
-**Performance & Safety** - All targets exceeded ✅
-- Merge 1000 files in 3.2s (target: <5s)
-- Memory efficient: <85MB
-- 42/44 tests passing (95.5%)
-- **Phase 3 Complete**: 4/4 production features delivered
-
----
-
-### 🎉 **v1.29.0: Batch Operations, Filtering & Analytics**
-
-**Batch Operations** - Sync 1000+ items in seconds
-- ⚡ **Parallel Processing** - 10 concurrent uploads (configurable)
-- 🔄 **Smart Rate Limiting** - Auto-throttle to respect GitHub API limits
-- 📊 **Progress Tracking** - Real-time progress bars
-- 🛡️ **Error Recovery** - Continues on failures with detailed reporting
-
-```bash
-autopm sync:batch                    # Sync all items
-autopm sync:batch --type prd         # Sync only PRDs
-autopm sync:batch --dry-run          # Preview changes
-```
-
-**Advanced Filtering & Search** - Find anything instantly
-- 🔍 **10 Filter Types** - status, priority, epic, dates, author, assignee, search
-- 📝 **Full-Text Search** - Search across all markdown content
-- 📅 **Date Ranges** - Filter by creation/update dates
-- 🎯 **Combined Filters** - AND logic for precise results
-
-```bash
-autopm prd:list --status active --priority high
-autopm search "authentication" --type prd,epic,task
-```
-
-**Analytics & Insights** - Data-driven project management
-- 📈 **Velocity Tracking** - Tasks/week with trend analysis
-- 📉 **Burndown Charts** - ASCII visualization (ideal vs actual)
-- 👥 **Team Metrics** - Completion rates, average duration
-- 🔗 **Dependency Analysis** - Bottlenecks, critical path, parallelizable tasks
-
-```bash
-autopm analytics:epic epic-001       # Full analytics with burndown
-autopm analytics:team --period 30    # Team metrics (30 days)
-autopm analytics:dependencies epic-001  # Find bottlenecks
-autopm analytics:export epic-001 --format csv  # Export data
-```
-
-**Performance** - All targets exceeded ✅
-- Batch sync: 1000 items in 28.5s
-- Filtering: < 500ms for 1000 items
-- Analytics: 230ms for 1000 tasks
-- **497+ Tests Passing** (99.6% pass rate)
-
----
-
-### 🎉 **v1.28.0: Templates & Scaffolding**
-
-**PRD Templates (Quick Start)**
-- 📋 **5 Built-in Templates** - api-feature, ui-feature, bug-fix, data-migration, documentation
-- 🚀 **70% Faster** - Create PRDs in 9 minutes instead of 30
-- 🎯 **Context7-Verified** - All templates use 2025 best practices
-
-```bash
-autopm prd:new --template api-feature "Payment API"
-autopm template:list
-```
-
----
-
-### 🎉 **v1.27.0: Phase 2 Complete!**
-
-**GitHub Sync (Bidirectional)**
-- 📤 **Upload to GitHub Issues** - Sync PRDs/Epics/Tasks with smart conflict detection
-- 📥 **Download from GitHub** - Pull Issues back to local files with reverse mapping
-- 🔄 **Bidirectional Mapping** - Maintain consistency with `sync-map.json`
-
-**Task Management**
-- ✅ **Complete Task Lifecycle** - List, show, update tasks within epics
-- 🔗 **Dependency Tracking** - Validate task dependencies automatically
-- 📊 **Progress Auto-update** - Epic progress updates on task completion
-
-### 🎉 **NEW in v2.1.0: Plugin-PM Published to NPM!**
-
-**Complete PM Workflow Plugin** - Now available on npm with 87 PM commands
-- 📦 **@claudeautopm/plugin-pm@2.1.0** - Published and ready to use
-- 🎯 **87 PM Commands** - Epic management, tasks, issues, Azure DevOps integration
-- 📦 **208 KB Compressed** - Fast downloads, 890 KB unpacked
-- ⚡ **Zero Dependencies** - Works standalone or with core framework
-- 🔍 **Auto-Discovery** - Commands discovered automatically via plugin.json
-
-**Available on NPM:**
-
-```bash
-# Install plugin-pm via npm
-npm install @claudeautopm/plugin-pm@2.1.0
-
-# Or install globally
-npm install -g @claudeautopm/plugin-pm
-```
-
-**Package Links:**
-- 📦 NPM: [https://www.npmjs.com/package/@claudeautopm/plugin-pm](https://www.npmjs.com/package/@claudeautopm/plugin-pm)
-- 📖 GitHub: [https://github.com/rafeekpro/ClaudeAutoPM/tree/main/packages/plugin-pm](https://github.com/rafeekpro/ClaudeAutoPM/tree/main/packages/plugin-pm)
-
-**What's Included:**
-
-| Category | Commands | Description |
-|----------|----------|-------------|
-| **PM Commands** | 45 | Epic, issue, PRD, context, workflow management |
-| **Azure DevOps** | 41 | Feature, task, user story, work item management |
-| **GitHub** | 1 | Workflow creation and automation |
-| **Total** | **87** | Complete PM workflow suite |
-
-**Quick Start:**
-
-```bash
-# Install from npm
-npm install @claudeautopm/plugin-pm@2.1.0
-
-# Commands auto-discovered via plugin.json
-# Use with ClaudeAutoPM CLI:
-/pm:epic-decompose my-epic
-/pm:task-sync
-/azure:feature-new
-/github:workflow-create
-```
-
-**Features:**
-- Epic Management: Decompose, start, close, sync, split, merge
-- Task Management: Create, update, sync, analyze
-- Issue Management: Analyze, start, close, sync, edit
-- Azure DevOps: Full integration with work items and sprints
-- GitHub: Workflow automation
-- PRD Management: Parse, status, create, edit
-
-### 🎉 **v2.8.1: Plugin Architecture!**
-
-**Modular Agent System** - Agents organized into installable plugins
-- 📦 **7 Official Plugins** - 35 specialized agents in thematic packages
-- 🔌 **npm Workspaces** - Monorepo architecture with scoped packages
-- 🏗️ **Context7-Driven** - Built on best practices from unplugin & npm
-- ⚡ **Install on Demand** - Only load the agents you need
-- 🔍 **Smart Discovery** - Automatic plugin detection and validation
-
-**Available Plugins:**
-
-| Plugin | Status | Description |
-|--------|--------|-------------|
-| **@claudeautopm/plugin-pm** | ✅ **Published** | 87 PM commands (epics, tasks, Azure, GitHub) |
-| **@claudeautopm/plugin-cloud** | 📦 Coming Soon | AWS, Azure, GCP, Terraform, Kubernetes |
-| **@claudeautopm/plugin-devops** | 📦 Coming Soon | Docker, GitHub Actions, Azure DevOps, SSH |
-| **@claudeautopm/plugin-frameworks** | 📦 Coming Soon | React, Vue, Tailwind CSS, UX Design |
-| **@claudeautopm/plugin-databases** | 📦 Coming Soon | PostgreSQL, MongoDB, Redis, BigQuery |
-| **@claudeautopm/plugin-languages** | 📦 Coming Soon | JavaScript, TypeScript, Python, Node.js, Bash |
-| **@claudeautopm/plugin-data** | 📦 Coming Soon | Airflow, Kedro, LangGraph workflows |
-| **@claudeautopm/plugin-testing** | 📦 Coming Soon | Frontend testing, E2E, accessibility |
-
-**Quick Start:**
-
-```bash
-# Install published plugin
-npm install @claudeautopm/plugin-pm
-
-# Coming soon: Install other plugins
-# npm install @claudeautopm/plugin-cloud
-# npm install @claudeautopm/plugin-devops
-
-# List available plugins
-autopm plugin list
-
-# Search for specific agents
-autopm plugin search epic
-
-# Get plugin info
-autopm plugin info pm
-```
-
-**Architecture:**
-- **PluginManager** - Context7-verified plugin system (unplugin patterns)
-- **Factory Pattern** - Dynamic plugin instantiation
-- **Event-Driven** - Hook system for extensibility
-- **Version Compatibility** - Peer dependency validation (semver)
-- **Persistent Registry** - Track installed/enabled state
-
-📖 **[Plugin Architecture Guide](docs/PLUGIN-ARCHITECTURE.md)** - Complete documentation
-
-### 🤖 **35 Specialized AI Agents** (Now in Plugins!)
-
-Previously monolithic, now organized into installable plugins:
-
-- **Core Agents** (4): agent-manager, code-analyzer, file-analyzer, test-runner
-- **Cloud & Infrastructure** (8): AWS, Azure, GCP, Kubernetes, Terraform specialists
-- **DevOps & CI/CD** (7): Docker, GitHub Actions, Azure DevOps, SSH, observability
-- **Frontend & Frameworks** (6): React, Vue, Tailwind, UX design, E2E testing
-- **Databases** (5): PostgreSQL, MongoDB, Redis, BigQuery, Cosmos DB
-- **Programming Languages** (5): JavaScript, TypeScript, Python, Node.js, Bash
-- **Data Engineering** (3): Airflow, Kedro, LangGraph workflow orchestration
-
-**Migration:** Existing projects continue to work. New projects can use plugins for modular installation.
-
-### 🔄 **Hybrid Execution Model**
-
-ClaudeAutoPM provides two distinct interfaces optimized for different operations:
-
-#### 🔧 CLI (`autopm`) - Non-AI Utilities
-Fast, deterministic operations that don't require AI:
-```bash
-autopm install                    # Framework installation
-autopm config set provider github # Configuration management
-autopm team load fullstack        # Load agent teams
-autopm mcp enable context7        # Manage MCP servers
-autopm epic status auth           # View epic progress (read-only)
-```
-
-**When to use:** Setup, configuration, read-only utilities, CI/CD scripts
-
-#### 🤖 Claude Code (`/pm:*`) - AI-Powered Operations
-Intelligent operations leveraging Claude's AI:
-```bash
-/pm:prd-new user-auth            # Create PRD with AI assistance
-/pm:epic-decompose user-auth     # Intelligent task breakdown
-/pm:next                         # Smart task prioritization
-/pm:standup                      # Generate progress summary
-/pm:what-next                    # AI suggests next actions
-```
-
-**When to use:** Creation, modification, intelligent analysis, development workflow
-
-📖 **[Full CLI vs Claude Code Guide](docs/CLI-vs-CLAUDE-CODE.md)**
-
-### 🎭 **Dynamic Team Management**
-
-Switch agent teams based on your current work:
-
-```bash
-autopm team load frontend    # React, UI, testing agents
-autopm team load backend     # Python, Node.js, database agents
-autopm team load fullstack   # Complete development stack
-autopm team load devops      # Docker, Kubernetes, CI/CD agents
-```
-
-Teams automatically activate the right agents for your context.
-
-### 🔌 **MCP (Model Context Protocol) Integration**
-
-Access up-to-date documentation and tools:
-
-```bash
-autopm mcp enable context7       # Documentation for all frameworks
-autopm mcp enable playwright     # Browser automation
-autopm mcp diagnose              # Health check all MCP servers
-```
-
-### 📊 **Multi-Provider Support**
+### 📊 Multi-Provider Support
 
 Seamlessly work with:
-- **GitHub**: Issues, PRs, Actions, Projects
-- **Azure DevOps**: Work Items, Boards, Pipelines, Repos
-- **Local**: Git-based workflow without remote provider
-
-### ⚡ **Parallel Execution Strategies**
-
-Choose your execution model:
-
-- **Sequential**: Safe, one agent at a time
-- **Adaptive**: Intelligent mode selection (recommended)
-- **Hybrid**: Maximum parallelization for power users
+- **GitHub** - Issues, PRs, Actions, Projects
+- **Azure DevOps** - Work Items, Boards, Pipelines, Repos
+- **Local** - Git-based workflow without remote provider
 
 ---
 
@@ -491,29 +254,57 @@ autopm --version
 cd your-project
 autopm install
 
-# 2. Choose your preset
-# - minimal: Basic setup
-# - docker-only: Docker development
-# - fullstack: Complete stack (recommended)
-# - devops: Full DevOps with K8s
-# - custom: Advanced configuration
+# 2. Choose your scenario (interactive menu)
+#    → Minimal (3 plugins) - Learning
+#    → Docker-only (6 plugins) - Modern web
+#    → Full DevOps (9 plugins) - Production ⭐ RECOMMENDED
+#    → Performance (11 plugins) - Data/ML workflows
+#    → Custom - Advanced configuration
 
-# 3. Configure your provider
+# 3. Plugins install automatically based on scenario
+#    System installs all agents, commands, rules for your scenario
+
+# 4. Configure your provider (optional)
 autopm config set provider github
 autopm config set github.owner YOUR_USERNAME
 autopm config set github.repo YOUR_REPO
 export GITHUB_TOKEN=your_github_token
 
-# 4. Load your team
-autopm team load fullstack
-
 # 5. Open Claude Code
 claude --dangerously-skip-permissions .
 ```
 
+### What You Get After Installation
+
+**Configuration File** (`.claude/config.json`):
+```json
+{
+  "version": "2.8.2",
+  "execution_strategy": "adaptive",
+  "plugins": ["plugin-core", "plugin-languages", ...],
+  "installedPlugins": [
+    {
+      "name": "plugin-core",
+      "agents": 4,
+      "commands": 3,
+      "rules": 17
+    }
+    // ... details for all installed plugins
+  ]
+}
+```
+
+**Installed Resources**:
+- `.claude/agents/` - All agents from installed plugins
+- `.claude/commands/` - All commands from installed plugins
+- `.claude/rules/` - Framework rules and guidelines
+- `.claude/hooks/` - Enforcement hooks (TDD, Context7)
+- `.claude/scripts/` - Utility scripts
+
 ### Your First Workflow
 
-**Option A: Using New CLI Commands (v2.7.0+)**
+**Option A: Using CLI Commands (v2.7.0+)**
+
 ```bash
 # 1. Initialize project structure
 autopm pm init
@@ -542,6 +333,7 @@ autopm pm sync
 ```
 
 **Option B: Classic Claude Code Workflow**
+
 ```bash
 # 1. Create a PRD (in Claude Code)
 /pm:prd-new "Build user authentication system"
@@ -561,284 +353,218 @@ autopm pm sync
 
 ---
 
-## 📚 Documentation
-
-### Getting Started
-- [Installation Guide](docs/getting-started/installation.md)
-- [Quick Start Tutorial](docs/getting-started/quick-start.md)
-- [Your First Project](docs/getting-started/first-project.md)
-
-### Core Concepts
-- [Architecture Overview](docs/core-concepts/architecture.md)
-- [CLI vs Claude Code](docs/CLI-vs-CLAUDE-CODE.md) ⭐ **Essential reading**
-- [Hybrid Execution](docs/core-concepts/hybrid-execution.md)
-- [Agent System](docs/core-concepts/agent-system.md)
-- [Team Management](docs/core-concepts/team-management.md)
-
-### Workflows
-- [PRD to Production](docs/workflows/prd-to-production.md)
-- [Epic Management](docs/workflows/epic-management.md)
-- [Development Cycle](docs/workflows/development-cycle.md)
-
-### Reference
-- [CLI Commands](docs/cli-reference/overview.md)
-- [Agent Registry](docs/agents/registry.md)
-- [Configuration](docs/cli-reference/config.md)
-
----
-
-## 🎬 See It In Action
-
-### Video Walkthroughs
-
-<details>
-<summary><b>1️⃣ Installation & Setup</b> - Complete installation process</summary>
-<br>
-<img src="docs/assets/video-1.gif" width="100%" alt="Install AutoPM">
-</details>
-
-<details>
-<summary><b>2️⃣ First Claude Execution</b> - Setting up and running Claude Code</summary>
-<br>
-<img src="docs/assets/video-2.gif" width="100%" alt="First Claude Execution">
-</details>
-
-<details>
-<summary><b>3️⃣ PRD Creation</b> - Product Requirements workflow</summary>
-<br>
-<img src="docs/assets/video-3.gif" width="100%" alt="Create PRD">
-</details>
-
-<details>
-<summary><b>4️⃣ GitHub Sync</b> - Synchronizing and starting work</summary>
-<br>
-<img src="docs/assets/video-4.gif" width="100%" alt="GitHub Sync">
-</details>
-
-<details>
-<summary><b>5️⃣ Task Completion</b> - Finishing and closing tasks</summary>
-<br>
-<img src="docs/assets/video-5.gif" width="100%" alt="Issues Complete">
-</details>
-
-<details>
-<summary><b>6️⃣ Demo Application</b> - Running Web App + FastAPI</summary>
-<br>
-<img src="docs/assets/video-6.gif" width="100%" alt="Web App and FastAPI">
-</details>
-
----
-
 ## 🏗️ Architecture
+
+### Plugin-Based Architecture (v2.8.2)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     ClaudeAutoPM                             │
+│                     ClaudeAutoPM v2.8.2                      │
 ├─────────────────────────────────────────────────────────────┤
 │                                                               │
-│  ┌─────────────┐  ┌──────────────┐  ┌──────────────┐       │
-│  │ CLI Layer   │  │ Agent Teams  │  │ MCP Servers  │       │
-│  │ (112 cmds)  │  │ (39 agents)  │  │ (Context7)   │       │
-│  └──────┬──────┘  └──────┬───────┘  └──────┬───────┘       │
-│         │                 │                  │                │
-│         └─────────────────┼──────────────────┘                │
-│                           │                                   │
-│  ┌────────────────────────┴─────────────────────────┐        │
-│  │         Execution Engine                         │        │
-│  │  - Sequential / Adaptive / Hybrid                │        │
-│  │  - Parallel agent coordination                   │        │
-│  │  - Context optimization                          │        │
-│  │  - STANDALONE mode (direct service access)       │        │
-│  └────────────────────────┬─────────────────────────┘        │
-│                           │                                   │
-│  ┌────────────────────────┴─────────────────────────┐        │
-│  │         Provider Integration                     │        │
-│  │  - GitHub (Issues, PRs, Actions)                 │        │
-│  │  - Azure DevOps (Work Items, Boards)             │        │
-│  │  - Local (Git-based)                             │        │
-│  └──────────────────────────────────────────────────┘        │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │           Scenario-Based Installer                  │    │
+│  │  • Minimal (3 plugins)                              │    │
+│  │  • Docker-only (6 plugins)                          │    │
+│  │  • Full DevOps (9 plugins) ⭐                       │    │
+│  │  • Performance (11 plugins)                         │    │
+│  └────────────────────┬────────────────────────────────┘    │
+│                       │                                      │
+│  ┌────────────────────┴────────────────────────────────┐    │
+│  │           Plugin System (11 plugins)               │    │
+│  │  • Core Framework (agents, commands, rules)        │    │
+│  │  • Domain Plugins (specialized agents)             │    │
+│  │  • Auto-discovery & installation                   │    │
+│  └────────────────────┬────────────────────────────────┘    │
+│                       │                                      │
+│  ┌────────────────────┴────────────────────────────────┐    │
+│  │         Agent Teams (145+ agents/commands)         │    │
+│  │  • Dynamic team loading                            │    │
+│  │  • Context7-driven documentation                   │    │
+│  │  • Parallel execution support                      │    │
+│  └────────────────────┬────────────────────────────────┘    │
+│                       │                                      │
+│  ┌────────────────────┴────────────────────────────────┐    │
+│  │         Execution Engine                           │    │
+│  │  • Sequential / Adaptive / Hybrid                  │    │
+│  │  • Parallel agent coordination                     │    │
+│  │  • Context optimization                            │    │
+│  └────────────────────┬────────────────────────────────┘    │
+│                       │                                      │
+│  ┌────────────────────┴────────────────────────────────┐    │
+│  │         Provider Integration                       │    │
+│  │  • GitHub (Issues, PRs, Actions)                   │    │
+│  │  • Azure DevOps (Work Items, Boards)               │    │
+│  │  • Local (Git-based)                               │    │
+│  └─────────────────────────────────────────────────────┘    │
 │                                                               │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+### Installation Flow
+
+```
+User runs: autopm install
+         ↓
+Choose Scenario (1-4)
+         ↓
+System determines plugin list
+         ↓
+For each plugin:
+  ├─ Copy agents → .claude/agents/<category>/
+  ├─ Copy commands → .claude/commands/
+  ├─ Copy rules → .claude/rules/
+  ├─ Copy hooks → .claude/hooks/
+  └─ Copy scripts → scripts/
+         ↓
+Create .claude/config.json
+  ├─ List installed plugins
+  ├─ Record installation details
+  └─ Save execution strategy
+         ↓
+✅ Installation Complete!
+```
+
+### Plugin Discovery
+
+**Installation Time** (v2.8.2):
+- Direct file system access to `packages/` directory
+- Reads `plugin.json` metadata
+- Copies resources to `.claude/` directories
+- No npm packages required
+
+**Runtime** (future versions):
+- PluginManager discovers plugins in `node_modules/@claudeautopm/`
+- Supports lazy loading and hot reloading
+- Dynamic plugin enable/disable
+
+---
+
+## 📚 Documentation
+
+### Getting Started
+- [Installation Guide](docs/getting-started/installation.md) - Detailed installation instructions
+- [Scenario Selection Guide](docs/getting-started/scenarios.md) - Choose the right scenario
+- [Quick Start Tutorial](docs/getting-started/quick-start.md) - First steps
+- [Your First Project](docs/getting-started/first-project.md) - Complete walkthrough
+
+### Core Concepts
+- [Plugin Architecture](docs/core-concepts/plugin-architecture.md) - How plugins work
+- [Agent System](docs/core-concepts/agent-system.md) - Understanding agents
+- [Execution Strategies](docs/core-concepts/execution-strategies.md) - Sequential vs Adaptive vs Hybrid
+- [CLI vs Claude Code](docs/CLI-vs-CLAUDE-CODE.md) ⭐ **Essential reading**
+
+### Plugin Guides
+- [Plugin System Overview](docs/plugins/overview.md) - Complete plugin documentation
+- [Core Framework Plugin](docs/plugins/core.md) - Framework essentials
+- [PM Plugin](docs/plugins/pm.md) - Project management commands
+- [Cloud Plugins](docs/plugins/cloud.md) - AWS, Azure, GCP
+- [Data & ML Plugins](docs/plugins/data-ml.md) - Data pipelines and ML workflows
+
+### Workflows
+- [PRD to Production](docs/workflows/prd-to-production.md) - Complete development cycle
+- [Epic Management](docs/workflows/epic-management.md) - Managing epics and tasks
+- [GitHub Integration](docs/workflows/github-integration.md) - Sync with GitHub
+
+### Reference
+- [CLI Commands](docs/cli-reference/overview.md) - Complete command reference
+- [Agent Registry](docs/agents/registry.md) - All available agents
+- [Configuration](docs/cli-reference/config.md) - Configuration options
+- [Migration Guide](docs/migration/v2.8-upgrade.md) - Upgrading from older versions
 
 ---
 
 ## 🛠️ Use Cases
 
 ### For Solo Developers
-- 🚀 Build MVPs faster with AI pair programming
-- 📝 Maintain clear project documentation
-- ⚡ Automate repetitive development tasks
-- 🔄 Keep GitHub/Azure in sync automatically
+- 🚀 **Quick Setup** - Minimal scenario gets you started in 5 minutes
+- 📝 **Organized Projects** - Clear structure with PRDs, epics, and tasks
+- ⚡ **Progressive Enhancement** - Start minimal, add plugins as needed
+- 🔄 **GitHub Integration** - Keep issues in sync automatically
 
 ### For Development Teams
-- 👥 Coordinate multiple AI agents like a team
-- 📊 Track progress across epics and sprints
-- 🔀 Parallel development on independent tasks
-- 📈 Maintain velocity with automated workflows
+- 👥 **Team Coordination** - Dynamic agent teams for different roles
+- 📊 **Progress Tracking** - Track progress across epics and sprints
+- 🔀 **Parallel Development** - Multiple agents work simultaneously
+- 📈 **Velocity Metrics** - Maintain velocity with automated workflows
 
 ### For DevOps Engineers
-- 🐳 Docker-first development patterns
-- ☸️ Kubernetes deployment automation
-- 🔧 Infrastructure as Code with Terraform
-- 📦 CI/CD pipeline generation
+- 🐳 **Full DevOps Scenario** - Docker, Kubernetes, cloud platforms
+- ☸️ **Infrastructure as Code** - Terraform, CloudFormation, ARM templates
+- 🔧 **CI/CD Integration** - GitHub Actions, Azure Pipelines
+- 📦 **Multi-Cloud Support** - AWS, Azure, GCP specialists
+
+### For Data Engineers
+- 📊 **Performance Scenario** - All data and ML capabilities
+- 🔄 **Pipeline Orchestration** - Airflow, Kedro, LangGraph
+- 💾 **Data Storage** - PostgreSQL, MongoDB, BigQuery
+- 🤖 **ML Workflows** - scikit-learn, PyTorch, TensorFlow, MLOps
 
 ---
 
 ## 🌟 Why ClaudeAutoPM?
 
 ### vs Traditional PM Tools
-- ✅ **AI-native**: Built for Claude Code, not adapted
-- ✅ **Code-first**: PRDs → Code → Production
-- ✅ **Parallel execution**: Multiple agents work simultaneously
-- ✅ **Context-aware**: Never lose track of your work
+- ✅ **AI-native** - Built for Claude Code, not adapted
+- ✅ **Modular** - Install only what you need
+- ✅ **Code-first** - PRDs → Code → Production
+- ✅ **Scenario-based** - Automatic plugin installation
 
 ### vs Other AI Tools
-- ✅ **Full workflow**: Not just code generation
-- ✅ **Multi-agent**: 39 specialized agents, not one generic
-- ✅ **Team coordination**: Dynamic team switching
-- ✅ **Enterprise-ready**: GitHub & Azure DevOps integration
+- ✅ **Full workflow** - Not just code generation
+- ✅ **Multi-agent** - 145+ specialized agents, not one generic
+- ✅ **Plugin architecture** - Mix and match capabilities
+- ✅ **Enterprise-ready** - GitHub & Azure DevOps integration
+
+### vs Building Your Own
+- ✅ **Proven patterns** - 2+ years of refinement
+- ✅ **TDD-developed** - 64+ tests with comprehensive coverage
+- ✅ **Active development** - Regular updates and improvements
+- ✅ **Community support** - Growing ecosystem and documentation
 
 ---
 
-## 📦 What's Included
+## 📊 Project Stats
 
-### CLI Commands (136+ total)
-- **Project Management**: 24 complete PM commands (Issue, Workflow, Context, Utility) ✨ NEW in v2.7.0
-  - Issue Management (6): show, start, close, status, edit, sync
-  - Workflow (6): next, what-next, standup, status, in-progress, blocked
-  - Context (4): create, prime, update, show
-  - Utilities (6): init, validate, sync, clean, search, import
-- **PRD & Epic**: PRD parsing, epic decomposition, task management
-- **Development**: Scaffolding, testing, deployment
-- **Configuration**: Provider setup, team management, MCP servers
-- **DevOps**: Docker, Kubernetes, CI/CD automation
+### Plugin System
+- **11+ plugins** - Modular architecture
+- **62+ agents** - Specialized AI experts
+- **91 commands** - Complete PM workflow
+- **4 scenarios** - From minimal to full DevOps
 
-### AI Agents (39 active)
-- **Core**: 7 system agents
-- **Languages**: 6 language agents
-- **Frameworks**: 8 framework agents
-- **Cloud**: 7 cloud & infrastructure agents
-- **DevOps**: 6 DevOps & CI/CD agents
-- **Data**: 5 database agents
+### Quality Metrics
+- **64+ tests** - Comprehensive test coverage
+- **TDD methodology** - Test-driven development
+- **Context7 integration** - Up-to-date documentation
+- **Production-ready** - Used in real projects
 
-### Documentation
-- Installation guides
-- Complete workflow tutorials
-- CLI reference
-- Agent documentation
-- Integration guides
+### Development Activity
+- **Active maintenance** - Regular updates
+- **npm published** - Easy global installation
+- **GitHub integration** - Full bidirectional sync
+- **Azure DevOps support** - Complete work item management
 
 ---
 
-## 🔧 Advanced Tools
+## 🔄 Execution Strategies
 
-### Epic Sync (JavaScript)
+### Sequential (Minimal Scenario)
+- **Safety First** - One agent at a time
+- **Predictable** - Easy to debug
+- **Resource Light** - Minimal system resources
+- **Best For** - Learning, debugging, simple projects
 
-Complete epic synchronization workflow in one command:
+### Adaptive (Docker-only & Full DevOps)
+- **Intelligent** - Automatic mode selection
+- **Balanced** - Performance + safety
+- **Context-Aware** - Adapts to task complexity
+- **Best For** - Most production projects ⭐ RECOMMENDED
 
-```bash
-# Full epic sync (create epic + tasks + update references)
-node .claude/lib/commands/pm/epicSync.js sync fullstack/01-infrastructure
-
-# Individual operations
-node .claude/lib/commands/pm/epicSync.js create-epic fullstack/01-infrastructure
-node .claude/lib/commands/pm/epicSync.js create-tasks fullstack/01-infrastructure 2
-node .claude/lib/commands/pm/epicSync.js update-epic fullstack/01-infrastructure 2
-```
-
-**Features:**
-- Creates GitHub epic issue with labels and stats
-- Creates task issues for all tasks in epic
-- Updates epic file with GitHub URLs
-- Renames task files to match issue numbers
-- Updates all cross-references automatically
-
-### Issue Sync (JavaScript)
-
-Synchronize local development progress with GitHub issues:
-
-```bash
-# Full sync workflow
-node .claude/lib/commands/pm/issueSync.js sync 123 .claude/epics/auth/updates/123
-
-# Mark task as complete
-node .claude/lib/commands/pm/issueSync.js sync 456 ./updates --complete
-
-# Dry run (preview without posting)
-node .claude/lib/commands/pm/issueSync.js sync 789 ./updates --dry-run
-
-# Individual operations
-node .claude/lib/commands/pm/issueSync.js gather 123 ./updates
-node .claude/lib/commands/pm/issueSync.js format 123 ./updates
-```
-
-**Features:**
-- Gathers updates from multiple sources (progress, notes, commits)
-- Formats professional GitHub comments
-- Posts updates to issues
-- Updates frontmatter with sync timestamps
-- Preflight validation (auth, issue exists, etc.)
-- Supports completion workflow
-
-**What gets synced:**
-- Progress updates and completion %
-- Technical notes and decisions
-- Recent commits (auto-detected or manual)
-- Acceptance criteria updates
-- Next steps and blockers
-
-### Epic Status (JavaScript)
-
-Track epic progress with detailed status reporting:
-
-```bash
-# Show epic status
-node .claude/lib/commands/pm/epicStatus.js fullstack/01-infrastructure
-
-# List available epics
-node .claude/lib/commands/pm/epicStatus.js
-```
-
-**Features:**
-- Counts tasks by status (completed/in-progress/pending)
-- Calculates progress percentage
-- Visual progress bar
-- Sub-epic breakdown
-- Comprehensive status reporting
-
-**Example output:**
-```
-Epic: fullstack/01-infrastructure
-==================================
-
-Total tasks:     12
-Completed:       8 (67%)
-In Progress:     2
-Pending:         2
-
-Progress: [=================================-------------] 67%
-
-Sub-Epic Breakdown:
--------------------
-  backend                        6 tasks (4 completed)
-  frontend                       4 tasks (3 completed)
-  infrastructure                 2 tasks (1 completed)
-```
-
-### Why JavaScript Tools?
-
-**Replaced 10 Bash scripts** (~2600 lines) with **3 JavaScript tools** (~1500 lines):
-
-**Benefits:**
-- ✅ Zero parsing errors (no heredoc/awk/sed complexity)
-- 🧪 Fully testable (all functions exported)
-- 📖 More readable and maintainable
-- 🚀 50% less code
-- 💾 Better error handling
-- 🔍 Easier debugging
-
-**Backward compatible:** Old Bash scripts still work, but new JS tools are recommended.
+### Hybrid (Performance Scenario)
+- **Maximum Speed** - Parallel agent execution
+- **Resource Intensive** - Uses all available cores
+- **Advanced** - Requires understanding of dependencies
+- **Best For** - Data pipelines, ML workflows, power users
 
 ---
 
@@ -846,9 +572,14 @@ Sub-Epic Breakdown:
 
 We welcome contributions! See [CONTRIBUTING.md](docs/development/contributing.md) for:
 - Development setup
+- Plugin development guide
 - Coding standards
 - Testing requirements
 - Pull request process
+
+### Building Plugins
+
+Want to create your own plugin? See [Plugin Development Guide](docs/development/plugin-development.md).
 
 ---
 
@@ -872,6 +603,37 @@ MIT License - see [LICENSE](LICENSE) for details.
 - 📧 Email: autopm@example.com
 - 🐦 Twitter: [@rafeekpro](https://twitter.com/rafeekpro)
 - 💬 GitHub Discussions for questions and community support
+
+---
+
+## 📋 Version History
+
+### v2.8.2 (2025-01-15) - Scenario-Based Installation
+- ✨ Automatic plugin installation based on scenarios
+- 🎯 4 installation presets (minimal, docker-only, full-devops, performance)
+- 📦 Configuration persistence in `.claude/config.json`
+- 🔍 Installation results tracking
+- 📚 Comprehensive documentation update
+
+### v2.8.1 (2025-01-10) - Plugin Architecture
+- 🔌 Modular plugin system with 11 official plugins
+- 📦 npm workspaces for plugin organization
+- 🏗️ Context7-driven architecture
+- 🔍 Smart plugin discovery
+
+### v2.8.0 (2025-01-05) - GitHub Integration
+- 🔄 Full bidirectional GitHub sync
+- ✅ Issue sync with conflict detection
+- 📦 Epic sync with task checkboxes
+- 🎯 99% test coverage
+
+### v2.7.0 (2024-12-20) - CLI Commands Complete
+- 📋 24 PM commands implemented
+- ⚡ 168 tests, 91.4% coverage
+- 🎨 Modern UX with progress spinners
+- 🧪 TDD methodology throughout
+
+For complete version history, see [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
