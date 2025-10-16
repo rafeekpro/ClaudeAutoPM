@@ -17,7 +17,15 @@
     },
     "size": "~15 KB (gzipped)",
     "required": false,
-    "tags": ["cloud", "aws", "azure", "gcp", "kubernetes", "terraform", "infrastructure"]
+    "tags": [
+      "cloud",
+      "aws",
+      "azure",
+      "gcp",
+      "kubernetes",
+      "terraform",
+      "infrastructure"
+    ]
   },
   "agents": [
     {
@@ -26,8 +34,18 @@
       "category": "cloud",
       "description": "AWS cloud architecture and infrastructure design patterns",
       "version": "2.0.0",
-      "tags": ["aws", "cloud", "architecture", "ec2", "s3", "vpc"],
-      "mcp": ["aws", "terraform"],
+      "tags": [
+        "aws",
+        "cloud",
+        "architecture",
+        "ec2",
+        "s3",
+        "vpc"
+      ],
+      "mcp": [
+        "aws",
+        "terraform"
+      ],
       "context7": [
         "/websites/aws_amazon",
         "/hashicorp/terraform-provider-aws"
@@ -39,8 +57,17 @@
       "category": "cloud",
       "description": "Azure cloud architecture and resource management",
       "version": "2.0.0",
-      "tags": ["azure", "cloud", "architecture", "arm", "bicep"],
-      "mcp": ["azure-cli", "terraform"],
+      "tags": [
+        "azure",
+        "cloud",
+        "architecture",
+        "arm",
+        "bicep"
+      ],
+      "mcp": [
+        "azure-cli",
+        "terraform"
+      ],
       "context7": [
         "/microsoftdocs/azure-docs",
         "/microsoftdocs/architecture-center"
@@ -52,8 +79,16 @@
       "category": "cloud",
       "description": "Google Cloud Platform architecture and design",
       "version": "2.0.0",
-      "tags": ["gcp", "google-cloud", "architecture", "compute-engine"],
-      "mcp": ["gcp", "terraform"],
+      "tags": [
+        "gcp",
+        "google-cloud",
+        "architecture",
+        "compute-engine"
+      ],
+      "mcp": [
+        "gcp",
+        "terraform"
+      ],
       "context7": [
         "/websites/cloud_google_architecture"
       ]
@@ -64,8 +99,15 @@
       "category": "cloud",
       "description": "Google Cloud Functions and serverless application development",
       "version": "2.0.0",
-      "tags": ["gcp", "cloud-functions", "serverless", "functions-as-a-service"],
-      "mcp": ["gcp"],
+      "tags": [
+        "gcp",
+        "cloud-functions",
+        "serverless",
+        "functions-as-a-service"
+      ],
+      "mcp": [
+        "gcp"
+      ],
       "context7": [
         "/websites/cloud_google_architecture"
       ]
@@ -76,8 +118,16 @@
       "category": "ai-integration",
       "description": "Google Gemini API integration and AI application development",
       "version": "2.0.0",
-      "tags": ["gemini", "google", "ai", "api", "llm"],
-      "mcp": ["gcp"],
+      "tags": [
+        "gemini",
+        "google",
+        "ai",
+        "api",
+        "llm"
+      ],
+      "mcp": [
+        "gcp"
+      ],
       "context7": [
         "/websites/cloud_google_architecture"
       ]
@@ -88,8 +138,16 @@
       "category": "orchestration",
       "description": "Kubernetes cluster orchestration and container management",
       "version": "2.0.0",
-      "tags": ["kubernetes", "k8s", "containers", "orchestration", "helm"],
-      "mcp": ["kubernetes"],
+      "tags": [
+        "kubernetes",
+        "k8s",
+        "containers",
+        "orchestration",
+        "helm"
+      ],
+      "mcp": [
+        "kubernetes"
+      ],
       "context7": [
         "/kubernetes/kubernetes"
       ]
@@ -100,8 +158,16 @@
       "category": "ai-integration",
       "description": "OpenAI API integration with Python for AI applications",
       "version": "2.0.0",
-      "tags": ["openai", "python", "ai", "api", "gpt"],
-      "mcp": ["openai"],
+      "tags": [
+        "openai",
+        "python",
+        "ai",
+        "api",
+        "gpt"
+      ],
+      "mcp": [
+        "openai"
+      ],
       "context7": [
         "/openai/openai-python"
       ]
@@ -112,8 +178,16 @@
       "category": "infrastructure",
       "description": "Terraform infrastructure as code for multi-cloud deployments",
       "version": "2.0.0",
-      "tags": ["terraform", "iac", "infrastructure", "multi-cloud", "hcl"],
-      "mcp": ["terraform"],
+      "tags": [
+        "terraform",
+        "iac",
+        "infrastructure",
+        "multi-cloud",
+        "hcl"
+      ],
+      "mcp": [
+        "terraform"
+      ],
       "context7": [
         "/hashicorp/terraform",
         "/hashicorp/terraform-provider-aws"
@@ -122,72 +196,15 @@
   ],
   "commands": [
     {
-      "name": "infra-deploy",
-      "file": "commands/infra-deploy.md",
-      "description": "Deploy infrastructure to cloud providers using IaC",
-      "category": "deployment",
-      "tags": ["infrastructure", "deployment", "terraform", "cloud"],
-      "requiredAgents": ["terraform-infrastructure-expert"],
-      "context7": [
-        "/hashicorp/terraform"
-      ]
-    },
-    {
-      "name": "ssh-security",
-      "file": "commands/ssh-security.md",
-      "description": "Configure SSH security hardening for cloud instances",
-      "category": "security",
-      "tags": ["ssh", "security", "hardening", "infrastructure"],
-      "context7": [
-        "/websites/aws_amazon"
-      ]
-    },
-    {
-      "name": "traefik-setup",
-      "file": "commands/traefik-setup.md",
-      "description": "Setup Traefik reverse proxy for cloud infrastructure",
-      "category": "networking",
-      "tags": ["traefik", "proxy", "networking", "load-balancer"],
-      "requiredAgents": ["kubernetes-orchestrator"],
-      "context7": [
-        "/traefik/traefik"
-      ]
-    },
-    {
-      "name": "k8s-deploy",
-      "file": "commands/k8s-deploy.md",
-      "description": "Deploy applications to Kubernetes clusters",
-      "category": "deployment",
-      "tags": ["kubernetes", "k8s", "deployment", "containers"],
-      "requiredAgents": ["kubernetes-orchestrator"],
-      "context7": [
-        "/kubernetes/kubernetes"
-      ]
-    },
-    {
-      "name": "cloud-validate",
-      "file": "commands/cloud-validate.md",
-      "description": "Validate cloud infrastructure configuration and credentials",
-      "category": "validation",
-      "tags": ["cloud", "validation", "security", "credentials", "terraform"],
-      "requiredAgents": ["aws-cloud-architect", "azure-cloud-architect", "gcp-cloud-architect", "terraform-infrastructure-expert"],
-      "context7": [
-        "/aws/aws-cdk",
-        "/hashicorp/terraform",
-        "/docker/docs",
-        "/kubernetes/kubernetes"
-      ]
-    },
-    {
-      "name": "cloud-cost-optimize",
-      "file": "commands/cloud-cost-optimize.md",
-      "description": "Analyze and optimize cloud infrastructure costs",
-      "category": "cost-optimization",
-      "tags": ["cloud", "cost", "optimization", "finops", "savings"],
-      "requiredAgents": ["aws-cloud-architect", "azure-cloud-architect", "gcp-cloud-architect"],
-      "context7": [
-        "/aws/aws-cdk",
-        "/hashicorp/terraform"
+      "subdirectory": "commands/",
+      "description": "Cloud Providers & Infrastructure commands (6 total)",
+      "type": "collection",
+      "discovery": "auto",
+      "tags": [
+        "infrastructure",
+        "deployment",
+        "terraform",
+        "cloud"
       ]
     }
   ],
@@ -197,18 +214,46 @@
       "file": "rules/infrastructure-pipeline.md",
       "priority": "high",
       "description": "Infrastructure deployment pipeline standards and validation",
-      "tags": ["infrastructure", "pipeline", "terraform", "docker", "kubernetes"],
-      "appliesTo": ["commands", "agents"],
-      "enforcesOn": ["terraform-infrastructure-expert", "kubernetes-orchestrator"]
+      "tags": [
+        "infrastructure",
+        "pipeline",
+        "terraform",
+        "docker",
+        "kubernetes"
+      ],
+      "appliesTo": [
+        "commands",
+        "agents"
+      ],
+      "enforcesOn": [
+        "terraform-infrastructure-expert",
+        "kubernetes-orchestrator"
+      ]
     },
     {
       "name": "cloud-security-compliance",
       "file": "rules/cloud-security-compliance.md",
       "priority": "critical",
       "description": "Cloud security best practices and compliance standards enforcement",
-      "tags": ["security", "compliance", "cloud", "encryption", "access-control"],
-      "appliesTo": ["commands", "agents", "deployments"],
-      "enforcesOn": ["aws-cloud-architect", "azure-cloud-architect", "gcp-cloud-architect", "terraform-infrastructure-expert", "kubernetes-orchestrator"]
+      "tags": [
+        "security",
+        "compliance",
+        "cloud",
+        "encryption",
+        "access-control"
+      ],
+      "appliesTo": [
+        "commands",
+        "agents",
+        "deployments"
+      ],
+      "enforcesOn": [
+        "aws-cloud-architect",
+        "azure-cloud-architect",
+        "gcp-cloud-architect",
+        "terraform-infrastructure-expert",
+        "kubernetes-orchestrator"
+      ]
     }
   ],
   "hooks": [
@@ -218,8 +263,18 @@
       "type": "pre-command",
       "description": "Security validation before cloud infrastructure deployment",
       "blocking": true,
-      "tags": ["security", "validation", "deployment", "terraform"],
-      "triggers": ["cloud:deploy", "infra-deploy", "k8s-deploy", "terraform-deploy"]
+      "tags": [
+        "security",
+        "validation",
+        "deployment",
+        "terraform"
+      ],
+      "triggers": [
+        "cloud:deploy",
+        "infra-deploy",
+        "k8s-deploy",
+        "terraform-deploy"
+      ]
     }
   ],
   "scripts": [
@@ -230,7 +285,11 @@
       "type": "example",
       "executable": true,
       "category": "terraform",
-      "tags": ["terraform", "init", "validation"]
+      "tags": [
+        "terraform",
+        "init",
+        "validation"
+      ]
     },
     {
       "name": "aws-validate",
@@ -239,7 +298,11 @@
       "type": "example",
       "executable": true,
       "category": "aws",
-      "tags": ["aws", "validation", "credentials"]
+      "tags": [
+        "aws",
+        "validation",
+        "credentials"
+      ]
     },
     {
       "name": "azure-setup",
@@ -248,7 +311,11 @@
       "type": "example",
       "executable": true,
       "category": "azure",
-      "tags": ["azure", "setup", "configuration"]
+      "tags": [
+        "azure",
+        "setup",
+        "configuration"
+      ]
     },
     {
       "name": "gcp-setup",
@@ -257,7 +324,11 @@
       "type": "example",
       "executable": true,
       "category": "gcp",
-      "tags": ["gcp", "setup", "configuration"]
+      "tags": [
+        "gcp",
+        "setup",
+        "configuration"
+      ]
     },
     {
       "name": "k8s-validate",
@@ -266,7 +337,12 @@
       "type": "example",
       "executable": true,
       "category": "kubernetes",
-      "tags": ["kubernetes", "k8s", "validation", "health-check"]
+      "tags": [
+        "kubernetes",
+        "k8s",
+        "validation",
+        "health-check"
+      ]
     }
   ],
   "features": {

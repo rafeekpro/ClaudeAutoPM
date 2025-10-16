@@ -17,7 +17,16 @@
     },
     "size": "~18 KB (gzipped)",
     "required": false,
-    "tags": ["devops", "docker", "github", "ci-cd", "observability", "ssh", "traefik", "containers"]
+    "tags": [
+      "devops",
+      "docker",
+      "github",
+      "ci-cd",
+      "observability",
+      "ssh",
+      "traefik",
+      "containers"
+    ]
   },
   "agents": [
     {
@@ -26,8 +35,16 @@
       "category": "ci-cd",
       "description": "Azure DevOps pipelines, workflows, and work item management",
       "version": "2.0.0",
-      "tags": ["azure", "devops", "pipelines", "ci-cd", "work-items"],
-      "mcp": ["azure-cli"],
+      "tags": [
+        "azure",
+        "devops",
+        "pipelines",
+        "ci-cd",
+        "work-items"
+      ],
+      "mcp": [
+        "azure-cli"
+      ],
       "context7": [
         "/microsoftdocs/azure-docs",
         "/microsoftdocs/architecture-center"
@@ -39,8 +56,16 @@
       "category": "containers",
       "description": "Docker containerization, Dockerfile optimization, and Docker Compose",
       "version": "2.0.0",
-      "tags": ["docker", "containers", "dockerfile", "compose", "multi-stage"],
-      "mcp": ["docker"],
+      "tags": [
+        "docker",
+        "containers",
+        "dockerfile",
+        "compose",
+        "multi-stage"
+      ],
+      "mcp": [
+        "docker"
+      ],
       "context7": [
         "/docker/docs",
         "/docker/compose"
@@ -52,8 +77,16 @@
       "category": "ci-cd",
       "description": "GitHub Actions workflows, repository management, and automation",
       "version": "2.0.0",
-      "tags": ["github", "actions", "workflows", "ci-cd", "automation"],
-      "mcp": ["github"],
+      "tags": [
+        "github",
+        "actions",
+        "workflows",
+        "ci-cd",
+        "automation"
+      ],
+      "mcp": [
+        "github"
+      ],
       "context7": [
         "/actions/toolkit",
         "/actions/starter-workflows"
@@ -65,7 +98,12 @@
       "category": "tooling",
       "description": "Model Context Protocol server management and context optimization",
       "version": "2.0.0",
-      "tags": ["mcp", "context", "optimization", "model-context-protocol"],
+      "tags": [
+        "mcp",
+        "context",
+        "optimization",
+        "model-context-protocol"
+      ],
       "mcp": [],
       "context7": []
     },
@@ -75,8 +113,17 @@
       "category": "monitoring",
       "description": "Prometheus, Grafana, logging, tracing, and observability stack",
       "version": "2.0.0",
-      "tags": ["observability", "prometheus", "grafana", "monitoring", "tracing"],
-      "mcp": ["prometheus", "grafana"],
+      "tags": [
+        "observability",
+        "prometheus",
+        "grafana",
+        "monitoring",
+        "tracing"
+      ],
+      "mcp": [
+        "prometheus",
+        "grafana"
+      ],
       "context7": [
         "/prometheus/prometheus",
         "/grafana/grafana"
@@ -88,7 +135,13 @@
       "category": "infrastructure",
       "description": "SSH operations, key management, tunneling, and security",
       "version": "2.0.0",
-      "tags": ["ssh", "security", "tunneling", "keys", "remote-access"],
+      "tags": [
+        "ssh",
+        "security",
+        "tunneling",
+        "keys",
+        "remote-access"
+      ],
       "mcp": [],
       "context7": [
         "/websites/aws_amazon"
@@ -100,7 +153,13 @@
       "category": "networking",
       "description": "Traefik reverse proxy, load balancing, and service discovery",
       "version": "2.0.0",
-      "tags": ["traefik", "proxy", "load-balancer", "service-discovery", "ssl"],
+      "tags": [
+        "traefik",
+        "proxy",
+        "load-balancer",
+        "service-discovery",
+        "ssl"
+      ],
       "mcp": [],
       "context7": [
         "/traefik/traefik"
@@ -109,40 +168,15 @@
   ],
   "commands": [
     {
-      "name": "workflow-create",
-      "file": "commands/workflow-create.md",
-      "description": "Create GitHub Actions workflow with best practices",
-      "category": "ci-cd",
-      "tags": ["github", "actions", "workflow", "ci-cd"],
-      "requiredAgents": ["github-operations-specialist"],
-      "context7": [
-        "/actions/toolkit",
-        "/actions/starter-workflows"
-      ]
-    },
-    {
-      "name": "docker-optimize",
-      "file": "commands/docker-optimize.md",
-      "description": "Optimize Docker images for size, security, and performance",
-      "category": "containers",
-      "tags": ["docker", "optimization", "security", "multi-stage", "buildkit"],
-      "requiredAgents": ["docker-containerization-expert"],
-      "context7": [
-        "/docker/docs",
-        "/docker/compose"
-      ]
-    },
-    {
-      "name": "ci-pipeline-create",
-      "file": "commands/ci-pipeline-create.md",
-      "description": "Create production-ready CI/CD pipelines for multiple platforms",
-      "category": "ci-cd",
-      "tags": ["ci-cd", "pipeline", "github-actions", "azure-devops", "gitlab"],
-      "requiredAgents": ["github-operations-specialist", "azure-devops-specialist", "docker-containerization-expert"],
-      "context7": [
-        "/docker/docs",
-        "/kubernetes/kubernetes",
-        "/actions/toolkit"
+      "subdirectory": "commands/",
+      "description": "DevOps & Infrastructure commands (3 total)",
+      "type": "collection",
+      "discovery": "auto",
+      "tags": [
+        "github",
+        "actions",
+        "workflow",
+        "ci-cd"
       ]
     }
   ],
@@ -152,36 +186,78 @@
       "file": "rules/github-operations.md",
       "priority": "high",
       "description": "GitHub operations standards and best practices",
-      "tags": ["github", "actions", "pr", "automation"],
-      "appliesTo": ["commands", "agents"],
-      "enforcesOn": ["github-operations-specialist"]
+      "tags": [
+        "github",
+        "actions",
+        "pr",
+        "automation"
+      ],
+      "appliesTo": [
+        "commands",
+        "agents"
+      ],
+      "enforcesOn": [
+        "github-operations-specialist"
+      ]
     },
     {
       "name": "docker-first-development",
       "file": "rules/docker-first-development.md",
       "priority": "medium",
       "description": "Docker-first development workflow and containerization standards",
-      "tags": ["docker", "containers", "development", "workflow"],
-      "appliesTo": ["commands", "agents"],
-      "enforcesOn": ["docker-containerization-expert"]
+      "tags": [
+        "docker",
+        "containers",
+        "development",
+        "workflow"
+      ],
+      "appliesTo": [
+        "commands",
+        "agents"
+      ],
+      "enforcesOn": [
+        "docker-containerization-expert"
+      ]
     },
     {
       "name": "devops-troubleshooting-playbook",
       "file": "rules/devops-troubleshooting-playbook.md",
       "priority": "high",
       "description": "DevOps troubleshooting methodologies and debugging strategies",
-      "tags": ["devops", "troubleshooting", "debugging", "monitoring"],
-      "appliesTo": ["commands", "agents"],
-      "enforcesOn": ["observability-engineer", "docker-containerization-expert"]
+      "tags": [
+        "devops",
+        "troubleshooting",
+        "debugging",
+        "monitoring"
+      ],
+      "appliesTo": [
+        "commands",
+        "agents"
+      ],
+      "enforcesOn": [
+        "observability-engineer",
+        "docker-containerization-expert"
+      ]
     },
     {
       "name": "ci-cd-kubernetes-strategy",
       "file": "rules/ci-cd-kubernetes-strategy.md",
       "priority": "high",
       "description": "CI/CD pipeline strategies for Kubernetes deployments",
-      "tags": ["ci-cd", "kubernetes", "deployment", "automation"],
-      "appliesTo": ["commands", "agents"],
-      "enforcesOn": ["github-operations-specialist", "azure-devops-specialist"]
+      "tags": [
+        "ci-cd",
+        "kubernetes",
+        "deployment",
+        "automation"
+      ],
+      "appliesTo": [
+        "commands",
+        "agents"
+      ],
+      "enforcesOn": [
+        "github-operations-specialist",
+        "azure-devops-specialist"
+      ]
     }
   ],
   "hooks": [
@@ -191,8 +267,17 @@
       "type": "pre-command",
       "description": "Validate Dockerfile best practices before building",
       "blocking": true,
-      "tags": ["docker", "validation", "security", "best-practices"],
-      "triggers": ["docker:build", "docker:optimize", "docker-compose:up"]
+      "tags": [
+        "docker",
+        "validation",
+        "security",
+        "best-practices"
+      ],
+      "triggers": [
+        "docker:build",
+        "docker:optimize",
+        "docker-compose:up"
+      ]
     }
   ],
   "scripts": [
@@ -203,7 +288,12 @@
       "type": "example",
       "executable": true,
       "category": "docker",
-      "tags": ["docker", "build", "multi-stage", "optimization"]
+      "tags": [
+        "docker",
+        "build",
+        "multi-stage",
+        "optimization"
+      ]
     },
     {
       "name": "github-workflow-validate",
@@ -212,7 +302,12 @@
       "type": "example",
       "executable": true,
       "category": "github",
-      "tags": ["github", "actions", "validation", "workflow"]
+      "tags": [
+        "github",
+        "actions",
+        "validation",
+        "workflow"
+      ]
     },
     {
       "name": "prometheus-health-check",
@@ -221,7 +316,12 @@
       "type": "example",
       "executable": true,
       "category": "monitoring",
-      "tags": ["prometheus", "monitoring", "health-check", "metrics"]
+      "tags": [
+        "prometheus",
+        "monitoring",
+        "health-check",
+        "metrics"
+      ]
     },
     {
       "name": "docker-compose-validate",
@@ -230,7 +330,12 @@
       "type": "example",
       "executable": true,
       "category": "docker",
-      "tags": ["docker", "compose", "validation", "health-check"]
+      "tags": [
+        "docker",
+        "compose",
+        "validation",
+        "health-check"
+      ]
     },
     {
       "name": "ssh-key-setup",
@@ -239,7 +344,12 @@
       "type": "example",
       "executable": true,
       "category": "ssh",
-      "tags": ["ssh", "security", "keys", "ed25519"]
+      "tags": [
+        "ssh",
+        "security",
+        "keys",
+        "ed25519"
+      ]
     }
   ],
   "features": {

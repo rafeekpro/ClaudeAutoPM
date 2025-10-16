@@ -17,7 +17,15 @@
     },
     "size": "~12 KB (gzipped)",
     "required": false,
-    "tags": ["frameworks", "react", "vue", "angular", "tailwind", "ui", "frontend"]
+    "tags": [
+      "frameworks",
+      "react",
+      "vue",
+      "angular",
+      "tailwind",
+      "ui",
+      "frontend"
+    ]
   },
   "agents": [
     {
@@ -26,8 +34,16 @@
       "category": "frontend",
       "description": "React development with hooks, performance optimization, and modern patterns",
       "version": "2.0.0",
-      "tags": ["react", "hooks", "frontend", "spa", "performance"],
-      "mcp": ["react-docs"],
+      "tags": [
+        "react",
+        "hooks",
+        "frontend",
+        "spa",
+        "performance"
+      ],
+      "mcp": [
+        "react-docs"
+      ],
       "context7": [
         "/reactjs/react.dev",
         "/remix-run/react-router"
@@ -39,8 +55,15 @@
       "category": "ui",
       "description": "React UI components, design systems, and component libraries",
       "version": "2.0.0",
-      "tags": ["react", "ui", "components", "design-system"],
-      "mcp": ["react-docs"],
+      "tags": [
+        "react",
+        "ui",
+        "components",
+        "design-system"
+      ],
+      "mcp": [
+        "react-docs"
+      ],
       "context7": [
         "/reactjs/react.dev"
       ]
@@ -51,7 +74,13 @@
       "category": "styling",
       "description": "Tailwind CSS utility-first styling, responsive design, and optimization",
       "version": "2.0.0",
-      "tags": ["tailwindcss", "css", "utility-first", "responsive", "styling"],
+      "tags": [
+        "tailwindcss",
+        "css",
+        "utility-first",
+        "responsive",
+        "styling"
+      ],
       "mcp": [],
       "context7": [
         "/tailwindlabs/tailwindcss.com"
@@ -63,54 +92,27 @@
       "category": "design",
       "description": "UX/UI design principles, accessibility, and user experience optimization",
       "version": "2.0.0",
-      "tags": ["ux", "ui", "design", "accessibility", "a11y"],
+      "tags": [
+        "ux",
+        "ui",
+        "design",
+        "accessibility",
+        "a11y"
+      ],
       "mcp": [],
       "context7": []
     }
   ],
   "commands": [
     {
-      "name": "tailwind-system",
-      "file": "commands/tailwind-system.md",
-      "description": "Setup Tailwind CSS design system with configuration",
-      "category": "styling",
-      "tags": ["tailwind", "design-system", "setup"],
-      "requiredAgents": ["tailwindcss-expert"],
-      "context7": [
-        "/tailwindlabs/tailwindcss.com"
-      ]
-    },
-    {
-      "name": "app-scaffold",
-      "file": "commands/app-scaffold.md",
-      "description": "Scaffold React application with modern tooling",
-      "category": "scaffolding",
-      "tags": ["react", "scaffold", "setup"],
-      "requiredAgents": ["react-frontend-engineer"],
-      "context7": [
-        "/reactjs/react.dev"
-      ]
-    },
-    {
-      "name": "react-optimize",
-      "file": "commands/react-optimize.md",
-      "description": "Optimize React performance with hooks, memoization, and rendering optimization",
-      "category": "optimization",
-      "tags": ["react", "performance", "useMemo", "useCallback", "memo", "optimization"],
-      "requiredAgents": ["react-frontend-engineer"],
-      "context7": [
-        "/reactjs/react.dev"
-      ]
-    },
-    {
-      "name": "nextjs-optimize",
-      "file": "commands/nextjs-optimize.md",
-      "description": "Optimize Next.js application for images, fonts, builds, and Core Web Vitals",
-      "category": "optimization",
-      "tags": ["nextjs", "performance", "image", "font", "optimization", "core-web-vitals"],
-      "requiredAgents": ["react-frontend-engineer"],
-      "context7": [
-        "/vercel/next.js"
+      "subdirectory": "commands/",
+      "description": "Frontend Frameworks & UI commands (4 total)",
+      "type": "collection",
+      "discovery": "auto",
+      "tags": [
+        "tailwind",
+        "design-system",
+        "setup"
       ]
     }
   ],
@@ -120,27 +122,59 @@
       "file": "rules/ui-development-standards.md",
       "priority": "high",
       "description": "UI development standards and component best practices",
-      "tags": ["ui", "standards", "components", "best-practices"],
-      "appliesTo": ["commands", "agents"],
-      "enforcesOn": ["react-frontend-engineer", "react-ui-expert", "tailwindcss-expert"]
+      "tags": [
+        "ui",
+        "standards",
+        "components",
+        "best-practices"
+      ],
+      "appliesTo": [
+        "commands",
+        "agents"
+      ],
+      "enforcesOn": [
+        "react-frontend-engineer",
+        "react-ui-expert",
+        "tailwindcss-expert"
+      ]
     },
     {
       "name": "performance-guidelines",
       "file": "rules/performance-guidelines.md",
       "priority": "high",
       "description": "Frontend performance optimization and best practices",
-      "tags": ["performance", "optimization", "react", "rendering"],
-      "appliesTo": ["commands", "agents"],
-      "enforcesOn": ["react-frontend-engineer"]
+      "tags": [
+        "performance",
+        "optimization",
+        "react",
+        "rendering"
+      ],
+      "appliesTo": [
+        "commands",
+        "agents"
+      ],
+      "enforcesOn": [
+        "react-frontend-engineer"
+      ]
     },
     {
       "name": "ui-framework-rules",
       "file": "rules/ui-framework-rules.md",
       "priority": "medium",
       "description": "Framework-specific conventions and patterns",
-      "tags": ["frameworks", "patterns", "conventions"],
-      "appliesTo": ["commands", "agents"],
-      "enforcesOn": ["react-frontend-engineer", "tailwindcss-expert"]
+      "tags": [
+        "frameworks",
+        "patterns",
+        "conventions"
+      ],
+      "appliesTo": [
+        "commands",
+        "agents"
+      ],
+      "enforcesOn": [
+        "react-frontend-engineer",
+        "tailwindcss-expert"
+      ]
     }
   ],
   "scripts": [
@@ -151,7 +185,12 @@
       "type": "example",
       "executable": true,
       "category": "react",
-      "tags": ["react", "performance", "useMemo", "useCallback"]
+      "tags": [
+        "react",
+        "performance",
+        "useMemo",
+        "useCallback"
+      ]
     },
     {
       "name": "vue-composition-check",
@@ -160,7 +199,11 @@
       "type": "example",
       "executable": true,
       "category": "vue",
-      "tags": ["vue", "composition-api", "patterns"]
+      "tags": [
+        "vue",
+        "composition-api",
+        "patterns"
+      ]
     },
     {
       "name": "tailwind-optimize",
@@ -169,7 +212,12 @@
       "type": "example",
       "executable": true,
       "category": "tailwind",
-      "tags": ["tailwind", "optimization", "responsive", "purge"]
+      "tags": [
+        "tailwind",
+        "optimization",
+        "responsive",
+        "purge"
+      ]
     }
   ],
   "features": {

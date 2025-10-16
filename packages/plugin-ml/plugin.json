@@ -222,27 +222,17 @@
   ],
   "commands": [
     {
-      "name": "ml-train-optimize",
-      "file": "commands/ml-train-optimize.md",
-      "description": "Optimize ML training with hyperparameter tuning, mixed precision, and distributed training",
-      "category": "optimization",
-      "tags": ["ml", "training", "optimization", "hyperparameters", "distributed", "amp"],
-      "requiredAgents": ["scikit-learn-expert", "pytorch-expert", "tensorflow-keras-expert"],
-      "context7": [
-        "/scikit-learn/scikit-learn",
-        "/pytorch/pytorch",
-        "/tensorflow/tensorflow"
-      ]
-    },
-    {
-      "name": "ml-automl",
-      "file": "commands/ml-automl.md",
-      "description": "Automated machine learning with AutoGluon, FLAML, AutoKeras for rapid model development",
-      "category": "automl",
-      "tags": ["automl", "autogluon", "flaml", "autokeras", "h2o", "automated"],
-      "requiredAgents": ["automl-expert"],
-      "context7": [
-        "/autogluon/autogluon"
+      "subdirectory": "commands/",
+      "description": "Machine Learning commands (2 total)",
+      "type": "collection",
+      "discovery": "auto",
+      "tags": [
+        "ml",
+        "training",
+        "optimization",
+        "hyperparameters",
+        "distributed",
+        "amp"
       ]
     }
   ],

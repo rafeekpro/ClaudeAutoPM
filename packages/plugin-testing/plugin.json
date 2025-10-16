@@ -17,7 +17,15 @@
     },
     "size": "~12 KB (gzipped)",
     "required": false,
-    "tags": ["testing", "qa", "jest", "vitest", "testing-library", "unit-testing", "integration-testing"]
+    "tags": [
+      "testing",
+      "qa",
+      "jest",
+      "vitest",
+      "testing-library",
+      "unit-testing",
+      "integration-testing"
+    ]
   },
   "agents": [
     {
@@ -26,7 +34,15 @@
       "category": "testing",
       "description": "Frontend unit and integration testing with Jest, Vitest, Testing Library for React, Vue, Angular",
       "version": "2.0.0",
-      "tags": ["frontend", "testing", "jest", "vitest", "react-testing-library", "vue", "angular"],
+      "tags": [
+        "frontend",
+        "testing",
+        "jest",
+        "vitest",
+        "react-testing-library",
+        "vue",
+        "angular"
+      ],
       "mcp": [],
       "context7": [
         "/vitest-dev/vitest",
@@ -37,57 +53,16 @@
   ],
   "commands": [
     {
-      "name": "test-setup",
-      "file": "commands/test-setup.md",
-      "category": "testing",
-      "priority": "medium",
-      "description": "Setup comprehensive testing framework with Jest/Vitest, Testing Library, and coverage reporting",
-      "tags": ["testing", "setup", "jest", "vitest", "configuration"],
-      "mcpTools": ["context7"]
-    },
-    {
-      "name": "test-coverage",
-      "file": "commands/test-coverage.md",
-      "category": "testing",
-      "priority": "medium",
-      "description": "Generate and analyze test coverage reports with actionable improvements",
-      "tags": ["coverage", "reporting", "quality", "metrics"],
-      "mcpTools": []
-    },
-    {
-      "name": "jest-optimize",
-      "file": "commands/jest-optimize.md",
-      "description": "Optimize Jest test performance with parallel execution, sharding, and database optimization",
-      "category": "optimization",
-      "tags": ["jest", "performance", "parallel", "sharding", "database", "optimization"],
-      "requiredAgents": ["frontend-testing-engineer"],
-      "context7": [
-        "/goldbergyoni/nodejs-testing-best-practices",
-        "/websites/jestjs_io_next"
-      ]
-    },
-    {
-      "name": "playwright-optimize",
-      "file": "commands/playwright-optimize.md",
-      "description": "Optimize Playwright E2E tests with fully parallel execution, sharding, and browser optimization",
-      "category": "optimization",
-      "tags": ["playwright", "e2e", "parallel", "sharding", "performance", "optimization"],
-      "requiredAgents": ["e2e-test-engineer"],
-      "context7": [
-        "/microsoft/playwright"
-      ]
-    },
-    {
-      "name": "test-performance",
-      "file": "commands/test-performance.md",
-      "description": "Comprehensive testing performance optimization across Jest, Playwright, Vitest with CI/CD pipeline optimization",
-      "category": "optimization",
-      "tags": ["performance", "optimization", "jest", "playwright", "vitest", "ci-cd", "testing"],
-      "requiredAgents": ["frontend-testing-engineer", "e2e-test-engineer"],
-      "context7": [
-        "/goldbergyoni/nodejs-testing-best-practices",
-        "/microsoft/playwright",
-        "/vitest-dev/vitest"
+      "subdirectory": "commands/",
+      "description": "Testing & QA commands (5 total)",
+      "type": "collection",
+      "discovery": "auto",
+      "tags": [
+        "testing",
+        "setup",
+        "jest",
+        "vitest",
+        "configuration"
       ]
     }
   ],
@@ -97,18 +72,38 @@
       "file": "rules/testing-standards.md",
       "priority": "high",
       "description": "Comprehensive testing standards with Context7-verified best practices for unit, integration, and E2E tests",
-      "tags": ["testing", "standards", "best-practices", "quality"],
-      "appliesTo": ["commands", "agents"],
-      "enforcesOn": ["frontend-testing-engineer"]
+      "tags": [
+        "testing",
+        "standards",
+        "best-practices",
+        "quality"
+      ],
+      "appliesTo": [
+        "commands",
+        "agents"
+      ],
+      "enforcesOn": [
+        "frontend-testing-engineer"
+      ]
     },
     {
       "name": "test-coverage-requirements",
       "file": "rules/test-coverage-requirements.md",
       "priority": "high",
       "description": "Test coverage thresholds and quality metrics enforcement",
-      "tags": ["coverage", "quality", "metrics", "enforcement"],
-      "appliesTo": ["commands", "agents"],
-      "enforcesOn": ["frontend-testing-engineer"]
+      "tags": [
+        "coverage",
+        "quality",
+        "metrics",
+        "enforcement"
+      ],
+      "appliesTo": [
+        "commands",
+        "agents"
+      ],
+      "enforcesOn": [
+        "frontend-testing-engineer"
+      ]
     }
   ],
   "scripts": [
@@ -119,7 +114,12 @@
       "type": "example",
       "executable": true,
       "category": "vitest",
-      "tags": ["vitest", "config", "testing", "context7"]
+      "tags": [
+        "vitest",
+        "config",
+        "testing",
+        "context7"
+      ]
     },
     {
       "name": "react-testing-example",
@@ -128,7 +128,12 @@
       "type": "example",
       "executable": true,
       "category": "react",
-      "tags": ["react", "testing-library", "vitest", "context7"]
+      "tags": [
+        "react",
+        "testing-library",
+        "vitest",
+        "context7"
+      ]
     },
     {
       "name": "vue-testing-example",
@@ -137,7 +142,12 @@
       "type": "example",
       "executable": true,
       "category": "vue",
-      "tags": ["vue", "vitest", "testing", "context7"]
+      "tags": [
+        "vue",
+        "vitest",
+        "testing",
+        "context7"
+      ]
     }
   ],
   "features": {
