@@ -195,123 +195,16 @@
   ],
   "commands": [
     {
-      "name": "rag-setup-scaffold",
-      "file": "commands/rag-setup-scaffold.md",
-      "category": "ai",
-      "priority": "medium",
-      "description": "Generate production-ready RAG system with Context7-verified patterns: document ingestion, vector stores, retrieval strategies, RAG chains with RunnablePassthrough",
+      "subdirectory": "commands/",
+      "description": "AI & Machine Learning commands (9 total)",
+      "type": "collection",
+      "discovery": "auto",
       "tags": [
         "rag",
         "langchain",
         "retrieval",
         "embeddings",
         "scaffold"
-      ],
-      "mcpTools": [
-        "context7"
-      ]
-    },
-    {
-      "name": "ai-model-deployment",
-      "file": "commands/ai-model-deployment.md",
-      "category": "ai",
-      "priority": "medium",
-      "description": "Generate production-ready AI model deployment infrastructure with Context7-verified patterns: FastAPI endpoints, MLflow registry, monitoring, caching, rate limiting",
-      "tags": [
-        "deployment",
-        "mlflow",
-        "fastapi",
-        "production",
-        "mlops"
-      ],
-      "mcpTools": [
-        "context7"
-      ]
-    },
-    {
-      "name": "openai-optimize",
-      "file": "commands/openai-optimize.md",
-      "description": "Optimize OpenAI API usage with async operations, batching, caching, and rate limiting for 90% cost reduction",
-      "category": "optimization",
-      "tags": ["openai", "async", "batching", "caching", "rate-limiting", "optimization"],
-      "requiredAgents": ["openai-python-expert"],
-      "context7": [
-        "/openai/openai-python"
-      ]
-    },
-    {
-      "name": "rag-optimize",
-      "file": "commands/rag-optimize.md",
-      "description": "Optimize RAG systems with vector store optimization, embeddings caching, MMR retrieval, and optimal chunking",
-      "category": "optimization",
-      "tags": ["rag", "vector-store", "embeddings", "retrieval", "langchain", "optimization"],
-      "requiredAgents": ["langgraph-workflow-expert"],
-      "context7": [
-        "/websites/python_langchain"
-      ]
-    },
-    {
-      "name": "llm-optimize",
-      "file": "commands/llm-optimize.md",
-      "description": "Optimize LLM inference with model selection, prompt engineering, and context management for 90% cost reduction",
-      "category": "optimization",
-      "tags": ["llm", "model-selection", "prompts", "inference", "tokens", "optimization"],
-      "requiredAgents": ["openai-python-expert", "gemini-api-expert"],
-      "context7": [
-        "/openai/openai-python",
-        "/google/generative-ai-python"
-      ]
-    },
-    {
-      "name": "anthropic-optimize",
-      "file": "commands/anthropic-optimize.md",
-      "description": "Optimize Claude API usage with prompt caching, multi-model routing, streaming, and async batching for 70-90% cost reduction",
-      "category": "optimization",
-      "tags": ["anthropic", "claude", "prompt-caching", "async", "streaming", "optimization"],
-      "requiredAgents": ["anthropic-claude-expert"],
-      "context7": [
-        "/anthropic/anthropic-sdk-python",
-        "/anthropic/prompt-caching",
-        "/anthropic/streaming"
-      ]
-    },
-    {
-      "name": "langchain-optimize",
-      "file": "commands/langchain-optimize.md",
-      "description": "Optimize LangChain chains with LCEL patterns, async batch processing, semantic caching, and RAG optimization for 60% cost reduction and 50x speedup",
-      "category": "optimization",
-      "tags": ["langchain", "lcel", "async", "caching", "rag", "optimization"],
-      "requiredAgents": ["langchain-expert"],
-      "context7": [
-        "/langchain-ai/langchain",
-        "/websites/python_langchain",
-        "/langchain/lcel-patterns"
-      ]
-    },
-    {
-      "name": "a2a-setup",
-      "file": "commands/a2a-setup.md",
-      "description": "Setup Google Agent-to-Agent (A2A) protocol with Vertex AI Agent Builder, multi-agent orchestration, and distributed agent systems",
-      "category": "setup",
-      "tags": ["a2a", "agent-to-agent", "vertex-ai", "multi-agent", "google-cloud"],
-      "requiredAgents": ["google-a2a-expert"],
-      "context7": [
-        "/googleapis/google-cloud-python/vertexai",
-        "/google-cloud/agent-builder",
-        "/google-cloud/a2a-protocol"
-      ]
-    },
-    {
-      "name": "huggingface-deploy",
-      "file": "commands/huggingface-deploy.md",
-      "description": "Deploy HuggingFace models to production with quantization, vLLM high-throughput serving, and Inference Endpoints for 75% memory savings and 6x speedup",
-      "category": "deployment",
-      "tags": ["huggingface", "deployment", "quantization", "vllm", "inference-endpoints"],
-      "requiredAgents": ["huggingface-expert"],
-      "context7": [
-        "/huggingface/transformers",
-        "/huggingface/inference-endpoints",
-        "/huggingface/quantization"
       ]
     }
   ],

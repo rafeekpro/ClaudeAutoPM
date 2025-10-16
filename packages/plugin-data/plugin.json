@@ -89,37 +89,16 @@
   ],
   "commands": [
     {
-      "name": "airflow-dag-scaffold",
-      "file": "commands/airflow-dag-scaffold.md",
-      "category": "data",
-      "priority": "medium",
-      "description": "Generate production-ready Apache Airflow DAG with Context7-verified patterns: TaskFlow API, task dependencies, sensors, error handling, and testing",
+      "subdirectory": "commands/",
+      "description": "Data Engineering & ML commands (2 total)",
+      "type": "collection",
+      "discovery": "auto",
       "tags": [
         "airflow",
         "dag",
         "scaffold",
         "etl",
         "taskflow"
-      ],
-      "mcpTools": [
-        "context7"
-      ]
-    },
-    {
-      "name": "kafka-pipeline-scaffold",
-      "file": "commands/kafka-pipeline-scaffold.md",
-      "category": "data",
-      "priority": "medium",
-      "description": "Generate production-ready Kafka streaming pipeline with Context7-verified patterns: producers, consumers, streams, error handling, and exactly-once semantics",
-      "tags": [
-        "kafka",
-        "streaming",
-        "pipeline",
-        "scaffold",
-        "event-driven"
-      ],
-      "mcpTools": [
-        "context7"
       ]
     }
   ],
