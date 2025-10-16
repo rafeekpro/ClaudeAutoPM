@@ -1,6 +1,7 @@
 {
   "name": "@claudeautopm/plugin-core",
   "version": "2.0.0",
+  "displayName": "Core Framework",
   "description": "Core framework functionality for ClaudeAutoPM",
   "schemaVersion": "2.0",
   "metadata": {

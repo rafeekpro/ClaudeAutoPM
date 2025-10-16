@@ -918,13 +918,34 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
           }
 
           for (const command of metadata.commands) {
-            if (!command.file) continue;
-            const sourcePath = path.join(pluginPath, command.file);
-            const targetPath = path.join(targetDir, path.basename(command.file));
+            // Handle subdirectory collections with auto-discovery
+            if (command.subdirectory && command.discovery === 'auto') {
+              const commandsSourceDir = path.join(pluginPath, command.subdirectory);
 
-            if (fs.existsSync(sourcePath) && !fs.existsSync(targetPath)) {
-              fs.copyFileSync(sourcePath, targetPath);
-              commandsInstalled++;
+              if (fs.existsSync(commandsSourceDir)) {
+                // Auto-discover all .md files in subdirectory
+                const files = fs.readdirSync(commandsSourceDir);
+                for (const file of files) {
+                  if (file.endsWith('.md')) {
+                    const sourcePath = path.join(commandsSourceDir, file);
+                    const targetPath = path.join(targetDir, file);
+
+                    if (fs.existsSync(sourcePath) && !fs.existsSync(targetPath)) {
+                      fs.copyFileSync(sourcePath, targetPath);
+                      commandsInstalled++;
+                    }
+                  }
+                }
+              }
+            } else if (command.file) {
+              // Handle individual command files
+              const sourcePath = path.join(pluginPath, command.file);
+              const targetPath = path.join(targetDir, path.basename(command.file));
+
+              if (fs.existsSync(sourcePath) && !fs.existsSync(targetPath)) {
+                fs.copyFileSync(sourcePath, targetPath);
+                commandsInstalled++;
+              }
             }
           }
         }
@@ -1020,9 +1041,11 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
           }
         }
 
+        const displayName = metadata.displayName || metadata.name || pluginName;
+
         installedPlugins.push({
           name: pluginName,
-          displayName: metadata.displayName,
+          displayName: displayName,
           agents: agentsInstalled,
           commands: commandsInstalled,
           rules: rulesInstalled
@@ -1033,7 +1056,7 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
         if (commandsInstalled > 0) summary.push(`${commandsInstalled} commands`);
         if (rulesInstalled > 0) summary.push(`${rulesInstalled} rules`);
 
-        this.printSuccess(`${metadata.displayName} installed (${summary.join(', ') || 'no resources'})`);
+        this.printSuccess(`${displayName} installed (${summary.join(', ') || 'no resources'})`);
       } catch (error) {
         failedPlugins.push({ name: pluginName, error: error.message });
         this.printWarning(`Failed to install ${pluginName}: ${error.message}`);
