@@ -884,12 +884,22 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
 
         // Install agents
         if (metadata.agents && metadata.agents.length > 0) {
-          const targetDir = path.join(this.targetDir, '.claude', 'agents', metadata.category);
-          if (!fs.existsSync(targetDir)) {
-            fs.mkdirSync(targetDir, { recursive: true });
-          }
-
           for (const agent of metadata.agents) {
+            // Validate agent has required properties
+            if (!agent.file) {
+              this.printWarning(`Agent ${agent.name || 'unknown'} missing file property, skipping`);
+              continue;
+            }
+            if (!agent.category) {
+              this.printWarning(`Agent ${agent.name || 'unknown'} missing category property, skipping`);
+              continue;
+            }
+
+            const targetDir = path.join(this.targetDir, '.claude', 'agents', agent.category);
+            if (!fs.existsSync(targetDir)) {
+              fs.mkdirSync(targetDir, { recursive: true });
+            }
+
             const sourcePath = path.join(pluginPath, agent.file);
             const targetPath = path.join(targetDir, path.basename(agent.file));
 
