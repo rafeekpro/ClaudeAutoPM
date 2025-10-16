@@ -459,6 +459,7 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
    • Native tooling: npm, pip, local installs
    • Best for: Simple projects, learning, debugging
    • No containers or orchestration
+   ${this.colors.DIM}• Plugins: core, languages, pm (3 plugins)${this.colors.NC}
 `);
 
     // Option 2: Docker-only (requires Docker)
@@ -468,6 +469,7 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
    • Docker containers for development environment
    • Best for: Microservices, consistent environments
    • Local Docker only, no Kubernetes
+   ${this.colors.DIM}• Plugins: core, languages, frameworks, testing, devops, pm (6 plugins)${this.colors.NC}
 `);
     } else {
       console.log(`${this.colors.DIM}2. Docker-only${this.colors.NC} ${this.colors.RED}(Docker not installed)${this.colors.NC}
@@ -481,6 +483,7 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
    • Kubernetes manifests and cloud deployment ready
    • GitHub Actions with KIND clusters and Kaniko builds
    • Best for: Production applications, enterprise projects
+   ${this.colors.DIM}• Plugins: core, languages, frameworks, testing, devops, cloud, databases, pm, ai (9 plugins)${this.colors.NC}
 `);
     } else if (availableTools.docker) {
       console.log(`${this.colors.DIM}3. Full DevOps${this.colors.NC} ${this.colors.RED}(kubectl not installed)${this.colors.NC}
@@ -497,6 +500,7 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
    • Advanced context isolation and security
    • Full DevOps capabilities with speed optimization
    • Best for: Large projects, massive refactoring, power users
+   ${this.colors.DIM}• Plugins: ALL - core, languages, frameworks, testing, devops, cloud, databases, data, pm, ai, ml (11 plugins)${this.colors.NC}
 `);
     } else if (availableTools.docker) {
       console.log(`${this.colors.DIM}4. Performance${this.colors.NC} ${this.colors.RED}(kubectl not installed)${this.colors.NC}
@@ -592,7 +596,8 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
         tools: {
           docker: { enabled: false },
           kubernetes: { enabled: false }
-        }
+        },
+        plugins: ['plugin-core', 'plugin-languages', 'plugin-pm']
       },
       docker: {
         version: version,
@@ -601,7 +606,8 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
         tools: {
           docker: { enabled: true, first: false },
           kubernetes: { enabled: false }
-        }
+        },
+        plugins: ['plugin-core', 'plugin-languages', 'plugin-frameworks', 'plugin-testing', 'plugin-devops', 'plugin-pm']
       },
       full: {
         version: version,
@@ -610,7 +616,8 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
         tools: {
           docker: { enabled: true, first: true },
           kubernetes: { enabled: true }
-        }
+        },
+        plugins: ['plugin-core', 'plugin-languages', 'plugin-frameworks', 'plugin-testing', 'plugin-devops', 'plugin-cloud', 'plugin-databases', 'plugin-pm', 'plugin-ai']
       },
       performance: {
         version: version,
@@ -620,7 +627,8 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
         tools: {
           docker: { enabled: true, first: false },
           kubernetes: { enabled: true }
-        }
+        },
+        plugins: ['plugin-core', 'plugin-languages', 'plugin-frameworks', 'plugin-testing', 'plugin-devops', 'plugin-cloud', 'plugin-databases', 'plugin-data', 'plugin-pm', 'plugin-ai', 'plugin-ml']
       }
     };
 
@@ -835,6 +843,214 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
     return processedContent;
   }
 
+  async installPlugins() {
+    if (!this.currentConfig || !this.currentConfig.plugins) {
+      this.printStep('No plugins configured for this scenario');
+      return;
+    }
+
+    const pluginsToInstall = this.currentConfig.plugins;
+
+    console.log('');
+    this.printStep('Installing plugins for selected scenario...');
+    console.log('');
+    this.printMsg('CYAN', `📦 Plugins to install (${pluginsToInstall.length}):`);
+
+    for (const plugin of pluginsToInstall) {
+      console.log(`  • ${plugin}`);
+    }
+    console.log('');
+
+    const packagesDir = path.join(this.baseDir, 'packages');
+    const installedPlugins = [];
+    const failedPlugins = [];
+
+    // Install each plugin directly
+    for (const pluginName of pluginsToInstall) {
+      try {
+        this.printStep(`Installing ${pluginName}...`);
+
+        const pluginPath = path.join(packagesDir, pluginName);
+        const pluginJsonPath = path.join(pluginPath, 'plugin.json');
+
+        if (!fs.existsSync(pluginJsonPath)) {
+          throw new Error(`Plugin metadata not found: ${pluginJsonPath}`);
+        }
+
+        const metadata = JSON.parse(fs.readFileSync(pluginJsonPath, 'utf-8'));
+        let agentsInstalled = 0;
+        let commandsInstalled = 0;
+        let rulesInstalled = 0;
+
+        // Install agents
+        if (metadata.agents && metadata.agents.length > 0) {
+          const targetDir = path.join(this.targetDir, '.claude', 'agents', metadata.category);
+          if (!fs.existsSync(targetDir)) {
+            fs.mkdirSync(targetDir, { recursive: true });
+          }
+
+          for (const agent of metadata.agents) {
+            const sourcePath = path.join(pluginPath, agent.file);
+            const targetPath = path.join(targetDir, path.basename(agent.file));
+
+            if (fs.existsSync(sourcePath) && !fs.existsSync(targetPath)) {
+              fs.copyFileSync(sourcePath, targetPath);
+              agentsInstalled++;
+            }
+          }
+        }
+
+        // Install commands
+        if (metadata.commands && metadata.commands.length > 0) {
+          const targetDir = path.join(this.targetDir, '.claude', 'commands');
+          if (!fs.existsSync(targetDir)) {
+            fs.mkdirSync(targetDir, { recursive: true });
+          }
+
+          for (const command of metadata.commands) {
+            if (!command.file) continue;
+            const sourcePath = path.join(pluginPath, command.file);
+            const targetPath = path.join(targetDir, path.basename(command.file));
+
+            if (fs.existsSync(sourcePath) && !fs.existsSync(targetPath)) {
+              fs.copyFileSync(sourcePath, targetPath);
+              commandsInstalled++;
+            }
+          }
+        }
+
+        // Install hooks
+        if (metadata.hooks && metadata.hooks.length > 0) {
+          const targetDir = path.join(this.targetDir, '.claude', 'hooks');
+          if (!fs.existsSync(targetDir)) {
+            fs.mkdirSync(targetDir, { recursive: true });
+          }
+
+          for (const hook of metadata.hooks) {
+            const files = hook.files || (hook.file ? [hook.file] : []);
+            for (const file of files) {
+              const sourcePath = path.join(pluginPath, file);
+              const targetPath = path.join(targetDir, path.basename(file));
+
+              if (fs.existsSync(sourcePath) && !fs.existsSync(targetPath)) {
+                fs.copyFileSync(sourcePath, targetPath);
+                // Make executable if shell script
+                if (file.endsWith('.sh')) {
+                  fs.chmodSync(targetPath, 0o755);
+                }
+              }
+            }
+          }
+        }
+
+        // Install scripts
+        if (metadata.scripts && metadata.scripts.length > 0) {
+          const targetDir = path.join(this.targetDir, 'scripts');
+          if (!fs.existsSync(targetDir)) {
+            fs.mkdirSync(targetDir, { recursive: true });
+          }
+
+          for (const script of metadata.scripts) {
+            if (script.subdirectory && script.files) {
+              // Handle subdirectory with multiple files
+              const cleanSubdir = script.subdirectory.replace(/^scripts\//, '');
+              const subdirTarget = path.join(targetDir, cleanSubdir);
+              if (!fs.existsSync(subdirTarget)) {
+                fs.mkdirSync(subdirTarget, { recursive: true });
+              }
+
+              for (const file of script.files) {
+                const sourcePath = path.join(pluginPath, script.subdirectory, file);
+                const targetPath = path.join(subdirTarget, file);
+
+                if (fs.existsSync(sourcePath) && !fs.existsSync(targetPath)) {
+                  fs.copyFileSync(sourcePath, targetPath);
+                  if (file.endsWith('.sh')) {
+                    fs.chmodSync(targetPath, 0o755);
+                  }
+                }
+              }
+            } else if (script.file) {
+              // Handle single script file
+              const cleanFile = script.file.replace(/^scripts\//, '');
+              const sourcePath = path.join(pluginPath, script.file);
+              const targetPath = path.join(targetDir, cleanFile);
+
+              // Create subdirectories if needed (e.g., lib/)
+              const scriptTargetDir = path.dirname(targetPath);
+              if (!fs.existsSync(scriptTargetDir)) {
+                fs.mkdirSync(scriptTargetDir, { recursive: true });
+              }
+
+              if (fs.existsSync(sourcePath) && !fs.existsSync(targetPath)) {
+                fs.copyFileSync(sourcePath, targetPath);
+                if (script.file.endsWith('.sh')) {
+                  fs.chmodSync(targetPath, 0o755);
+                }
+              }
+            }
+          }
+        }
+
+        // Install rules
+        if (metadata.rules && metadata.rules.length > 0) {
+          const targetDir = path.join(this.targetDir, '.claude', 'rules');
+          if (!fs.existsSync(targetDir)) {
+            fs.mkdirSync(targetDir, { recursive: true });
+          }
+
+          for (const rule of metadata.rules) {
+            const sourcePath = path.join(pluginPath, rule.file);
+            const targetPath = path.join(targetDir, path.basename(rule.file));
+
+            if (fs.existsSync(sourcePath) && !fs.existsSync(targetPath)) {
+              fs.copyFileSync(sourcePath, targetPath);
+              rulesInstalled++;
+            }
+          }
+        }
+
+        installedPlugins.push({
+          name: pluginName,
+          displayName: metadata.displayName,
+          agents: agentsInstalled,
+          commands: commandsInstalled,
+          rules: rulesInstalled
+        });
+
+        const summary = [];
+        if (agentsInstalled > 0) summary.push(`${agentsInstalled} agents`);
+        if (commandsInstalled > 0) summary.push(`${commandsInstalled} commands`);
+        if (rulesInstalled > 0) summary.push(`${rulesInstalled} rules`);
+
+        this.printSuccess(`${metadata.displayName} installed (${summary.join(', ') || 'no resources'})`);
+      } catch (error) {
+        failedPlugins.push({ name: pluginName, error: error.message });
+        this.printWarning(`Failed to install ${pluginName}: ${error.message}`);
+      }
+    }
+
+    // Store installation results in config
+    this.currentConfig.installedPlugins = installedPlugins;
+    this.currentConfig.failedPlugins = failedPlugins;
+
+    // Update config file with installation results
+    const configPath = path.join(this.targetDir, '.claude', 'config.json');
+    if (fs.existsSync(configPath)) {
+      fs.writeFileSync(configPath, JSON.stringify(this.currentConfig, null, 2));
+    }
+
+    console.log('');
+    if (installedPlugins.length > 0) {
+      this.printMsg('GREEN', `✓ Successfully installed ${installedPlugins.length} plugin(s)`);
+    }
+    if (failedPlugins.length > 0) {
+      this.printMsg('YELLOW', `⚠ Failed to install ${failedPlugins.length} plugin(s)`);
+      this.printMsg('CYAN', '💡 Tip: Install missing plugins with: autopm plugin install <name>');
+    }
+    console.log('');
+  }
+
   setupMCPIntegration() {
     const mcpServersPath = path.join(this.targetDir, '.claude', 'mcp-servers.json');
     const configPath = path.join(this.targetDir, '.claude', 'config.json');
@@ -951,6 +1167,9 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
 
     // Install configuration
     this.installConfig(scenario);
+
+    // Install plugins based on scenario
+    await this.installPlugins();
 
     // Install CLAUDE.md
     this.installClaudeMd();
