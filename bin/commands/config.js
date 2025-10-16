@@ -300,6 +300,61 @@ class ConfigCommand {
     // Format the confirmation message
     const displayKey = key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1');
     console.log(`✅ ${displayKey} set to: ${value}`);
+
+    // Show helpful information for provider setup
+    if (key === 'provider') {
+      console.log('');
+      console.log('┌─────────────────────────────────────────────────────────────┐');
+      console.log(`│  ${value === 'github' ? 'GitHub' : 'Azure DevOps'} Provider Configuration`);
+      console.log('├─────────────────────────────────────────────────────────────┤');
+
+      if (value === 'github') {
+        console.log('│  Required Settings:');
+        console.log('│  • Repository owner/organization name');
+        console.log('│  • Repository name');
+        console.log('│  • Personal Access Token (PAT)');
+        console.log('│');
+        console.log('│  Setup Commands:');
+        console.log('│  1. Set owner:     autopm config set github.owner YOUR_USERNAME');
+        console.log('│  2. Set repo:      autopm config set github.repo YOUR_REPO');
+        console.log('│  3. Add PAT:       Edit .claude/.env and add:');
+        console.log('│                    GITHUB_TOKEN=ghp_your_token_here');
+        console.log('│');
+        console.log('│  Create a GitHub Personal Access Token:');
+        console.log('│  1. Go to: https://github.com/settings/tokens');
+        console.log('│  2. Click "Generate new token (classic)"');
+        console.log('│  3. Give it a name and select scopes:');
+        console.log('│     - repo (all)');
+        console.log('│     - workflow (if using GitHub Actions)');
+        console.log('│  4. Generate and copy the token');
+        console.log('│');
+        console.log('│  Verify setup:     autopm config validate');
+      } else if (value === 'azure') {
+        console.log('│  Required Settings:');
+        console.log('│  • Organization name');
+        console.log('│  • Project name');
+        console.log('│  • Personal Access Token (PAT)');
+        console.log('│');
+        console.log('│  Setup Commands:');
+        console.log('│  1. Set org:       autopm config set azure.organization YOUR_ORG');
+        console.log('│  2. Set project:   autopm config set azure.project YOUR_PROJECT');
+        console.log('│  3. Add PAT:       Edit .claude/.env and add:');
+        console.log('│                    AZURE_DEVOPS_PAT=your_token_here');
+        console.log('│');
+        console.log('│  Create an Azure DevOps Personal Access Token:');
+        console.log('│  1. Go to: https://dev.azure.com/YOUR_ORG/_usersSettings/tokens');
+        console.log('│  2. Click "+ New Token"');
+        console.log('│  3. Give it a name and select scopes:');
+        console.log('│     - Work Items: Read, write, & manage');
+        console.log('│     - Code: Read & write');
+        console.log('│  4. Create and copy the token');
+        console.log('│');
+        console.log('│  Verify setup:     autopm config validate');
+      }
+
+      console.log('└─────────────────────────────────────────────────────────────┘');
+      console.log('');
+    }
   }
 
   /**
@@ -411,9 +466,7 @@ class ConfigCommand {
    */
   async switch(provider) {
     await this.set('provider', provider);
-
-    const providerName = provider === 'azure' ? 'Azure DevOps' : 'GitHub';
-    console.log(`✅ Switched to ${providerName}`);
+    // The set method will handle showing the configuration guide
   }
 }
 
