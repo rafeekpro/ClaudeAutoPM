@@ -840,7 +840,84 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
       processedContent = processedContent.replace(regex, value);
     }
 
+    // Generate agent @include directives from installed plugins
+    const agentIncludes = this.generateAgentIncludes();
+    processedContent = processedContent.replace(
+      /<!-- AGENTS_START -->\s*<!-- AGENTS_END -->/,
+      `<!-- AGENTS_START -->\n${agentIncludes}\n<!-- AGENTS_END -->`
+    );
+
     return processedContent;
+  }
+
+  generateAgentIncludes() {
+    if (!this.currentConfig?.installedPlugins) {
+      return '';
+    }
+
+    const packagesDir = path.join(this.baseDir, 'packages');
+    const agentsByCategory = {};
+
+    // Collect all agents from installed plugins
+    for (const plugin of this.currentConfig.installedPlugins) {
+      const pluginPath = path.join(packagesDir, plugin.name);
+      const pluginJsonPath = path.join(pluginPath, 'plugin.json');
+
+      if (!fs.existsSync(pluginJsonPath)) {
+        continue;
+      }
+
+      try {
+        const metadata = JSON.parse(fs.readFileSync(pluginJsonPath, 'utf-8'));
+
+        if (metadata.agents && metadata.agents.length > 0) {
+          for (const agent of metadata.agents) {
+            const category = agent.category || 'other';
+
+            if (!agentsByCategory[category]) {
+              agentsByCategory[category] = [];
+            }
+
+            // Build installed path: .claude/agents/{category}/{filename}
+            // agent.file contains the full path like "agents/core/agent-manager.md"
+            // We extract just the filename and use category for the directory
+            const filename = path.basename(agent.file);
+            const installedPath = `.claude/agents/${category}/${filename}`;
+
+            agentsByCategory[category].push({
+              name: agent.name,
+              path: installedPath,
+              description: agent.description
+            });
+          }
+        }
+      } catch (error) {
+        this.printWarning(`Failed to read plugin metadata for ${plugin.name}: ${error.message}`);
+      }
+    }
+
+    // Generate @include directives organized by category
+    const lines = [];
+    const categoryOrder = ['core', 'languages', 'frameworks', 'testing', 'devops', 'cloud', 'databases', 'data', 'ai', 'ml'];
+
+    for (const category of categoryOrder) {
+      if (agentsByCategory[category]) {
+        for (const agent of agentsByCategory[category]) {
+          lines.push(`- @include ${agent.path}`);
+        }
+      }
+    }
+
+    // Add any remaining categories not in the order list
+    for (const category of Object.keys(agentsByCategory)) {
+      if (!categoryOrder.includes(category)) {
+        for (const agent of agentsByCategory[category]) {
+          lines.push(`- @include ${agent.path}`);
+        }
+      }
+    }
+
+    return lines.join('\n');
   }
 
   async installPlugins() {
