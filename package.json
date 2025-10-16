@@ -117,6 +117,7 @@
     "bin/",
     "lib/",
     "autopm/",
+    "packages/",
     ".github/",
     "scripts/",
     "install/",
