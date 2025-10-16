@@ -283,7 +283,61 @@ autopm template:list
 - 🔗 **Dependency Tracking** - Validate task dependencies automatically
 - 📊 **Progress Auto-update** - Epic progress updates on task completion
 
-### 🎉 **NEW in v2.8.1: Plugin Architecture!**
+### 🎉 **NEW in v2.1.0: Plugin-PM Published to NPM!**
+
+**Complete PM Workflow Plugin** - Now available on npm with 87 PM commands
+- 📦 **@claudeautopm/plugin-pm@2.1.0** - Published and ready to use
+- 🎯 **87 PM Commands** - Epic management, tasks, issues, Azure DevOps integration
+- 📦 **208 KB Compressed** - Fast downloads, 890 KB unpacked
+- ⚡ **Zero Dependencies** - Works standalone or with core framework
+- 🔍 **Auto-Discovery** - Commands discovered automatically via plugin.json
+
+**Available on NPM:**
+
+```bash
+# Install plugin-pm via npm
+npm install @claudeautopm/plugin-pm@2.1.0
+
+# Or install globally
+npm install -g @claudeautopm/plugin-pm
+```
+
+**Package Links:**
+- 📦 NPM: [https://www.npmjs.com/package/@claudeautopm/plugin-pm](https://www.npmjs.com/package/@claudeautopm/plugin-pm)
+- 📖 GitHub: [https://github.com/rafeekpro/ClaudeAutoPM/tree/main/packages/plugin-pm](https://github.com/rafeekpro/ClaudeAutoPM/tree/main/packages/plugin-pm)
+
+**What's Included:**
+
+| Category | Commands | Description |
+|----------|----------|-------------|
+| **PM Commands** | 45 | Epic, issue, PRD, context, workflow management |
+| **Azure DevOps** | 41 | Feature, task, user story, work item management |
+| **GitHub** | 1 | Workflow creation and automation |
+| **Total** | **87** | Complete PM workflow suite |
+
+**Quick Start:**
+
+```bash
+# Install from npm
+npm install @claudeautopm/plugin-pm@2.1.0
+
+# Commands auto-discovered via plugin.json
+# Use with ClaudeAutoPM CLI:
+/pm:epic-decompose my-epic
+/pm:task-sync
+/azure:feature-new
+/github:workflow-create
+```
+
+**Features:**
+- Epic Management: Decompose, start, close, sync, split, merge
+- Task Management: Create, update, sync, analyze
+- Issue Management: Analyze, start, close, sync, edit
+- Azure DevOps: Full integration with work items and sprints
+- GitHub: Workflow automation
+- PRD Management: Parse, status, create, edit
+
+### 🎉 **v2.8.1: Plugin Architecture!**
 
 **Modular Agent System** - Agents organized into installable plugins
 - 📦 **7 Official Plugins** - 35 specialized agents in thematic packages
@@ -294,31 +348,35 @@ autopm template:list
 
 **Available Plugins:**
 
-| Plugin | Agents | Description |
+| Plugin | Status | Description |
 |--------|--------|-------------|
-| **@claudeautopm/plugin-cloud** | 8 | AWS, Azure, GCP, Terraform, Kubernetes |
-| **@claudeautopm/plugin-devops** | 7 | Docker, GitHub Actions, Azure DevOps, SSH |
-| **@claudeautopm/plugin-frameworks** | 6 | React, Vue, Tailwind CSS, UX Design |
-| **@claudeautopm/plugin-databases** | 5 | PostgreSQL, MongoDB, Redis, BigQuery |
-| **@claudeautopm/plugin-languages** | 5 | JavaScript, TypeScript, Python, Node.js, Bash |
-| **@claudeautopm/plugin-data** | 3 | Airflow, Kedro, LangGraph workflows |
-| **@claudeautopm/plugin-testing** | 1 | Frontend testing, E2E, accessibility |
+| **@claudeautopm/plugin-pm** | ✅ **Published** | 87 PM commands (epics, tasks, Azure, GitHub) |
+| **@claudeautopm/plugin-cloud** | 📦 Coming Soon | AWS, Azure, GCP, Terraform, Kubernetes |
+| **@claudeautopm/plugin-devops** | 📦 Coming Soon | Docker, GitHub Actions, Azure DevOps, SSH |
+| **@claudeautopm/plugin-frameworks** | 📦 Coming Soon | React, Vue, Tailwind CSS, UX Design |
+| **@claudeautopm/plugin-databases** | 📦 Coming Soon | PostgreSQL, MongoDB, Redis, BigQuery |
+| **@claudeautopm/plugin-languages** | 📦 Coming Soon | JavaScript, TypeScript, Python, Node.js, Bash |
+| **@claudeautopm/plugin-data** | 📦 Coming Soon | Airflow, Kedro, LangGraph workflows |
+| **@claudeautopm/plugin-testing** | 📦 Coming Soon | Frontend testing, E2E, accessibility |
 
 **Quick Start:**
 
 ```bash
-# Install a plugin
-npm install -g @claudeautopm/plugin-cloud
-autopm plugin install cloud
+# Install published plugin
+npm install @claudeautopm/plugin-pm
+
+# Coming soon: Install other plugins
+# npm install @claudeautopm/plugin-cloud
+# npm install @claudeautopm/plugin-devops
 
 # List available plugins
 autopm plugin list
 
 # Search for specific agents
-autopm plugin search docker
+autopm plugin search epic
 
 # Get plugin info
-autopm plugin info cloud
+autopm plugin info pm
 ```
 
 **Architecture:**
