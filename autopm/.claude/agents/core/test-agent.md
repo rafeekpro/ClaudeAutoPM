@@ -1,1 +1,0 @@
-/Users/rafal.lagowski/ClaudeAutoPM/test/fixtures/agents/test-agent.md
