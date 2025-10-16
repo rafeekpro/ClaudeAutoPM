@@ -1,6 +1,6 @@
 {
   "name": "@claudeautopm/plugin-ai",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Complete AI/ML plugin with OpenAI, Gemini, LangChain agents, RAG systems, model deployment, prompt engineering, and MLOps patterns for ClaudeAutoPM",
   "main": "plugin.json",
   "type": "module",
