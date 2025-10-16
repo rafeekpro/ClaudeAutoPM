@@ -14,7 +14,7 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 // We'll test the actual classes, not the CLI
-const PrdCreator = require('../../autopm/.claude/scripts/pm/prd-new');
+// Note: PrdCreator import removed - migrated to packages/plugin-pm/scripts/
 const TemplateEngine = require('../../lib/template-engine');
 
 describe('CLI Integration - Template System', () => {
