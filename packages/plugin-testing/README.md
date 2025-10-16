@@ -1,58 +1,131 @@
 # @claudeautopm/plugin-testing
 
-Testing frameworks, E2E testing, and quality assurance specialists.
+Complete testing plugin with Jest, Vitest, Testing Library, and comprehensive test strategies for frontend, backend, and E2E testing.
+
+**Version**: 2.0.0 | **Schema**: 2.0 | **Context7-Verified**: ✅
 
 ## 📦 Installation
 
 ```bash
 # Install the plugin package
-npm install -g @claudeautopm/plugin-testing
+npm install @claudeautopm/plugin-testing
 
-# Install plugin agents to your project
-autopm plugin install testing
+# Or install globally
+npm install -g @claudeautopm/plugin-testing
 ```
 
-## 🤖 Agents Included
+## Context7 Integration
 
-### Frontend Testing
-- **frontend-testing-engineer** - Frontend testing specialist
-  - Unit testing with Jest/Vitest
-  - Component testing with React Testing Library
-  - E2E testing with Playwright/Cypress
-  - Visual regression testing
-  - Accessibility testing
-  - Performance testing
-  - Test automation strategies
+This plugin uses Context7 MCP server to ensure all testing patterns follow the latest official documentation:
 
-## 💡 Usage
+**Libraries Verified**:
+- **Vitest**: `/vitest-dev/vitest` (1,183 snippets, trust 8.3)
+- **Testing Library**: `/testing-library/testing-library-docs` (499 snippets, trust 9.3)
+- **React Testing Library**: `/testing-library/react-testing-library` (trust 9.3)
 
-### In Claude Code
+All testing patterns, best practices, and code examples are verified against current official documentation to prevent outdated testing approaches.
 
-After installation, agents are available in your project:
+## 🧪 What's Included
+
+### Agent
+
+- **frontend-testing-engineer** - Frontend unit and integration testing specialist
+  - Jest and Vitest configuration
+  - React Testing Library patterns
+  - Vue Test Utils patterns
+  - Angular testing utilities
+  - Component testing strategies
+  - Coverage analysis and optimization
+  - Test quality best practices
+
+### Commands
+
+- **test-setup** - Setup comprehensive testing framework
+  - Interactive framework selection (Vitest/Jest)
+  - Project type detection (React/Vue/Angular)
+  - Coverage configuration
+  - CI/CD integration
+  - Example test creation
+
+- **test-coverage** - Generate and analyze coverage reports
+  - Coverage metrics analysis
+  - Gap identification
+  - Actionable recommendations
+  - Trend tracking
+  - CI/CD integration
+
+### Rules
+
+- **testing-standards** - Comprehensive testing best practices
+  - Test-Driven Development (TDD) enforcement
+  - Query priority standards
+  - Test independence requirements
+  - AAA pattern structure
+  - Coverage quality standards
+
+- **test-coverage-requirements** - Coverage threshold enforcement
+  - Minimum coverage thresholds
+  - Per-directory requirements
+  - Pre-commit hooks
+  - CI/CD integration
+  - Mutation testing recommendations
+
+### Example Scripts
+
+- **vitest-config-example.js** - Vitest configuration with all features
+  - Coverage setup
+  - Sharding configuration
+  - Performance profiling
+  - Browser testing
+  - Dependency injection
+
+- **react-testing-example.test.jsx** - React Testing Library examples
+  - Component testing patterns
+  - User interaction testing
+  - Async operations
+  - MSW API mocking
+  - Context7-verified patterns
+
+- **vue-testing-example.test.js** - Vue Test Utils examples
+  - Vue 3 component testing
+  - Pinia store testing
+  - Event emission testing
+  - Async data fetching
+  - Context7-verified patterns
+
+## 🚀 Quick Start
+
+### Using Commands
+
+```bash
+# Setup testing framework (interactive)
+/test:setup
+
+# Setup with Vitest for React project
+/test:setup --framework=vitest --type=react --coverage
+
+# Generate coverage report
+/test:coverage
+
+# Generate detailed coverage analysis
+/test:coverage --detailed --html
+```
+
+### Using Agent
 
 ```markdown
-<!-- CLAUDE.md -->
-## Active Team Agents
+@frontend-testing-engineer
 
-<!-- Load testing agents -->
-- @include .claude/agents/testing/frontend-testing-engineer.md
-```
+I need to create comprehensive tests for my UserProfile component.
 
-Or use `autopm team load` to automatically include agents:
+Requirements:
+- Test all user interactions
+- Test loading and error states
+- Test form validation
+- Achieve 90%+ coverage
+- Include accessibility tests
 
-```bash
-# Load testing-focused team
-autopm team load testing
-
-# Or include testing in fullstack team
-autopm team load fullstack
-```
-
-### Direct Invocation
-
-```bash
-# Invoke agent directly from CLI
-autopm agent invoke frontend-testing-engineer "Create E2E tests for checkout flow"
+Please create tests following Context7-verified best practices.
 ```
 
 ## 📋 Agent Capabilities

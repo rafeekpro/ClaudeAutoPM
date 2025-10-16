@@ -1,0 +1,49 @@
+{
+  "name": "@claudeautopm/plugin-ml",
+  "version": "2.0.0",
+  "description": "Comprehensive Machine Learning plugin with 10 specialist agents: TensorFlow/Keras, PyTorch, RL, Scikit-learn, Neural Architecture, Gradient Boosting, Computer Vision, NLP Transformers, Time Series, and AutoML. Context7-verified patterns.",
+  "main": "plugin.json",
+  "scripts": {
+    "test": "echo \"No tests for plugin package\" && exit 0"
+  },
+  "keywords": [
+    "claudeautopm",
+    "plugin",
+    "machine-learning",
+    "deep-learning",
+    "tensorflow",
+    "keras",
+    "pytorch",
+    "reinforcement-learning",
+    "gymnasium",
+    "stable-baselines3",
+    "scikit-learn",
+    "neural-networks",
+    "ml-ops",
+    "ai",
+    "context7"
+  ],
+  "author": "ClaudeAutoPM Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rafeekpro/ClaudeAutoPM.git",
+    "directory": "packages/plugin-ml"
+  },
+  "bugs": {
+    "url": "https://github.com/rafeekpro/ClaudeAutoPM/issues"
+  },
+  "homepage": "https://github.com/rafeekpro/ClaudeAutoPM/tree/main/packages/plugin-ml#readme",
+  "files": [
+    "agents/",
+    "plugin.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "peerDependencies": {
+    "@claudeautopm/plugin-core": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

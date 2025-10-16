@@ -132,3 +132,4 @@ __pycache__/
 *.so
 .mcp.json
 .claude/templates/
+status/*

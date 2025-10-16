@@ -1,11 +1,36 @@
 {
   "name": "@claudeautopm/plugin-databases",
-  "version": "1.0.0",
-  "description": "PostgreSQL, MongoDB, Redis, and database architecture specialists",
+  "version": "2.0.0",
+  "description": "Complete database plugin with PostgreSQL, MongoDB, Redis, BigQuery, and Cosmos DB experts, database rules, and optimization scripts for ClaudeAutoPM",
+  "main": "plugin.json",
+  "type": "module",
+  "files": [
+    "agents/",
+    "rules/",
+    "scripts/",
+    "plugin.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "validate": "node -e \"require('./plugin.json')\" && echo 'plugin.json is valid'"
+  },
   "keywords": [
     "claudeautopm",
     "plugin",
-    "databases"
+    "databases",
+    "postgresql",
+    "mongodb",
+    "redis",
+    "bigquery",
+    "cosmosdb",
+    "sql",
+    "nosql",
+    "data-warehouse",
+    "caching",
+    "optimization",
+    "performance"
   ],
   "author": {
     "name": "ClaudeAutoPM Team",
@@ -25,16 +50,11 @@
     "node": ">=16.0.0",
     "npm": ">=8.0.0"
   },
+  "peerDependencies": {
+    "@claudeautopm/plugin-core": "^2.0.0"
+  },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
-  },
-  "files": [
-    "agents/",
-    "plugin.json",
-    "README.md"
-  ],
-  "peerDependencies": {
-    "claude-autopm": ">=2.8.0"
   }
 }

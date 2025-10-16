@@ -1,11 +1,37 @@
 {
   "name": "@claudeautopm/plugin-devops",
-  "version": "1.0.0",
-  "description": "DevOps, CI/CD, containers, and infrastructure automation agents",
+  "version": "2.0.0",
+  "description": "Complete DevOps plugin with agents, commands, rules, and scripts for CI/CD, Docker, GitHub, observability, and infrastructure automation for ClaudeAutoPM",
+  "main": "plugin.json",
+  "type": "module",
+  "files": [
+    "agents/",
+    "commands/",
+    "rules/",
+    "scripts/",
+    "plugin.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "validate": "node -e \"require('./plugin.json')\" && echo 'plugin.json is valid'"
+  },
   "keywords": [
     "claudeautopm",
     "plugin",
-    "devops"
+    "devops",
+    "docker",
+    "github",
+    "ci-cd",
+    "azure-devops",
+    "observability",
+    "prometheus",
+    "grafana",
+    "ssh",
+    "traefik",
+    "containers",
+    "automation"
   ],
   "author": {
     "name": "ClaudeAutoPM Team",
@@ -25,16 +51,11 @@
     "node": ">=16.0.0",
     "npm": ">=8.0.0"
   },
+  "peerDependencies": {
+    "@claudeautopm/plugin-core": "^2.0.0"
+  },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
-  },
-  "files": [
-    "agents/",
-    "plugin.json",
-    "README.md"
-  ],
-  "peerDependencies": {
-    "claude-autopm": ">=2.8.0"
   }
 }
