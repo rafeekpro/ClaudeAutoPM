@@ -229,6 +229,379 @@ describe('UserProfileComponent', () => {
 });
 ```
 
+## Context7-Verified Testing Patterns
+
+**Sources**:
+- `/vitest-dev/vitest` (1,183 snippets, trust 8.3)
+- `/testing-library/testing-library-docs` (499 snippets, trust 9.3)
+- `/testing-library/react-testing-library` (trust 9.3)
+
+### ✅ CORRECT: Query Priority (Testing Library)
+
+Always follow Testing Library's query priority - queries that reflect user experience:
+
+```javascript
+// ✅ BEST: Accessible to everyone (including screen readers)
+screen.getByRole('button', { name: /submit/i });
+screen.getByRole('textbox', { name: /username/i });
+screen.getByRole('heading', { name: /welcome/i });
+
+// ✅ GOOD: Form elements with labels
+screen.getByLabelText('Email address');
+screen.getByLabelText(/password/i);
+
+// ✅ GOOD: Text content users can see
+screen.getByText('Welcome back!');
+screen.getByDisplayValue('john@example.com');
+
+// ⚠️ ACCEPTABLE: Test IDs (only when semantic queries don't work)
+screen.getByTestId('custom-element');
+
+// ❌ AVOID: Implementation details (fragile to DOM changes)
+container.querySelector('.user-profile-class');
+container.querySelector('#user-id-123');
+```
+
+### ✅ CORRECT: Vitest Configuration with Provide
+
+Use Vitest's `provide` option to inject dependencies in tests:
+
+```javascript
+// vitest.config.js
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    provide: {
+      // Inject values available in all tests via `inject()`
+      API_URL: 'https://test.api.com',
+      FEATURE_FLAGS: { darkMode: true, newUI: false }
+    },
+    globals: true,
+    environment: 'jsdom',
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: ['node_modules/', 'test/', '*.config.js']
+    }
+  }
+});
+```
+
+```javascript
+// Using injected values in tests
+import { inject } from 'vitest';
+
+test('uses provided API URL', () => {
+  const apiUrl = inject('API_URL');
+  expect(apiUrl).toBe('https://test.api.com');
+});
+```
+
+### ✅ CORRECT: Performance Profiling with Vitest
+
+Enable performance profiling to identify slow tests:
+
+```javascript
+// vitest.config.js with profiling
+export default defineConfig({
+  test: {
+    // ... other config
+    benchmark: {
+      include: ['**/*.bench.js'],
+      reporters: ['default', 'json']
+    }
+  }
+});
+
+// Run with profiling
+// npx vitest --reporter=verbose --profile
+```
+
+```javascript
+// benchmark.bench.js
+import { bench, describe } from 'vitest';
+
+describe('Array operations', () => {
+  bench('Array.push', () => {
+    const arr = [];
+    for (let i = 0; i < 1000; i++) {
+      arr.push(i);
+    }
+  });
+
+  bench('Array spread', () => {
+    let arr = [];
+    for (let i = 0; i < 1000; i++) {
+      arr = [...arr, i];
+    }
+  });
+});
+```
+
+### ✅ CORRECT: Browser Mode with Multiple Instances
+
+Run tests in real browsers with Vitest browser mode:
+
+```javascript
+// vitest.config.js with browser testing
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    browser: {
+      enabled: true,
+      name: 'chromium', // or 'firefox', 'webkit'
+      provider: 'playwright',
+      // Multiple browser instances for parallel testing
+      instances: [
+        { browser: 'chromium' },
+        { browser: 'firefox' },
+        { browser: 'webkit' }
+      ],
+      headless: true
+    }
+  }
+});
+```
+
+### ✅ CORRECT: Test Sharding for Parallel Execution
+
+Distribute tests across multiple processes for faster execution:
+
+```bash
+# Split test suite into 3 shards
+npx vitest --shard=1/3  # Run shard 1
+npx vitest --shard=2/3  # Run shard 2
+npx vitest --shard=3/3  # Run shard 3
+
+# In CI/CD (GitHub Actions example)
+# jobs:
+#   test:
+#     strategy:
+#       matrix:
+#         shard: [1, 2, 3]
+#     steps:
+#       - run: npx vitest --shard=${{ matrix.shard }}/3
+```
+
+```javascript
+// vitest.config.js
+export default defineConfig({
+  test: {
+    // Configure for sharding
+    pool: 'threads',
+    poolOptions: {
+      threads: {
+        singleThread: false,
+        isolate: true
+      }
+    }
+  }
+});
+```
+
+### ✅ CORRECT: Semantic Queries Over CSS Selectors
+
+Prioritize queries that match how users find elements:
+
+```javascript
+// ✅ CORRECT: Semantic, accessible, user-facing queries
+const submitButton = screen.getByRole('button', { name: 'Submit' });
+const emailInput = screen.getByLabelText('Email');
+const heading = screen.getByRole('heading', { name: /dashboard/i });
+const linkToProfile = screen.getByRole('link', { name: /view profile/i });
+
+// ✅ CORRECT: Filter within sections
+const nav = screen.getByRole('navigation');
+const homeLink = within(nav).getByRole('link', { name: 'Home' });
+
+// ❌ WRONG: CSS selectors tied to implementation
+const submitButton = container.querySelector('button.submit-btn');
+const emailInput = container.querySelector('#email-input');
+const heading = container.querySelector('.dashboard-heading');
+```
+
+### ✅ CORRECT: Async Utilities for Waiting
+
+Use Testing Library's async utilities instead of manual delays:
+
+```javascript
+// ✅ CORRECT: Wait for element to appear
+await waitFor(() => {
+  expect(screen.getByText('Data loaded')).toBeInTheDocument();
+});
+
+// ✅ CORRECT: Find element (built-in wait)
+const element = await screen.findByText('Async content');
+
+// ✅ CORRECT: Wait for element to disappear
+await waitForElementToBeRemoved(() => screen.queryByText('Loading...'));
+
+// ❌ WRONG: Manual delays (unreliable, slow)
+await new Promise(resolve => setTimeout(resolve, 1000));
+expect(screen.getByText('Data loaded')).toBeInTheDocument();
+```
+
+### ✅ CORRECT: User-Centric Testing Approach
+
+Write tests that mirror how users interact with your app:
+
+```javascript
+// ✅ CORRECT: Test user flows, not implementation
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+test('user can log in', async () => {
+  const user = userEvent.setup();
+  render(<LoginForm />);
+
+  // User finds and fills email field
+  await user.type(screen.getByLabelText('Email'), 'user@example.com');
+
+  // User finds and fills password field
+  await user.type(screen.getByLabelText('Password'), 'secure123');
+
+  // User clicks submit button
+  await user.click(screen.getByRole('button', { name: 'Log in' }));
+
+  // User sees welcome message
+  expect(await screen.findByText(/welcome/i)).toBeInTheDocument();
+});
+
+// ❌ WRONG: Testing implementation details
+test('sets isLoggedIn state to true', () => {
+  const { container } = render(<LoginForm />);
+  const component = container.querySelector('.login-form').__reactInternalInstance;
+  expect(component.state.isLoggedIn).toBe(true); // Don't access internal state
+});
+```
+
+### ✅ CORRECT: Coverage Configuration Best Practices
+
+Configure meaningful coverage thresholds and exclusions:
+
+```javascript
+// vitest.config.js
+export default defineConfig({
+  test: {
+    coverage: {
+      provider: 'v8', // or 'istanbul'
+      reporter: ['text', 'json', 'html', 'lcov'],
+
+      // Set realistic thresholds
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 75,
+        statements: 80
+      },
+
+      // Include only source files
+      include: ['src/**/*.{js,jsx,ts,tsx}'],
+
+      // Exclude non-testable code
+      exclude: [
+        'node_modules/',
+        'test/',
+        '**/*.config.js',
+        '**/*.spec.js',
+        '**/*.test.js',
+        'src/main.js',
+        'src/index.js',
+        'src/**/*.d.ts'
+      ],
+
+      // Clean coverage directory before each run
+      clean: true,
+
+      // All files should be included in coverage
+      all: true
+    }
+  }
+});
+```
+
+### ✅ CORRECT: Test Isolation with beforeEach
+
+Ensure each test starts with clean state:
+
+```javascript
+import { beforeEach, afterEach, describe, it, expect } from 'vitest';
+import { cleanup, render } from '@testing-library/react';
+
+describe('UserProfile', () => {
+  beforeEach(() => {
+    // Reset state before each test
+    localStorage.clear();
+    sessionStorage.clear();
+
+    // Mock API calls
+    global.fetch = vi.fn(() =>
+      Promise.resolve({
+        json: () => Promise.resolve({ id: 1, name: 'Test User' })
+      })
+    );
+  });
+
+  afterEach(() => {
+    // Cleanup after each test
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('test 1', () => {
+    // Test runs with clean state
+  });
+
+  it('test 2', () => {
+    // This test is completely independent of test 1
+  });
+});
+```
+
+### Performance Best Practices
+
+1. **Query Priority**: Use semantic queries (getByRole, getByLabelText) over CSS selectors
+2. **Async Utilities**: Use waitFor, findBy queries instead of manual delays
+3. **Test Sharding**: Distribute tests across multiple processes in CI
+4. **Coverage Exclusions**: Exclude non-testable code from coverage reports
+5. **Test Isolation**: Use beforeEach/afterEach to prevent test interdependence
+6. **Browser Testing**: Use Vitest browser mode for real browser testing
+7. **Performance Profiling**: Enable profiling to identify slow tests
+
+### Anti-Patterns to Avoid
+
+```javascript
+// ❌ Don't query by CSS classes or IDs
+container.querySelector('.submit-button');
+container.querySelector('#user-form');
+
+// ✅ Use accessible roles instead
+screen.getByRole('button', { name: 'Submit' });
+screen.getByRole('form', { name: 'User registration' });
+
+// ❌ Don't use manual timeouts
+await new Promise(resolve => setTimeout(resolve, 1000));
+
+// ✅ Use async utilities
+await waitFor(() => expect(element).toBeInTheDocument());
+
+// ❌ Don't test implementation details
+expect(component.state.count).toBe(5);
+
+// ✅ Test user-visible behavior
+expect(screen.getByText('Count: 5')).toBeInTheDocument();
+
+// ❌ Don't write interdependent tests
+let sharedState = null;
+it('test 1', () => { sharedState = 'value'; });
+it('test 2', () => { expect(sharedState).toBe('value'); });
+
+// ✅ Use beforeEach for setup
+beforeEach(() => { state = initialValue; });
+```
+
 ## 4. Test Strategies
 
 ### Snapshot Testing

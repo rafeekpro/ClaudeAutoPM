@@ -1,0 +1,66 @@
+{
+  "name": "@claudeautopm/plugin-ai",
+  "version": "2.0.0",
+  "description": "Complete AI/ML plugin with OpenAI, Gemini, LangChain agents, RAG systems, model deployment, prompt engineering, and MLOps patterns for ClaudeAutoPM",
+  "main": "plugin.json",
+  "type": "module",
+  "keywords": [
+    "claudeautopm",
+    "plugin",
+    "ai",
+    "ml",
+    "machine-learning",
+    "openai",
+    "gemini",
+    "langchain",
+    "langgraph",
+    "huggingface",
+    "mlflow",
+    "rag",
+    "llm",
+    "gpt",
+    "embeddings",
+    "prompt-engineering",
+    "mlops"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "validate": "node -e \"require('./plugin.json')\" && echo 'plugin.json is valid'",
+    "lint:python": "find scripts/examples -name '*.py' -exec python3 -m py_compile {} \\;",
+    "lint:all": "npm run lint:python"
+  },
+  "author": {
+    "name": "ClaudeAutoPM Team",
+    "email": "autopm@example.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rafeekpro/ClaudeAutoPM.git",
+    "directory": "packages/plugin-ai"
+  },
+  "homepage": "https://github.com/rafeekpro/ClaudeAutoPM/tree/main/packages/plugin-ai#readme",
+  "bugs": {
+    "url": "https://github.com/rafeekpro/ClaudeAutoPM/issues"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "agents/",
+    "commands/",
+    "rules/",
+    "scripts/",
+    "plugin.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "peerDependencies": {
+    "@claudeautopm/plugin-core": "^2.0.0"
+  }
+}

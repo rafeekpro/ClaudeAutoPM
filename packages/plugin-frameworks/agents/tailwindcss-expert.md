@@ -109,6 +109,257 @@ Access Tailwind CSS documentation through context7:
    - Integrate with component libraries and frameworks
    - Build complex animations and interactions
 
+## Context7-Verified Tailwind CSS Patterns
+
+**Source**: `/tailwindlabs/tailwindcss.com` (1,769 snippets, trust 10.0)
+
+### ✅ CORRECT: Mobile-First Responsive Design
+
+Tailwind uses mobile-first breakpoint system - unprefixed utilities apply to all screen sizes:
+
+```html
+<!-- ✅ Correct: Mobile-first approach -->
+<!-- Center text on mobile, left align from sm breakpoint (640px) and up -->
+<div class="text-center sm:text-left">
+  This is mobile-first responsive text
+</div>
+
+<!-- ❌ Wrong: This won't work as expected on mobile -->
+<!-- Only centers from 640px, mobile has no centering -->
+<div class="sm:text-center">
+  This is NOT mobile-first
+</div>
+```
+
+### ✅ CORRECT: Responsive Breakpoint Prefixes
+
+Apply different utilities based on screen size:
+
+```html
+<!-- Responsive image sizing -->
+<img class="w-16 md:w-32 lg:w-48" src="..." />
+
+<!-- Responsive grid columns -->
+<div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+  <!-- ... -->
+</div>
+
+<!-- Responsive flex direction -->
+<div class="flex flex-col md:flex-row">
+  <!-- ... -->
+</div>
+```
+
+### ✅ CORRECT: Targeting Single Breakpoint Ranges
+
+Combine breakpoint variants with max-width variants:
+
+```html
+<!-- Apply flex only from md to lg (not at xl and above) -->
+<div class="md:max-lg:flex">
+  <!-- ... -->
+</div>
+
+<!-- Apply flex from md to xl (not at 2xl and above) -->
+<div class="md:max-xl:flex">
+  <!-- ... -->
+</div>
+
+<!-- Apply specific column layout only at md breakpoint range -->
+<div class="md:max-lg:flex-col">
+  <!-- ... -->
+</div>
+```
+
+### ✅ CORRECT: Container Queries
+
+Mark elements as containers and apply styles based on container size:
+
+```html
+<!-- Basic container query -->
+<div class="@container">
+  <div class="flex flex-col @md:flex-row">
+    <!-- Changes from column to row when container is medium size -->
+  </div>
+</div>
+
+<!-- Named containers for nested queries -->
+<div class="@container/main">
+  <!-- ... nested content ... -->
+  <div class="flex flex-row @sm/main:flex-col">
+    <!-- Responds to /main container size, not nearest container -->
+  </div>
+</div>
+
+<!-- Container query ranges -->
+<div class="@container">
+  <div class="flex flex-row @sm:@max-md:flex-col">
+    <!-- Only applies flex-col when container is between sm and md -->
+  </div>
+</div>
+```
+
+### ✅ CORRECT: Arbitrary Breakpoint Values
+
+Use one-off breakpoints without defining in theme:
+
+```html
+<!-- Custom minimum width breakpoint -->
+<div class="min-[320px]:text-center">
+  <!-- ... -->
+</div>
+
+<!-- Custom maximum width breakpoint -->
+<div class="max-[600px]:bg-sky-300">
+  <!-- ... -->
+</div>
+
+<!-- Combined for precise range -->
+<div class="min-[320px]:max-[640px]:bg-blue-500">
+  <!-- Active only between 320px and 640px -->
+</div>
+```
+
+### ✅ CORRECT: Responsive Marketing Card Layout
+
+Complete responsive component example:
+
+```html
+<div class="mx-auto max-w-md overflow-hidden rounded-xl bg-white shadow-md md:max-w-2xl">
+  <div class="md:flex">
+    <div class="md:shrink-0">
+      <img
+        class="h-48 w-full object-cover md:h-full md:w-48"
+        src="/img/building.jpg"
+        alt="Modern building architecture"
+      />
+    </div>
+    <div class="p-8">
+      <div class="text-sm font-semibold tracking-wide text-indigo-500 uppercase">
+        Company retreats
+      </div>
+      <a href="#" class="mt-1 block text-lg leading-tight font-medium text-black hover:underline">
+        Incredible accommodation for your team
+      </a>
+      <p class="mt-2 text-gray-500">
+        Looking to take your team away on a retreat to enjoy awesome food and
+        take in some sunshine? We have a list of places to do just that.
+      </p>
+    </div>
+  </div>
+</div>
+```
+
+### ✅ CORRECT: Custom Theme Breakpoints
+
+Define custom breakpoints using CSS variables:
+
+```css
+/* @theme in CSS */
+@import "tailwindcss";
+
+@theme {
+  --breakpoint-xs: 30rem;      /* 480px */
+  --breakpoint-2xl: 100rem;    /* 1600px - override default */
+  --breakpoint-3xl: 120rem;    /* 1920px - new breakpoint */
+}
+```
+
+```html
+<!-- Use custom breakpoints -->
+<div class="grid xs:grid-cols-2 3xl:grid-cols-6">
+  <!-- ... -->
+</div>
+```
+
+### ✅ CORRECT: Combining Variants (Responsive + Hover + Dark Mode)
+
+Stack multiple variants for complex interactive designs:
+
+```html
+<!-- Responsive + hover + dark mode -->
+<button class="lg:dark:hover:bg-gray-50 lg:dark:bg-white">
+  <!-- On large screens in dark mode, white bg that turns gray on hover -->
+</button>
+
+<!-- Responsive + focus + dark mode -->
+<input class="md:focus:ring-2 md:focus:ring-blue-500 md:dark:focus:ring-blue-400" />
+```
+
+### ✅ CORRECT: Viewport Meta Tag (Required)
+
+Essential for proper responsive behavior:
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- ✅ REQUIRED for responsive design -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <!-- ... -->
+  </body>
+</html>
+```
+
+### ✅ CORRECT: Container Query Length Units
+
+Use container query units as arbitrary values:
+
+```html
+<div class="@container">
+  <div class="w-[50cqw]">
+    <!-- Width is 50% of container width, not viewport -->
+  </div>
+
+  <div class="text-[5cqw]">
+    <!-- Font size scales with container width -->
+  </div>
+</div>
+```
+
+### ✅ CORRECT: Responsive Utility-First Component
+
+Building fully responsive components with utilities only:
+
+```jsx
+<div className="mx-auto max-w-sm space-y-2 rounded-xl bg-white px-8 py-8 shadow-lg ring ring-black/5 @sm:flex @sm:items-center @sm:space-y-0 @sm:gap-x-6 @sm:py-4">
+  <img
+    className="mx-auto block h-24 rounded-full @sm:mx-0 @sm:shrink-0"
+    src={erinLindford.src}
+    alt="Woman's Face"
+  />
+  <div className="space-y-2 text-center @sm:text-left">
+    <div className="space-y-0.5">
+      <p className="text-lg font-semibold text-black">Erin Lindford</p>
+      <p className="font-medium text-gray-500">Product Engineer</p>
+    </div>
+    <button className="rounded-full border border-purple-200 px-4 py-1 text-sm font-semibold text-purple-600 hover:border-transparent hover:bg-purple-600 hover:text-white active:bg-purple-700">
+      Message
+    </button>
+  </div>
+</div>
+```
+
+### Performance Best Practices
+
+**JIT (Just-In-Time) Mode**: Tailwind v3+ automatically uses JIT for optimal performance
+**PurgeCSS**: Automatically removes unused styles in production
+**Content Configuration**: Ensure all template paths are included in `content` array
+
+```javascript
+// tailwind.config.js
+module.exports = {
+  content: [
+    './src/**/*.{html,js,jsx,ts,tsx,vue}',
+    './public/index.html',
+    // Include all files that use Tailwind classes
+  ],
+  // ...
+}
+```
+
 ## Configuration Setup
 
 ### Tailwind Configuration

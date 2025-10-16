@@ -1,6 +1,22 @@
 # @claudeautopm/plugin-devops
 
-DevOps, CI/CD, containers, and infrastructure automation specialists.
+> **Complete DevOps Plugin for ClaudeAutoPM Framework**
+
+[![npm version](https://img.shields.io/npm/v/@claudeautopm/plugin-devops.svg)](https://www.npmjs.com/package/@claudeautopm/plugin-devops)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+## 📋 Overview
+
+`@claudeautopm/plugin-devops` provides comprehensive DevOps capabilities for the ClaudeAutoPM framework. This plugin includes agents for Docker, GitHub Actions, Azure DevOps, observability (Prometheus/Grafana), infrastructure automation, CI/CD commands, DevOps rules, and example scripts.
+
+### Package Information
+
+- **Package Name:** `@claudeautopm/plugin-devops`
+- **Version:** 2.0.0
+- **Schema Version:** 2.0
+- **Category:** DevOps & CI/CD
+- **Size:** ~18 KB (gzipped)
+- **Total Resources:** 18 (7 agents + 1 command + 4 rules + 5 scripts)
 
 ## 📦 Installation
 
@@ -12,54 +28,101 @@ npm install -g @claudeautopm/plugin-devops
 autopm plugin install devops
 ```
 
-## 🤖 Agents Included
+## 🎯 What's Included
 
-### CI/CD & Version Control
-- **azure-devops-specialist** - Azure DevOps pipelines and workflows
-  - Azure Pipelines YAML configuration
-  - Build and release automation
-  - Azure Repos integration
-  - Work item tracking and boards
+### DevOps Agents (7 agents)
 
-- **github-operations-specialist** - GitHub workflows and automation
-  - GitHub Actions workflows
-  - Repository management
-  - PR automation and branch protection
-  - GitHub CLI operations
+#### CI/CD & Version Control
 
-### Containerization
-- **docker-containerization-expert** - Docker containerization and orchestration
-  - Dockerfile optimization
-  - Multi-stage builds
-  - Docker Compose orchestration
-  - Container security best practices
+- **azure-devops-specialist** - Azure DevOps pipelines, workflows, and work item management
+  - Tags: azure, devops, pipelines, ci-cd, work-items
+  - Context7: Azure documentation, Architecture center
+  - MCP: azure-cli
 
-### Infrastructure & Networking
-- **traefik-proxy-expert** - Traefik reverse proxy configuration
-  - Dynamic service discovery
-  - Load balancing strategies
-  - SSL/TLS certificate management
-  - Middleware configuration
+- **github-operations-specialist** - GitHub Actions workflows, repository management, and automation
+  - Tags: github, actions, workflows, ci-cd, automation
+  - Context7: GitHub Actions toolkit, Starter workflows
+  - MCP: github
 
-- **ssh-operations-expert** - SSH security and operations
-  - SSH key management
-  - Secure remote access
-  - SSH tunneling and port forwarding
-  - Hardening and security policies
+#### Containerization
 
-### Monitoring & Observability
-- **observability-engineer** - Monitoring, logging, and observability
-  - Metrics collection (Prometheus, Grafana)
-  - Distributed tracing
-  - Log aggregation and analysis
-  - SLO/SLI implementation
+- **docker-containerization-expert** - Docker containerization, Dockerfile optimization, and Docker Compose
+  - Tags: docker, containers, dockerfile, compose, multi-stage
+  - Context7: Docker docs, Docker Compose
+  - MCP: docker
 
-### Context Management
-- **mcp-context-manager** - MCP server context optimization
-  - Context window management
-  - Token optimization strategies
-  - Multi-agent communication patterns
-  - Context sharing best practices
+#### Infrastructure & Networking
+
+- **traefik-proxy-expert** - Traefik reverse proxy, load balancing, and service discovery
+  - Tags: traefik, proxy, load-balancer, service-discovery, ssl
+  - Context7: Traefik documentation
+  - MCP: -
+
+- **ssh-operations-expert** - SSH operations, key management, tunneling, and security
+  - Tags: ssh, security, tunneling, keys, remote-access
+  - Context7: AWS SSH best practices
+  - MCP: -
+
+#### Monitoring & Observability
+
+- **observability-engineer** - Prometheus, Grafana, logging, tracing, and observability stack
+  - Tags: observability, prometheus, grafana, monitoring, tracing
+  - Context7: Prometheus, Grafana
+  - MCP: prometheus, grafana
+
+#### Context Management
+
+- **mcp-context-manager** - Model Context Protocol server management and context optimization
+  - Tags: mcp, context, optimization, model-context-protocol
+  - Context7: -
+  - MCP: -
+
+### CI/CD Commands (1 command)
+
+1. **workflow-create** - Create GitHub Actions workflow with best practices
+   - Category: ci-cd
+   - Required Agent: github-operations-specialist
+   - Context7: GitHub Actions toolkit, Starter workflows
+
+### DevOps Rules (4 rules)
+
+1. **github-operations** - GitHub operations standards and best practices
+   - Priority: high
+   - Enforces on: github-operations-specialist
+
+2. **docker-first-development** - Docker-first development workflow and containerization standards
+   - Priority: medium
+   - Enforces on: docker-containerization-expert
+
+3. **devops-troubleshooting-playbook** - DevOps troubleshooting methodologies and debugging strategies
+   - Priority: high
+   - Enforces on: observability-engineer, docker-containerization-expert
+
+4. **ci-cd-kubernetes-strategy** - CI/CD pipeline strategies for Kubernetes deployments
+   - Priority: high
+   - Enforces on: github-operations-specialist, azure-devops-specialist
+
+### Example Scripts (5 scripts)
+
+1. **docker-build-multistage.sh** - Multi-stage Docker build with BuildKit optimization
+   - Category: docker
+   - Demonstrates: Docker multi-stage builds, BuildKit, security scanning
+
+2. **github-workflow-validate.sh** - GitHub Actions workflow validation and syntax check
+   - Category: github
+   - Demonstrates: GitHub CLI, workflow validation, YAML linting
+
+3. **prometheus-health-check.sh** - Prometheus health check and metrics validation
+   - Category: monitoring
+   - Demonstrates: Prometheus API, health checks, alert monitoring
+
+4. **docker-compose-validate.sh** - Docker Compose configuration validation
+   - Category: docker
+   - Demonstrates: Compose validation, syntax checking, health checks
+
+5. **ssh-key-setup.sh** - SSH key generation and setup with ED25519
+   - Category: ssh
+   - Demonstrates: ED25519 key generation, SSH agent, best practices
 
 ## 💡 Usage
 
