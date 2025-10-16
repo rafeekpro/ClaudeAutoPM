@@ -1,7 +1,22 @@
 {
   "name": "@claudeautopm/plugin-cloud",
-  "version": "1.0.0",
-  "description": "Cloud architecture agents for AWS, Azure, GCP, and infrastructure as code",
+  "version": "2.0.0",
+  "description": "Complete cloud infrastructure plugin with agents for AWS, Azure, GCP, Kubernetes, Terraform, and infrastructure automation for ClaudeAutoPM",
+  "main": "plugin.json",
+  "type": "module",
+  "files": [
+    "agents/",
+    "commands/",
+    "rules/",
+    "scripts/",
+    "plugin.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "validate": "node -e \"require('./plugin.json')\" && echo 'plugin.json is valid'"
+  },
   "keywords": [
     "claudeautopm",
     "plugin",
@@ -9,39 +24,41 @@
     "aws",
     "azure",
     "gcp",
+    "google-cloud",
+    "kubernetes",
+    "k8s",
     "terraform",
-    "serverless",
     "infrastructure",
-    "iac"
+    "iac",
+    "infrastructure-as-code",
+    "serverless",
+    "cloud-functions",
+    "devops",
+    "architecture",
+    "containers",
+    "orchestration",
+    "helm",
+    "docker"
   ],
-  "author": {
-    "name": "ClaudeAutoPM Team",
-    "email": "autopm@example.com"
-  },
+  "author": "ClaudeAutoPM Team",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rafeekpro/ClaudeAutoPM.git",
     "directory": "packages/plugin-cloud"
   },
-  "homepage": "https://github.com/rafeekpro/ClaudeAutoPM/tree/main/packages/plugin-cloud#readme",
   "bugs": {
     "url": "https://github.com/rafeekpro/ClaudeAutoPM/issues"
   },
+  "homepage": "https://github.com/rafeekpro/ClaudeAutoPM/tree/main/packages/plugin-cloud#readme",
   "engines": {
-    "node": ">=16.0.0",
-    "npm": ">=8.0.0"
+    "node": ">=16.0.0"
+  },
+  "peerDependencies": {
+    "@claudeautopm/plugin-core": "^2.0.0"
   },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
-  },
-  "files": [
-    "agents/",
-    "plugin.json",
-    "README.md"
-  ],
-  "peerDependencies": {
-    "claude-autopm": ">=2.8.0"
   }
 }
