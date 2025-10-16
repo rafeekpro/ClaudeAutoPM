@@ -976,7 +976,7 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
 
         // Install scripts
         if (metadata.scripts && metadata.scripts.length > 0) {
-          const targetDir = path.join(this.targetDir, 'scripts');
+          const targetDir = path.join(this.targetDir, '.claude', 'scripts');
           if (!fs.existsSync(targetDir)) {
             fs.mkdirSync(targetDir, { recursive: true });
           }
