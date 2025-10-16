@@ -1,6 +1,6 @@
 {
   "name": "@claudeautopm/plugin-pm",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "schemaVersion": "2.0",
   "displayName": "Project Management",
   "description": "Complete project management plugin with PM workflows, epic management, issue tracking, and release automation",
@@ -436,6 +436,20 @@
       "executable": true,
       "category": "workflow",
       "tags": ["planning", "workflow", "ai"]
+    }
+  ],
+  "commands": [
+    {
+      "subdirectory": "commands/",
+      "description": "PM workflow commands (87 total)",
+      "type": "collection",
+      "categories": {
+        "pm": "Core PM commands (45)",
+        "azure": "Azure DevOps integration commands (41)",
+        "github": "GitHub workflow commands (1)"
+      },
+      "discovery": "auto",
+      "tags": ["pm", "workflows", "epic", "task", "issue", "azure", "github"]
     }
   ],
   "features": {
