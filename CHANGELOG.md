@@ -63,6 +63,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### 🧹 Context Hygiene Enforcement System
+
+**New feature:** Multi-layer system to enforce `/clear` usage between issues.
+
+**Components:**
+1. **Pre-commit hook** (`pre-commit-clear-reminder.sh`)
+   - Detects issue closure in commit messages
+   - Displays reminder after commit
+   - Creates `.claude/.clear-reminder` file
+
+2. **Session start check** (`check-clear-reminder.sh`)
+   - Checks for pending `/clear` reminder
+   - Displays warning on new session
+   - Shows which issue was closed
+
+3. **Context hygiene rule** (`context-hygiene.md`)
+   - Documents when to run `/clear`
+   - Explains why it matters
+   - Provides workflow examples
+
+4. **Strategy document** (`CONTEXT-HYGIENE-STRATEGY.md`)
+   - Complete implementation strategy
+   - User experience scenarios
+   - Configuration options
+   - Future enhancements
+
+**Why This Matters:**
+- Prevents context bleed between issues
+- Improves response quality
+- Reduces token waste
+- Ensures fresh start for each task
+
+**How It Works:**
+```bash
+# 1. Close issue
+git commit -m "fix: closes #123"
+# → Hook shows reminder
+
+# 2. Start new session
+claude
+# → If reminder pending, shows warning
+
+# 3. Clear context
+/clear
+# → Reminder removed, ready for next task
+```
+
+**Benefits:**
+- ✅ Hard to forget `/clear`
+- ✅ Multiple reminder touchpoints
+- ✅ Non-blocking (doesn't prevent work)
+- ✅ Configurable per project
+
 #### 🔄 Plugin Update Command
 
 **New feature:** `autopm plugin update` command for updating installed plugins to their latest versions.
