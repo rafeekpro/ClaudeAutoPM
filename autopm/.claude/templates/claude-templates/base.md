@@ -118,26 +118,78 @@ Use for coordinating multiple work streams in parallel.
 
 <!-- CICD_SECTION -->
 
-## TDD PIPELINE FOR ALL IMPLEMENTATIONS
+## 🚨 TDD PIPELINE FOR ALL IMPLEMENTATIONS (HIGHEST PRIORITY)
+
+```
+╔═══════════════════════════════════════════════════════════════════╗
+║  🔴 RED → ✅ GREEN → ♻️ REFACTOR                                   ║
+║                                                                   ║
+║  ZERO TOLERANCE: No code without tests. No exceptions.           ║
+║  See: .claude/rules/tdd.enforcement.md                           ║
+╚═══════════════════════════════════════════════════════════════════╝
+```
 
 ### Mandatory Test-Driven Development Cycle
 
-Every implementation MUST follow:
+**CRITICAL**: Every implementation MUST follow TDD cycle. This rule has **HIGHEST PRIORITY**.
 
-1. **RED Phase**: Write failing test first
-   - Test must describe desired behavior
-   - Test MUST fail initially
-   - Test must be meaningful (no trivial assertions)
+#### 1. 🔴 RED Phase: Write FAILING Test First
 
-2. **GREEN Phase**: Make test pass
-   - Write MINIMUM code to pass test
-   - Don't add features not required by test
-   - Focus on making test green, not perfection
+- Write test that describes desired behavior
+- Test **MUST FAIL** initially (run `@test-runner` to confirm)
+- Test must be meaningful (no trivial assertions)
+- **NEVER proceed to code without failing test**
 
-3. **REFACTOR Phase**: Improve code
-   - Improve structure while tests stay green
-   - Remove duplication
-   - Enhance readability
+```bash
+# Example workflow:
+touch tests/test_feature.py
+# Write test
+@test-runner run tests/test_feature.py  # MUST SEE RED ❌
+git commit -m "test: add failing test for feature"
+```
+
+#### 2. ✅ GREEN Phase: Write MINIMUM Code to Pass
+
+- Write **MINIMUM** code to pass test
+- Don't add features not required by test
+- Focus on making test green, not perfection
+- Run `@test-runner` to confirm tests pass
+
+```bash
+# Implement feature
+@test-runner run tests/test_feature.py  # MUST SEE GREEN ✅
+git commit -m "feat: implement feature"
+```
+
+#### 3. ♻️ REFACTOR Phase: Improve While Tests Stay Green
+
+- Improve code structure
+- Remove duplication
+- Enhance readability
+- **All tests MUST remain green**
+- Run `@test-runner` after each change
+
+```bash
+# Refactor code
+@test-runner run all tests  # ALL MUST BE GREEN ✅
+git commit -m "refactor: improve feature structure"
+```
+
+### TDD Commit Pattern (MANDATORY)
+
+For EVERY feature, you MUST see this commit sequence:
+```bash
+git log --oneline
+# c3d4e5f refactor: improve feature structure  ♻️
+# b2c3d4e feat: implement feature              ✅
+# a1b2c3d test: add failing test for feature  🔴
+```
+
+**❌ VIOLATIONS (Auto-Reject):**
+- Commits with code but no tests
+- Commits with "WIP" or "TODO: add tests later"
+- Skipping any phase of TDD cycle
+- Tests written after implementation
 
 ## CONTEXT OPTIMIZATION RULES
 
