@@ -9,6 +9,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+#### 🔒 Enhanced Agent Usage Enforcement
+
+**Improvement:** Strengthened `agent-mandatory.md` rule with clearer enforcement and Context7 requirements.
+
+**Changes:**
+- Added **MANDATORY SELF-CHECK** section at top of rule
+- Added **"BEFORE YOU START"** checklist for immediate visibility
+- Added **Context7 Integration** section with examples
+- Added **"Why This Rule Exists"** explanation
+- Added **"What Happens When You Don't Use Agents"** consequences
+- Created **pre-action-agent-reminder.js** hook for pattern detection
+
+**New Requirements:**
+1. **Self-check BEFORE any task**: 5-question checklist
+2. **Query Context7 BEFORE implementation**: Up-to-date best practices
+3. **Use agents for ALL non-trivial tasks**: No exceptions
+
+**Benefits:**
+- Clearer expectations for Claude behavior
+- Reduced violations of agent usage rules
+- Better integration with Context7 MCP
+- Improved code quality through specialized agents
+- Consistent TDD enforcement via agents
+
+**Hook Features:**
+- Pattern detection for code writing, testing, database, DevOps tasks
+- Suggests appropriate agents based on task type
+- Recommends Context7 queries for each category
+- Non-blocking reminder (can proceed but should consider)
+
 #### 📉 Task Workflow Template Optimization
 
 **Optimization:** `task-workflow.md` template reduced by 73% (16,669 → 4,553 characters).
