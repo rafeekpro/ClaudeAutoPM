@@ -1,0 +1,36 @@
+<!-- Plugin Manifest Template for Token-Optimized CLAUDE.md -->
+<!-- This template generates compressed plugin listings for base-optimized.md -->
+
+<plugins>
+<installed>{{INSTALLED_PLUGINS}}</installed>
+
+<manifest>
+{{PLUGIN_MANIFESTS}}
+</manifest>
+
+<lazy_loading>
+<enabled>true</enabled>
+<triggers>
+  commands: "/[plugin-id]:[command-name]"
+  agents: "@[agent-name]" (from plugin)
+  rules: on-violation or explicit reference
+</triggers>
+</lazy_loading>
+
+<usage>
+Commands: Type /[plugin-id]:[command] to invoke
+Agents: Type @[agent-name] to invoke
+Rules: Automatically loaded when needed
+Files: All available in .claude/plugins/[plugin-id]/
+</usage>
+</plugins>
+
+<!-- Example compressed manifest per plugin -->
+<!--
+<plugin id="core">
+  agents: agent-manager|code-analyzer|test-runner|file-analyzer
+  commands: code-rabbit|prompt|re-init
+  rules: 23 files (on-demand)
+  📖 .claude/plugins/core/
+</plugin>
+-->
