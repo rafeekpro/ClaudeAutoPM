@@ -24,7 +24,7 @@ module.exports = {
       .positional('action', {
         describe: 'Plugin action to perform',
         type: 'string',
-        choices: ['list', 'search', 'install', 'uninstall', 'info', 'enable', 'disable']
+        choices: ['list', 'search', 'install', 'uninstall', 'update', 'info', 'enable', 'disable']
       })
       .positional('name', {
         describe: 'Plugin name (without @claudeautopm/plugin- prefix)',
@@ -40,6 +40,8 @@ module.exports = {
       .example('autopm plugin search cloud', 'Search for cloud-related plugins')
       .example('autopm plugin install cloud', 'Install cloud plugin')
       .example('autopm plugin uninstall cloud', 'Remove cloud plugin')
+      .example('autopm plugin update', 'Update all installed plugins')
+      .example('autopm plugin update cloud devops', 'Update specific plugins')
       .example('autopm plugin info cloud', 'Show cloud plugin details')
       .epilogue(`
 📦 Plugin Management
@@ -120,6 +122,12 @@ Usage:
             process.exit(1);
           }
           await handleDisable(manager, argv.name, argv);
+          break;
+        case 'update':
+          // argv.name is optional - if not provided, update all
+          // argv._ contains additional arguments after the command
+          const pluginsToUpdate = argv.name ? [argv.name, ...(argv._.slice(3) || [])] : null;
+          await handleUpdate(manager, pluginsToUpdate, argv);
           break;
         default:
           console.error(chalk.red(`Unknown action: ${argv.action}`));
@@ -392,4 +400,121 @@ async function handleDisable(manager, pluginName, argv) {
   console.log(chalk.yellow(`\n⚠ Plugin disabled: ${pluginName}\n`));
   console.log(chalk.gray('Note: Agents remain in .claude/agents/ but plugin is marked as disabled'));
   console.log('');
+}
+
+/**
+ * Handle 'update' command
+ */
+async function handleUpdate(manager, pluginNames, argv) {
+  console.log(chalk.bold('\n🔄 Updating Plugins\n'));
+
+  // Get list of installed plugins
+  const installed = manager.getInstalledPlugins();
+
+  if (installed.length === 0) {
+    console.log(chalk.yellow('No plugins installed to update.'));
+    console.log('');
+    return;
+  }
+
+  // Determine which plugins to update
+  let toUpdate = [];
+  if (pluginNames && pluginNames.length > 0) {
+    // Update specific plugins
+    for (const name of pluginNames) {
+      const fullName = name.startsWith('plugin-') ? name : `plugin-${name}`;
+      if (!installed.includes(fullName)) {
+        console.log(chalk.yellow(`⚠ Plugin ${name} is not installed, skipping`));
+      } else {
+        toUpdate.push(fullName);
+      }
+    }
+  } else {
+    // Update all installed plugins
+    toUpdate = installed;
+    console.log(chalk.gray(`Updating all ${installed.length} installed plugin(s)...\n`));
+  }
+
+  if (toUpdate.length === 0) {
+    console.log(chalk.yellow('No plugins to update.'));
+    console.log('');
+    return;
+  }
+
+  const results = {
+    updated: [],
+    failed: [],
+    skipped: [],
+    upToDate: []
+  };
+
+  // Update each plugin
+  for (const pluginName of toUpdate) {
+    const shortName = pluginName.replace('plugin-', '');
+
+    try {
+      console.log(chalk.bold(`\n📦 Updating ${shortName}...`));
+
+      const result = await manager.updatePlugin(pluginName, {
+        verbose: argv.verbose,
+        force: argv.force
+      });
+
+      if (result.updated) {
+        results.updated.push({
+          name: shortName,
+          oldVersion: result.oldVersion,
+          newVersion: result.newVersion,
+          stats: result.stats
+        });
+        console.log(chalk.green(`✅ Updated ${shortName} (${result.oldVersion} → ${result.newVersion})`));
+
+        if (argv.verbose && result.stats) {
+          console.log(chalk.gray(`   Agents: ${result.stats.agents || 0}, Commands: ${result.stats.commands || 0}, Rules: ${result.stats.rules || 0}`));
+        }
+      } else if (result.upToDate) {
+        results.upToDate.push(shortName);
+        console.log(chalk.gray(`✓ ${shortName} is already up to date (${result.currentVersion})`));
+      } else {
+        results.skipped.push(shortName);
+        console.log(chalk.yellow(`⚠ Skipped ${shortName}: ${result.reason || 'Unknown reason'}`));
+      }
+    } catch (error) {
+      results.failed.push({ name: shortName, error: error.message });
+      console.log(chalk.red(`✗ Failed to update ${shortName}: ${error.message}`));
+
+      if (argv.verbose) {
+        console.error(chalk.red(error.stack));
+      }
+    }
+  }
+
+  // Summary
+  console.log(chalk.bold('\n📊 Update Summary\n'));
+  console.log(`${chalk.green('✅ Updated:')} ${results.updated.length}`);
+  console.log(`${chalk.gray('✓ Up to date:')} ${results.upToDate.length}`);
+  console.log(`${chalk.yellow('⚠ Skipped:')} ${results.skipped.length}`);
+  console.log(`${chalk.red('✗ Failed:')} ${results.failed.length}`);
+  console.log('');
+
+  if (results.updated.length > 0) {
+    console.log(chalk.bold('Updated Plugins:'));
+    for (const plugin of results.updated) {
+      console.log(`  • ${plugin.name} (${plugin.oldVersion} → ${plugin.newVersion})`);
+    }
+    console.log('');
+  }
+
+  if (results.failed.length > 0) {
+    console.log(chalk.bold(chalk.red('Failed Updates:')));
+    for (const plugin of results.failed) {
+      console.log(chalk.red(`  • ${plugin.name}: ${plugin.error}`));
+    }
+    console.log('');
+  }
+
+  // Exit with error if any updates failed
+  if (results.failed.length > 0) {
+    process.exit(1);
+  }
 }

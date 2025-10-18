@@ -9,6 +9,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### 🔄 Plugin Update Command
+
+**New feature:** `autopm plugin update` command for updating installed plugins to their latest versions.
+
+**Usage:**
+```bash
+autopm plugin update              # Update all installed plugins
+autopm plugin update cloud devops # Update specific plugins
+autopm plugin update --verbose    # Show detailed update progress
+```
+
+**Features:**
+- Updates plugins to latest npm versions
+- Preserves enabled/disabled state
+- Shows version changes (old → new)
+- Supports selective updates (specific plugins)
+- Provides detailed update summary
+- Automatic backup before update (via uninstall/reinstall)
+
+**Implementation:**
+- Added `updatePlugin()` method to PluginManager (`lib/plugins/PluginManager.js:911-1040`)
+- Added `handleUpdate()` handler to plugin CLI (`bin/commands/plugin.js:405-520`)
+- Integrated with existing plugin lifecycle (uninstall → npm update → install)
+- Emits events: `update:start`, `update:complete`, `update:error`, `update:skipped`
+
+**Benefits:**
+- Ensures plugins stay up-to-date with latest features and bug fixes
+- Maintains consistency across all plugin resources (agents, commands, rules, hooks, scripts)
+- Eliminates need for manual uninstall/install workflow
+- Provides clear feedback on update status and results
+
 #### 🚀 Token Optimization System - 96% Reduction in Context Usage
 
 Complete redesign of context management achieving **96.4% token reduction** while maintaining full functionality through intelligent lazy loading and XML compression.
