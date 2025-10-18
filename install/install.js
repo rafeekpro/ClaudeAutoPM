@@ -765,6 +765,9 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
   getRequiredAddons() {
     const addons = [];
 
+    // ALWAYS include task-workflow (standard workflow for all projects)
+    addons.push('task-workflow');
+
     // Based on scenario/configuration, determine required addons
     if (this.currentConfig) {
       if (this.currentConfig.tools?.docker?.enabled) {
@@ -804,6 +807,7 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
       'docker-agents': 'AGENT_SELECTION_SECTION',
       'devops-agents': 'AGENT_SELECTION_SECTION',
       'minimal-agents': 'AGENT_SELECTION_SECTION',
+      'task-workflow': 'WORKFLOW_SECTION',
       'docker-workflow': 'WORKFLOW_SECTION',
       'devops-workflow': 'WORKFLOW_SECTION',
       'minimal-workflow': 'WORKFLOW_SECTION',

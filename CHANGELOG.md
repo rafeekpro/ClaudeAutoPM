@@ -7,6 +7,105 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+#### 🚀 Token Optimization System - 96% Reduction in Context Usage
+
+Complete redesign of context management achieving **96.4% token reduction** while maintaining full functionality through intelligent lazy loading and XML compression.
+
+**3-Tier Architecture:**
+- **Tier 1: Minimal CLAUDE.md** (1,646 tokens vs 45,199 old - 96.4% reduction)
+  - `base-optimized.md` - XML-structured minimal template
+  - Lazy loading triggers for on-demand content
+  - Compressed agent listings with pipe-separated values
+  - Reference links instead of embedded documentation
+
+- **Tier 2: Quick Reference Files** (768 tokens avg per file)
+  - `tdd-cycle.md` - Compressed TDD workflow (285 tokens)
+  - `workflow-steps.md` - 9-step workflow reference (545 tokens)
+  - `context7-queries.md` - Common Context7 patterns (660 tokens)
+  - `agent-quick-ref.md` - Agent categories and usage (1,062 tokens)
+  - `common-patterns.md` - Development patterns library (1,290 tokens)
+
+- **Tier 3: Full Documentation** (loaded on-demand)
+  - Optimized rules with 54.7% average savings
+  - `agent-mandatory-optimized.md` (61.5% reduction)
+  - `context7-enforcement-optimized.md` (47.9% reduction)
+
+**Optimization Techniques:**
+- XML compression for 40-60% savings per section
+- Pipe-separated lists for 30% savings
+- Lazy loading architecture for 90% initial context reduction
+- Reference links instead of content embedding
+- Compressed agent descriptions (93.75% reduction)
+
+**Performance Improvements:**
+- Initial load: 1,646 tokens (vs 45,199 old)
+- Typical session: 3,183 tokens (vs 45,199+ old)
+- Quick reference files: Average 768 tokens each
+- All targets exceeded: ✅ <3,000 initial, ✅ <10,000 typical, ✅ >85% savings
+
+**Files Created:**
+- `autopm/.claude/templates/claude-templates/base-optimized.md`
+- `autopm/.claude/quick-ref/tdd-cycle.md`
+- `autopm/.claude/quick-ref/workflow-steps.md`
+- `autopm/.claude/quick-ref/context7-queries.md`
+- `autopm/.claude/quick-ref/agent-quick-ref.md`
+- `autopm/.claude/quick-ref/common-patterns.md`
+- `autopm/.claude/rules/agent-mandatory-optimized.md`
+- `autopm/.claude/rules/context7-enforcement-optimized.md`
+- `autopm/.claude/agents-compressed-example.md`
+- `test/token-optimization-validation.js`
+- `docs/TOKEN-OPTIMIZATION-SYSTEM.md`
+
+**Validation:**
+- Automated test suite confirms 96.4% reduction
+- All optimization targets exceeded
+- Functionality preserved through lazy loading
+- Context7 integration maintained
+
+**Documentation:**
+- Complete system documentation: `docs/TOKEN-OPTIMIZATION-SYSTEM.md`
+- Compression examples: `autopm/.claude/agents-compressed-example.md`
+- Validation test: `test/token-optimization-validation.js`
+
+#### Standard Task Workflow Addon
+
+**Automatic inclusion of comprehensive workflow instructions:**
+- 9-step standard workflow (from backlog to task completion)
+- Core workflow principles (branches, PRs, conflict resolution, feedback, completion)
+- Standard Definition of Done checklist
+- Acceptance Criteria patterns for features, bugs, and improvements
+- Integration examples with specialized agents
+- Workflow variations (hotfix, feature flags)
+- Quick reference commands
+- Based on Anthropic's prompt engineering best practices and Context7 documentation
+- Automatically included in ALL installations (no configuration needed)
+- Template: `autopm/.claude/templates/claude-templates/addons/task-workflow.md`
+- Documentation: `docs/WORKFLOW-ADDON.md`
+
+### Changed
+
+#### Installer Enhancement
+- `install/install.js` now automatically includes `task-workflow` addon
+  - Added to `getRequiredAddons()` method (line 769)
+  - Added to section mapping for `WORKFLOW_SECTION` placeholder (line 810)
+  - Ensures workflow instructions are in every project's `CLAUDE.md`
+
+#### Enhanced TDD Enforcement
+- TDD is now MUCH more visible and enforced throughout templates
+  - **Visual TDD Banner** in task-workflow addon - ASCII art box highlighting TDD requirements
+  - **Expanded Implementation Section** - Step-by-step TDD cycle (RED-GREEN-REFACTOR) with code examples
+  - **Enhanced Base Template** - TDD Pipeline section with visual banner and detailed phases
+  - **Commit Pattern Examples** - Mandatory commit sequence showing test→feat→refactor
+  - **Prohibited Patterns** - Explicit list of auto-reject violations (WIP, TODO tests, code before tests)
+  - **Updated Important Reminders** - TDD is now #1 HIGHEST PRIORITY reminder
+  - All templates emphasize: "🚨 CRITICAL", "MANDATORY", "ZERO TOLERANCE"
+  - Integration with `@test-runner` agent throughout workflow
+  - Real Python and TypeScript test examples
+  - Context7 integration for testing best practices
+  - Documentation: `docs/TDD-ENFORCEMENT-ENHANCEMENT.md`
+
 ## [2.8.2] - 2025-01-15
 
 ### 🎉 NEW: Scenario-Based Plugin Installation
