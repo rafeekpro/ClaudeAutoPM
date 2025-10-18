@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+#### 📉 Task Workflow Template Optimization
+
+**Optimization:** `task-workflow.md` template reduced by 73% (16,669 → 4,553 characters).
+
+**Changes:**
+- Removed verbose step-by-step examples (available in rules)
+- Consolidated redundant TDD explanations
+- Removed duplicate Acceptance Criteria patterns
+- Simplified workflow to essential steps only
+- Improved readability with clearer structure
+
+**Benefits:**
+- Generates smaller CLAUDE.md files (reduces token usage)
+- Faster template processing during installation
+- Easier maintenance of template files
+- Users still get full functionality (details in `.claude/rules/`)
+
+**Impact on installations:**
+- New installations: Automatically benefit from smaller templates
+- Existing projects: Can regenerate CLAUDE.md for optimization
+- No functionality loss: All content moved to appropriate rule files
+
 ### Added
 
 #### 🔄 Plugin Update Command
