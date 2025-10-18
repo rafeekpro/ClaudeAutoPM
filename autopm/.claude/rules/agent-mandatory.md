@@ -2,11 +2,42 @@
 
 **🚨 CRITICAL: This rule has HIGHEST PRIORITY and MUST be followed for ALL tasks.**
 
+## ⚠️ BEFORE YOU START ANY TASK - READ THIS
+
+**MANDATORY SELF-CHECK:**
+
+Before doing ANYTHING complex, ask yourself:
+1. ❓ Is this writing code? → **USE AGENT**
+2. ❓ Is this testing code? → **USE test-runner**
+3. ❓ Is this analyzing code/files? → **USE code-analyzer or file-analyzer**
+4. ❓ Is this database work? → **USE database expert agent**
+5. ❓ Is this DevOps/infrastructure? → **USE DevOps agent**
+
+**If YES to ANY → STOP and USE the appropriate agent!**
+
 ## Core Requirement
 
 **YOU MUST USE SPECIALIZED AGENTS FOR ALL NON-TRIVIAL TASKS.**
 
 Do NOT perform complex tasks yourself. Use the Task tool to delegate to appropriate agents.
+
+### Why This Rule Exists
+
+1. **Quality**: Specialized agents have deeper expertise
+2. **Consistency**: Agents follow established patterns
+3. **Context7**: Agents query live documentation (you should too!)
+4. **TDD**: Agents enforce RED-GREEN-REFACTOR cycle
+5. **Best Practices**: Agents apply industry standards
+
+### What Happens When You Don't Use Agents
+
+❌ **Common failures:**
+- Code without tests (violates TDD)
+- Missing Context7 queries (outdated patterns)
+- Inconsistent code style
+- Security vulnerabilities
+- Performance issues
+- Missing error handling
 
 ## When to Use Agents
 
@@ -160,11 +191,59 @@ If you're unsure whether to use an agent:
 - When in doubt, delegate to specialist
 - Better to over-use agents than under-use them
 
+## Context7 Integration - ALSO MANDATORY
+
+**In addition to using agents, you MUST query Context7 for up-to-date documentation.**
+
+### When to Query Context7
+
+**BEFORE implementing ANY code:**
+```bash
+# Query relevant documentation
+mcp://context7/<framework>/<topic>
+mcp://context7/<language>/best-practices
+mcp://context7/<library>/api-reference
+```
+
+### Why Context7 is Required
+
+1. **Up-to-date info**: Your training data may be outdated
+2. **API changes**: Libraries evolve, APIs change
+3. **Best practices**: Current industry standards
+4. **Bug fixes**: Known issues and workarounds
+
+### Examples
+
+**Writing Python FastAPI code:**
+```bash
+# Query BEFORE implementation
+mcp://context7/fastapi/routing
+mcp://context7/fastapi/validation
+mcp://context7/pydantic/models
+```
+
+**Writing React components:**
+```bash
+# Query BEFORE implementation
+mcp://context7/react/hooks
+mcp://context7/react/18.0/best-practices
+mcp://context7/typescript/react-patterns
+```
+
+**Database schema design:**
+```bash
+# Query BEFORE implementation
+mcp://context7/postgresql/schema-design
+mcp://context7/postgresql/indexing
+mcp://context7/postgresql/performance
+```
+
 ## Summary
 
 **Before doing ANY complex task, ask yourself:**
 1. Is there a specialized agent for this?
 2. Would an agent do this better/faster/more thoroughly?
 3. Am I trying to do something I should delegate?
+4. Should I query Context7 for current best practices?
 
-**If answer is YES to any → USE THE AGENT!**
+**If answer is YES to any → USE THE AGENT! AND QUERY CONTEXT7!**
