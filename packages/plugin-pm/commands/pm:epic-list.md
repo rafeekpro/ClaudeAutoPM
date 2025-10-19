@@ -2,6 +2,10 @@
 allowed-tools: Bash
 ---
 
+---
+
+## Instructions
+
 Run `node .claude/scripts/pm/epic-list.js` using the Bash tool and show me the complete output.
 
 - You MUST display the complete output.

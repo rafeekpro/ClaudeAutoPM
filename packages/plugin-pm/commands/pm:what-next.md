@@ -2,6 +2,10 @@
 allowed-tools: Bash
 ---
 
+---
+
+## Instructions
+
 Run `node .claude/scripts/pm/what-next.js` using the Bash tool and show me the complete output.
 
 - DO NOT truncate.

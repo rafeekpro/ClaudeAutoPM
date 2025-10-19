@@ -118,3 +118,14 @@ If the automatic split isn't perfect, you can:
 2. Adjust dependencies in meta.yaml
 3. Merge or split epics further
 4. Update time estimates
+
+---
+
+## Instructions
+
+Run `node .claude/scripts/pm/epic-split.js $ARGUMENTS` using the Bash tool and show me the complete output.
+
+- You MUST display the complete output.
+- DO NOT truncate.
+- DO NOT collapse.
+- DO NOT abbreviate.
