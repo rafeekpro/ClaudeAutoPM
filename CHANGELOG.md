@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.12.1] - 2025-01-19
+
+### Fixed
+
+#### 🔧 PM Command Instructions Sections
+
+**Fix:** Resolved 17 PM commands failing due to missing `## Instructions` sections.
+
+**Problem:**
+- Commands like `/pm:epic-split` were throwing module resolution errors
+- Missing or malformed `## Instructions` sections prevented script execution
+- Error: `Cannot find module '.claude/scripts/pm/.claude/scripts/pm/...'`
+
+**Fixed Commands:**
+- `pm:epic-split` - Added complete Instructions section
+- 16 others - Added missing `## Instructions` headers:
+  - `pm:blocked`, `pm:context`, `pm:epic-list`, `pm:epic-show`
+  - `pm:epic-status`, `pm:help`, `pm:in-progress`, `pm:init`
+  - `pm:next`, `pm:prd-list`, `pm:prd-status`, `pm:search`
+  - `pm:standup`, `pm:status`, `pm:validate`, `pm:what-next`
+
+**New Tools:**
+- `scripts/fix-command-instructions.js` - Automated fix tool
+  - Detects missing/malformed Instructions sections
+  - Supports plugin, dev, and installed project structures
+  - Provides detailed fix reports
+
+**Documentation:**
+- `docs/COMMAND-INSTRUCTIONS-FIX.md` - Comprehensive analysis
+  - Problem root cause and solution
+  - Standard command format template
+  - Prevention strategies (hooks, tests, templates)
+
+**Impact:**
+- ✅ All 38 PM commands now functional
+- ✅ Consistent command structure
+- ✅ Automated validation available
+
 ### Changed
 
 #### 🔒 Enhanced Agent Usage Enforcement
