@@ -12,6 +12,10 @@ updates:
       prefix: "deps"
       prefix-development: "deps-dev"
       include: "scope"
+    ignore:
+      # ora 9.x is pure ESM, incompatible with our CommonJS codebase
+      - dependency-name: "ora"
+        update-types: ["version-update:semver-major"]
     
   # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
