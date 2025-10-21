@@ -1057,7 +1057,7 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
 
         // Install scripts
         if (metadata.scripts && metadata.scripts.length > 0) {
-          const targetDir = path.join(this.targetDir, '.claude', 'scripts');
+          const targetDir = path.join(this.targetDir, '.claude');
           if (!fs.existsSync(targetDir)) {
             fs.mkdirSync(targetDir, { recursive: true });
           }
@@ -1065,7 +1065,8 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
           for (const script of metadata.scripts) {
             if (script.subdirectory && script.files) {
               // Handle subdirectory with multiple files
-              const cleanSubdir = script.subdirectory.replace(/^scripts\//, '');
+              // scripts/pm/epic-sync/ -> .claude/scripts/pm/epic-sync/
+              const cleanSubdir = script.subdirectory;
               const subdirTarget = path.join(targetDir, cleanSubdir);
               if (!fs.existsSync(subdirTarget)) {
                 fs.mkdirSync(subdirTarget, { recursive: true });
@@ -1084,7 +1085,8 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
               }
             } else if (script.file) {
               // Handle single script file
-              const cleanFile = script.file.replace(/^scripts\//, '');
+              // Keep full path structure (scripts/pm/file.js -> scripts/pm/file.js)
+              const cleanFile = script.file;
               const sourcePath = path.join(pluginPath, script.file);
               const targetPath = path.join(targetDir, cleanFile);
 
