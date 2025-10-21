@@ -75,6 +75,20 @@
       "description": "Reinitialize CLAUDE.md with framework rules",
       "category": "core",
       "tags": ["initialization", "framework"]
+    },
+    {
+      "name": "agent-test",
+      "file": "commands/core:agent-test.md",
+      "description": "Test agent configurations and behaviors",
+      "category": "core-operations",
+      "tags": ["core", "agents", "testing", "validation", "quality-assurance"]
+    },
+    {
+      "name": "context-analyze",
+      "file": "commands/core:context-analyze.md",
+      "description": "Context usage analysis and optimization",
+      "category": "core-operations",
+      "tags": ["core", "context", "optimization", "mcp", "performance"]
     }
   ],
   "rules": [

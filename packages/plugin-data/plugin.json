@@ -90,7 +90,7 @@
   "commands": [
     {
       "subdirectory": "commands/",
-      "description": "Data Engineering & ML commands (2 total)",
+      "description": "Data Engineering & ML commands (4 total)",
       "type": "collection",
       "discovery": "auto",
       "tags": [
@@ -98,7 +98,14 @@
         "dag",
         "scaffold",
         "etl",
-        "taskflow"
+        "taskflow",
+        "lineage",
+        "openlineage",
+        "data-catalog",
+        "governance",
+        "data-quality",
+        "great-expectations",
+        "validation"
       ]
     }
   ],

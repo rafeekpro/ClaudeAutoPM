@@ -33,7 +33,7 @@
   "commands": [
     {
       "subdirectory": "commands/",
-      "description": "Database & Data Storage commands (3 total: db:query-analyze, db:db-optimize, db:schema-migrate)",
+      "description": "Database & Data Storage commands (5 total: db:query-analyze, db:db-optimize, db:schema-migrate, db:connection-pool, db:backup-restore)",
       "type": "collection",
       "discovery": "auto",
       "tags": [
@@ -42,6 +42,10 @@
         "performance",
         "indexing",
         "query-analysis",
+        "connection-pool",
+        "backup",
+        "restore",
+        "disaster-recovery",
         "postgresql",
         "mongodb",
         "redis",
@@ -315,6 +319,10 @@
     "database_optimization": {
       "enabled": true,
       "description": "Query optimization, indexing, and performance tuning"
+    },
+    "connection_pooling": {
+      "enabled": true,
+      "description": "Connection pool optimization for PostgreSQL, MySQL, MongoDB, and Redis"
     },
     "cost_optimization": {
       "enabled": true,
