@@ -169,14 +169,28 @@
   "commands": [
     {
       "subdirectory": "commands/",
-      "description": "DevOps & Infrastructure commands (3 total)",
+      "description": "DevOps & Infrastructure commands (7 total)",
       "type": "collection",
       "discovery": "auto",
       "tags": [
         "github",
         "actions",
         "workflow",
-        "ci-cd"
+        "ci-cd",
+        "monitoring",
+        "observability",
+        "prometheus",
+        "grafana",
+        "deployment",
+        "rollback",
+        "kubernetes",
+        "docker",
+        "security",
+        "secrets",
+        "audit",
+        "compliance",
+        "incident-response",
+        "troubleshooting"
       ]
     }
   ],
@@ -371,7 +385,11 @@
     },
     "security": {
       "enabled": true,
-      "description": "SSH operations and security hardening"
+      "description": "SSH operations, security hardening, and secrets auditing"
+    },
+    "secrets_management": {
+      "enabled": true,
+      "description": "Secrets scanning, audit, and compliance reporting"
     },
     "context_management": {
       "enabled": true,
@@ -406,7 +424,11 @@
     "ssh",
     "traefik",
     "containers",
-    "automation"
+    "automation",
+    "security",
+    "secrets",
+    "audit",
+    "compliance"
   ],
   "compatibleWith": ">=3.0.0"
 }
