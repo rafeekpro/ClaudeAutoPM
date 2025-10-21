@@ -197,14 +197,18 @@
   "commands": [
     {
       "subdirectory": "commands/",
-      "description": "Cloud Providers & Infrastructure commands (6 total)",
+      "description": "Cloud Providers & Infrastructure commands (7 total)",
       "type": "collection",
       "discovery": "auto",
       "tags": [
         "infrastructure",
         "deployment",
         "terraform",
-        "cloud"
+        "cloud",
+        "disaster-recovery",
+        "backup",
+        "cost-management",
+        "monitoring"
       ]
     }
   ],

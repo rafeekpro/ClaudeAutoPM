@@ -223,7 +223,7 @@
   "commands": [
     {
       "subdirectory": "commands/",
-      "description": "Machine Learning commands (2 total)",
+      "description": "Machine Learning commands (6 total)",
       "type": "collection",
       "discovery": "auto",
       "tags": [
@@ -232,7 +232,21 @@
         "optimization",
         "hyperparameters",
         "distributed",
-        "amp"
+        "amp",
+        "model-comparison",
+        "evaluation",
+        "mlflow",
+        "benchmarking",
+        "feature-engineering",
+        "feature-selection",
+        "data-transformation",
+        "data-pipeline",
+        "etl",
+        "kedro",
+        "airflow",
+        "feature-store",
+        "data-quality",
+        "great-expectations"
       ]
     }
   ],

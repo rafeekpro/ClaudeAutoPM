@@ -54,7 +54,7 @@
   "commands": [
     {
       "subdirectory": "commands/",
-      "description": "Testing & QA commands (5 total)",
+      "description": "Testing & QA commands (7 total)",
       "type": "collection",
       "discovery": "auto",
       "tags": [
@@ -62,7 +62,10 @@
         "setup",
         "jest",
         "vitest",
-        "configuration"
+        "configuration",
+        "flaky-tests",
+        "mutation-testing",
+        "test-quality"
       ]
     }
   ],
@@ -174,6 +177,10 @@
     "snapshot_testing": {
       "enabled": true,
       "description": "Snapshot testing for UI components"
+    },
+    "flaky_test_detection": {
+      "enabled": true,
+      "description": "Automated flaky test detection and analysis with root cause identification"
     }
   },
   "dependencies": [],
