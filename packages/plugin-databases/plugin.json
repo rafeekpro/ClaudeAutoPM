@@ -33,7 +33,7 @@
   "commands": [
     {
       "subdirectory": "commands/",
-      "description": "Database & Data Storage commands (1 total)",
+      "description": "Database & Data Storage commands (3 total: db:query-analyze, db:db-optimize, db:schema-migrate)",
       "type": "collection",
       "discovery": "auto",
       "tags": [
@@ -41,9 +41,11 @@
         "optimization",
         "performance",
         "indexing",
+        "query-analysis",
         "postgresql",
         "mongodb",
-        "redis"
+        "redis",
+        "bigquery"
       ]
     }
   ],
