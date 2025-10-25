@@ -1,6 +1,6 @@
 {
   "name": "@claudeautopm/plugin-databases",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Complete database plugin with PostgreSQL, MongoDB, Redis, BigQuery, and Cosmos DB experts, database rules, and optimization scripts for ClaudeAutoPM",
   "main": "plugin.json",
   "type": "module",

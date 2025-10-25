@@ -268,9 +268,14 @@ autopm install
 autopm config set provider github
 autopm config set github.owner YOUR_USERNAME
 autopm config set github.repo YOUR_REPO
-export GITHUB_TOKEN=your_github_token
 
-# 5. Open Claude Code
+# Add your token to .claude/.env (recommended) or export directly
+echo "GITHUB_TOKEN=your_github_token" >> .claude/.env
+
+# 5. Verify configuration
+autopm config validate
+
+# 6. Open Claude Code
 claude --dangerously-skip-permissions .
 ```
 

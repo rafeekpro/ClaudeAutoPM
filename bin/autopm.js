@@ -278,12 +278,22 @@ function main() {
    autopm config set provider github
    autopm config set github.owner <username>
    autopm config set github.repo <repository>
+
+   # Add token to .claude/.env (recommended)
+   echo "GITHUB_TOKEN=ghp_your_token_here" >> .claude/.env
+
+   # Or export as environment variable
    export GITHUB_TOKEN=ghp_your_token_here
 
    # Configure Azure DevOps provider
    autopm config set provider azure
    autopm config set azure.organization <org>
    autopm config set azure.project <project>
+
+   # Add token to .claude/.env (recommended)
+   echo "AZURE_DEVOPS_PAT=your_azure_pat" >> .claude/.env
+
+   # Or export as environment variable
    export AZURE_DEVOPS_PAT=your_azure_pat
 
    # Quick switch between providers
@@ -312,6 +322,13 @@ function main() {
    autopm mcp status                # Show all MCP servers status
 
 🔑 Token Setup:
+   # RECOMMENDED: Store tokens in .claude/.env file
+   echo "GITHUB_TOKEN=ghp_your_token" >> .claude/.env
+   echo "AZURE_DEVOPS_PAT=your_pat" >> .claude/.env
+
+   # The .env file is automatically loaded during validation
+   autopm config validate
+
    # GitHub PAT (Settings → Developer settings → Personal access tokens)
    Scopes: repo, workflow, admin:repo_hook
 
