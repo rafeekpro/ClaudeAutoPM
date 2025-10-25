@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **epic-oneshot workflow** - New `/pm:epic-oneshot` command for one-step PRD → Epic → GitHub sync (epic-oneshot.test.js:14)
+  - Combines PRD parsing, task decomposition, and provider sync in single operation
+  - 14 comprehensive tests covering all workflow steps
+  - CommonJS script for compatibility with ES module packages
+
+### Fixed
+- **Config validation .env loading** - `autopm config validate` now automatically loads environment variables from `.claude/.env`
+  - Added `dotenv` support to ConfigCommand constructor (bin/commands/config.js:10-32)
+  - 3 new tests for environment variable loading (test/cli/config-command.test.js:217-261)
+  - Updated documentation to recommend `.env` file for token storage
+
 ## [3.0.0] - 2025-10-21
 
 ### Added

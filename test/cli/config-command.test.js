@@ -214,6 +214,52 @@ describe('ConfigCommand', () => {
     });
   });
 
+  describe('loadEnv', () => {
+    it('should load environment variables from .claude/.env', async () => {
+      const envContent = 'GITHUB_TOKEN=test_github_token_from_env\nAZURE_DEVOPS_PAT=test_azure_token';
+      await fs.writeFile(cmd.envPath, envContent);
+
+      // Create new instance to trigger loadEnv()
+      const newCmd = new ConfigCommand();
+
+      assert.strictEqual(process.env.GITHUB_TOKEN, 'test_github_token_from_env');
+      assert.strictEqual(process.env.AZURE_DEVOPS_PAT, 'test_azure_token');
+    });
+
+    it('should not fail if .env file does not exist', () => {
+      // Should not throw error even if .env doesn't exist
+      const newCmd = new ConfigCommand();
+      assert.ok(newCmd);
+    });
+
+    it('should validate config with token from .env file', async () => {
+      // Write .env file with token
+      const envContent = 'GITHUB_TOKEN=test_token_from_file';
+      await fs.writeFile(cmd.envPath, envContent);
+
+      // Write config
+      await cmd.saveConfig({
+        provider: 'github',
+        providers: {
+          github: {
+            owner: 'testuser',
+            repo: 'testrepo'
+          }
+        }
+      });
+
+      // Create required directories
+      await fs.mkdir(path.join(tempDir, '.claude', 'agents'), { recursive: true });
+      await fs.mkdir(path.join(tempDir, '.claude', 'commands'), { recursive: true });
+
+      // Create new instance to load .env
+      const newCmd = new ConfigCommand();
+
+      const valid = await newCmd.validate();
+      assert.strictEqual(valid, true);
+    });
+  });
+
   describe('validate', () => {
     it('should return false for missing config', async () => {
       const valid = await cmd.validate();
