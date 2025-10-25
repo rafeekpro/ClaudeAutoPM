@@ -17,7 +17,12 @@
     },
     "size": "~25 KB (gzipped)",
     "required": false,
-    "tags": ["project-management", "agile", "workflows", "automation"]
+    "tags": [
+      "project-management",
+      "agile",
+      "workflows",
+      "automation"
+    ]
   },
   "scripts": [
     {
@@ -27,7 +32,11 @@
       "type": "utility",
       "executable": true,
       "category": "analytics",
-      "tags": ["analytics", "metrics", "reporting"]
+      "tags": [
+        "analytics",
+        "metrics",
+        "reporting"
+      ]
     },
     {
       "name": "blocked",
@@ -36,7 +45,11 @@
       "type": "workflow",
       "executable": true,
       "category": "issue-management",
-      "tags": ["blocked", "dependencies", "workflow"],
+      "tags": [
+        "blocked",
+        "dependencies",
+        "workflow"
+      ],
       "wrapper": "scripts/pm/blocked.sh"
     },
     {
@@ -46,7 +59,11 @@
       "type": "utility",
       "executable": true,
       "category": "maintenance",
-      "tags": ["cleanup", "maintenance", "automation"]
+      "tags": [
+        "cleanup",
+        "maintenance",
+        "automation"
+      ]
     },
     {
       "name": "context-create",
@@ -55,7 +72,11 @@
       "type": "workflow",
       "executable": true,
       "category": "context-management",
-      "tags": ["context", "workflow", "initialization"]
+      "tags": [
+        "context",
+        "workflow",
+        "initialization"
+      ]
     },
     {
       "name": "context-prime",
@@ -64,7 +85,11 @@
       "type": "workflow",
       "executable": true,
       "category": "context-management",
-      "tags": ["context", "setup", "initialization"]
+      "tags": [
+        "context",
+        "setup",
+        "initialization"
+      ]
     },
     {
       "name": "context-update",
@@ -73,7 +98,11 @@
       "type": "workflow",
       "executable": true,
       "category": "context-management",
-      "tags": ["context", "update", "workflow"]
+      "tags": [
+        "context",
+        "update",
+        "workflow"
+      ]
     },
     {
       "name": "context",
@@ -82,7 +111,11 @@
       "type": "workflow",
       "executable": true,
       "category": "context-management",
-      "tags": ["context", "management", "workflow"]
+      "tags": [
+        "context",
+        "management",
+        "workflow"
+      ]
     },
     {
       "name": "epic-close",
@@ -91,7 +124,11 @@
       "type": "workflow",
       "executable": true,
       "category": "epic-management",
-      "tags": ["epic", "close", "workflow"]
+      "tags": [
+        "epic",
+        "close",
+        "workflow"
+      ]
     },
     {
       "name": "epic-edit",
@@ -100,7 +137,11 @@
       "type": "workflow",
       "executable": true,
       "category": "epic-management",
-      "tags": ["epic", "edit", "workflow"]
+      "tags": [
+        "epic",
+        "edit",
+        "workflow"
+      ]
     },
     {
       "name": "epic-list",
@@ -109,7 +150,11 @@
       "type": "utility",
       "executable": true,
       "category": "epic-management",
-      "tags": ["epic", "list", "query"],
+      "tags": [
+        "epic",
+        "list",
+        "query"
+      ],
       "wrapper": "scripts/pm/epic-list.sh"
     },
     {
@@ -119,7 +164,11 @@
       "type": "utility",
       "executable": true,
       "category": "epic-management",
-      "tags": ["epic", "show", "query"],
+      "tags": [
+        "epic",
+        "show",
+        "query"
+      ],
       "wrapper": "scripts/pm/epic-show.sh"
     },
     {
@@ -129,7 +178,11 @@
       "type": "workflow",
       "executable": true,
       "category": "epic-management",
-      "tags": ["epic", "split", "refactor"]
+      "tags": [
+        "epic",
+        "split",
+        "refactor"
+      ]
     },
     {
       "name": "epic-start",
@@ -143,7 +196,11 @@
       ],
       "main": "epic-start.js",
       "category": "epic-management",
-      "tags": ["epic", "start", "initialization"]
+      "tags": [
+        "epic",
+        "start",
+        "initialization"
+      ]
     },
     {
       "name": "epic-status",
@@ -152,13 +209,17 @@
       "type": "utility",
       "executable": true,
       "category": "epic-management",
-      "tags": ["epic", "status", "progress"],
+      "tags": [
+        "epic",
+        "status",
+        "progress"
+      ],
       "wrapper": "scripts/pm/epic-status.sh"
     },
     {
-      "name": "epic-sync",
+      "name": "epic-sync-scripts",
       "subdirectory": "scripts/pm/epic-sync/",
-      "description": "Synchronize epics with GitHub issues",
+      "description": "Epic sync modular scripts (subdirectory)",
       "type": "workflow",
       "files": [
         "create-epic-issue.sh",
@@ -169,8 +230,26 @@
       ],
       "main": "create-epic-issue.sh",
       "category": "epic-management",
-      "tags": ["epic", "sync", "github", "integration"],
-      "wrapper": "scripts/pm/epic-sync.sh"
+      "tags": [
+        "epic",
+        "sync",
+        "github",
+        "integration"
+      ]
+    },
+    {
+      "name": "epic-sync",
+      "file": "scripts/pm/epic-sync.sh",
+      "description": "Epic sync orchestration script (main wrapper)",
+      "type": "workflow",
+      "executable": true,
+      "category": "epic-management",
+      "tags": [
+        "epic",
+        "sync",
+        "github",
+        "orchestration"
+      ]
     },
     {
       "name": "help",
@@ -179,7 +258,11 @@
       "type": "utility",
       "executable": true,
       "category": "documentation",
-      "tags": ["help", "documentation", "usage"],
+      "tags": [
+        "help",
+        "documentation",
+        "usage"
+      ],
       "wrapper": "scripts/pm/help.sh"
     },
     {
@@ -189,7 +272,11 @@
       "type": "utility",
       "executable": true,
       "category": "workflow",
-      "tags": ["progress", "workflow", "status"],
+      "tags": [
+        "progress",
+        "workflow",
+        "status"
+      ],
       "wrapper": "scripts/pm/in-progress.sh"
     },
     {
@@ -199,7 +286,11 @@
       "type": "workflow",
       "executable": true,
       "category": "initialization",
-      "tags": ["init", "setup", "configuration"],
+      "tags": [
+        "init",
+        "setup",
+        "configuration"
+      ],
       "wrapper": "scripts/pm/init.sh"
     },
     {
@@ -209,7 +300,11 @@
       "type": "workflow",
       "executable": true,
       "category": "issue-management",
-      "tags": ["issue", "close", "workflow"]
+      "tags": [
+        "issue",
+        "close",
+        "workflow"
+      ]
     },
     {
       "name": "issue-edit",
@@ -218,7 +313,11 @@
       "type": "workflow",
       "executable": true,
       "category": "issue-management",
-      "tags": ["issue", "edit", "workflow"]
+      "tags": [
+        "issue",
+        "edit",
+        "workflow"
+      ]
     },
     {
       "name": "issue-show",
@@ -227,7 +326,11 @@
       "type": "utility",
       "executable": true,
       "category": "issue-management",
-      "tags": ["issue", "show", "query"]
+      "tags": [
+        "issue",
+        "show",
+        "query"
+      ]
     },
     {
       "name": "issue-start",
@@ -236,7 +339,11 @@
       "type": "workflow",
       "executable": true,
       "category": "issue-management",
-      "tags": ["issue", "start", "workflow"]
+      "tags": [
+        "issue",
+        "start",
+        "workflow"
+      ]
     },
     {
       "name": "issue-sync",
@@ -252,7 +359,12 @@
       ],
       "main": "preflight-validation.sh",
       "category": "issue-management",
-      "tags": ["issue", "sync", "github", "integration"]
+      "tags": [
+        "issue",
+        "sync",
+        "github",
+        "integration"
+      ]
     },
     {
       "name": "lib",
@@ -266,7 +378,11 @@
       ],
       "exported": true,
       "category": "library",
-      "tags": ["library", "utilities", "helpers"]
+      "tags": [
+        "library",
+        "utilities",
+        "helpers"
+      ]
     },
     {
       "name": "next",
@@ -275,7 +391,11 @@
       "type": "workflow",
       "executable": true,
       "category": "workflow",
-      "tags": ["next", "workflow", "planning"],
+      "tags": [
+        "next",
+        "workflow",
+        "planning"
+      ],
       "wrapper": "scripts/pm/next.sh"
     },
     {
@@ -285,7 +405,11 @@
       "type": "utility",
       "executable": true,
       "category": "optimization",
-      "tags": ["optimize", "performance", "improvement"]
+      "tags": [
+        "optimize",
+        "performance",
+        "improvement"
+      ]
     },
     {
       "name": "pr-create",
@@ -294,7 +418,11 @@
       "type": "workflow",
       "executable": true,
       "category": "pull-requests",
-      "tags": ["pr", "pull-request", "github"]
+      "tags": [
+        "pr",
+        "pull-request",
+        "github"
+      ]
     },
     {
       "name": "pr-list",
@@ -303,7 +431,11 @@
       "type": "utility",
       "executable": true,
       "category": "pull-requests",
-      "tags": ["pr", "list", "query"]
+      "tags": [
+        "pr",
+        "list",
+        "query"
+      ]
     },
     {
       "name": "prd-list",
@@ -312,7 +444,11 @@
       "type": "utility",
       "executable": true,
       "category": "documentation",
-      "tags": ["prd", "list", "documentation"],
+      "tags": [
+        "prd",
+        "list",
+        "documentation"
+      ],
       "wrapper": "scripts/pm/prd-list.sh"
     },
     {
@@ -322,7 +458,11 @@
       "type": "workflow",
       "executable": true,
       "category": "documentation",
-      "tags": ["prd", "create", "documentation"]
+      "tags": [
+        "prd",
+        "create",
+        "documentation"
+      ]
     },
     {
       "name": "prd-parse",
@@ -331,7 +471,11 @@
       "type": "workflow",
       "executable": true,
       "category": "documentation",
-      "tags": ["prd", "parse", "analysis"]
+      "tags": [
+        "prd",
+        "parse",
+        "analysis"
+      ]
     },
     {
       "name": "prd-status",
@@ -340,7 +484,11 @@
       "type": "utility",
       "executable": true,
       "category": "documentation",
-      "tags": ["prd", "status", "progress"],
+      "tags": [
+        "prd",
+        "status",
+        "progress"
+      ],
       "wrapper": "scripts/pm/prd-status.sh"
     },
     {
@@ -350,7 +498,11 @@
       "type": "workflow",
       "executable": true,
       "category": "release",
-      "tags": ["release", "automation", "publishing"]
+      "tags": [
+        "release",
+        "automation",
+        "publishing"
+      ]
     },
     {
       "name": "search",
@@ -359,7 +511,11 @@
       "type": "utility",
       "executable": true,
       "category": "search",
-      "tags": ["search", "query", "find"],
+      "tags": [
+        "search",
+        "query",
+        "find"
+      ],
       "wrapper": "scripts/pm/search.sh"
     },
     {
@@ -369,7 +525,11 @@
       "type": "utility",
       "executable": true,
       "category": "reporting",
-      "tags": ["standup", "reporting", "status"],
+      "tags": [
+        "standup",
+        "reporting",
+        "status"
+      ],
       "wrapper": "scripts/pm/standup.sh"
     },
     {
@@ -379,7 +539,11 @@
       "type": "utility",
       "executable": true,
       "category": "reporting",
-      "tags": ["status", "dashboard", "overview"],
+      "tags": [
+        "status",
+        "dashboard",
+        "overview"
+      ],
       "wrapper": "scripts/pm/status.sh"
     },
     {
@@ -389,7 +553,11 @@
       "type": "workflow",
       "executable": true,
       "category": "synchronization",
-      "tags": ["sync", "batch", "github"]
+      "tags": [
+        "sync",
+        "batch",
+        "github"
+      ]
     },
     {
       "name": "sync",
@@ -398,7 +566,11 @@
       "type": "workflow",
       "executable": true,
       "category": "synchronization",
-      "tags": ["sync", "github", "integration"]
+      "tags": [
+        "sync",
+        "github",
+        "integration"
+      ]
     },
     {
       "name": "template-list",
@@ -407,7 +579,11 @@
       "type": "utility",
       "executable": true,
       "category": "templates",
-      "tags": ["template", "list", "documentation"]
+      "tags": [
+        "template",
+        "list",
+        "documentation"
+      ]
     },
     {
       "name": "template-new",
@@ -416,7 +592,11 @@
       "type": "workflow",
       "executable": true,
       "category": "templates",
-      "tags": ["template", "create", "documentation"]
+      "tags": [
+        "template",
+        "create",
+        "documentation"
+      ]
     },
     {
       "name": "validate",
@@ -425,7 +605,11 @@
       "type": "utility",
       "executable": true,
       "category": "validation",
-      "tags": ["validate", "quality", "integrity"],
+      "tags": [
+        "validate",
+        "quality",
+        "integrity"
+      ],
       "wrapper": "scripts/pm/validate.sh"
     },
     {
@@ -435,7 +619,193 @@
       "type": "workflow",
       "executable": true,
       "category": "workflow",
-      "tags": ["planning", "workflow", "ai"]
+      "tags": [
+        "planning",
+        "workflow",
+        "ai"
+      ]
+    },
+    {
+      "name": "blocked",
+      "file": "scripts/pm/blocked.sh",
+      "description": "Blocked wrapper script",
+      "type": "workflow",
+      "executable": true,
+      "category": "pm-workflow",
+      "tags": [
+        "pm",
+        "workflow",
+        "automation"
+      ]
+    },
+    {
+      "name": "epic-list",
+      "file": "scripts/pm/epic-list.sh",
+      "description": "Epic List wrapper script",
+      "type": "workflow",
+      "executable": true,
+      "category": "pm-workflow",
+      "tags": [
+        "pm",
+        "epic",
+        "automation"
+      ]
+    },
+    {
+      "name": "epic-show",
+      "file": "scripts/pm/epic-show.sh",
+      "description": "Epic Show wrapper script",
+      "type": "workflow",
+      "executable": true,
+      "category": "pm-workflow",
+      "tags": [
+        "pm",
+        "epic",
+        "automation"
+      ]
+    },
+    {
+      "name": "epic-status",
+      "file": "scripts/pm/epic-status.sh",
+      "description": "Epic Status wrapper script",
+      "type": "workflow",
+      "executable": true,
+      "category": "pm-workflow",
+      "tags": [
+        "pm",
+        "epic",
+        "automation"
+      ]
+    },
+    {
+      "name": "help",
+      "file": "scripts/pm/help.sh",
+      "description": "Help wrapper script",
+      "type": "workflow",
+      "executable": true,
+      "category": "pm-workflow",
+      "tags": [
+        "pm",
+        "workflow",
+        "automation"
+      ]
+    },
+    {
+      "name": "in-progress",
+      "file": "scripts/pm/in-progress.sh",
+      "description": "In Progress wrapper script",
+      "type": "workflow",
+      "executable": true,
+      "category": "pm-workflow",
+      "tags": [
+        "pm",
+        "workflow",
+        "automation"
+      ]
+    },
+    {
+      "name": "init",
+      "file": "scripts/pm/init.sh",
+      "description": "Init wrapper script",
+      "type": "workflow",
+      "executable": true,
+      "category": "pm-workflow",
+      "tags": [
+        "pm",
+        "workflow",
+        "automation"
+      ]
+    },
+    {
+      "name": "next",
+      "file": "scripts/pm/next.sh",
+      "description": "Next wrapper script",
+      "type": "workflow",
+      "executable": true,
+      "category": "pm-workflow",
+      "tags": [
+        "pm",
+        "workflow",
+        "automation"
+      ]
+    },
+    {
+      "name": "prd-list",
+      "file": "scripts/pm/prd-list.sh",
+      "description": "Prd List wrapper script",
+      "type": "workflow",
+      "executable": true,
+      "category": "pm-workflow",
+      "tags": [
+        "pm",
+        "workflow",
+        "automation"
+      ]
+    },
+    {
+      "name": "prd-status",
+      "file": "scripts/pm/prd-status.sh",
+      "description": "Prd Status wrapper script",
+      "type": "workflow",
+      "executable": true,
+      "category": "pm-workflow",
+      "tags": [
+        "pm",
+        "workflow",
+        "automation"
+      ]
+    },
+    {
+      "name": "search",
+      "file": "scripts/pm/search.sh",
+      "description": "Search wrapper script",
+      "type": "workflow",
+      "executable": true,
+      "category": "pm-workflow",
+      "tags": [
+        "pm",
+        "workflow",
+        "automation"
+      ]
+    },
+    {
+      "name": "standup",
+      "file": "scripts/pm/standup.sh",
+      "description": "Standup wrapper script",
+      "type": "workflow",
+      "executable": true,
+      "category": "pm-workflow",
+      "tags": [
+        "pm",
+        "workflow",
+        "automation"
+      ]
+    },
+    {
+      "name": "status",
+      "file": "scripts/pm/status.sh",
+      "description": "Status wrapper script",
+      "type": "workflow",
+      "executable": true,
+      "category": "pm-workflow",
+      "tags": [
+        "pm",
+        "workflow",
+        "automation"
+      ]
+    },
+    {
+      "name": "validate",
+      "file": "scripts/pm/validate.sh",
+      "description": "Validate wrapper script",
+      "type": "workflow",
+      "executable": true,
+      "category": "pm-workflow",
+      "tags": [
+        "pm",
+        "workflow",
+        "automation"
+      ]
     }
   ],
   "commands": [
@@ -449,7 +819,15 @@
         "github": "GitHub workflow commands (1)"
       },
       "discovery": "auto",
-      "tags": ["pm", "workflows", "epic", "task", "issue", "azure", "github"]
+      "tags": [
+        "pm",
+        "workflows",
+        "epic",
+        "task",
+        "issue",
+        "azure",
+        "github"
+      ]
     }
   ],
   "features": {
