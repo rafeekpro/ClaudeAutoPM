@@ -67,7 +67,7 @@ epic_number=$(gh issue create \
 - Created: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
 " \
     --label "$labels" \
-    2>&1 | grep -oP '(?<=#)[0-9]+' | head -1)
+    2>&1 | grep -o '#[0-9]\+' | head -1 | sed 's/#//')
 
 if [[ -z "$epic_number" ]]; then
     echo "❌ Error: Failed to create epic issue"

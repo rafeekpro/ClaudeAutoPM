@@ -66,7 +66,7 @@ for task_file in $task_files; do
 - Created: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
 " \
         --label "task,epic:$EPIC_NAME" \
-        2>&1 | grep -oP '(?<=#)[0-9]+' | head -1)
+        2>&1 | grep -o '#[0-9]\+' | head -1 | sed 's/#//')
 
     if [[ -n "$issue_number" ]]; then
         echo "#$issue_number ✓"
