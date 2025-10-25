@@ -7,11 +7,28 @@
 
 const fs = require('fs-extra');
 const path = require('path');
+const dotenv = require('dotenv');
 
 class ConfigCommand {
   constructor() {
     this.configPath = path.join(process.cwd(), '.claude', 'config.json');
     this.envPath = path.join(process.cwd(), '.claude', '.env');
+
+    // Load .env file if it exists
+    this.loadEnv();
+  }
+
+  /**
+   * Load environment variables from .claude/.env
+   */
+  loadEnv() {
+    try {
+      if (fs.existsSync(this.envPath)) {
+        dotenv.config({ path: this.envPath });
+      }
+    } catch (error) {
+      // Silently ignore - env file is optional
+    }
   }
 
   /**

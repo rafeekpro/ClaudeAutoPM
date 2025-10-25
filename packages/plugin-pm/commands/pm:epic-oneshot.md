@@ -45,75 +45,120 @@ See `.claude/rules/tdd.enforcement.md` for complete requirements.
 
 ### 1. Validate Prerequisites
 
-Check that epic exists and hasn't been processed:
 ```bash
-# Epic must exist
-test -f .claude/epics/$ARGUMENTS/epic.md || echo "❌ Epic not found. Run: /pm:prd-parse $ARGUMENTS"
-
-# Check for existing tasks
-if ls .claude/epics/$ARGUMENTS/[0-9]*.md 2>/dev/null | grep -q .; then
-  echo "⚠️ Tasks already exist. This will create duplicates."
-  echo "Delete existing tasks or use /pm:epic-sync instead."
+# Check if PRD exists
+if [ ! -f ".claude/prds/$ARGUMENTS.md" ]; then
+  echo "❌ PRD not found: $ARGUMENTS.md"
+  echo "💡 Create it first with: /pm:prd-new $ARGUMENTS"
   exit 1
 fi
 
-# Check if already synced
-if grep -q "github:" .claude/epics/$ARGUMENTS/epic.md; then
-  echo "⚠️ Epic already synced to GitHub."
-  echo "Use /pm:epic-sync to update."
+echo "✅ PRD found"
+
+# Check if epic already exists
+if [ -f ".claude/epics/$ARGUMENTS/epic.md" ]; then
+  echo "⚠️ Epic already exists: $ARGUMENTS"
+  echo "💡 View it with: /pm:epic-show $ARGUMENTS"
+  echo "💡 Or use a different name"
+  exit 1
+fi
+
+echo "✅ Ready to create epic"
+```
+
+### 2. Execute Epic Oneshot Script
+
+Run the all-in-one script that handles:
+- PRD parsing
+- Task decomposition
+- GitHub/Azure sync
+
+```bash
+node .claude/scripts/pm/epic-oneshot.cjs $ARGUMENTS
+```
+
+### 3. Verify Success
+
+```bash
+# Check epic was created
+if [ -f ".claude/epics/$ARGUMENTS/epic.md" ]; then
+  echo ""
+  echo "✅ Epic Oneshot Complete!"
+  echo ""
+  echo "📋 Next steps:"
+  echo "  • View epic: /pm:epic-show $ARGUMENTS"
+  echo "  • Start work: /pm:epic-start $ARGUMENTS"
+  echo "  • Get next task: /pm:next"
+  echo ""
+else
+  echo "❌ Epic creation failed. Check output above for errors."
   exit 1
 fi
 ```
 
-### 2. Execute Decompose
+## What It Does
 
-Simply run the decompose command:
-```
-Running: /pm:epic-decompose $ARGUMENTS
-```
+This command executes a complete workflow in one operation:
 
-This will:
-- Read the epic
-- Create task files (using parallel agents if appropriate)
-- Update epic with task summary
+**Step 1: Parse PRD**
+- Reads `.claude/prds/$ARGUMENTS.md`
+- Extracts features, requirements, technical details
+- Creates epic structure
 
-### 3. Execute Sync
+**Step 2: Decompose Tasks**
+- Analyzes epic content
+- Generates implementation tasks
+- Adds tasks to epic.md
 
-Immediately follow with sync:
-```
-Running: /pm:epic-sync $ARGUMENTS
-```
+**Step 3: Sync to Provider**
+- Creates epic issue on GitHub/Azure
+- Creates sub-issues for each task
+- Links everything together
 
-This will:
-- Create epic issue on GitHub
-- Create sub-issues (using parallel agents if appropriate)
-- Rename task files to issue IDs
-- Create epic branch
+## Output Structure
 
-### 4. Output
+After successful execution:
 
 ```
-🚀 Epic Oneshot Complete: $ARGUMENTS
+.claude/
+  epics/
+    <feature-name>/
+      epic.md              # Main epic with embedded tasks
+      metadata.json        # Epic metadata
+      tasks/               # Individual task files (if created)
+```
 
-Step 1: Decomposition ✓
-  - Tasks created: {count}
-  
-Step 2: GitHub Sync ✓
-  - Epic: #{number}
-  - Sub-issues created: {count}
-  - Branch: epic/$ARGUMENTS
+## Example Usage
 
-Ready for development!
-  Start work: /pm:epic-start $ARGUMENTS
-  Or single task: /pm:issue-start {task_number}
+```bash
+# Complete workflow in one command
+/pm:epic-oneshot gym-trading-env
+
+# What happens:
+# 1. Parses .claude/prds/gym-trading-env.md
+# 2. Creates .claude/epics/gym-trading-env/epic.md
+# 3. Generates implementation tasks
+# 4. Syncs to GitHub/Azure DevOps
+# 5. Ready to start work!
 ```
 
 ## Important Notes
 
-This is simply a convenience wrapper that runs:
-1. `/pm:epic-decompose` 
-2. `/pm:epic-sync`
+**Advantages of Oneshot:**
+- ✅ Fastest way from PRD to implementation
+- ✅ No manual intervention needed
+- ✅ Automatic task generation
+- ✅ Immediate GitHub sync
 
-Both commands handle their own error checking, parallel execution, and validation. This command just orchestrates them in sequence.
+**When NOT to use:**
+- ❌ Complex PRDs needing manual review between steps
+- ❌ Custom task decomposition required
+- ❌ Learning the PM workflow (use step-by-step instead)
 
-Use this when you're confident the epic is ready and want to go from epic to GitHub issues in one step.
+**Alternative: Step-by-Step**
+```bash
+# If you prefer manual control:
+/pm:prd-parse <feature>       # Step 1: Create epic
+/pm:epic-decompose <feature>  # Step 2: Add tasks (if available)
+/pm:epic-sync <feature>       # Step 3: Sync to provider
+```

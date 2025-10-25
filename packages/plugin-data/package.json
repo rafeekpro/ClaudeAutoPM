@@ -1,6 +1,6 @@
 {
   "name": "@claudeautopm/plugin-data",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Complete data engineering plugin with Airflow, Kedro, LangGraph, Kafka, dbt, pandas experts, data quality rules, and example scripts for ClaudeAutoPM",
   "main": "plugin.json",
   "type": "module",
