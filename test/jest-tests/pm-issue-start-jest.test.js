@@ -9,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const { execSync } = require('child_process');
-const IssueStarter = require('../../autopm/.claude/scripts/pm/issue-start.js');
+const IssueStarter = require('../../packages/plugin-pm/scripts/pm/issue-start.cjs');
 
 // Mock child_process for controlled testing
 jest.mock('child_process', () => ({
@@ -814,6 +814,266 @@ describe('PM Issue Start Script - Comprehensive Jest Tests', () => {
 
       const activeWork = issueStarter.loadActiveWork();
       expect(activeWork.issues).toHaveLength(10); // Limited to 10
+    });
+  });
+
+  describe('--analyze Flag Support (NEW FUNCTIONALITY)', () => {
+    beforeEach(() => {
+      // Setup basic epic structure
+      fs.mkdirSync('.claude/epics/test-epic', { recursive: true });
+    });
+
+    test('should recognize --analyze flag in arguments', async () => {
+      const issueId = 'TEST-123';
+
+      jest.spyOn(issueStarter, 'analyzeIssue').mockResolvedValue(true);
+      jest.spyOn(issueStarter, 'startIssueWithAnalysis').mockResolvedValue(undefined);
+
+      await issueStarter.run([issueId, '--analyze']);
+
+      expect(issueStarter.analyzeIssue).toHaveBeenCalledWith(issueId, {});
+      expect(issueStarter.startIssueWithAnalysis).toHaveBeenCalledWith(issueId, {});
+    });
+
+    test('should call analysis before starting when --analyze flag present', async () => {
+      const issueId = 'TEST-123';
+      const callOrder = [];
+
+      jest.spyOn(issueStarter, 'analyzeIssue').mockImplementation(async () => {
+        callOrder.push('analyze');
+        return true;
+      });
+      jest.spyOn(issueStarter, 'startIssueWithAnalysis').mockImplementation(async () => {
+        callOrder.push('start');
+      });
+
+      await issueStarter.run([issueId, '--analyze']);
+
+      expect(callOrder).toEqual(['analyze', 'start']);
+    });
+
+    test('should find issue task file by number pattern', () => {
+      const issueId = '123';
+
+      // Create task file with GitHub issue URL in frontmatter
+      const taskFile = path.join('.claude/epics/test-epic', '123.md');
+      fs.writeFileSync(taskFile, `---
+github: https://github.com/user/repo/issues/123
+title: Test Issue
+---
+# Test Issue Content
+`);
+
+      const foundFile = issueStarter.findTaskFile(issueId);
+      expect(foundFile).toBe(taskFile);
+    });
+
+    test('should find issue task file by old naming convention', () => {
+      const issueId = '123';
+
+      // Create task file with old naming
+      const taskFile = path.join('.claude/epics/test-epic', 'feature-name.md');
+      fs.writeFileSync(taskFile, `---
+github: https://github.com/user/repo/issues/123
+title: Test Issue
+---
+# Test Issue Content
+`);
+
+      const foundFile = issueStarter.findTaskFile(issueId);
+      expect(foundFile).toBe(taskFile);
+    });
+
+    test('should create analysis file with correct structure', async () => {
+      const issueId = '123';
+      const epicName = 'test-epic';
+
+      // Create task file
+      const taskFile = path.join('.claude/epics', epicName, `${issueId}.md`);
+      fs.writeFileSync(taskFile, `---
+github: https://github.com/user/repo/issues/123
+title: Add authentication feature
+epic: ${epicName}
+---
+# Add Authentication Feature
+
+Implement user authentication with JWT tokens.
+`);
+
+      // Mock gh command
+      mockExecSync.mockImplementation((cmd) => {
+        if (cmd.includes('gh issue view')) {
+          return JSON.stringify({
+            title: 'Add authentication feature',
+            body: 'Need to implement JWT-based authentication',
+            labels: [{name: 'enhancement'}]
+          });
+        }
+        throw new Error('Command not found');
+      });
+
+      await issueStarter.analyzeIssue(issueId);
+
+      const analysisFile = path.join('.claude/epics', epicName, `${issueId}-analysis.md`);
+      expect(fs.existsSync(analysisFile)).toBe(true);
+
+      const content = fs.readFileSync(analysisFile, 'utf8');
+      expect(content).toContain('# Parallel Work Analysis: Issue #123');
+      expect(content).toContain('## Overview');
+      expect(content).toContain('## Parallel Streams');
+    });
+
+    test('should parse analysis file and extract streams', () => {
+      const issueId = '123';
+      const epicName = 'test-epic';
+
+      // Create analysis file
+      const analysisFile = path.join('.claude/epics', epicName, `${issueId}-analysis.md`);
+      const analysisContent = `---
+issue: 123
+title: Test Issue
+analyzed: 2023-01-01T10:00:00Z
+---
+# Parallel Work Analysis: Issue #123
+
+## Parallel Streams
+
+### Stream A: Backend API
+**Scope**: Create REST endpoints
+**Files**:
+- src/api/auth.js
+- src/middleware/jwt.js
+**Agent Type**: nodejs-backend-engineer
+**Can Start**: immediately
+**Estimated Hours**: 4
+**Dependencies**: none
+
+### Stream B: Frontend Components
+**Scope**: Build login UI
+**Files**:
+- src/components/Login.jsx
+**Agent Type**: react-frontend-engineer
+**Can Start**: immediately
+**Estimated Hours**: 3
+**Dependencies**: none
+`;
+      fs.writeFileSync(analysisFile, analysisContent);
+
+      const streams = issueStarter.parseAnalysisStreams(analysisFile);
+
+      expect(streams).toHaveLength(2);
+      expect(streams[0]).toMatchObject({
+        name: 'Backend API',
+        agentType: 'nodejs-backend-engineer',
+        canStart: 'immediately',
+        files: ['src/api/auth.js', 'src/middleware/jwt.js']
+      });
+      expect(streams[1]).toMatchObject({
+        name: 'Frontend Components',
+        agentType: 'react-frontend-engineer',
+        canStart: 'immediately'
+      });
+    });
+
+    test('should create workspace structure for issue', async () => {
+      const issueId = '123';
+      const epicName = 'test-epic';
+
+      await issueStarter.createWorkspace(issueId, epicName);
+
+      const workspaceDir = path.join('.claude/epics', epicName, 'updates', issueId);
+      expect(fs.existsSync(workspaceDir)).toBe(true);
+    });
+
+    test('should create stream tracking files', async () => {
+      const issueId = '123';
+      const epicName = 'test-epic';
+      const stream = {
+        name: 'Backend API',
+        scope: 'Create REST endpoints',
+        files: ['src/api/auth.js'],
+        agentType: 'nodejs-backend-engineer',
+        canStart: 'immediately'
+      };
+
+      await issueStarter.createStreamFile(issueId, epicName, stream, 1);
+
+      const streamFile = path.join('.claude/epics', epicName, 'updates', issueId, 'stream-1.md');
+      expect(fs.existsSync(streamFile)).toBe(true);
+
+      const content = fs.readFileSync(streamFile, 'utf8');
+      expect(content).toContain('stream: Backend API');
+      expect(content).toContain('agent: nodejs-backend-engineer');
+      expect(content).toContain('status: in_progress');
+    });
+
+    test('should fail gracefully when no task file found', async () => {
+      const issueId = '999';
+
+      await expect(issueStarter.analyzeIssue(issueId)).rejects.toThrow('No task file found for issue #999');
+    });
+
+    test('should skip analysis if analysis file already exists', async () => {
+      const issueId = '123';
+      const epicName = 'test-epic';
+
+      // Create task file
+      const taskFile = path.join('.claude/epics', epicName, `${issueId}.md`);
+      fs.writeFileSync(taskFile, `---
+github: https://github.com/user/repo/issues/123
+title: Test
+epic: ${epicName}
+---
+# Test
+`);
+
+      // Create existing analysis
+      const analysisFile = path.join('.claude/epics', epicName, `${issueId}-analysis.md`);
+      fs.writeFileSync(analysisFile, 'Existing analysis');
+
+      // Mock console.log to capture output
+      const logSpy = jest.spyOn(console, 'log');
+
+      await issueStarter.analyzeIssue(issueId, { force: false });
+
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Analysis already exists'));
+    });
+
+    test('should overwrite analysis when force flag is true', async () => {
+      const issueId = '123';
+      const epicName = 'test-epic';
+
+      // Create task file
+      const taskFile = path.join('.claude/epics', epicName, `${issueId}.md`);
+      fs.writeFileSync(taskFile, `---
+github: https://github.com/user/repo/issues/123
+title: Test
+epic: ${epicName}
+---
+# Test
+`);
+
+      // Create existing analysis
+      const analysisFile = path.join('.claude/epics', epicName, `${issueId}-analysis.md`);
+      fs.writeFileSync(analysisFile, 'Old analysis');
+
+      // Mock gh command
+      mockExecSync.mockImplementation((cmd) => {
+        if (cmd.includes('gh issue view')) {
+          return JSON.stringify({
+            title: 'Test',
+            body: 'Test body',
+            labels: []
+          });
+        }
+        throw new Error('Command not found');
+      });
+
+      await issueStarter.analyzeIssue(issueId, { force: true });
+
+      const content = fs.readFileSync(analysisFile, 'utf8');
+      expect(content).not.toBe('Old analysis');
+      expect(content).toContain('# Parallel Work Analysis');
     });
   });
 });

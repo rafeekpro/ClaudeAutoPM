@@ -45,7 +45,7 @@ async function benchmarkProviderRouting(iterations = 20) {
 
     // Measure module loading time
     const loadStart = performance.now();
-    const ProviderRouter = require('../../autopm/.claude/providers/router');
+    const ProviderRouter = require('../../.claude/providers/router');
     const loadEnd = performance.now();
 
     // Measure routing time
