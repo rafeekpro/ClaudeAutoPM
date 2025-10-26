@@ -72,7 +72,7 @@ async function benchmarkIssueList(iterations = 10) {
   };
 
   // Load the actual module (with mocked client)
-  const AzureIssueList = require('../../autopm/.claude/providers/azure/issue-list');
+  const AzureIssueList = require('../../.claude/providers/azure/issue-list');
 
   for (let i = 0; i < iterations; i++) {
     // Create fresh instance
