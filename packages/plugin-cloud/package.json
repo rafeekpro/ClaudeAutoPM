@@ -20,7 +20,7 @@
     "validate": "node -e \"require('./plugin.json')\" && echo 'plugin.json is valid'"
   },
   "devDependencies": {
-    "jest": "^29.7.0"
+    "jest": "^30.2.0"
   },
   "keywords": [
     "claudeautopm",
