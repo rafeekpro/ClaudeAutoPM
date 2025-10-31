@@ -165,7 +165,7 @@
     "sinon": "^21.0.0"
   },
   "optionalDependencies": {
-    "@playwright/mcp": "^0.0.43",
+    "@playwright/mcp": "^0.0.44",
     "@upstash/context7-mcp": "^1.0.0"
   },
   "publishConfig": {
