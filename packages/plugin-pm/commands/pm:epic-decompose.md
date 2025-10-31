@@ -6,6 +6,11 @@ allowed-tools: Bash, Read, Write, LS, Task
 
 Break epic into concrete, actionable tasks.
 
+**⚠️ IMPORTANT**: This is a Claude Code command file, not a standalone script.
+- Execute via Claude Code as: `/pm:epic-decompose <feature_name>`
+- Do NOT run as: `node .claude/scripts/pm/epic-decompose.js`
+- This command has no standalone script equivalent
+
 ## Usage
 
 **Single Epic:**

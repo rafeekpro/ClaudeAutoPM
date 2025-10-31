@@ -24,14 +24,10 @@ Begin work on a GitHub issue with parallel agents based on work stream analysis.
    - If not found, search for file containing `github:.*issues/$ARGUMENTS` in frontmatter (old naming)
    - If not found: "❌ No local task for issue #$ARGUMENTS. This issue may have been created outside the PM system."
 
-3. **Check for analysis:**
-   ` ``bash
-   test -f .claude/epics/*/$ARGUMENTS-analysis.md || echo "❌ No analysis found for issue #$ARGUMENTS
-   
-   Run: /pm:issue-analyze $ARGUMENTS first
-   Or: /pm:issue-start $ARGUMENTS --analyze to do both"
-   ` ``
-   If no analysis exists and no --analyze flag, stop execution.
+3. **Check for analysis (when NOT using --analyze flag):**
+   - If user didn't use `--analyze` flag, check if analysis file exists
+   - Analysis file location: `.claude/epics/{epic_name}/$ARGUMENTS-analysis.md`
+   - If no analysis AND no `--analyze` flag: Stop and suggest using `--analyze` flag
 
 ## Required Documentation Access
 
@@ -71,7 +67,25 @@ See `.claude/rules/tdd.enforcement.md` for complete TDD requirements.
 
 ## Instructions
 
-### 1. Ensure Branch Exists
+### 0. Handle --analyze Flag (if provided)
+
+If user provided `--analyze` flag, delegate to the Node.js script:
+` ``bash
+node packages/plugin-pm/scripts/pm/issue-start.cjs $ARGUMENTS --analyze
+` ``
+
+This script will:
+1. Find the task file for the issue
+2. Generate analysis file with parallel work streams
+3. Create workspace structure
+4. Launch parallel agents based on analysis
+5. Handle all subsequent steps automatically
+
+**STOP HERE** if using `--analyze` flag - the script handles everything.
+
+---
+
+### 1. Ensure Branch Exists (Non-analyze workflow)
 
 Check if epic branch exists:
 ` ``bash
