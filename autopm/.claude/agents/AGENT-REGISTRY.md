@@ -88,6 +88,15 @@ Deprecated agents have been removed. Use the consolidated versions with appropri
 **Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
 **Status**: Active
 
+### context-optimizer
+
+**Location**: `.claude/agents/core/context-optimizer.md`
+**Description**: Use this agent for managing context window efficiency, implementing compaction strategies, summarizing long conversations, and optimizing memory usage for long-running workflows.
+**Scope**: Context analysis, compaction strategies, checkpoint creation, session continuity, memory patterns
+**NOT for**: MCP server management (use mcp-manager), agent coordination (use mcp-context-manager)
+**Tools**: Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, Edit, Write, MultiEdit, Bash, Task, Agent
+**Status**: Active
+
 ## Framework Agents
 
 ### react-ui-expert
@@ -419,7 +428,7 @@ When adding agents to the main system prompt, use this format:
 ## Agent Count Summary
 
 ### Active Agents by Category
-- **Core**: 6 agents (agent-manager, file-analyzer, code-analyzer, test-runner, parallel-worker, mcp-manager)
+- **Core**: 7 agents (agent-manager, file-analyzer, code-analyzer, test-runner, parallel-worker, mcp-manager, context-optimizer)
 - **Frameworks/Testing**: 8 agents (react-ui-expert, react-frontend-engineer, ux-design-expert, tailwindcss-expert, e2e-test-engineer, frontend-testing-engineer, nats-messaging-expert, message-queue-engineer)
 - **Languages**: 5 agents (python-backend-expert, python-backend-engineer, javascript-frontend-engineer, nodejs-backend-engineer, bash-scripting-expert)
 - **Cloud**: 7 agents (AWS, Azure, GCP, Kubernetes, Terraform, Cloud Functions)
@@ -428,7 +437,7 @@ When adding agents to the main system prompt, use this format:
 - **Data Engineering**: 3 agents (Airflow, Kedro, LangGraph)
 - **AI/API**: 2 agents (Gemini, OpenAI)
 
-**Total Active**: 43 agents (Phase 2 complete - added frontend-testing, observability, message-queue)
+**Total Active**: 44 agents (Phase 3 - added context-optimizer for context management)
 **Decision Matrices**: 3 tools (not agents)
 
 ## Adding New Agents

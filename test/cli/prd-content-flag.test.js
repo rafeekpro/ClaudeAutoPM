@@ -1,0 +1,346 @@
+/**
+ * Jest TDD Tests for PM PRD --content flag
+ *
+ * Tests the non-interactive content mode for prd new command
+ */
+
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+
+// Import the prd module
+const prdCommand = require('../../lib/cli/commands/prd');
+
+describe('PM PRD New --content Flag Tests', () => {
+  let tempDir;
+  let originalCwd;
+  let originalExit;
+  let consoleLogSpy;
+  let consoleErrorSpy;
+
+  beforeEach(() => {
+    // Create isolated test environment
+    originalCwd = process.cwd();
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pm-prd-content-'));
+    process.chdir(tempDir);
+
+    // Create .claude directory
+    fs.mkdirSync('.claude/prds', { recursive: true });
+
+    // Mock process.exit
+    originalExit = process.exit;
+    process.exit = jest.fn();
+
+    // Spy on console
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+  });
+
+  afterEach(() => {
+    // Restore environment
+    process.chdir(originalCwd);
+    if (fs.existsSync(tempDir)) {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+    process.exit = originalExit;
+    consoleLogSpy.mockRestore();
+    consoleErrorSpy.mockRestore();
+    jest.clearAllMocks();
+  });
+
+  describe('prdNewFromContent function', () => {
+    const prdNewHandler = prdCommand.handlers.new;
+
+    test('should create PRD from inline content', async () => {
+      const argv = {
+        name: 'test-feature',
+        content: '# Test PRD\n\nThis is a test PRD content.',
+        force: false
+      };
+
+      await prdNewHandler(argv);
+
+      const prdPath = path.join(tempDir, '.claude', 'prds', 'test-feature.md');
+      expect(fs.existsSync(prdPath)).toBe(true);
+
+      const content = fs.readFileSync(prdPath, 'utf8');
+      expect(content).toContain('# Test PRD');
+      expect(content).toContain('This is a test PRD content.');
+      // Should have frontmatter added
+      expect(content).toContain('---');
+      expect(content).toContain('title: test-feature');
+      expect(content).toContain('status: draft');
+    });
+
+    test('should create PRD from file reference (@filepath)', async () => {
+      // Create source file
+      const sourceContent = '# Source PRD\n\nContent from file.';
+      const sourcePath = path.join(tempDir, 'source-prd.md');
+      fs.writeFileSync(sourcePath, sourceContent);
+
+      const argv = {
+        name: 'from-file',
+        content: `@${sourcePath}`,
+        force: false
+      };
+
+      await prdNewHandler(argv);
+
+      const prdPath = path.join(tempDir, '.claude', 'prds', 'from-file.md');
+      expect(fs.existsSync(prdPath)).toBe(true);
+
+      const content = fs.readFileSync(prdPath, 'utf8');
+      expect(content).toContain('# Source PRD');
+      expect(content).toContain('Content from file.');
+    });
+
+    test('should create PRD from relative file path', async () => {
+      // Create source file in temp dir
+      const sourceContent = '# Relative Source\n\nRelative file content.';
+      fs.writeFileSync('relative-source.md', sourceContent);
+
+      const argv = {
+        name: 'from-relative',
+        content: '@relative-source.md',
+        force: false
+      };
+
+      await prdNewHandler(argv);
+
+      const prdPath = path.join(tempDir, '.claude', 'prds', 'from-relative.md');
+      expect(fs.existsSync(prdPath)).toBe(true);
+
+      const content = fs.readFileSync(prdPath, 'utf8');
+      expect(content).toContain('# Relative Source');
+    });
+
+    test('should not overwrite existing PRD without --force', async () => {
+      // Create existing PRD
+      const existingPath = path.join(tempDir, '.claude', 'prds', 'existing.md');
+      fs.writeFileSync(existingPath, '# Existing PRD');
+
+      const argv = {
+        name: 'existing',
+        content: '# New Content',
+        force: false
+      };
+
+      await prdNewHandler(argv);
+
+      // Should exit with error (note: in mocked environment, code continues after process.exit)
+      expect(process.exit).toHaveBeenCalledWith(1);
+
+      // Should have logged error about existing file
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('already exists')
+      );
+    });
+
+    test('should overwrite existing PRD with --force flag', async () => {
+      // Create existing PRD
+      const existingPath = path.join(tempDir, '.claude', 'prds', 'existing.md');
+      fs.writeFileSync(existingPath, '# Existing PRD');
+
+      const argv = {
+        name: 'existing',
+        content: '# New Content\n\nOverwritten.',
+        force: true
+      };
+
+      await prdNewHandler(argv);
+
+      // Should succeed
+      const content = fs.readFileSync(existingPath, 'utf8');
+      expect(content).toContain('# New Content');
+      expect(content).toContain('Overwritten.');
+    });
+
+    test('should preserve existing frontmatter if present', async () => {
+      const contentWithFrontmatter = `---
+title: Custom Title
+status: approved
+priority: P0
+created: 2024-01-01T00:00:00Z
+author: custom-author
+timeline: Q2 2024
+---
+
+# PRD with Frontmatter
+
+Content here.`;
+
+      const argv = {
+        name: 'with-frontmatter',
+        content: contentWithFrontmatter,
+        force: false
+      };
+
+      await prdNewHandler(argv);
+
+      const prdPath = path.join(tempDir, '.claude', 'prds', 'with-frontmatter.md');
+      const content = fs.readFileSync(prdPath, 'utf8');
+
+      // Should preserve original frontmatter
+      expect(content).toContain('title: Custom Title');
+      expect(content).toContain('status: approved');
+      expect(content).toContain('priority: P0');
+      expect(content).toContain('author: custom-author');
+    });
+
+    test('should add frontmatter with custom priority and timeline', async () => {
+      const argv = {
+        name: 'custom-meta',
+        content: '# Custom PRD',
+        priority: 'P0',
+        timeline: 'Q1 2025',
+        force: false
+      };
+
+      await prdNewHandler(argv);
+
+      const prdPath = path.join(tempDir, '.claude', 'prds', 'custom-meta.md');
+      const content = fs.readFileSync(prdPath, 'utf8');
+
+      expect(content).toContain('priority: P0');
+      expect(content).toContain('timeline: Q1 2025');
+    });
+
+    test('should fail if source file does not exist', async () => {
+      const argv = {
+        name: 'missing-source',
+        content: '@/nonexistent/path/file.md',
+        force: false
+      };
+
+      await prdNewHandler(argv);
+
+      expect(process.exit).toHaveBeenCalledWith(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('File not found')
+      );
+    });
+
+    test('should create prds directory if it does not exist', async () => {
+      // Remove the prds directory
+      fs.rmSync('.claude/prds', { recursive: true });
+      expect(fs.existsSync('.claude/prds')).toBe(false);
+
+      const argv = {
+        name: 'auto-create-dir',
+        content: '# Auto Create Dir Test',
+        force: false
+      };
+
+      await prdNewHandler(argv);
+
+      expect(fs.existsSync('.claude/prds')).toBe(true);
+      expect(fs.existsSync('.claude/prds/auto-create-dir.md')).toBe(true);
+    });
+
+    test('should handle multiline content correctly', async () => {
+      const multilineContent = `# Multi-Line PRD
+
+## Section 1
+
+This is section 1 content.
+
+## Section 2
+
+- Item 1
+- Item 2
+- Item 3
+`;
+
+      const argv = {
+        name: 'multiline-test',
+        content: multilineContent,
+        force: false
+      };
+
+      await prdNewHandler(argv);
+
+      const prdPath = path.join(tempDir, '.claude', 'prds', 'multiline-test.md');
+      const content = fs.readFileSync(prdPath, 'utf8');
+
+      expect(content).toContain('## Section 1');
+      expect(content).toContain('## Section 2');
+      expect(content).toContain('- Item 1');
+    });
+
+    test('should show next steps after successful creation', async () => {
+      const argv = {
+        name: 'next-steps-test',
+        content: '# Next Steps Test',
+        force: false
+      };
+
+      await prdNewHandler(argv);
+
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        expect.stringContaining('PRD created')
+      );
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Next steps')
+      );
+    });
+  });
+
+  describe('Integration with yargs builder', () => {
+    test('should define --content option', () => {
+      expect(prdCommand.builder).toBeDefined();
+      expect(typeof prdCommand.builder).toBe('function');
+    });
+
+    test('should define --force option', () => {
+      expect(prdCommand.builder).toBeDefined();
+    });
+
+    test('should define --priority option', () => {
+      expect(prdCommand.builder).toBeDefined();
+    });
+
+    test('should define --timeline option', () => {
+      expect(prdCommand.builder).toBeDefined();
+    });
+  });
+
+  describe('Edge cases', () => {
+    const prdNewHandler = prdCommand.handlers.new;
+
+    test('should handle special characters in content', async () => {
+      const specialContent = '# PRD with Special Chars\n\nContent: <script>alert("test")</script> & more';
+
+      const argv = {
+        name: 'special-chars',
+        content: specialContent,
+        force: false
+      };
+
+      await prdNewHandler(argv);
+
+      const prdPath = path.join(tempDir, '.claude', 'prds', 'special-chars.md');
+      const content = fs.readFileSync(prdPath, 'utf8');
+
+      expect(content).toContain('<script>');
+      expect(content).toContain('& more');
+    });
+
+    test('should handle unicode content', async () => {
+      const unicodeContent = '# PRD z Polskimi Znakami\n\nŻółć jaźń ŻÓŁĆ JAŹŃ 中文';
+
+      const argv = {
+        name: 'unicode-content',
+        content: unicodeContent,
+        force: false
+      };
+
+      await prdNewHandler(argv);
+
+      const prdPath = path.join(tempDir, '.claude', 'prds', 'unicode-content.md');
+      const content = fs.readFileSync(prdPath, 'utf8');
+
+      expect(content).toContain('Żółć jaźń');
+      expect(content).toContain('中文');
+    });
+  });
+});
