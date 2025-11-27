@@ -1,0 +1,15 @@
+{
+  "current_task": {
+    "id": "",
+    "title": "",
+    "branch": "",
+    "started": "",
+    "status": "pending"
+  },
+  "recent_changes": [],
+  "blockers": [],
+  "next_steps": [],
+  "context_notes": "",
+  "decisions_made": [],
+  "files_of_interest": []
+}

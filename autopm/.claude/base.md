@@ -84,6 +84,9 @@ Use for running tests and analyzing results with structured reports.
 #### parallel-worker - Multi-stream parallel execution
 Use for coordinating multiple work streams in parallel.
 
+#### context-optimizer - Context management and compaction
+Use for managing context window efficiency, creating checkpoints, and session continuity.
+
 <!-- AGENT_SELECTION_SECTION -->
 
 ## Azure DevOps Integration
@@ -127,6 +130,19 @@ Every implementation MUST follow:
 ## CONTEXT OPTIMIZATION RULES
 
 See **`.claude/rules/context-optimization.md`** for detailed context preservation patterns and agent usage requirements.
+
+### Context Management Tools
+
+- **context-optimizer agent** - Use `@context-optimizer` for managing context window efficiency
+- **`.claude/rules/context-compaction.md`** - Automatic compaction rules and triggers
+- **`.claude/guides/memory-patterns.md`** - File-based memory patterns for session continuity
+
+### Key Context Strategies
+
+1. **Compaction Triggers**: Auto-compact after 10+ tool results, 30+ messages, or 3+ reads of same file
+2. **Checkpoint System**: Create checkpoints with `@context-optimizer checkpoint "name"`
+3. **Memory Patterns**: Use `.claude/active-work.json` for cross-session state
+4. **Session Transfer**: Generate handoff notes with `@context-optimizer transfer`
 
 ## ERROR HANDLING PIPELINE
 
