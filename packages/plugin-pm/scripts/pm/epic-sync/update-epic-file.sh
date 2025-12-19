@@ -62,12 +62,17 @@ if [[ -f "$MAPPING_FILE" ]]; then
 
     # Read mapping and update task references
     while read -r old_name new_number; do
+        # Cross-platform sed: create temp file instead of in-place
         # Update checkbox items like "- [ ] 001" to "- [ ] #2"
-        sed -i "s/- \[ \] $old_name\b/- [ ] #$new_number/g" "$EPIC_FILE.tmp"
-        sed -i "s/- \[x\] $old_name\b/- [x] #$new_number/g" "$EPIC_FILE.tmp"
+        sed "s/- \[ \] $old_name\b/- [ ] #$new_number/g" "$EPIC_FILE.tmp" > "$EPIC_FILE.tmp2"
+        mv "$EPIC_FILE.tmp2" "$EPIC_FILE.tmp"
+
+        sed "s/- \[x\] $old_name\b/- [x] #$new_number/g" "$EPIC_FILE.tmp" > "$EPIC_FILE.tmp2"
+        mv "$EPIC_FILE.tmp2" "$EPIC_FILE.tmp"
 
         # Update task links
-        sed -i "s/Task $old_name\b/Task #$new_number/g" "$EPIC_FILE.tmp"
+        sed "s/Task $old_name\b/Task #$new_number/g" "$EPIC_FILE.tmp" > "$EPIC_FILE.tmp2"
+        mv "$EPIC_FILE.tmp2" "$EPIC_FILE.tmp"
     done < "$MAPPING_FILE"
 fi
 

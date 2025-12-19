@@ -31,7 +31,7 @@ REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null || echo "
 
 echo "🔗 Updating task references and renaming files"
 
-# Read mapping file and rename files
+# First pass: Rename files and update frontmatter
 while read -r old_name new_number; do
     old_file="$EPIC_DIR/$old_name.md"
     new_file="$EPIC_DIR/$new_number.md"
@@ -84,6 +84,36 @@ while read -r old_name new_number; do
     fi
 
 done < "$MAPPING_FILE"
+
+# Second pass: Update cross-references within renamed files
+echo ""
+echo "   Updating cross-references within task files..."
+
+# Read all renamed files
+find "$EPIC_DIR" -name "[0-9]*.md" -type f | while read -r task_file; do
+    # Create temp file for updates
+    cp "$task_file" "$task_file.tmp"
+
+    # Update all task references using the mapping
+    while read -r old_name new_number; do
+        # Update patterns like "task 001", "Task 001", "#001", "issue 001"
+        sed "s/\btask $old_name\b/task #$new_number/gi" "$task_file.tmp" > "$task_file.tmp2"
+        mv "$task_file.tmp2" "$task_file.tmp"
+
+        sed "s/#$old_name\b/#$new_number/g" "$task_file.tmp" > "$task_file.tmp2"
+        mv "$task_file.tmp2" "$task_file.tmp"
+
+        sed "s/\bissue $old_name\b/issue #$new_number/gi" "$task_file.tmp" > "$task_file.tmp2"
+        mv "$task_file.tmp2" "$task_file.tmp"
+
+        # Update dependency format: "depends on 001" -> "depends on #46"
+        sed "s/depends on $old_name\b/depends on #$new_number/gi" "$task_file.tmp" > "$task_file.tmp2"
+        mv "$task_file.tmp2" "$task_file.tmp"
+    done < "$MAPPING_FILE"
+
+    # Replace original with updated version
+    mv "$task_file.tmp" "$task_file"
+done
 
 echo ""
 echo "✅ Task files renamed and frontmatter updated"

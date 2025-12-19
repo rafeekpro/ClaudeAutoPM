@@ -70,6 +70,111 @@ Example:
 **IMPORTANT:** Before executing this command, read and follow:
 - `.claude/rules/datetime.md` - For getting real current date/time
 
+## Agent Selection Strategy
+
+Based on the PRD content and technical requirements, automatically determine which specialized agents should be assigned to tasks.
+
+### Step 1: Analyze PRD for Technology Stack
+
+Read `.claude/prds/$ARGUMENTS.md` and identify:
+- **Programming languages** mentioned (Python, JavaScript/TypeScript, Go, Bash, etc.)
+- **Frameworks** required (React, FastAPI, Next.js, Express, etc.)
+- **Databases** needed (PostgreSQL, MongoDB, Redis, etc.)
+- **Cloud platforms** (AWS, Azure, GCP)
+- **Infrastructure** tools (Docker, Kubernetes, Terraform)
+- **Testing** requirements (unit, integration, E2E)
+- **CI/CD** platforms (GitHub Actions, Azure DevOps, GitLab CI)
+
+### Step 2: Map Technologies to Specialized Agents
+
+**Programming Languages**:
+- Python → `.claude/agents/languages/python-backend-engineer.md`
+- JavaScript/TypeScript/Node.js → `.claude/agents/languages/nodejs-backend-engineer.md`
+- React → `.claude/agents/frontend/react-frontend-engineer.md`
+- Bash/Shell scripting → `.claude/agents/languages/bash-scripting-expert.md`
+
+**Databases**:
+- PostgreSQL → `.claude/agents/databases/postgresql-expert.md`
+- MongoDB → `.claude/agents/databases/mongodb-expert.md`
+- Redis → `.claude/agents/databases/redis-expert.md`
+- Cosmos DB → `.claude/agents/databases/cosmosdb-expert.md`
+
+**Cloud Platforms**:
+- AWS → `.claude/agents/cloud/aws-cloud-architect.md`
+- Azure → `.claude/agents/cloud/azure-cloud-architect.md`
+- GCP → `.claude/agents/cloud/gcp-cloud-architect.md`
+
+**Infrastructure & Containers**:
+- Docker → `.claude/agents/containers/docker-containerization-expert.md`
+- Kubernetes → `.claude/agents/orchestration/kubernetes-orchestrator.md`
+- Terraform → `.claude/agents/infrastructure/terraform-infrastructure-expert.md`
+
+**Testing**:
+- Unit/Integration tests → `.claude/agents/core/test-runner.md`
+- Frontend E2E testing → `.claude/agents/testing/frontend-testing-engineer.md`
+- E2E automation → `.claude/agents/testing/e2e-test-engineer.md`
+
+**DevOps & CI/CD**:
+- GitHub operations → `.claude/agents/devops/github-operations-specialist.md`
+- Azure DevOps → `.claude/agents/devops/azure-devops-specialist.md`
+- Observability → `.claude/agents/devops/observability-engineer.md`
+
+### Step 3: Document Agent Assignments in Epic Frontmatter
+
+Add `required_agents` array to epic.md frontmatter:
+
+```yaml
+---
+name: user-authentication
+prd: user-authentication
+status: backlog
+created: 2025-12-17T10:00:00Z
+updated: 2025-12-17T10:00:00Z
+required_agents:
+  - path: .claude/agents/languages/python-backend-engineer.md
+    role: API implementation
+    tasks: [001, 002, 003]
+  - path: .claude/agents/databases/postgresql-expert.md
+    role: Database schema and migrations
+    tasks: [004, 005]
+  - path: .claude/agents/testing/frontend-testing-engineer.md
+    role: Test suite development
+    tasks: [006, 007]
+  - path: .claude/agents/devops/github-operations-specialist.md
+    role: CI/CD pipeline setup
+    tasks: [008]
+---
+```
+
+### Step 4: Assign Agents to Individual Tasks
+
+Each task file should include `assigned_agent` in frontmatter:
+
+```yaml
+---
+name: Implement JWT authentication endpoints
+status: open
+created: 2025-12-17T10:00:00Z
+updated: 2025-12-17T10:00:00Z
+assigned_agent: .claude/agents/languages/python-backend-engineer.md
+agent_context:
+  framework: fastapi
+  auth_method: jwt
+  libraries: [pyjwt, passlib]
+github: [Will be updated when synced to GitHub]
+depends_on: [004]  # Depends on user schema
+parallel: true
+conflicts_with: []
+---
+```
+
+**Benefits of Agent Assignment**:
+- ✅ Automatic selection of specialized agents based on technology
+- ✅ Clear agent responsibilities per task
+- ✅ Easier task assignment when starting work
+- ✅ Better parallel execution planning with appropriate agents
+- ✅ Consistent expertise application across similar tasks
+
 ## Preflight Checklist
 
 Before proceeding, complete these validation steps.
@@ -139,35 +244,81 @@ You are decomposing epic(s) into specific, actionable tasks for: **$ARGUMENTS**
 - Understand the technical approach and requirements
 - Review the task breakdown preview
 
-### 2. Analyze for Parallel Creation
+### 3. Analyze PRD and Select Agents
+
+**IMPORTANT**: Before creating tasks, determine which specialized agents should be used:
+
+1. **Read the PRD** from `.claude/prds/$ARGUMENTS.md` (or linked PRD in epic frontmatter)
+
+2. **Identify Technology Stack**:
+   - Scan for programming languages (Python, JavaScript, Go, etc.)
+   - Find frameworks (React, FastAPI, Django, Express, etc.)
+   - Note databases (PostgreSQL, MongoDB, Redis, etc.)
+   - Identify cloud platforms (AWS, Azure, GCP)
+   - Check for infrastructure tools (Docker, K8s, Terraform)
+
+3. **Map to Specialized Agents** using the Agent Selection Strategy section above:
+   - **Backend tasks** → `python-backend-engineer` or `nodejs-backend-engineer`
+   - **Frontend tasks** → `react-frontend-engineer` or `javascript-frontend-engineer`
+   - **Database tasks** → `postgresql-expert`, `mongodb-expert`, or `redis-expert`
+   - **Cloud tasks** → `aws-cloud-architect`, `azure-cloud-architect`, or `gcp-cloud-architect`
+   - **Container tasks** → `docker-containerization-expert`
+   - **Orchestration** → `kubernetes-orchestrator`
+   - **IaC tasks** → `terraform-infrastructure-expert`
+   - **Testing** → `test-runner`, `frontend-testing-engineer`, `e2e-test-engineer`
+   - **CI/CD** → `github-operations-specialist` or `azure-devops-specialist`
+
+4. **Update Epic Frontmatter** with `required_agents` array (see Agent Selection Strategy section)
+
+5. **Prepare Agent Assignments** for each task to be created
+
+**Example**:
+```markdown
+Technology Stack Detected:
+- Backend: Python + FastAPI
+- Database: PostgreSQL
+- Testing: pytest
+- Deployment: Docker
+
+Agent Mapping:
+- Tasks 001-003 (API): python-backend-engineer
+- Tasks 004-005 (Database): postgresql-expert
+- Tasks 006-007 (Tests): test-runner
+- Task 008 (Docker): docker-containerization-expert
+```
+
+### 4. Analyze for Parallel Creation
 
 Determine if tasks can be created in parallel:
 - If tasks are mostly independent: Create in parallel using Task agents
 - If tasks have complex dependencies: Create sequentially
 - For best results: Group independent tasks for parallel creation
 
-### 3. Parallel Task Creation (When Possible)
+### 5. Parallel Task Creation (When Possible)
 
-If tasks can be created in parallel, spawn sub-agents:
+If tasks can be created in parallel, spawn sub-agents.
 
-```yaml
-Task:
-  description: "Create task files batch {X}"
-  subagent_type: "general-purpose"
-  prompt: |
-    Create task files for epic: $ARGUMENTS
+**IMPORTANT**: Do NOT use generic "general-purpose" agents. Task creation should be done directly by Claude Code, not delegated to sub-agents, as it requires careful analysis of PRD, agent selection, and proper frontmatter generation.
 
-    Tasks to create:
-    - {list of 3-4 tasks for this batch}
+**Task Creation Process**:
+1. For each task, determine the appropriate `assigned_agent` based on PRD analysis
+2. Create task file with complete frontmatter including agent assignment
+3. Generate proper task content with all required sections
+4. Ensure sequential numbering (001.md, 002.md, etc.)
 
-    For each task:
-    1. Create file: .claude/epics/$ARGUMENTS/{number}.md
-    2. Use exact format with frontmatter and all sections
-    3. Follow task breakdown from epic
-    4. Set parallel/depends_on fields appropriately
-    5. Number sequentially (001.md, 002.md, etc.)
+**Example Task Creation**:
+```markdown
+Creating task 001 (API endpoint):
+- assigned_agent: .claude/agents/languages/python-backend-engineer.md
+- agent_context: {framework: "fastapi", auth: "jwt"}
+- File: .claude/epics/$ARGUMENTS/001.md
+✓ Created
 
-    Return: List of files created
+Creating task 002 (Database schema):
+- assigned_agent: .claude/agents/databases/postgresql-expert.md
+- agent_context: {orm: "sqlalchemy", migrations: "alembic"}
+- File: .claude/epics/$ARGUMENTS/002.md
+✓ Created
 ```
 
 ### 4. Task File Format with Frontmatter
@@ -179,6 +330,11 @@ name: [Task Title]
 status: open
 created: [Current ISO date/time]
 updated: [Current ISO date/time]
+assigned_agent: .claude/agents/{category}/{agent-name}.md  # Specialized agent for this task
+agent_context:  # Optional: Agent-specific configuration
+  framework: [framework_name]
+  language: [language_name]
+  approach: [implementation_approach]
 github: [Will be updated when synced to GitHub]
 depends_on: []  # List of task numbers this depends on, e.g., [001, 002]
 parallel: true  # Can this run in parallel with other tasks?
@@ -245,6 +401,15 @@ Example: `.claude/epics/ecommerce/01-infrastructure/001.md`
 - **status**: Always start with "open" for new tasks
 - **created**: Get REAL current datetime by running: `date -u +"%Y-%m-%dT%H:%M:%SZ"`
 - **updated**: Use the same real datetime as created for new tasks
+- **assigned_agent**: Path to specialized agent file (e.g., `.claude/agents/languages/python-backend-engineer.md`)
+  - Select based on technology stack from PRD
+  - Use most specific agent for the task type
+  - See Agent Selection Strategy section for mapping
+- **agent_context**: Optional object with agent-specific configuration
+  - **framework**: Specific framework being used (e.g., "fastapi", "react", "express")
+  - **language**: Programming language if multiple options (e.g., "python", "typescript")
+  - **approach**: Implementation approach or pattern to use
+  - Add any task-specific parameters the agent needs
 - **github**: Leave placeholder text - will be updated during sync
 - **depends_on**: List task numbers that must complete before this can start (e.g., [001, 002])
 - **parallel**: Set to true if this can run alongside other tasks without conflicts
