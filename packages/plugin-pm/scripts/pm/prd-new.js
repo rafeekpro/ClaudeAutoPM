@@ -612,6 +612,20 @@ ${data.technical || 'Technical requirements to be specified...'}
   }
 
   async run(args) {
+    // Check if running in non-interactive environment (e.g., Claude Code)
+    if (!process.stdin.isTTY) {
+      console.error('❌ Error: This script requires an interactive terminal');
+      console.error('\n💡 Solutions:');
+      console.error('   1. Use LLM-assisted generation (default):');
+      console.error('      /pm:prd-new <feature-name>');
+      console.error('   2. Use --content flag with existing content:');
+      console.error('      /pm:prd-new <feature-name> --content @path/to/file.md');
+      console.error('   3. Run in a regular terminal (not Claude Code):');
+      console.error('      node .claude/scripts/pm/prd-new.js <feature-name>');
+      console.error('\n📚 See: /pm:help prd-new');
+      process.exit(1);
+    }
+
     // Parse arguments
     let prdName = null;
     let templateName = null;

@@ -74,4 +74,49 @@ if [[ -z "$epic_number" ]]; then
     exit 1
 fi
 
+# Add documentation comment to issue
+echo "📎 Adding local documentation links to issue #$epic_number..."
+
+# Extract PRD name from epic file
+prd_name=$(grep -A 5 "^prd:" "$EPIC_FILE" | grep -v "^prd:" | head -1 | tr -d ' ')
+if [[ -z "$prd_name" ]]; then
+    prd_name="$EPIC_NAME"
+fi
+
+# Create comment with documentation links
+cat > /tmp/epic-doc-comment.md <<EOF
+📁 **Local Documentation**
+
+This epic is tracked locally at:
+- **Epic file**: \`.claude/epics/$EPIC_NAME/epic.md\`
+- **PRD**: \`.claude/prds/$prd_name.md\`
+
+**For developers**: Clone the repository and review these files for:
+- Complete technical specifications
+- Acceptance criteria
+- Implementation details
+- Task breakdown
+
+**File Structure**:
+\`\`\`
+.claude/epics/$EPIC_NAME/
+├── epic.md           # This epic (#$epic_number)
+├── 001.md           # Task 1 (will be issue #XX)
+├── 002.md           # Task 2 (will be issue #XX)
+└── ...              # Additional tasks
+\`\`\`
+
+Tasks will be created as sub-issues and linked here.
+EOF
+
+# Add comment to issue
+if gh issue comment "$epic_number" --body-file /tmp/epic-doc-comment.md &> /dev/null; then
+    echo "✅ Documentation links added to issue #$epic_number"
+else
+    echo "⚠️ Warning: Failed to add documentation comment (issue created successfully)"
+fi
+
+# Cleanup
+rm -f /tmp/epic-doc-comment.md
+
 echo "$epic_number"

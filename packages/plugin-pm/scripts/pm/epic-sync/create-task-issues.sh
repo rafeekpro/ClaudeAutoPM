@@ -72,6 +72,30 @@ for task_file in $task_files; do
         echo "#$issue_number ✓"
         # Save mapping: old_name -> new_number
         echo "$task_basename $issue_number" >> "$MAPPING_FILE"
+
+        # Add documentation comment to task issue
+        cat > /tmp/task-doc-comment.md <<EOF
+📁 **Local Documentation**
+
+This task is tracked locally at:
+- **Task file**: \`.claude/epics/$EPIC_NAME/$task_basename.md\`
+- **Epic file**: \`.claude/epics/$EPIC_NAME/epic.md\`
+
+**For developers**: Clone the repository and review the local task file for:
+- Detailed implementation requirements
+- Acceptance criteria
+- Technical specifications
+- Dependencies and related tasks
+
+**Part of Epic**: #$EPIC_NUMBER
+EOF
+
+        # Add comment (silent to avoid clutter in output)
+        if gh issue comment "$issue_number" --body-file /tmp/task-doc-comment.md &> /dev/null; then
+            echo "      📎 Documentation links added"
+        fi
+
+        rm -f /tmp/task-doc-comment.md
     else
         echo "FAILED"
         echo "⚠️  Failed to create issue for $task_basename"
