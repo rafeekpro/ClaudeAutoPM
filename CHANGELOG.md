@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.4] - 2025-12-28
+
+### Fixed
+- **Complete installer fix for context optimization** - Ensures all 15 essential rules are installed after cleanup
+  - Added 4 missing rules to plugin-core: agent-mandatory-optimized, context7-enforcement-optimized, github-operations, test-execution
+  - v3.2.3 cleanup was too aggressive, removing framework rules not in plugins
+  - Plugin-core now has 15 complete rules matching framework base
+
+### Changed
+- Updated plugin-core/plugin.json with 4 additional rule entries (total: 15 rules)
+
 ## [3.2.3] - 2025-12-28
 
 ### Fixed
