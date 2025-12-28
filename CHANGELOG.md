@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.2] - 2025-12-28
+
+### Changed
+- **Plugin rules optimization** - Archived 12 rules from plugin-core
+  - Moved verbose/duplicate rules to `packages/plugin-core/rules-archive/`
+  - Updated plugin.json to reference only essential 11 rules
+  - Reduces Memory tokens from plugins by ~50%
+
+### Removed (moved to archive)
+- plugin-core: agent-coordination.md, agent-mandatory.md, context7-enforcement.md, definition-of-done.md, development-environments.md, framework-path-rules.md, golden-rules.md, no-pr-workflow.md, performance-guidelines.md, pipeline-mandatory.md, security-checklist.md, use-ast-grep.md
+
 ## [3.2.1] - 2025-12-28
 
 ### Changed
