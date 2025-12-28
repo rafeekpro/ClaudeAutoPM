@@ -1,0 +1,81 @@
+{
+  "name": "@claudeautopm/plugin-pm-azure",
+  "version": "2.0.0",
+  "schemaVersion": "2.0",
+  "displayName": "Azure DevOps Integration",
+  "description": "Azure DevOps integration plugin with work items, sprints, features, user stories, and task management",
+  "category": "project-management",
+  "metadata": {
+    "category": "Project Management",
+    "author": "ClaudeAutoPM Team",
+    "license": "MIT",
+    "homepage": "https://github.com/rafeekpro/ClaudeAutoPM",
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/rafeekpro/ClaudeAutoPM.git",
+      "directory": "packages/plugin-pm-azure"
+    },
+    "size": "~12 KB (gzipped)",
+    "required": false,
+    "tags": [
+      "azure-devops",
+      "work-items",
+      "sprints",
+      "agile",
+      "integration"
+    ]
+  },
+  "commands": [
+    {
+      "subdirectory": "commands/azure/",
+      "description": "Azure DevOps integration commands (41 total)",
+      "type": "collection",
+      "categories": {
+        "azure": "Azure DevOps work item management"
+      },
+      "discovery": "auto",
+      "tags": [
+        "azure",
+        "devops",
+        "work-items",
+        "sprints",
+        "features",
+        "user-stories",
+        "tasks"
+      ]
+    }
+  ],
+  "features": {
+    "azure_devops_integration": {
+      "enabled": true,
+      "description": "Full Azure DevOps work item management"
+    },
+    "sprint_management": {
+      "enabled": true,
+      "description": "Sprint planning and tracking"
+    },
+    "feature_decomposition": {
+      "enabled": true,
+      "description": "Feature breakdown into user stories and tasks"
+    },
+    "work_item_sync": {
+      "enabled": true,
+      "description": "Bidirectional sync with Azure DevOps"
+    }
+  },
+  "dependencies": [],
+  "peerPlugins": [
+    "@claudeautopm/plugin-core",
+    "@claudeautopm/plugin-pm"
+  ],
+  "keywords": [
+    "claudeautopm",
+    "azure-devops",
+    "work-items",
+    "sprints",
+    "agile",
+    "project-management",
+    "integration"
+  ],
+  "compatibleWith": ">=3.0.0"
+}

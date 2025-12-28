@@ -453,73 +453,91 @@ ${this.colors.YELLOW}Note:${this.colors.NC} Some installation options require ad
 ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
 `);
 
+    // Option 0: Micro (always available) - NEW ultra-light option
+    console.log(`${this.colors.CYAN}0. Micro${this.colors.NC} - Ultra-light, minimal context usage
+   • Only essential core agents (4 agents, 5 commands)
+   • Lowest context footprint (~2k tokens)
+   • Best for: Context-sensitive work, simple tasks
+   • No PM workflows, no language specialists
+   ${this.colors.DIM}• Plugins: core only (1 plugin)${this.colors.NC}
+`);
+
     // Option 1: Minimal (always available)
-    console.log(`${this.colors.CYAN}1. Minimal${this.colors.NC} - Traditional development workflow
+    console.log(`${this.colors.CYAN}1. Minimal${this.colors.NC} - Basic development workflow
+   • Core + language specialists (9 agents, 10 commands)
    • Sequential agent execution (one at a time)
-   • Native tooling: npm, pip, local installs
    • Best for: Simple projects, learning, debugging
-   • No containers or orchestration
+   • No PM workflows or containers
+   ${this.colors.DIM}• Plugins: core, languages (2 plugins)${this.colors.NC}
+`);
+
+    // Option 2: Standard (always available) - includes PM without Azure
+    console.log(`${this.colors.CYAN}2. Standard${this.colors.NC} - Development with project management
+   • Core + languages + PM workflows (~55 commands)
+   • Sequential agent execution
+   • Best for: Projects needing epic/issue tracking
+   • GitHub integration (no Azure DevOps)
    ${this.colors.DIM}• Plugins: core, languages, pm (3 plugins)${this.colors.NC}
 `);
 
-    // Option 2: Docker-only (requires Docker)
+    // Option 3: Docker-only (requires Docker)
     if (availableTools.docker) {
-      console.log(`${this.colors.CYAN}2. Docker-only${this.colors.NC} - Containerized local development
+      console.log(`${this.colors.CYAN}3. Docker-only${this.colors.NC} - Containerized local development
    • Adaptive execution (smart sequential/parallel choice)
    • Docker containers for development environment
    • Best for: Microservices, consistent environments
-   • Local Docker only, no Kubernetes
-   ${this.colors.DIM}• Plugins: core, languages, frameworks, testing, devops, pm (6 plugins)${this.colors.NC}
+   • Full PM + Azure DevOps integration
+   ${this.colors.DIM}• Plugins: core, languages, frameworks, testing, devops, pm, pm-azure (7 plugins)${this.colors.NC}
 `);
     } else {
-      console.log(`${this.colors.DIM}2. Docker-only${this.colors.NC} ${this.colors.RED}(Docker not installed)${this.colors.NC}
+      console.log(`${this.colors.DIM}3. Docker-only${this.colors.NC} ${this.colors.RED}(Docker not installed)${this.colors.NC}
 `);
     }
 
-    // Option 3: Full DevOps (requires Docker and kubectl)
+    // Option 4: Full DevOps (requires Docker and kubectl)
     if (availableTools.docker && availableTools.kubectl) {
-      console.log(`${this.colors.GREEN}3. Full DevOps${this.colors.NC} - Complete CI/CD pipeline ${this.colors.BOLD}(RECOMMENDED)${this.colors.NC}
+      console.log(`${this.colors.GREEN}4. Full DevOps${this.colors.NC} - Complete CI/CD pipeline ${this.colors.BOLD}(RECOMMENDED)${this.colors.NC}
    • Adaptive execution with Docker-first priority
    • Kubernetes manifests and cloud deployment ready
    • GitHub Actions with KIND clusters and Kaniko builds
    • Best for: Production applications, enterprise projects
-   ${this.colors.DIM}• Plugins: core, languages, frameworks, testing, devops, cloud, databases, pm, ai (9 plugins)${this.colors.NC}
+   ${this.colors.DIM}• Plugins: core, languages, frameworks, testing, devops, cloud, databases, pm, pm-azure, ai (10 plugins)${this.colors.NC}
 `);
     } else if (availableTools.docker) {
-      console.log(`${this.colors.DIM}3. Full DevOps${this.colors.NC} ${this.colors.RED}(kubectl not installed)${this.colors.NC}
+      console.log(`${this.colors.DIM}4. Full DevOps${this.colors.NC} ${this.colors.RED}(kubectl not installed)${this.colors.NC}
 `);
     } else {
-      console.log(`${this.colors.DIM}3. Full DevOps${this.colors.NC} ${this.colors.RED}(Docker and kubectl not installed)${this.colors.NC}
+      console.log(`${this.colors.DIM}4. Full DevOps${this.colors.NC} ${this.colors.RED}(Docker and kubectl not installed)${this.colors.NC}
 `);
     }
 
-    // Option 4: Performance (requires Docker and kubectl)
+    // Option 5: Performance (requires Docker and kubectl)
     if (availableTools.docker && availableTools.kubectl) {
-      console.log(`${this.colors.YELLOW}4. Performance${this.colors.NC} - Maximum parallel execution
+      console.log(`${this.colors.YELLOW}5. Performance${this.colors.NC} - Maximum parallel execution
    • Hybrid strategy: up to 5 parallel agents
    • Advanced context isolation and security
    • Full DevOps capabilities with speed optimization
    • Best for: Large projects, massive refactoring, power users
-   ${this.colors.DIM}• Plugins: ALL - core, languages, frameworks, testing, devops, cloud, databases, data, pm, ai, ml (11 plugins)${this.colors.NC}
+   ${this.colors.DIM}• Plugins: ALL (12 plugins including pm-azure, data, ml)${this.colors.NC}
 `);
     } else if (availableTools.docker) {
-      console.log(`${this.colors.DIM}4. Performance${this.colors.NC} ${this.colors.RED}(kubectl not installed)${this.colors.NC}
+      console.log(`${this.colors.DIM}5. Performance${this.colors.NC} ${this.colors.RED}(kubectl not installed)${this.colors.NC}
 `);
     } else {
-      console.log(`${this.colors.DIM}4. Performance${this.colors.NC} ${this.colors.RED}(Docker and kubectl not installed)${this.colors.NC}
+      console.log(`${this.colors.DIM}5. Performance${this.colors.NC} ${this.colors.RED}(Docker and kubectl not installed)${this.colors.NC}
 `);
     }
 
-    // Option 5: Custom (always available)
-    console.log(`${this.colors.CYAN}5. Custom${this.colors.NC} - Manual configuration
+    // Option 6: Custom (always available)
+    console.log(`${this.colors.CYAN}6. Custom${this.colors.NC} - Manual configuration
    • Configure execution strategy manually
    • Choose your own agents and workflows
    • Advanced users only
 `);
 
     if (process.env.AUTOPM_TEST_MODE === '1') {
-      this.printMsg('CYAN', 'Auto-selecting option 1 for test mode');
-      return 'minimal';
+      this.printMsg('CYAN', 'Auto-selecting option 0 (micro) for test mode');
+      return 'micro';
     }
 
     const rl = readline.createInterface({
@@ -528,43 +546,48 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
     });
 
     // Determine default based on available tools
-    const defaultChoice = availableTools.docker && availableTools.kubectl ? '3' : '1';
+    const defaultChoice = availableTools.docker && availableTools.kubectl ? '4' : '2';
 
     return new Promise((resolve) => {
       const askQuestion = () => {
-        rl.question(`${this.colors.CYAN}Enter your choice (1-5) [${defaultChoice}]: ${this.colors.NC}`, (answer) => {
+        rl.question(`${this.colors.CYAN}Enter your choice (0-6) [${defaultChoice}]: ${this.colors.NC}`, (answer) => {
           const choice = answer.trim() || defaultChoice;
           const scenarios = {
+            '0': 'micro',
             '1': 'minimal',
-            '2': 'docker',
-            '3': 'full',
-            '4': 'performance',
-            '5': 'custom'
+            '2': 'standard',
+            '3': 'docker',
+            '4': 'full',
+            '5': 'performance',
+            '6': 'custom'
           };
 
           const selectedScenario = scenarios[choice];
 
           // Validate choice based on available tools
-          if (choice === '2' && !availableTools.docker) {
-            console.log(`${this.colors.RED}✗ Docker is required for this option. Please install Docker first or choose option 1 (Minimal).${this.colors.NC}`);
+          // Option 3 (Docker-only) requires Docker
+          if (choice === '3' && !availableTools.docker) {
+            console.log(`${this.colors.RED}✗ Docker is required for this option. Please install Docker first or choose option 0-2.${this.colors.NC}`);
             askQuestion();
             return;
           }
 
-          if ((choice === '3' || choice === '4') && !availableTools.docker) {
-            console.log(`${this.colors.RED}✗ Docker is required for this option. Please install Docker first or choose option 1 (Minimal).${this.colors.NC}`);
+          // Options 4 (Full) and 5 (Performance) require Docker
+          if ((choice === '4' || choice === '5') && !availableTools.docker) {
+            console.log(`${this.colors.RED}✗ Docker is required for this option. Please install Docker first or choose option 0-2.${this.colors.NC}`);
             askQuestion();
             return;
           }
 
-          if ((choice === '3' || choice === '4') && availableTools.docker && !availableTools.kubectl) {
-            console.log(`${this.colors.RED}✗ kubectl is required for this option. Please install kubectl first or choose option 2 (Docker-only).${this.colors.NC}`);
+          // Options 4 (Full) and 5 (Performance) require kubectl
+          if ((choice === '4' || choice === '5') && availableTools.docker && !availableTools.kubectl) {
+            console.log(`${this.colors.RED}✗ kubectl is required for this option. Please install kubectl first or choose option 3 (Docker-only).${this.colors.NC}`);
             askQuestion();
             return;
           }
 
           if (!selectedScenario) {
-            console.log(`${this.colors.RED}✗ Invalid choice. Please select 1-5.${this.colors.NC}`);
+            console.log(`${this.colors.RED}✗ Invalid choice. Please select 0-6.${this.colors.NC}`);
             askQuestion();
             return;
           }
@@ -589,7 +612,27 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
     }
 
     const configs = {
+      micro: {
+        version: version,
+        installed: new Date().toISOString(),
+        execution_strategy: 'sequential',
+        tools: {
+          docker: { enabled: false },
+          kubernetes: { enabled: false }
+        },
+        plugins: ['plugin-core']
+      },
       minimal: {
+        version: version,
+        installed: new Date().toISOString(),
+        execution_strategy: 'sequential',
+        tools: {
+          docker: { enabled: false },
+          kubernetes: { enabled: false }
+        },
+        plugins: ['plugin-core', 'plugin-languages']
+      },
+      standard: {
         version: version,
         installed: new Date().toISOString(),
         execution_strategy: 'sequential',
@@ -607,7 +650,7 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
           docker: { enabled: true, first: false },
           kubernetes: { enabled: false }
         },
-        plugins: ['plugin-core', 'plugin-languages', 'plugin-frameworks', 'plugin-testing', 'plugin-devops', 'plugin-pm']
+        plugins: ['plugin-core', 'plugin-languages', 'plugin-frameworks', 'plugin-testing', 'plugin-devops', 'plugin-pm', 'plugin-pm-azure']
       },
       full: {
         version: version,
@@ -617,7 +660,7 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
           docker: { enabled: true, first: true },
           kubernetes: { enabled: true }
         },
-        plugins: ['plugin-core', 'plugin-languages', 'plugin-frameworks', 'plugin-testing', 'plugin-devops', 'plugin-cloud', 'plugin-databases', 'plugin-pm', 'plugin-ai']
+        plugins: ['plugin-core', 'plugin-languages', 'plugin-frameworks', 'plugin-testing', 'plugin-devops', 'plugin-cloud', 'plugin-databases', 'plugin-pm', 'plugin-pm-azure', 'plugin-ai']
       },
       performance: {
         version: version,
@@ -628,7 +671,7 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
           docker: { enabled: true, first: false },
           kubernetes: { enabled: true }
         },
-        plugins: ['plugin-core', 'plugin-languages', 'plugin-frameworks', 'plugin-testing', 'plugin-devops', 'plugin-cloud', 'plugin-databases', 'plugin-data', 'plugin-pm', 'plugin-ai', 'plugin-ml']
+        plugins: ['plugin-core', 'plugin-languages', 'plugin-frameworks', 'plugin-testing', 'plugin-devops', 'plugin-cloud', 'plugin-databases', 'plugin-data', 'plugin-pm', 'plugin-pm-azure', 'plugin-ai', 'plugin-ml']
       }
     };
 
