@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.3] - 2025-12-28
+
+### Fixed
+- **Installer now cleans rules directory before plugin installation** - Fixes issue where archived rules persisted from previous installations
+  - Added cleanup step in `installPlugins()` that removes all existing rules before installing fresh from plugins
+  - Ensures v3.2.1/v3.2.2 context optimizations actually take effect on upgrade
+  - Memory tokens now properly reduced from ~86k to ~30-35k (~60% reduction)
+
 ## [3.2.2] - 2025-12-28
 
 ### Changed
