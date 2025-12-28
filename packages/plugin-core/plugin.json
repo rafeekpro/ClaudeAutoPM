@@ -168,6 +168,34 @@
       "priority": "low",
       "description": "Frontmatter stripping utility patterns",
       "tags": ["frontmatter", "utilities"]
+    },
+    {
+      "name": "agent-mandatory-optimized",
+      "file": "rules/agent-mandatory-optimized.md",
+      "priority": "critical",
+      "description": "Mandatory agent usage (optimized version)",
+      "tags": ["agents", "enforcement", "optimized"]
+    },
+    {
+      "name": "context7-enforcement-optimized",
+      "file": "rules/context7-enforcement-optimized.md",
+      "priority": "critical",
+      "description": "Context7 documentation enforcement (optimized version)",
+      "tags": ["context7", "enforcement", "optimized"]
+    },
+    {
+      "name": "github-operations",
+      "file": "rules/github-operations.md",
+      "priority": "high",
+      "description": "GitHub CLI operations and repository protection",
+      "tags": ["github", "operations", "safety"]
+    },
+    {
+      "name": "test-execution",
+      "file": "rules/test-execution.md",
+      "priority": "high",
+      "description": "Test execution patterns and standards",
+      "tags": ["testing", "execution"]
     }
   ],
   "hooks": [
