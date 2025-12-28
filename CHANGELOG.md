@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.1] - 2025-12-28
+
+### Changed
+- **Context optimization** - Reduced Memory token usage from ~86k to ~30-35k (~60% reduction)
+  - Archived 13 non-essential framework rules to `autopm/.claude/rules-archive/`
+  - Archived 3 non-essential project rules to `.claude/rules-archive/`
+  - Kept only `-optimized` versions, removed full duplicates
+  - Archive files preserved for reference but not loaded into context
+
+### Removed
+- Moved to archive: agent-mandatory.md, agent-coordination.md, context7-enforcement.md, context-compaction.md, context-hygiene.md, definition-of-done.md, development-environments.md, framework-path-rules.md, golden-rules.md, no-pr-workflow.md, pipeline-mandatory.md, security-checklist.md, use-ast-grep.md (framework)
+- Moved to archive: definition-of-done.md, golden-rules.md, performance-guidelines.md (project)
+
+## [3.2.0] - 2025-12-27
+
 ### Added
 - **epic-oneshot workflow** - New `/pm:epic-oneshot` command for one-step PRD → Epic → GitHub sync (epic-oneshot.test.js:14)
   - Combines PRD parsing, task decomposition, and provider sync in single operation
