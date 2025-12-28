@@ -100,34 +100,6 @@
       "tags": ["tdd", "testing", "enforcement"]
     },
     {
-      "name": "context7-enforcement",
-      "file": "rules/context7-enforcement.md",
-      "priority": "critical",
-      "description": "Enforce Context7 documentation queries before implementation",
-      "tags": ["context7", "documentation", "enforcement"]
-    },
-    {
-      "name": "agent-coordination",
-      "file": "rules/agent-coordination.md",
-      "priority": "high",
-      "description": "Agent orchestration patterns and coordination",
-      "tags": ["agents", "coordination", "orchestration"]
-    },
-    {
-      "name": "agent-mandatory",
-      "file": "rules/agent-mandatory.md",
-      "priority": "high",
-      "description": "Agent usage requirements and enforcement",
-      "tags": ["agents", "enforcement"]
-    },
-    {
-      "name": "framework-path-rules",
-      "file": "rules/framework-path-rules.md",
-      "priority": "critical",
-      "description": "Path convention enforcement (never hardcode autopm/ paths)",
-      "tags": ["paths", "conventions", "enforcement"]
-    },
-    {
       "name": "ai-integration-patterns",
       "file": "rules/ai-integration-patterns.md",
       "priority": "medium",
@@ -156,20 +128,6 @@
       "tags": ["datetime", "utilities"]
     },
     {
-      "name": "definition-of-done",
-      "file": "rules/definition-of-done.md",
-      "priority": "high",
-      "description": "Quality standards and completion criteria",
-      "tags": ["quality", "standards"]
-    },
-    {
-      "name": "development-environments",
-      "file": "rules/development-environments.md",
-      "priority": "medium",
-      "description": "Development environment setup and configuration",
-      "tags": ["environment", "setup"]
-    },
-    {
       "name": "development-workflow",
       "file": "rules/development-workflow.md",
       "priority": "high",
@@ -191,46 +149,11 @@
       "tags": ["git", "workflow"]
     },
     {
-      "name": "golden-rules",
-      "file": "rules/golden-rules.md",
-      "priority": "critical",
-      "description": "Core framework principles and philosophies",
-      "tags": ["principles", "framework"]
-    },
-    {
       "name": "naming-conventions",
       "file": "rules/naming-conventions.md",
       "priority": "medium",
       "description": "Universal naming standards and conventions",
       "tags": ["naming", "conventions"]
-    },
-    {
-      "name": "no-pr-workflow",
-      "file": "rules/no-pr-workflow.md",
-      "priority": "medium",
-      "description": "Alternative git workflow without pull requests",
-      "tags": ["git", "workflow"]
-    },
-    {
-      "name": "performance-guidelines",
-      "file": "rules/performance-guidelines.md",
-      "priority": "medium",
-      "description": "Universal performance optimization guidelines",
-      "tags": ["performance", "optimization"]
-    },
-    {
-      "name": "pipeline-mandatory",
-      "file": "rules/pipeline-mandatory.md",
-      "priority": "high",
-      "description": "Pipeline enforcement and requirements",
-      "tags": ["pipelines", "enforcement"]
-    },
-    {
-      "name": "security-checklist",
-      "file": "rules/security-checklist.md",
-      "priority": "critical",
-      "description": "Universal security standards and checklist",
-      "tags": ["security", "checklist"]
     },
     {
       "name": "standard-patterns",
@@ -245,13 +168,6 @@
       "priority": "low",
       "description": "Frontmatter stripping utility patterns",
       "tags": ["frontmatter", "utilities"]
-    },
-    {
-      "name": "use-ast-grep",
-      "file": "rules/use-ast-grep.md",
-      "priority": "low",
-      "description": "AST parsing utility with ast-grep",
-      "tags": ["ast", "parsing", "utilities"]
     }
   ],
   "hooks": [
