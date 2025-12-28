@@ -461,7 +461,7 @@ When modifying framework files, work in the `autopm/` directory:
 - `autopm/.claude/` - Resources that will be copied to user projects
 - `autopm/.claude/templates/` - Templates for generating files (NOT copied)
 
-**⚠️ CRITICAL PATH RULE:** Never use hardcoded `autopm/` paths in framework files. The `autopm/` directory does not exist after installation. Always use `.claude/` paths instead. See `autopm/.claude/rules/framework-path-rules.md` for details.
+**⚠️ CRITICAL PATH RULE:** Never use hardcoded `autopm/` paths in framework files. The `autopm/` directory does not exist after installation. Always use `.claude/` paths instead.
 
 ### Testing Changes
 
