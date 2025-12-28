@@ -946,6 +946,22 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
     const installedPlugins = [];
     const failedPlugins = [];
 
+    // Clean rules directory before installing plugins
+    // This removes old/archived rules that are no longer in plugin.json
+    const rulesDir = path.join(this.targetDir, '.claude', 'rules');
+    if (fs.existsSync(rulesDir)) {
+      const oldRules = fs.readdirSync(rulesDir);
+      if (oldRules.length > 0) {
+        this.printStep('Cleaning rules directory for fresh install...');
+        for (const file of oldRules) {
+          const filePath = path.join(rulesDir, file);
+          if (fs.statSync(filePath).isFile()) {
+            fs.unlinkSync(filePath);
+          }
+        }
+      }
+    }
+
     // Install each plugin directly
     for (const pluginName of pluginsToInstall) {
       try {
