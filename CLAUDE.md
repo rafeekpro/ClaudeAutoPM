@@ -519,11 +519,15 @@ npm run setup:githooks
 
 ### Installation Scenarios
 
-1. **Minimal** - Sequential execution, no Docker/K8s
-2. **Docker-only** - Adaptive execution with Docker
-3. **Full DevOps** - Adaptive execution with all features (RECOMMENDED)
-4. **Performance** - Hybrid parallel execution for power users
-5. **Custom** - User-provided configuration
+0. **Micro** - Ultra-light, core only (4 agents, 5 commands, ~2k tokens)
+1. **Minimal** - Core + languages (9 agents, 10 commands)
+2. **Standard** - Core + languages + PM without Azure (~55 commands)
+3. **Docker-only** - Containerized dev with full PM + Azure (7 plugins)
+4. **Full DevOps** - Complete CI/CD pipeline (RECOMMENDED, 10 plugins)
+5. **Performance** - Maximum parallel execution (12 plugins)
+6. **Custom** - User-provided configuration
+
+**Note:** Azure DevOps commands are now in separate `plugin-pm-azure` package.
 
 ### Execution Strategies
 

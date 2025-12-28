@@ -811,21 +811,20 @@
   "commands": [
     {
       "subdirectory": "commands/",
-      "description": "PM workflow commands (87 total)",
+      "description": "PM workflow commands (46 total)",
       "type": "collection",
       "categories": {
         "pm": "Core PM commands (45)",
-        "azure": "Azure DevOps integration commands (41)",
         "github": "GitHub workflow commands (1)"
       },
       "discovery": "auto",
+      "exclude": ["azure"],
       "tags": [
         "pm",
         "workflows",
         "epic",
         "task",
         "issue",
-        "azure",
         "github"
       ]
     }
