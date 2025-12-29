@@ -35,6 +35,7 @@
 #### Epic Management
 
 - `/pm:epic-decompose` - Break epic into tasks
+- `/pm:epic-sync` - Sync epic/tasks to GitHub as issues
 - `/pm:epic-start` - Launch parallel agents for epic
 - `/pm:epic-status` - Show execution status
 - `/pm:epic-merge` - Merge epic branch
