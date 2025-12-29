@@ -811,10 +811,10 @@
   "commands": [
     {
       "subdirectory": "commands/",
-      "description": "Core PM workflow commands (28 total)",
+      "description": "Core PM workflow commands (29 total)",
       "type": "collection",
       "categories": {
-        "pm": "Provider-agnostic PM commands (28)"
+        "pm": "Provider-agnostic PM commands (29)"
       },
       "discovery": "auto",
       "tags": [
