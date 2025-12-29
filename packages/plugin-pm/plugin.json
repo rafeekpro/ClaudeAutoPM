@@ -2,8 +2,8 @@
   "name": "@claudeautopm/plugin-pm",
   "version": "2.1.0",
   "schemaVersion": "2.0",
-  "displayName": "Project Management",
-  "description": "Complete project management plugin with PM workflows, epic management, issue tracking, and release automation",
+  "displayName": "Project Management Core",
+  "description": "Core PM plugin with provider-agnostic workflows, epic management, PRD handling, and local PM operations",
   "category": "project-management",
   "metadata": {
     "category": "Project Management",
@@ -811,52 +811,37 @@
   "commands": [
     {
       "subdirectory": "commands/",
-      "description": "PM workflow commands (46 total)",
+      "description": "Core PM workflow commands (28 total)",
       "type": "collection",
       "categories": {
-        "pm": "Core PM commands (45)",
-        "github": "GitHub workflow commands (1)"
+        "pm": "Provider-agnostic PM commands (28)"
       },
       "discovery": "auto",
-      "exclude": ["azure"],
       "tags": [
         "pm",
         "workflows",
         "epic",
-        "task",
-        "issue",
-        "github"
+        "prd",
+        "local"
       ]
     }
   ],
   "features": {
     "epic_management": {
       "enabled": true,
-      "description": "Complete epic lifecycle management"
-    },
-    "issue_tracking": {
-      "enabled": true,
-      "description": "GitHub issue integration and tracking"
-    },
-    "github_sync": {
-      "enabled": true,
-      "description": "Bidirectional GitHub synchronization"
+      "description": "Local epic lifecycle management"
     },
     "prd_management": {
       "enabled": true,
       "description": "Product Requirements Document workflows"
     },
-    "release_automation": {
-      "enabled": true,
-      "description": "Automated release and publishing"
-    },
-    "analytics": {
-      "enabled": true,
-      "description": "Project metrics and analytics"
-    },
     "context_management": {
       "enabled": true,
       "description": "Work context tracking and management"
+    },
+    "local_workflows": {
+      "enabled": true,
+      "description": "Provider-agnostic PM workflows"
     }
   },
   "dependencies": [],
@@ -868,13 +853,9 @@
     "project-management",
     "agile",
     "epics",
-    "issues",
-    "github",
     "workflows",
-    "automation",
-    "release",
     "prd",
-    "analytics"
+    "local"
   ],
   "compatibleWith": ">=3.0.0"
 }
