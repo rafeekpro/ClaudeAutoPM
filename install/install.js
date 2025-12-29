@@ -453,31 +453,31 @@ ${this.colors.YELLOW}Note:${this.colors.NC} Some installation options require ad
 ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
 `);
 
-    // Option 0: Micro (always available) - NEW ultra-light option
-    console.log(`${this.colors.CYAN}0. Micro${this.colors.NC} - Ultra-light, minimal context usage
-   • Only essential core agents (4 agents, 5 commands)
-   • Lowest context footprint (~2k tokens)
-   • Best for: Context-sensitive work, simple tasks
-   • No PM workflows, no language specialists
-   ${this.colors.DIM}• Plugins: core only (1 plugin)${this.colors.NC}
+    // Option 0: Lite PM (always available) - minimal PM setup
+    console.log(`${this.colors.CYAN}0. Lite${this.colors.NC} - Minimal PM setup
+   • Core + PM essentials (~50 commands)
+   • Lowest context footprint for PM work
+   • Best for: Simple PM tasks, learning
+   • GitHub integration (no Azure DevOps)
+   ${this.colors.DIM}• Plugins: core, pm (2 plugins)${this.colors.NC}
 `);
 
-    // Option 1: Minimal (always available)
-    console.log(`${this.colors.CYAN}1. Minimal${this.colors.NC} - Basic development workflow
-   • Core + language specialists (9 agents, 10 commands)
-   • Sequential agent execution (one at a time)
-   • Best for: Simple projects, learning, debugging
-   • No PM workflows or containers
-   ${this.colors.DIM}• Plugins: core, languages (2 plugins)${this.colors.NC}
-`);
-
-    // Option 2: Standard (always available) - includes PM without Azure
-    console.log(`${this.colors.CYAN}2. Standard${this.colors.NC} - Development with project management
-   • Core + languages + PM workflows (~55 commands)
+    // Option 1: Standard PM (always available)
+    console.log(`${this.colors.CYAN}1. Standard${this.colors.NC} - Standard PM with language support
+   • Core + languages + PM (~55 commands)
    • Sequential agent execution
-   • Best for: Projects needing epic/issue tracking
+   • Best for: Most projects
    • GitHub integration (no Azure DevOps)
    ${this.colors.DIM}• Plugins: core, languages, pm (3 plugins)${this.colors.NC}
+`);
+
+    // Option 2: PM + Azure (always available)
+    console.log(`${this.colors.CYAN}2. Azure${this.colors.NC} - Full PM with Azure DevOps
+   • Core + languages + PM + Azure (~95 commands)
+   • Sequential agent execution
+   • Best for: Azure DevOps projects
+   • Full GitHub + Azure DevOps integration
+   ${this.colors.DIM}• Plugins: core, languages, pm, pm-azure (4 plugins)${this.colors.NC}
 `);
 
     // Option 3: Docker-only (requires Docker)
@@ -536,8 +536,8 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
 `);
 
     if (process.env.AUTOPM_TEST_MODE === '1') {
-      this.printMsg('CYAN', 'Auto-selecting option 0 (micro) for test mode');
-      return 'micro';
+      this.printMsg('CYAN', 'Auto-selecting option 0 (lite) for test mode');
+      return 'lite';
     }
 
     const rl = readline.createInterface({
@@ -546,16 +546,16 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
     });
 
     // Determine default based on available tools
-    const defaultChoice = availableTools.docker && availableTools.kubectl ? '4' : '2';
+    const defaultChoice = availableTools.docker && availableTools.kubectl ? '4' : '1';
 
     return new Promise((resolve) => {
       const askQuestion = () => {
         rl.question(`${this.colors.CYAN}Enter your choice (0-6) [${defaultChoice}]: ${this.colors.NC}`, (answer) => {
           const choice = answer.trim() || defaultChoice;
           const scenarios = {
-            '0': 'micro',
-            '1': 'minimal',
-            '2': 'standard',
+            '0': 'lite',
+            '1': 'standard',
+            '2': 'azure',
             '3': 'docker',
             '4': 'full',
             '5': 'performance',
@@ -612,7 +612,7 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
     }
 
     const configs = {
-      micro: {
+      lite: {
         version: version,
         installed: new Date().toISOString(),
         execution_strategy: 'sequential',
@@ -620,17 +620,7 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
           docker: { enabled: false },
           kubernetes: { enabled: false }
         },
-        plugins: ['plugin-core']
-      },
-      minimal: {
-        version: version,
-        installed: new Date().toISOString(),
-        execution_strategy: 'sequential',
-        tools: {
-          docker: { enabled: false },
-          kubernetes: { enabled: false }
-        },
-        plugins: ['plugin-core', 'plugin-languages']
+        plugins: ['plugin-core', 'plugin-pm']
       },
       standard: {
         version: version,
@@ -641,6 +631,16 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
           kubernetes: { enabled: false }
         },
         plugins: ['plugin-core', 'plugin-languages', 'plugin-pm']
+      },
+      azure: {
+        version: version,
+        installed: new Date().toISOString(),
+        execution_strategy: 'sequential',
+        tools: {
+          docker: { enabled: false },
+          kubernetes: { enabled: false }
+        },
+        plugins: ['plugin-core', 'plugin-languages', 'plugin-pm', 'plugin-pm-azure']
       },
       docker: {
         version: version,
