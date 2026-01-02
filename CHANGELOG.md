@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.0] - 2026-01-02
+
+### Changed
+- **Complete documentation rewrite** - New VitePress-based documentation structure
+  - Deleted 41 design docs from docs/ (~540KB removed)
+  - Created new getting-started/, user-guide/, developer-guide/ sections
+  - Added 17 new comprehensive documentation pages
+  - Updated VitePress config with proper navigation and sidebar
+- **README.md simplified** - Reduced from 650 to 149 lines
+  - Focus on quick install and links to full documentation
+  - Removed verbose architecture diagrams and version history
+- **Documentation sync script** - Added scripts/sync-docs.js for docs-site → docs mirroring
+
+### Removed
+- Removed duplicate directories from docs-site (guide/, development/, architecture/)
+- Removed empty/stub directories from docs/ (core-concepts/, examples/, troubleshooting/, etc.)
+- Removed root documentation files (COMMANDS.md, MCP_SETUP_GUIDE.md, IMPLEMENTATION-PLAN.md)
+
 ## [3.2.4] - 2025-12-28
 
 ### Fixed
