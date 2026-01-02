@@ -29,21 +29,24 @@ Choose your scenario during installation:
 
 ## Quick Start
 
+All commands run inside Claude Code (not terminal):
+
 ```bash
 # Initialize PM structure
-autopm pm init
+/pm:init
 
 # Create and decompose a feature
 /pm:prd-new "User authentication system"
-/pm:epic-decompose prd-001-authentication.md
+/pm:prd-parse user-authentication
+/pm:epic-decompose user-authentication
 
 # Work on tasks
-autopm pm next
-autopm issue start 123
-autopm issue close 123
+/pm:next
+/pm:issue-start 1
+/pm:issue-close 1
 
-# Sync with provider
-autopm pm sync
+# Sync with GitHub/Azure DevOps
+/pm:epic-sync user-authentication
 ```
 
 ---
