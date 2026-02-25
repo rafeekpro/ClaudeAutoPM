@@ -1,0 +1,129 @@
+<!--
+Stage 2: Code Generation Template
+Purpose: Generate implementation code based on architecture
+-->
+
+<prompt_workflow>
+  <stage>2</stage>
+  <workflow_type>code_generation</workflow_type>
+
+  <task>{{task}}</task>
+
+  <context>{{context}}</context>
+
+  <requirements>
+    {{#each requirements}}
+    <requirement>{{this}}</requirement>
+    {{/each}}
+  </requirements>
+
+  <constraints>
+    <allowed_libraries>{{allowed_libraries}}</allowed_libraries>
+    <forbidden_approaches>{{forbidden_approaches}}</forbidden_approaches>
+    <complexity_limits>{{complexity_limits}}</complexity_limits>
+    <integration_requirements>{{integration_requirements}}</integration_requirements>
+  </constraints>
+
+  <tdd_requirements>
+    <test_first>REQUIRED - Write tests BEFORE implementation</test_first>
+    <test_framework>Use project's existing test framework (detected via /testing:prime)</test_framework>
+    <coverage_target>100% for new code</coverage_target>
+    <test_pattern>
+      1. Write failing test (RED)
+      2. Write minimal code to pass (GREEN)
+      3. Refactor while tests pass (REFACTOR)
+    </test_pattern>
+  </tdd_requirements>
+
+  <deliverables>
+    <deliverable>
+      <name>Test Files</name>
+      <description>Comprehensive test suite written FIRST (TDD Red phase)</description>
+      <format>{{test_format}}</format>
+      <required>YES</required>
+    </deliverable>
+    <deliverable>
+      <name>Implementation Code</name>
+      <description>Minimal code to make tests pass (TDD Green phase)</description>
+      <format>{{code_format}}</format>
+      <required>YES</required>
+    </deliverable>
+    <deliverable>
+      <name>Refactored Code</name>
+      <description>Clean, maintainable code after refactoring (TDD Refactor phase)</description>
+      <format>{{code_format}}</format>
+      <required>YES</required>
+    </deliverable>
+    <deliverable>
+      <name>Usage Documentation</name>
+      <description>Code comments and brief usage examples</description>
+      <format>Inline comments + optional README section</format>
+      <required>NO</required>
+    </deliverable>
+  </deliverables>
+
+  <thinking>
+    Before generating code:
+
+    1. UNDERSTAND REQUIREMENTS:
+       - What exactly needs to be implemented?
+       - What are the edge cases?
+       - What constraints must be followed?
+
+    2. DESIGN THE TESTS FIRST:
+       - What are the test cases for happy path?
+       - What are the test cases for edge cases?
+       - What are the test cases for error conditions?
+       - How will tests be structured?
+
+    3. PLAN THE IMPLEMENTATION:
+       - What is the minimal code to pass tests?
+       - What functions/classes are needed?
+       - How will they interact?
+       - What design patterns apply?
+
+    4. IDENTIFY INTEGRATION POINTS:
+       - What existing code needs to be called?
+       - What APIs/services are used?
+       - How is error handling done?
+
+    5. CONSIDER REFACTORING:
+       - What code smells to avoid?
+       - What design principles to follow?
+       - When to refactor vs. keep it simple?
+
+    CRITICAL: Follow TDD strictly
+    - Tests MUST be written first
+    - Implementation MUST be minimal
+    - Refactoring MUST happen while tests are green
+    - NO skipping TDD phases
+  </thinking>
+
+  {{#if existing_code}}
+  <existing_code>
+    <description>Current code to refactor or extend</description>
+    <content>{{existing_code}}</content>
+  </existing_code>
+  {{/if}}
+
+  {{#if example}}
+  <example>
+    <description>Reference implementation pattern from codebase</description>
+    <content>{{example}}</content>
+  </example>
+  {{/if}}
+
+  <quality_checklist>
+    <check>Tests written before implementation</check>
+    <check>Tests fail initially (RED phase confirmed)</check>
+    <check>Minimal implementation to pass tests</check>
+    <check>All tests passing (GREEN phase achieved)</check>
+    <check>Code refactored for clarity</check>
+    <check>All tests still passing after refactor</check>
+    <check>No code duplication</check>
+    <check>Single responsibility principle followed</check>
+    <check>Proper error handling</check>
+    <check>No resource leaks</check>
+    <check>Consistent naming with codebase</check>
+  </quality_checklist>
+</prompt_workflow>

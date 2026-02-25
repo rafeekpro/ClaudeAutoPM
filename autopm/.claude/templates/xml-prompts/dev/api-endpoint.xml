@@ -1,0 +1,175 @@
+<!--
+Template: REST API Endpoint Creation
+Purpose: Generate REST API endpoint with full TDD cycle
+Category: dev
+Stage: 2
+-->
+
+<prompt_workflow>
+  <stage>2</stage>
+  <workflow_type>api_endpoint_creation</workflow_type>
+
+  <task>{{task}}</task>
+
+  <context>{{context}}</context>
+
+  <requirements>
+    {{#each requirements}}
+    <requirement>{{this}}</requirement>
+    {{/each}}
+  </requirements>
+
+  <constraints>
+    <allowed_libraries>{{allowed_libraries}}</allowed_libraries>
+    <forbidden_approaches>{{forbidden_approaches}}</forbidden_approaches>
+    <complexity_limits>{{complexity_limits}}</complexity_limits>
+    <integration_requirements>{{integration_requirements}}</integration_requirements>
+  </constraints>
+
+  <endpoint_specification>
+    <method>{{http_method}}</method>
+    <path>{{endpoint_path}}</path>
+    <authentication>{{auth_required}}</authentication>
+    <request_format>{{request_format}}</request_format>
+    <response_format>{{response_format}}</response_format>
+  </endpoint_specification>
+
+  <tdd_requirements>
+    <test_first>REQUIRED - Tests MUST be written before implementation</test_first>
+    <test_framework>{{test_framework}}</test_framework>
+    <coverage_minimum>{{coverage_minimum}}</coverage_minimum>
+    <test_patterns>
+      - Test success scenario (200/201)
+      - Test validation errors (400)
+      - Test authentication errors (401)
+      - Test authorization errors (403)
+      - Test not found (404)
+      - Test conflict (409)
+      - Test server errors (500)
+    </test_patterns>
+  </tdd_requirements>
+
+  <deliverables>
+    <deliverable>
+      <name>Route Definition</name>
+      <description>Express/Koa/Fastify route registration</description>
+      <format>JavaScript/TypeScript route file</format>
+      <required>YES</required>
+    </deliverable>
+    <deliverable>
+      <name>Controller/Handler</name>
+      <description>Request handling logic</description>
+      <format>JavaScript/TypeScript controller</format>
+      <required>YES</required>
+    </deliverable>
+    <deliverable>
+      <name>Input Validation</name>
+      <description>Request schema validation</description>
+      <format>Joi/Yup/Zod schema or middleware</format>
+      <required>YES</required>
+    </deliverable>
+    <deliverable>
+      <name>Service Layer</name>
+      <description>Business logic (if complex)</description>
+      <format>JavaScript/TypeScript service</format>
+      <required>Conditional</required>
+    </deliverable>
+    <deliverable>
+      <name>Tests</name>
+      <description>Comprehensive test suite (written FIRST)</description>
+      <format>Test file with 10+ test cases</format>
+      <required>YES</required>
+    </deliverable>
+    <deliverable>
+      <name>Error Handler</name>
+      <description>Error handling middleware</description>
+      <format>Middleware function</format>
+      <required>YES</required>
+    </deliverable>
+  </deliverables>
+
+  <thinking>
+    Before creating API endpoint:
+
+    1. UNDERSTAND THE REQUIREMENT:
+       - What is the endpoint's purpose?
+       - What HTTP method is appropriate?
+       - What is the resource path?
+       - What are the success/error scenarios?
+
+    2. DESIGN THE INTERFACE:
+       - What request parameters are needed?
+       - What does the request body look like?
+       - What does the response body look like?
+       - What status codes should be returned?
+
+    3. PLAN VALIDATION:
+       - What inputs are required?
+       - What validations are needed?
+       - How are validation errors returned?
+
+    4. PLAN AUTHENTICATION/AUTHORIZATION:
+       - Is authentication required?
+       - What authorization checks are needed?
+       - How are auth errors handled?
+
+    5. DESIGN TESTS (TDD - RED PHASE):
+       - Test successful request with valid data
+       - Test validation errors for each field
+       - Test authentication failures
+       - Test authorization failures
+       - Test not found scenarios
+       - Test conflict scenarios
+       - Test server error handling
+
+    6. IMPLEMENT MINIMALLY (TDD - GREEN PHASE):
+       - Write just enough code to pass tests
+       - Don't add features not tested
+       - Keep it simple
+
+    7. REFACTOR (TDD - REFACTOR PHASE):
+       - Extract business logic to service if needed
+       - Improve error handling
+       - Add meaningful error messages
+       - Keep tests passing
+
+    CRITICAL TDD RULES:
+    - Tests MUST be written first
+    - Every test must fail initially (RED)
+    - Implementation MUST be minimal to pass (GREEN)
+    - Refactor ONLY while tests pass
+    - NO skipping TDD phases
+  </thinking>
+
+  {{#if existing_code}}
+  <existing_code>
+    <description>Existing route/controller to extend</description>
+    <content>{{existing_code}}</content>
+  </existing_code>
+  {{/if}}
+
+  {{#if example}}
+  <example>
+    <description>Reference endpoint implementation</description>
+    <content>{{example}}</content>
+  </example>
+  {{/if}}
+
+  <quality_checklist>
+    <check>Tests written before implementation (TDD)</check>
+    <check>Tests fail initially (RED phase confirmed)</check>
+    <check>Route registered correctly</check>
+    <check>Input validation implemented</check>
+    <check>Authentication/authorization checked</check>
+    <check>Success response returns correct data</check>
+    <check>Error responses have appropriate status codes</check>
+    <check>Error responses have descriptive messages</check>
+    <check>Implementation is minimal (no over-engineering)</check>
+    <check>All tests passing (GREEN phase achieved)</check>
+    <check>Code refactored for clarity (REFACTOR phase)</check>
+    <check>Tests still passing after refactor</check>
+    <check>No code duplication</check>
+    <check>Single responsibility principle</check>
+    <check>Consistent with existing API patterns</check>
+  </quality_checklist>
+</prompt_workflow>

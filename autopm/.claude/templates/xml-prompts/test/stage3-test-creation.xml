@@ -1,0 +1,156 @@
+<!--
+Stage 3: Test Creation Template
+Purpose: Generate comprehensive test suites for existing code
+-->
+
+<prompt_workflow>
+  <stage>3</stage>
+  <workflow_type>test_creation</workflow_type>
+
+  <task>{{task}}</task>
+
+  <context>{{context}}</context>
+
+  <requirements>
+    {{#each requirements}}
+    <requirement>{{this}}</requirement>
+    {{/each}}
+  </requirements>
+
+  <constraints>
+    <allowed_libraries>{{allowed_libraries}}</allowed_libraries>
+    <forbidden_approaches>{{forbidden_approaches}}</forbidden_approaches>
+    <test_coverage_minimum>{{test_coverage_minimum}}</test_coverage_minimum>
+    <integration_requirements>{{integration_requirements}}</integration_requirements>
+  </constraints>
+
+  <test_requirements>
+    <framework>Use project's existing test framework (detected via /testing:prime)</framework>
+    <no_mocks>DO NOT mock services - use real implementations</no_mocks>
+    <verbose_output>Tests should be verbose for debugging</verbose_output>
+    <isolation>Each test should be independent</isolation>
+    <clarity>Test names should clearly describe what is being tested</clarity>
+  </test_requirements>
+
+  <deliverables>
+    <deliverable>
+      <name>Unit Tests</name>
+      <description>Tests for individual functions/methods</description>
+      <format>Test file matching project structure</format>
+      <required>YES</required>
+    </deliverable>
+    <deliverable>
+      <name>Integration Tests</name>
+      <description>Tests for component interactions</description>
+      <format>Test file in integration test directory</format>
+      <required>Conditional</required>
+    </deliverable>
+    <deliverable>
+      <name>Edge Case Tests</name>
+      <description>Tests for boundary conditions and errors</description>
+      <format>Included in unit tests</format>
+      <required>YES</required>
+    </deliverable>
+    <deliverable>
+      <name>Test Documentation</name>
+      <description>Comments explaining complex test scenarios</description>
+      <format>Inline comments</format>
+      <required>NO</required>
+    </deliverable>
+  </deliverables>
+
+  <thinking>
+    Before creating tests:
+
+    1. ANALYZE THE CODE:
+       - What are the entry points (functions, methods, endpoints)?
+       - What are the success scenarios?
+       - What are the failure scenarios?
+       - What are the edge cases?
+
+    2. IDENTIFY TEST CATEGORIES:
+       - Happy path tests (normal operation)
+       - Edge case tests (boundaries, limits)
+       - Error case tests (exceptions, invalid input)
+       - Integration tests (if multiple components)
+
+    3. DESIGN TEST STRUCTURE:
+       - How to organize tests logically?
+       - What test fixtures/setup is needed?
+       - How to handle test data?
+       - How to clean up after tests?
+
+    4. PLAN ASSERTIONS:
+       - What exactly should be verified?
+       - How to assert on results?
+       - How to assert on side effects?
+       - How to assert on errors?
+
+    5. CONSIDER COVERAGE:
+       - What code paths need testing?
+       - Are all branches covered?
+       - Are all error conditions covered?
+       - What is the target coverage percentage?
+
+    CRITICAL TESTING PRINCIPLES:
+    - Tests must be independent (no shared state)
+    - Tests must be repeatable (same result every time)
+    - Tests must be verbose (clear failure messages)
+    - Tests must be realistic (test actual usage patterns)
+    - Use real implementations, NOT mocks
+  </thinking>
+
+  {{#if existing_code}}
+  <existing_code>
+    <description>Code to be tested</description>
+    <content>{{existing_code}}</content>
+  </existing_code>
+  {{/if}}
+
+  {{#if example}}
+  <example>
+    <description>Example test pattern from codebase</description>
+    <content>{{example}}</content>
+  </example>
+  {{/if}}
+
+  <test_patterns>
+    <pattern>
+      <name>Arrange-Act-Assert</name>
+      <description>
+        1. Arrange: Set up test data and conditions
+        2. Act: Execute the code being tested
+        3. Assert: Verify expected outcomes
+      </description>
+    </pattern>
+    <pattern>
+      <name>Given-When-Then</name>
+      <description>
+        1. Given: Preconditions and context
+        2. When: Action is performed
+        3. Then: Expected outcome
+      </description>
+    </pattern>
+    <pattern>
+      <name>Test Naming</name>
+      <description>
+        Use descriptive names like:
+        - test_userAuthentication_withValidCredentials_returnsToken
+        - test_calculateTotal_withNegativeInput_throwsException
+      </description>
+    </pattern>
+  </test_patterns>
+
+  <quality_checklist>
+    <check>Tests cover all code paths</check>
+    <check>Tests include edge cases</check>
+    <check>Tests include error conditions</check>
+    <check>Tests are independent</check>
+    <check>Tests use real implementations (no mocks)</check>
+    <check>Tests have clear, descriptive names</check>
+    <check>Tests have helpful failure messages</check>
+    <check>Tests clean up after themselves</check>
+    <check>Test coverage meets minimum threshold</check>
+    <check>Tests run quickly</check>
+  </quality_checklist>
+</prompt_workflow>

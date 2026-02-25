@@ -1,0 +1,194 @@
+<!--
+Stage 4: Refactoring Template
+Purpose: Improve code structure while maintaining functionality
+-->
+
+<prompt_workflow>
+  <stage>4</stage>
+  <workflow_type>refactoring</workflow_type>
+
+  <task>{{task}}</task>
+
+  <context>{{context}}</context>
+
+  <requirements>
+    {{#each requirements}}
+    <requirement>{{this}}</requirement>
+    {{/each}}
+  </requirements>
+
+  <constraints>
+    <allowed_libraries>{{allowed_libraries}}</allowed_libraries>
+    <forbidden_approaches>{{forbidden_approaches}}</forbidden_approaches>
+    <refactoring_scope>{{refactoring_scope}}</refactoring_scope>
+    <integration_requirements>{{integration_requirements}}</integration_requirements>
+  </constraints>
+
+  <refactoring_principles>
+    <principle>
+      <name>Preserve Behavior</name>
+      <description>Refactoring must NOT change external behavior</description>
+    </principle>
+    <principle>
+      <name>Tests Pass</name>
+      <description>All tests must pass before and after refactoring</description>
+    </principle>
+    <principle>
+      <name>Small Steps</name>
+      <description>Refactor in small, incremental changes</description>
+    </principle>
+    <principle>
+      <name>Test First</name>
+      <description>Write tests if none exist before refactoring</description>
+    </principle>
+  </refactoring_principles>
+
+  <deliverables>
+    <deliverable>
+      <name>Refactored Code</name>
+      <description>Improved code structure with same behavior</description>
+      <format>{{code_format}}</format>
+      <required>YES</required>
+    </deliverable>
+    <deliverable>
+      <name>Test Results</name>
+      <description>All tests passing after refactoring</description>
+      <format>Test output summary</format>
+      <required>YES</required>
+    </deliverable>
+    <deliverable>
+      <name>Refactoring Summary</name>
+      <description>What changed and why</description>
+      <format>Brief markdown description</format>
+      <required>YES</required>
+    </deliverable>
+  </deliverables>
+
+  <thinking>
+    Before refactoring:
+
+    1. IDENTIFY CODE SMELLS:
+       - Duplicate code (DRY violation)
+       - Long methods/functions
+       - Complex conditional logic
+       - Poor naming
+       - Mixed responsibilities
+       - Feature envy
+       - Inappropriate intimacy
+       - Data clumps
+
+    2. ASSESS TEST COVERAGE:
+       - Do tests exist for the code?
+       - What is the coverage percentage?
+       - Are tests comprehensive?
+       - If no tests, write them FIRST
+
+    3. PLAN REFACTORING:
+       - What refactoring patterns apply?
+       - What is the scope of changes?
+       - What are the risks?
+       - How to mitigate risks?
+
+    4. IDENTIFY PATTERNS:
+       - Extract Method/Function
+       - Extract Class/Module
+       - Rename for clarity
+       - Introduce Parameter Object
+       - Replace Conditional with Polymorphism
+       - Decompose Conditional
+       - Consolidate Conditional
+       - Replace Magic Numbers with Constants
+
+    5. PRIORITIZE CHANGES:
+       - Which changes have highest impact?
+       - Which changes are safest?
+       - What is the order of refactoring?
+       - Can changes be done incrementally?
+
+    CRITICAL REFACTORING RULES:
+    - NEVER change behavior without tests
+    - NEVER refactor without passing tests
+    - NEVER make large changes at once
+    - ALWAYS run tests after each change
+    - ALWAYS commit working state after each step
+  </thinking>
+
+  {{#if existing_code}}
+  <existing_code>
+    <description>Code to be refactored</description>
+    <content>{{existing_code}}</content>
+  </existing_code>
+  {{/if}}
+
+  {{#if example}}
+  <example>
+    <description>Desired code pattern or style</description>
+    <content>{{example}}</content>
+  </example>
+  {{/if}}
+
+  <refactoring_techniques>
+    <technique>
+      <name>Extract Method/Function</name>
+      <when>Code is doing multiple things</when>
+      <how>Create focused functions with single responsibilities</how>
+    </technique>
+    <technique>
+      <name>Rename for Clarity</name>
+      <when>Names don't reveal intent</when>
+      <how>Use descriptive names that explain purpose</how>
+    </technique>
+    <technique>
+      <name>Remove Duplication</name>
+      <when>Same code appears multiple times</when>
+      <how>Extract to shared function/module</how>
+    </technique>
+    <technique>
+      <name>Simplify Conditionals</name>
+      <when>Nested or complex logic</when>
+      <how>Use guard clauses, early returns, or polymorphism</how>
+    </technique>
+    <technique>
+      <name>Separate Concerns</name>
+      <when>Code mixes responsibilities</when>
+      <how>Create modules/classes for each concern</how>
+    </technique>
+    <technique>
+      <name>Reduce Complexity</name>
+      <when>Cyclomatic complexity is high</when>
+      <how>Break into smaller, simpler functions</how>
+    </technique>
+  </refactoring_techniques>
+
+  <quality_checklist>
+    <check>Tests written if none existed</check>
+    <check>All tests pass before refactoring</check>
+    <check>Code smells identified and documented</check>
+    <check>Refactoring planned before changes</check>
+    <check>Changes made incrementally</check>
+    <check>Tests pass after each change</check>
+    <check>Behavior unchanged (verified by tests)</check>
+    <check>Code is clearer and simpler</check>
+    <check>Names are descriptive</check>
+    <check>No duplication introduced</check>
+    <check>Complexity reduced</check>
+  </quality_checklist>
+
+  <pre_refactoring_checklist>
+    <item>Understand what the code does</item>
+    <item>Identify code smells and issues</item>
+    <item>Ensure tests exist and pass</item>
+    <item>If no tests, write comprehensive tests first</item>
+    <item>Document current behavior</item>
+  </pre_refactoring_checklist>
+
+  <post_refactoring_checklist>
+    <item>All tests still pass</item>
+    <item>Behavior is identical to before</item>
+    <item>Code is easier to understand</item>
+    <item>Code is easier to modify</item>
+    <item>Complexity is reduced</item>
+    <item>Duplication is eliminated</item>
+    <item>Names are clear and descriptive</item>
+  </post_refactoring_checklist>
+</prompt_workflow>
