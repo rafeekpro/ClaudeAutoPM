@@ -1,0 +1,175 @@
+<!--
+Stage 5: Documentation Template
+Purpose: Generate comprehensive documentation for code
+-->
+
+<prompt_workflow>
+  <stage>5</stage>
+  <workflow_type>documentation</workflow_type>
+
+  <task>{{task}}</task>
+
+  <context>{{context}}</context>
+
+  <requirements>
+    {{#each requirements}}
+    <requirement>{{this}}</requirement>
+    {{/each}}
+  </requirements>
+
+  <constraints>
+    <documentation_style>{{documentation_style}}</documentation_style>
+    <target_audience>{{target_audience}}</target_audience>
+    <format_standards>{{format_standards}}</format_standards>
+    <integration_requirements>{{integration_requirements}}</integration_requirements>
+  </constraints>
+
+  <documentation_requirements>
+    <principle>Documentation should answer "why", not just "what"</principle>
+    <principle>Include examples for complex functionality</principle>
+    <principle>Keep documentation up-to-date with code</principle>
+    <principle>Use clear, concise language</principle>
+    <principle>Assume reader has basic knowledge</principle>
+  </documentation_requirements>
+
+  <deliverables>
+    <deliverable>
+      <name>API/Function Documentation</name>
+      <description>Documentation for public interfaces</description>
+      <format>{{doc_format}} (inline comments or docstrings)</format>
+      <required>YES</required>
+    </deliverable>
+    <deliverable>
+      <name>Usage Examples</name>
+      <description>Practical examples showing how to use the code</description>
+      <format>Code examples with explanations</format>
+      <required>YES</required>
+    </deliverable>
+    <deliverable>
+      <name>Architecture Overview</name>
+      <description>High-level design and component interactions</description>
+      <format>Markdown with diagrams</format>
+      <required>Conditional</required>
+    </deliverable>
+    <deliverable>
+      <name>README Updates</name>
+      <description>Project-level documentation updates</description>
+      <format>Markdown</format>
+      <required>Conditional</required>
+    </deliverable>
+  </deliverables>
+
+  <thinking>
+    Before documenting:
+
+    1. UNDERSTAND THE AUDIENCE:
+       - Who will read this documentation?
+       - What is their expertise level?
+       - What do they need to know?
+       - What questions will they have?
+
+    2. IDENTIFY WHAT TO DOCUMENT:
+       - What are the public interfaces?
+       - What is complex or non-obvious?
+       - What decisions were made?
+       - What are the common use cases?
+       - What are the edge cases?
+
+    3. STRUCTURE THE DOCUMENTATION:
+       - Overview/Introduction
+       - Installation/Setup (if applicable)
+       - Quick Start/Basic Usage
+       - Advanced Usage
+       - API Reference
+       - Examples
+       - Troubleshooting/FAQ
+
+    4. WRITE EFFECTIVE EXAMPLES:
+       - Show real-world usage
+       - Start simple, get complex
+       - Explain what each example does
+       - Include expected outputs
+       - Handle error cases
+
+    5. MAINTAIN CLARITY:
+       - Use simple, direct language
+       - Avoid jargon where possible
+       - Explain necessary jargon
+       - Use consistent terminology
+       - Provide context
+
+    DOCUMENTATION BEST PRACTICES:
+    - Document "why", not just "what"
+    - Keep it concise but complete
+    - Use active voice
+    - Provide concrete examples
+    - Update documentation with code changes
+    - Get feedback from users
+  </thinking>
+
+  {{#if existing_code}}
+  <existing_code>
+    <description>Code to be documented</description>
+    <content>{{existing_code}}</content>
+  </existing_code>
+  {{/if}}
+
+  {{#if example}}
+  <example>
+    <description>Desired documentation style</description>
+    <content>{{example}}</content>
+  </example>
+  {{/if}}
+
+  <documentation_sections>
+    <section>
+      <name>Purpose</name>
+      <description>What does this code do and why does it exist?</description>
+      <required>YES</required>
+    </section>
+    <section>
+      <name>Usage</name>
+      <description>How to use this code with examples</description>
+      <required>YES</required>
+    </section>
+    <section>
+      <name>Parameters/Arguments</name>
+      <description>What inputs does it accept and what are their types?</description>
+      <required>For functions/methods</required>
+    </section>
+    <section>
+      <name>Return Values</name>
+      <description>What does it return and what is the type?</description>
+      <required>For functions/methods</required>
+    </section>
+    <section>
+      <name>Exceptions/Errors</name>
+      <description>What errors can occur and how to handle them</description>
+      <required>If applicable</required>
+    </section>
+    <section>
+      <name>Examples</name>
+      <description>Concrete usage examples with explanations</description>
+      <required>YES</required>
+    </section>
+    <section>
+      <name>Notes</name>
+      <description>Important caveats, limitations, or special considerations</description>
+      <required>Conditional</required>
+    </section>
+  </documentation_sections>
+
+  <quality_checklist>
+    <check>Documentation explains "why" not just "what"</check>
+    <check>Examples are practical and realistic</check>
+    <check>Examples show common use cases</check>
+    <check>Complex functionality has examples</check>
+    <check>Parameters are documented with types</check>
+    <check>Return values are documented</check>
+    <check>Errors/exceptions are documented</check>
+    <check>Language is clear and concise</check>
+    <check>Terminology is consistent</check>
+    <check>Documentation is up-to-date with code</check>
+    <check>Target audience is appropriate</check>
+  </quality_checklist>
+</prompt_workflow>

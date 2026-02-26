@@ -7,6 +7,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.0] - 2025-02-25
+
+### Added
+- **XML Structured Prompting System** - Complete framework for precise AI code generation through XML templates
+  - **5-Stage Workflow Templates** - Architecture → Code → Tests → Refactor → Documentation
+  - **XML Prompt Builder** - Template engine with variable substitution (16 utility classes)
+  - **XML Validator** - Comprehensive validation system with stage-specific requirements
+  - **8 XML Templates** - 5 base stage templates + 3 example templates (5062 lines)
+  - **2 New Commands** - `/prompt:xml` (generate prompts), `/xml:template` (manage templates)
+  - **4 Documentation Guides** - README, templates guide, creating templates, best practices (2442 lines)
+  - **TDD Enforcement** - Stage 2 templates mandate test-first development
+  - **Constraint System** - Allowed libraries, forbidden approaches, complexity limits
+  - **Deliverables Specification** - Exact outputs with validation criteria
+  - **Agent Integration** - XML prompts guide specialized agent behavior
+
+### Templates
+- `arch/stage1-architectural-planning.xml` - Design system architecture before implementation
+- `arch/prd-to-epic.xml` - Convert Product Requirements to technical epics
+- `dev/stage2-code-generation.xml` - Generate code with TDD (test-first mandate)
+- `dev/api-endpoint.xml` - REST API endpoint creation with full validation
+- `test/stage3-test-creation.xml` - Comprehensive test suite generation
+- `test/test-suite.xml` - Full test suite with high coverage requirements
+- `refactor/stage4-refactoring.xml` - Safe code refactoring with behavior preservation
+- `doc/stage5-documentation.xml` - Complete documentation generation
+
+### Commands
+- `/prompt:xml <template>` - Generate XML prompts from templates with flag-based variable substitution
+- `/xml:template list` - List all available templates by category
+- `/xml:template show <name>` - Display template structure and metadata
+- `/xml:template validate <name>` - Validate template structure and completeness
+- `/xml:template create <name>` - Create custom template interactively
+- `/xml:template delete <name>` - Delete custom template (built-ins protected)
+- `/xml:template export <name>` - Export template for sharing
+- `/xml:template import <file>` - Import shared template
+
+### Utilities
+- `autopm/.claude/lib/xml-prompt-builder.js` - Template engine (194 lines)
+  - Variable substitution (simple, arrays, conditionals)
+  - Template listing and metadata extraction
+  - Custom template creation
+- `autopm/.claude/lib/xml-validator.js` - Validation system (355 lines)
+  - Stage-specific requirement validation
+  - Constraints and deliverables checking
+  - Error and warning reporting
+
+### Documentation
+- `autopm/.claude/docs/xml-prompts/README.md` - Overview and quick start (526 lines)
+- `autopm/.claude/docs/xml-prompts/templates-guide.md` - Using templates effectively (549 lines)
+- `autopm/.claude/docs/xml-prompts/creating-templates.md` - Custom template creation (673 lines)
+- `autopm/.claude/docs/xml-prompts/best-practices.md` - Advanced techniques (694 lines)
+
+### Integration
+- Works with existing `/pm:*` commands
+- Context7 enforcement mandated in all commands
+- Agent delegation support with XML constraints
+- TDD workflow integration (RED → GREEN → REFACTOR)
+- Template composition and progressive refinement
+
 ## [3.5.0] - 2026-01-02
 
 ### Changed

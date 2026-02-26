@@ -1,0 +1,151 @@
+<!--
+Template: PRD to Epic Decomposition
+Purpose: Convert Product Requirements Document to technical epic
+Category: arch
+Stage: 1
+-->
+
+<prompt_workflow>
+  <stage>1</stage>
+  <workflow_type>prd_to_epic_decomposition</workflow_type>
+
+  <task>{{task}}</task>
+
+  <context>{{context}}</context>
+
+  <requirements>
+    {{#each requirements}}
+    <requirement>{{this}}</requirement>
+    {{/each}}
+  </requirements>
+
+  <constraints>
+    <allowed_libraries>{{allowed_libraries}}</allowed_libraries>
+    <forbidden_approaches>{{forbidden_approaches}}</forbidden_approaches>
+    <complexity_limits>{{complexity_limits}}</complexity_limits>
+    <integration_requirements>{{integration_requirements}}</integration_requirements>
+  </constraints>
+
+  <prd_analysis>
+    <extract_requirements>
+      - Identify functional requirements
+      - Identify non-functional requirements
+      - Identify constraints and dependencies
+      - Identify success criteria
+    </extract_requirements>
+    <technical_considerations>
+      - System architecture implications
+      - Database schema requirements
+      - API endpoint needs
+      - Integration requirements
+      - Performance considerations
+      - Security requirements
+    </technical_considerations>
+  </prd_analysis>
+
+  <deliverables>
+    <deliverable>
+      <name>Epic Overview</name>
+      <description>High-level epic summary with objectives and scope</description>
+      <format>Markdown with frontmatter</format>
+      <required>YES</required>
+    </deliverable>
+    <deliverable>
+      <name>Technical Architecture</name>
+      <description>System design addressing PRD requirements</description>
+      <format>Markdown with diagrams</format>
+      <required>YES</required>
+    </deliverable>
+    <deliverable>
+      <name>Task Breakdown</name>
+      <description>Decomposed tasks with dependencies</description>
+      <format>Numbered task list with estimates</format>
+      <required>YES</required>
+    </deliverable>
+    <deliverable>
+      <name>Data Model</name>
+      <description>Database schema and data structures</description>
+      <format>Entity-relationship description or diagram</format>
+      <required>Conditional</required>
+    </deliverable>
+    <deliverable>
+      <name>API Specification</name>
+      <description>Required API endpoints and interfaces</description>
+      <format>Markdown table or OpenAPI spec</format>
+      <required>Conditional</required>
+    </deliverable>
+    <deliverable>
+      <name>Risk Assessment</name>
+      <description>Technical risks and mitigation strategies</description>
+      <format>Markdown list</format>
+      <required>NO</required>
+    </deliverable>
+  </deliverables>
+
+  <thinking>
+    Before converting PRD to Epic:
+
+    1. ANALYZE THE PRD:
+       - What is the core business objective?
+       - What are the must-have vs nice-to-have features?
+       - What are the technical constraints?
+       - What is the timeline?
+
+    2. IDENTIFY TECHNICAL REQUIREMENTS:
+       - What system components are needed?
+       - What data needs to be stored?
+       - What APIs need to be exposed?
+       - What integrations are required?
+
+    3. DESIGN THE ARCHITECTURE:
+       - What is the system structure?
+       - How do components interact?
+       - What are the data flows?
+       - What technologies are appropriate?
+
+    4. DECOMPOSE INTO TASKS:
+       - What are the logical work packages?
+       - What are the dependencies between tasks?
+       - What can be done in parallel?
+       - What is the effort estimation?
+
+    5. IDENTIFY RISKS:
+       - What could go wrong technically?
+       - What are the performance concerns?
+       - What are the security implications?
+       - How can risks be mitigated?
+
+    CRITICAL: Epic must be technically feasible and properly scoped
+    - Ensure tasks are independent where possible
+    - Estimate effort realistically
+    - Identify clear acceptance criteria
+    - Plan for testing and documentation
+  </thinking>
+
+  {{#if existing_code}}
+  <existing_code>
+    <description>Current system implementation</description>
+    <content>{{existing_code}}</content>
+  </existing_code>
+  {{/if}}
+
+  {{#if example}}
+  <example>
+    <description>Reference epic structure</description>
+    <content>{{example}}</content>
+  </example>
+  {{/if}}
+
+  <quality_checklist>
+    <check>All PRD requirements addressed</check>
+    <check>Technical approach is sound</check>
+    <check>Tasks are properly scoped</check>
+    <check>Dependencies are clear</check>
+    <check>Effort estimates are realistic</check>
+    <check>Risks are identified</check>
+    <check>Acceptance criteria defined</check>
+    <check>Integration points specified</check>
+    <check>Data model designed (if applicable)</check>
+    <check>API specification complete (if applicable)</check>
+  </quality_checklist>
+</prompt_workflow>

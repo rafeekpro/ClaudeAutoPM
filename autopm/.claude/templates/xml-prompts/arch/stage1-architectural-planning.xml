@@ -1,0 +1,99 @@
+<!--
+Stage 1: Architectural Planning Template
+Purpose: Design system architecture before implementation
+-->
+
+<prompt_workflow>
+  <stage>1</stage>
+  <workflow_type>architectural_planning</workflow_type>
+
+  <task>{{task}}</task>
+
+  <context>{{context}}</context>
+
+  <requirements>
+    {{#each requirements}}
+    <requirement>{{this}}</requirement>
+    {{/each}}
+  </requirements>
+
+  <constraints>
+    <allowed_libraries>{{allowed_libraries}}</allowed_libraries>
+    <forbidden_approaches>{{forbidden_approaches}}</forbidden_approaches>
+    <complexity_limits>{{complexity_limits}}</complexity_limits>
+    <integration_requirements>{{integration_requirements}}</integration_requirements>
+  </constraints>
+
+  <deliverables>
+    <deliverable>
+      <name>System Architecture Diagram</name>
+      <description>High-level component architecture showing major modules and their interactions</description>
+      <format>markdown mermaid diagram or textual description</format>
+    </deliverable>
+    <deliverable>
+      <name>Data Model</name>
+      <description>Database schema, data structures, and key entities</description>
+      <format>markdown table or entity-relationship description</format>
+    </deliverable>
+    <deliverable>
+      <name>API Specification</name>
+      <description>Endpoints, methods, request/response formats if applicable</description>
+      <format>OpenAPI spec or markdown table</format>
+    </deliverable>
+    <deliverable>
+      <name>Technology Stack</name>
+      <description>Recommended frameworks, libraries, and tools</description>
+      <format>markdown list with justifications</format>
+    </deliverable>
+  </deliverables>
+
+  <thinking>
+    Before creating the architecture:
+
+    1. Analyze the requirements:
+       - What are the core functional requirements?
+       - What are the non-functional requirements (performance, security, scalability)?
+       - What constraints must be respected?
+
+    2. Consider architectural patterns:
+       - Which pattern best fits (MVC, microservices, event-driven, etc.)?
+       - What are the trade-offs of this pattern?
+       - How does it align with existing codebase patterns?
+
+    3. Design component boundaries:
+       - What are the logical modules?
+       - How do they communicate?
+       - What are the interfaces between them?
+
+    4. Plan data flow:
+       - How does data enter the system?
+       - How is it processed and stored?
+       - How is it retrieved and presented?
+
+    5. Identify integration points:
+       - What external systems need integration?
+       - What are the APIs/services required?
+       - How will authentication/authorization work?
+
+    6. Consider testing strategy:
+       - What needs to be tested at each layer?
+       - How will components be tested in isolation?
+       - What integration tests are needed?
+
+    After this thinking, provide a comprehensive architecture design.
+  </thinking>
+
+  {{#if existing_code}}
+  <existing_code>
+    <description>Current implementation to consider</description>
+    <content>{{existing_code}}</content>
+  </existing_code>
+  {{/if}}
+
+  {{#if example}}
+  <example>
+    <description>Reference implementation pattern</description>
+    <content>{{example}}</content>
+  </example>
+  {{/if}}
+</prompt_workflow>
