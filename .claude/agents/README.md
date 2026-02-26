@@ -57,7 +57,7 @@ Language-specific development:
 Framework specialists:
 
 - `react-frontend-engineer` - React/Next.js expert
-- `playwright-test-engineer` - E2E testing expert
+- `frontend-testing-engineer` - E2E testing expert
 - *Planned: angular, vue, django, spring, express*
 
 ### Cloud (4 agents, 5+ planned)

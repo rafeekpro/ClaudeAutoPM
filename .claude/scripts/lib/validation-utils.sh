@@ -12,7 +12,7 @@ source "${SCRIPT_DIR}/logging-utils.sh"
 validate_required_commands() {
     local commands=("$@")
 
-    log_function_entry "validate_required_commands" "${commands[@]}"
+    log_function_entry "validate_required_commands" "${commands[@]:-}"
 
     local missing_commands=()
 

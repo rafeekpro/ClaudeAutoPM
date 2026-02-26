@@ -10,7 +10,7 @@ All rule files in `.claude/rules/` define mandatory behaviors and must be follow
 
 ### Core Development Rules
 
-- **Test-Driven Development** - TDD cycle (RED-GREEN-REFACTOR). HIGHEST PRIORITY for all code changes
+- **tdd.enforcement.md** - Test-Driven Development cycle (RED-GREEN-REFACTOR). HIGHEST PRIORITY for all code changes
 - **pipeline-mandatory.md** - Required pipelines for errors, features, bugs, code search, and log analysis
 - **naming-conventions.md** - Naming standards, code quality requirements, and prohibited patterns
 - **context-optimization.md** - Agent usage patterns for context preservation (<20% data return)
@@ -68,6 +68,160 @@ Agents are organized by category for better maintainability:
 - **Azure DevOps Commands** (`.claude/commands/azure/`) - Complete Azure DevOps integration
 - **PM Commands** (`.claude/commands/pm/`) - Project management workflow
 
+## XML Structured Prompting
+
+### Overview
+
+XML Prompt Templates provide structured, consistent prompting for different development stages. Templates enforce TDD practices, quality gates, and best practices through XML-defined workflows.
+
+### Key Benefits
+
+- **Consistency**: Every prompt follows the same structure
+- **Completeness**: Templates ensure nothing is overlooked
+- **TDD Enforcement**: Test-first approach built-in
+- **Quality Gates**: Built-in validation checkpoints
+- **Anti-Patterns**: Clear guidance on what NOT to do
+
+### Template Categories
+
+Templates are organized by development stage:
+
+- **Stage 1 (arch/)**: Architectural planning
+- **Stage 2 (dev/)**: Code and infrastructure implementation
+- **Stage 3 (test/)**: Test creation and validation
+- **Stage 4 (refactor/)**: Refactoring with safety
+- **Stage 5 (doc/)**: Documentation generation
+
+### Quick Start
+
+```javascript
+const XMLPromptBuilder = require('.claude/lib/xml-prompt-builder');
+const builder = new XMLPromptBuilder();
+
+// Build prompt from template
+const prompt = builder.build('dev/stage2-code-generation.xml', {
+  task: 'Implement user authentication',
+  context: 'Express.js API with JWT',
+  requirements: [
+    'Login endpoint',
+    'JWT token generation',
+    'Password hashing'
+  ],
+  allowed_libraries: 'bcrypt, jsonwebtoken',
+  test_format: 'Jest',
+  code_format: 'TypeScript'
+});
+
+// Use with agent
+console.log(prompt);
+```
+
+### Template Management
+
+```bash
+# List all available templates
+/xml:template list
+
+# Create custom template
+/xml:template new dev my-custom-workflow
+```
+
+### Critical Features
+
+#### Test Real Functionality Enforcement
+
+Templates enforce real functionality testing:
+
+```xml
+<testing_requirements>
+  <test_real_functionality>REQUIRED</test_real_functionality>
+  <test_pattern>
+    ❌ FORBIDDEN: assert Path("Dockerfile").exists()
+    ✅ REQUIRED: subprocess.run(["docker", "build", "."])
+  </test_pattern>
+</testing_requirements>
+```
+
+#### Forbidden Test Patterns
+
+Anti-examples show what NOT to do:
+
+```xml
+<forbidden_test_patterns>
+  <pattern>
+    <name>File Existence Only</name>
+    <anti_example>assert Path("Dockerfile").exists()</anti_example>
+    <why>Test passes but Dockerfile may be broken</why>
+    <real_test>subprocess.run(["docker", "build", "."])</real_test>
+  </pattern>
+</forbidden_test_patterns>
+```
+
+#### Quality Gates
+
+Validation checkpoints ensure quality:
+
+```xml
+<quality_gates>
+  <gate name="TDD Compliance">
+    <check>Tests written before implementation</check>
+    <check>Tests fail initially (RED phase)</check>
+    <check>All tests passing (GREEN phase)</check>
+    <failure>Complete TDD cycle</failure>
+  </gate>
+</quality_gates>
+```
+
+#### Critical Reminders
+
+Priority-tagged reminders prevent mistakes:
+
+```xml
+<critical_reminders>
+  <reminder priority="1">
+    NEVER report "100% tests passing" if only file-checking tests ran
+  </reminder>
+  <reminder priority="2">
+    Always test REAL functionality, not just file existence
+  </reminder>
+</critical_reminders>
+```
+
+### Best Practices
+
+1. **Always use templates for structured work** - Don't write ad-hoc prompts
+2. **Fill all required variables** - Complete context yields better results
+3. **Respect template structure** - Don't remove required sections
+4. **Follow TDD requirements** - Templates enforce test-first approach
+5. **Pay attention to anti-patterns** - Learn from forbidden patterns
+
+### Documentation
+
+- **TEMPLATE_REGISTRY.md**: Complete template catalog with usage examples
+- **xml-prompting-quickstart.md**: Comprehensive user guide
+- **EXAMPLE-docker-validation.xml**: Complete working example
+
+### Mustache Variable Syntax
+
+Templates use Mustache templating:
+
+```mustache
+{{variable}}              {{#if condition}}...{{/if}}
+{{#each array}}...{{/each}}
+```
+
+### Integration with Agents
+
+Pass XML prompts to specialized agents:
+
+```markdown
+@nodejs-backend-engineer
+
+<prompt_workflow>
+  <!-- Generated XML prompt -->
+</prompt_workflow>
+```
+
 ## USE SUB-AGENTS FOR CONTEXT OPTIMIZATION
 
 ### Core Agents (Always Available)
@@ -83,6 +237,9 @@ Use for running tests and analyzing results with structured reports.
 
 #### parallel-worker - Multi-stream parallel execution
 Use for coordinating multiple work streams in parallel.
+
+#### context-optimizer - Context management and compaction
+Use for managing context window efficiency, creating checkpoints, and session continuity.
 
 <!-- AGENT_SELECTION_SECTION -->
 
@@ -127,6 +284,19 @@ Every implementation MUST follow:
 ## CONTEXT OPTIMIZATION RULES
 
 See **`.claude/rules/context-optimization.md`** for detailed context preservation patterns and agent usage requirements.
+
+### Context Management Tools
+
+- **context-optimizer agent** - Use `@context-optimizer` for managing context window efficiency
+- **`.claude/rules/context-compaction.md`** - Automatic compaction rules and triggers
+- **`.claude/guides/memory-patterns.md`** - File-based memory patterns for session continuity
+
+### Key Context Strategies
+
+1. **Compaction Triggers**: Auto-compact after 10+ tool results, 30+ messages, or 3+ reads of same file
+2. **Checkpoint System**: Create checkpoints with `@context-optimizer checkpoint "name"`
+3. **Memory Patterns**: Use `.claude/active-work.json` for cross-session state
+4. **Session Transfer**: Generate handoff notes with `@context-optimizer transfer`
 
 ## ERROR HANDLING PIPELINE
 
@@ -185,7 +355,7 @@ Key principles:
 
 - NO PARTIAL IMPLEMENTATION
 - NO CODE DUPLICATION (always search first)
-- IMPLEMENT TEST FOR EVERY FUNCTION (TDD required)
+- IMPLEMENT TEST FOR EVERY FUNCTION (see `.claude/rules/tdd.enforcement.md`)
 - NO CHEATER TESTS (tests must be meaningful)
 - Follow all rules defined in `.claude/rules/` without exception
 
@@ -195,7 +365,7 @@ Key principles:
 
 ```bash
 # Minimum Definition of Done
-✓ Tests written and passing (TDD)
+✓ Tests written and passing (TDD - see .claude/rules/tdd.enforcement.md)
 ✓ Code formatted (black, prettier, eslint)
 ✓ No partial implementations
 ✓ No code duplication
