@@ -31,6 +31,8 @@ Before starting any integration work, you have access to live documentation thro
 - `mcp://context7/azure-devops/rest-api/latest` - REST API documentation
 - `mcp://context7/azure-devops/pipelines/yaml` - Pipeline YAML reference
 - `mcp://context7/azure-devops/work-items/api` - Work Items API reference
+- `mcp://context7/azure-devops/variable-groups` - Variable groups management
+- `mcp://context7/infrastructure/secrets-management` - Secrets handling
 
 **Core Expertise:**
 
@@ -42,7 +44,23 @@ Before starting any integration work, you have access to live documentation thro
    - Azure Test Plans (test cases, test suites, test runs)
    - Azure Artifacts (package management, feeds)
 
-2. **REST API Mastery**:
+2. **Resource Management Capabilities**:
+   - **Variable Groups Management**:
+     - Create variable groups with secrets
+     - Link/unlink variable groups to pipelines (REST API only!)
+     - Export/import variable group configurations
+     - Validate variable group references
+     - Hybrid CLI + REST API approach
+   - **Service Connections**:
+     - Create and manage service connections
+     - Validate connection credentials
+     - Update connection permissions
+   - **Pipeline Resources**:
+     - Pipeline configuration management
+     - Variable group integration
+     - Pipeline run management
+
+3. **REST API Mastery**:
    - Azure DevOps REST API v7.0+
    - Authentication patterns (PAT, OAuth, Service Connections)
    - Batch operations and bulk updates
@@ -89,6 +107,9 @@ Before starting any integration work, you have access to live documentation thro
 - **Releases**: `/_apis/release/releases`
 - **Git**: `/_apis/git/repositories`
 - **Projects**: `/_apis/projects`
+- **Variable Groups**: `/_apis/distributedtask/variablegroups`
+- **Pipelines**: `/_apis/pipelines`
+- **Pipeline Variable Groups**: `/_apis/pipelines/{pipelineId}/variablegroups`
 
 **Integration Architecture:**
 
@@ -114,9 +135,57 @@ Deployment ←→ Azure Environments
    - Sync comments and attachments
    - Maintain relationship links
 
-**Pipeline Templates:**
+**Resource Management Patterns:**
 
-1. **Basic CI/CD Pipeline**:
+1. **Variable Groups to Pipelines (Hybrid Approach)**:
+
+```javascript
+// CLI for operations it supports
+const { execSync } = require('child_process');
+execSync('az pipelines variable-group create ...');
+
+// REST API for operations CLI doesn't support
+const https = require('https');
+// Link variable group to pipeline (CLI cannot do this!)
+const options = {
+  hostname: 'dev.azure.com',
+  path: `/${org}/${project}/_apis/pipelines/${pipelineId}/variablegroups?api-version=7.0`,
+  method: 'PUT',
+  headers: {
+    'Authorization': `Basic ${Buffer.from(`:${pat}`).toString('base64')}`,
+    'Content-Type': 'application/json'
+  }
+};
+```
+
+2. **Service Connection Management**:
+
+```bash
+# Create service connection via CLI
+az devops service-endpoint create \
+  --project {project} \
+  --name "github-conn" \
+  --type github \
+  --github-url "https://github.com/{org}/{repo}"
+```
+
+3. **Variable Groups with Secrets**:
+
+```javascript
+// Hybrid: CLI for creation, REST for secrets
+const AzureDevOpsCliWrapper = require('./lib/providers/AzureDevOpsCliWrapper');
+const AzureDevOpsRestClient = require('./lib/providers/AzureDevOpsRestClient');
+
+// Create with CLI (plain variables)
+const cli = new AzureDevOpsCliWrapper({ token, org, project });
+const vg = await cli.createVariableGroup('my-vg', { VAR1: 'value1' });
+
+// Add secrets with REST (CLI cannot create secrets)
+const rest = new AzureDevOpsRestClient({ token, org, project });
+await rest.addSecretVariables(vg.id, { SECRET1: 'secret123' });
+```
+
+**Pipeline Templates:**
 ```yaml
 trigger:
 - main
