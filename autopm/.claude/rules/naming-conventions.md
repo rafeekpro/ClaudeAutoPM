@@ -21,14 +21,15 @@
 - ❌ Documentation files unless explicitly requested
 - ❌ Temporary explanation files
 
+## Search Before Create
+
+Before ANY implementation:
+1. Search for existing function/pattern in codebase
+2. Check for similar implementations to avoid duplication
+3. Follow established naming patterns exactly
+4. Only create new code after confirming no duplication
+
 ## Required Naming Patterns
-
-### Before ANY Implementation
-
-1. Check existing codebase for naming patterns
-2. Read naming conventions from existing code
-3. Follow established patterns exactly
-4. When in doubt, search for similar functions
 
 ### Function/Variable Naming
 
