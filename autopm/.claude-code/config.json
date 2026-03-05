@@ -1,6 +1,6 @@
 {
   "hooks": {
-    "tool-use": ".claude/hooks/enforce-agents.sh"
+    "tool-use": ".claude/hooks/pre-action-agent-reminder.js"
   },
   "settings": {
     "enforce_agents": true,

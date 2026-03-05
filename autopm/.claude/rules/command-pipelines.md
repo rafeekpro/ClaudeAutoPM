@@ -2,66 +2,6 @@
 
 > **CRITICAL**: Follow these exact command sequences for each workflow.
 
-## Command Categories
-
-### Context Management (`/context:*`)
-
-- `/context:create` - Build initial project documentation
-- `/context:update` - Refresh context with recent changes  
-- `/context:prime` - Load context into conversation
-
-### Testing (`/testing:*`)
-
-- `/testing:prime` - Configure testing framework and detect test runner
-- `/testing:run` - Execute tests via test-runner agent
-
-### Project Management (`/pm:*`)
-
-#### System Management
-
-- `/pm:init` - Initialize PM system (REQUIRED FIRST)
-- `/pm:status` - Show current PM status
-- `/pm:standup` - Daily standup report
-- `/pm:validate` - Validate PM structure
-- `/pm:sync` - Sync with external systems
-
-#### PRD Management
-
-- `/pm:prd-new` - Create new Product Requirements Document
-- `/pm:prd-parse` - Convert PRD to technical epic
-- `/pm:prd-edit` - Edit existing PRD
-- `/pm:prd-status` - Show PRD status
-
-#### Epic Management
-
-- `/pm:epic-decompose` - Break epic into tasks
-- `/pm:epic-sync` - Sync epic/tasks to GitHub as issues
-- `/pm:epic-start` - Launch parallel agents for epic
-- `/pm:epic-status` - Show execution status
-- `/pm:epic-merge` - Merge epic branch
-- `/pm:epic-close` - Close completed epic
-
-#### Issue Management
-
-- `/pm:issue-analyze` - Identify parallel work streams
-- `/pm:issue-start` - Begin work on issue
-- `/pm:issue-status` - Show issue status
-- `/pm:issue-close` - Mark issue complete
-- `/pm:import` - Import GitHub issues
-
-#### Workflow Navigation
-
-- `/pm:next` - Get next task recommendation
-- `/pm:in-progress` - Show current work
-- `/pm:blocked` - Show blocked tasks
-- `/pm:search` - Search PM system
-
-### Utilities
-
-- `/prompt` - Handle complex prompts with @ references
-- `/re-init` - Update CLAUDE.md with PM rules
-- `/code-rabbit` - Process CodeRabbit review comments
-
 ## Mandatory Command Pipelines
 
 ### 1. NEW PROJECT INITIALIZATION

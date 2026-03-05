@@ -8,49 +8,7 @@
 **Information Hierarchy**: Only critical information in main thread
 **Efficiency Target**: Agents return <20% of processed data
 
-## Agent Usage Requirements
-
-### ALWAYS USE file-analyzer WHEN
-
-- Reading any log file
-- Analyzing test outputs  
-- Reviewing configuration files
-- Summarizing verbose outputs
-- Reading multiple files for comparison
-- Extracting key information from large files
-
-### ALWAYS USE code-analyzer WHEN
-
-- Searching for code patterns
-- Tracing logic flow
-- Investigating bugs
-- Reviewing code changes
-- Finding security vulnerabilities
-- Analyzing dependencies
-- Understanding code structure
-
-### ALWAYS USE test-runner WHEN
-
-- Running any tests
-- Validating implementations
-- Checking for regressions
-- Debugging test failures
-- Verifying fixes
-
-### ALWAYS USE parallel-worker WHEN
-
-- Implementing features with multiple components
-- Working on multiple files simultaneously
-- Decomposing epics into parallel tasks
-- Handling independent work streams
-
-### ALWAYS USE fastapi-expert WHEN
-
-- Building FastAPI endpoints
-- Implementing API authentication
-- Optimizing API performance
-- Adding WebSocket functionality
-- Debugging FastAPI-specific issues
+Agent-to-task mapping: See `.claude/rules/agent-mandatory-optimized.md`
 
 ## Context Firewall Pattern
 
@@ -93,25 +51,15 @@
 - State changes affecting next steps
 - User approval needed between steps
 
-## Anti-Patterns to Avoid
+## Anti-Patterns
 
-### NEVER DO
-
-- ❌ Direct grep/find/cat usage
-- ❌ Reading files without file-analyzer
-- ❌ Running tests without test-runner
-- ❌ Searching code without code-analyzer
-- ❌ Dumping verbose output to main thread
-- ❌ Processing logs in main conversation
-
-### Context Waste Examples
+- Do not use direct grep/find/cat for large outputs
+- Do not dump verbose output to main thread
+- Do not process logs in main conversation
 
 ```
 BAD: Dumping entire log file to main thread
 GOOD: Use file-analyzer to extract key errors
-
-BAD: Running grep directly and showing all matches
-GOOD: Use code-analyzer to find and summarize patterns
 
 BAD: Showing full test output in conversation
 GOOD: Use test-runner to run and summarize results
@@ -121,56 +69,12 @@ GOOD: Use test-runner to run and summarize results
 
 ### Priority 1: Critical (Main Thread)
 
-- Blocking errors
-- Security vulnerabilities
-- Data loss risks
-- User decisions required
+- Blocking errors, security vulnerabilities, data loss risks, user decisions
 
 ### Priority 2: Important (Agent Summary)
 
-- Test failures
-- Performance issues
-- Code quality problems
-- Configuration errors
+- Test failures, performance issues, code quality problems
 
 ### Priority 3: Verbose (Agent Internal)
 
-- Detailed logs
-- Full test output
-- Complete search results
-- Implementation details
-
-## Success Metrics
-
-### Context Efficiency
-
-- ✅ All agents return <20% of processed data
-- ✅ No raw logs in main thread
-- ✅ No direct file reads without agents
-- ✅ Batch operations when possible
-- ✅ Clear summaries over raw data
-
-### Agent Utilization
-
-- ✅ 100% file reads through file-analyzer
-- ✅ 100% code search through code-analyzer
-- ✅ 100% test runs through test-runner
-- ✅ Multi-file work through parallel-worker
-
-## Enforcement
-
-### Violation Detection
-
-If context wastage detected:
-
-1. Stop current approach
-2. Identify appropriate agent
-3. Delegate task to agent
-4. Resume with summary only
-
-### Continuous Improvement
-
-- Monitor context usage
-- Identify patterns for new agents
-- Update agent capabilities
-- Document new patterns in CLAUDE.md
+- Detailed logs, full test output, complete search results

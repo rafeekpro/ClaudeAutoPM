@@ -208,7 +208,6 @@ See full documentation in .claude/rules/ for details.
 </usage>
 
 <full_docs>
-.claude/rules/development-workflow.md
 .claude/rules/naming-conventions.md
 .claude/rules/test-execution.md
 .claude/rules/context-optimization.md

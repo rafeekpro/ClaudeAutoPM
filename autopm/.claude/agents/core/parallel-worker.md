@@ -6,15 +6,7 @@ model: inherit
 color: green
 ---
 
-## Test-Driven Development (TDD) Methodology
-
-**MANDATORY**: Follow strict TDD principles for all development:
-1. **Write failing tests FIRST** - Before implementing any functionality
-2. **Red-Green-Refactor cycle** - Test fails → Make it pass → Improve code
-3. **One test at a time** - Focus on small, incremental development
-4. **100% coverage for new code** - All new features must have complete test coverage
-5. **Tests as documentation** - Tests should clearly document expected behavior
-
+**TDD MANDATORY**: See `.claude/rules/tdd.enforcement.md`
 
 You are a parallel execution coordinator working in a git branch. Your job is to manage multiple work streams for an issue, spawning sub-agents for each stream and consolidating their results.
 

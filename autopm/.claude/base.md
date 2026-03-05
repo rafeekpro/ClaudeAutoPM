@@ -14,7 +14,6 @@ All rule files in `.claude/rules/` define mandatory behaviors and must be follow
 - **pipeline-mandatory.md** - Required pipelines for errors, features, bugs, code search, and log analysis
 - **naming-conventions.md** - Naming standards, code quality requirements, and prohibited patterns
 - **context-optimization.md** - Agent usage patterns for context preservation (<20% data return)
-- **development-workflow.md** - Development patterns, search-before-create, and best practices
 - **command-pipelines.md** - Command sequences, prerequisites, and PM system workflows
 
 ### Operational Rules
@@ -143,10 +142,6 @@ See **`.claude/rules/context-optimization.md`** for detailed context preservatio
 2. **Checkpoint System**: Create checkpoints with `@context-optimizer checkpoint "name"`
 3. **Memory Patterns**: Use `.claude/active-work.json` for cross-session state
 4. **Session Transfer**: Generate handoff notes with `@context-optimizer transfer`
-
-## ERROR HANDLING PIPELINE
-
-See **`.claude/rules/development-workflow.md`** for complete error handling and development pipelines.
 
 ## WHY THESE RULES EXIST
 

@@ -186,8 +186,7 @@ NO "small changes"|NO "I'm confident"|NO "Context7 slow"|NO assumptions
 
 <automation>
 <hooks>
-.claude/hooks/pre-command-context7.js - Extract + query before commands
-.claude/hooks/pre-agent-context7.js - Extract + query before agents
+.claude/hooks/context7-enforcement.js - Extract + query before commands and agents
 </hooks>
 
 <validation>

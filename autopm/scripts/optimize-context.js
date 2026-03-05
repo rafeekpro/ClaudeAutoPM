@@ -15,7 +15,7 @@ const readline = require('readline');
 class ContextOptimizer {
   constructor() {
     this.rulesDir = path.join('.claude', 'rules');
-    this.archiveDir = path.join('.claude', 'rules-archive');
+    this.archiveDir = null; // rules-archive removed - use git history
 
     // Rule categories with descriptions
     this.ruleCategories = {
@@ -76,7 +76,6 @@ class ContextOptimizer {
       'command-pipelines.md',
       'context-optimization.md',
       'datetime.md',
-      'development-workflow.md',
       'docker-first-development.md',
       'frontmatter-operations.md',
       'git-strategy.md',
@@ -235,7 +234,7 @@ class ContextOptimizer {
 
     console.log('💡 Next steps:');
     console.log('   • Test your workflow to ensure everything works');
-    console.log('   • Restore files if needed: mv .claude/rules-archive/<file> .claude/rules/');
+    console.log('   • Restore files from git history if needed');
     console.log('   • Run wizard again anytime to further optimize\n');
   }
 
@@ -378,7 +377,6 @@ Essential Rules (Never Archived):
   • command-pipelines.md
   • context-optimization.md
   • datetime.md
-  • development-workflow.md
   • docker-first-development.md
   • frontmatter-operations.md
   • git-strategy.md
