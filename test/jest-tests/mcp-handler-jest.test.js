@@ -144,30 +144,23 @@ describe('MCP Handler - Full Coverage Tests', () => {
 
   describe('Server Discovery and Parsing', () => {
     test('should get all servers from mcp directory', () => {
-      // Create mock MCP directory structure
-      const mcpDir = path.join(handler.frameworkRoot, 'autopm', '.claude', 'mcp');
+      // Create mock MCP directory with proper frontmatter
+      const mcpDir = path.join(tempDir, '.claude', 'mcp');
       fs.mkdirSync(mcpDir, { recursive: true });
 
-      // Create test server files
-      fs.writeFileSync(path.join(mcpDir, 'test-server.md'), `
+      // Create test server files with valid frontmatter
+      fs.writeFileSync(path.join(mcpDir, 'test-server.md'), `---
+name: test-server
+command: npx
+args: ["test-package"]
+description: A test server
+category: testing
+---
+
 # Test Server
-
-- **Category**: testing
-- **Description**: A test server
-- **Command**: npx
-- **Args**: test-package
-
-## Configuration
-
-\`\`\`json
-{
-  "name": "test-server",
-  "command": "npx",
-  "args": ["test-package"]
-}
-\`\`\`
 `);
 
+      handler.mcpDir = mcpDir;
       const servers = handler.getAllServers();
       expect(Array.isArray(servers)).toBe(true);
 
@@ -249,29 +242,24 @@ describe('MCP Handler - Full Coverage Tests', () => {
 
   describe('Server Management', () => {
     test('should get specific server by name', () => {
-      // Create mock server
-      const mcpDir = path.join(handler.frameworkRoot, 'autopm', '.claude', 'mcp');
+      // Create mock server with valid frontmatter
+      const mcpDir = path.join(tempDir, '.claude', 'mcp');
       fs.mkdirSync(mcpDir, { recursive: true });
 
-      fs.writeFileSync(path.join(mcpDir, 'test-server.md'), `
-# Test Server
+      fs.writeFileSync(path.join(mcpDir, 'test-server.md'), `---
+name: test-server
+command: npx
+description: A test server
+---
 
-\`\`\`json
-{
-  "name": "test-server",
-  "command": "npx"
-}
-\`\`\`
+# Test Server
 `);
 
+      handler.mcpDir = mcpDir;
       const server = handler.getServer('test-server');
 
-      if (server) {
-        expect(server.name).toBe('test-server');
-      } else {
-        // Handle case where server not found
-        expect(server).toBeNull();
-      }
+      expect(server).not.toBeNull();
+      expect(server.name).toBe('test-server');
     });
 
     test('should return null for non-existent server', () => {
@@ -280,31 +268,31 @@ describe('MCP Handler - Full Coverage Tests', () => {
     });
 
     test('should enable server correctly', () => {
-      // Create mock server
-      const mcpDir = path.join(handler.frameworkRoot, 'autopm', '.claude', 'mcp');
+      // Create mock server with valid frontmatter
+      const mcpDir = path.join(tempDir, '.claude', 'mcp');
       fs.mkdirSync(mcpDir, { recursive: true });
 
-      fs.writeFileSync(path.join(mcpDir, 'test-server.md'), `
-# Test Server
+      fs.writeFileSync(path.join(mcpDir, 'test-server.md'), `---
+name: test-server
+command: npx
+args: ["test-package"]
+description: A test server
+---
 
-\`\`\`json
-{
-  "name": "test-server",
-  "command": "npx",
-  "args": ["test-package"]
-}
-\`\`\`
+# Test Server
 `);
 
-      // Mock console output
-      const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+      handler.mcpDir = mcpDir;
+
+      // Mock sync to avoid side effects
+      const syncSpy = jest.spyOn(handler, 'sync').mockImplementation(() => {});
 
       handler.enable('test-server');
 
       // Should not throw error
       expect(consoleLogSpy).toHaveBeenCalled();
 
-      consoleLogSpy.mockRestore();
+      syncSpy.mockRestore();
     });
 
     test('should handle enabling non-existent server', () => {
@@ -329,13 +317,14 @@ describe('MCP Handler - Full Coverage Tests', () => {
       };
       handler.saveConfig(config);
 
-      const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+      // Mock sync to avoid side effects
+      const syncSpy = jest.spyOn(handler, 'sync').mockImplementation(() => {});
 
       handler.disable('test-server');
 
       expect(consoleLogSpy).toHaveBeenCalled();
 
-      consoleLogSpy.mockRestore();
+      syncSpy.mockRestore();
     });
   });
 
@@ -432,31 +421,26 @@ describe('MCP Handler - Full Coverage Tests', () => {
 
   describe('Information Display', () => {
     test('should display server info', () => {
-      // Create mock server
-      const mcpDir = path.join(handler.frameworkRoot, 'autopm', '.claude', 'mcp');
+      // Create mock server with valid frontmatter
+      const mcpDir = path.join(tempDir, '.claude', 'mcp');
       fs.mkdirSync(mcpDir, { recursive: true });
 
-      fs.writeFileSync(path.join(mcpDir, 'info-server.md'), `
+      fs.writeFileSync(path.join(mcpDir, 'info-server.md'), `---
+name: info-server
+command: npx
+args: ["-y", "info-package"]
+description: Info test server
+category: testing
+---
+
 # Info Server
-
-- **Category**: testing
-- **Description**: Info test server
-
-\`\`\`json
-{
-  "name": "info-server",
-  "command": "npx"
-}
-\`\`\`
 `);
 
-      const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+      handler.mcpDir = mcpDir;
 
       handler.info('info-server');
 
       expect(consoleLogSpy).toHaveBeenCalled();
-
-      consoleLogSpy.mockRestore();
     });
 
     test('should handle info for non-existent server', () => {
@@ -518,6 +502,152 @@ describe('MCP Handler - Full Coverage Tests', () => {
 
       consoleErrorSpy.mockRestore();
       processExitSpy.mockRestore();
+    });
+  });
+
+  describe('getAllServers filtering', () => {
+    test('should filter out servers without command in metadata', () => {
+      // Create mcp directory with valid and invalid server files
+      const mcpDir = path.join(tempDir, '.claude', 'mcp');
+      fs.mkdirSync(mcpDir, { recursive: true });
+
+      // Valid server with frontmatter containing command
+      fs.writeFileSync(path.join(mcpDir, 'valid-server.md'), `---
+name: valid-server
+command: npx
+args: ["-y", "valid-package"]
+description: A valid server
+---
+
+# Valid Server
+`);
+
+      // Invalid server without frontmatter (like old test-server.md)
+      fs.writeFileSync(path.join(mcpDir, 'no-frontmatter.md'), `
+# No Frontmatter Server
+
+\`\`\`json
+{
+  "name": "no-frontmatter",
+  "command": "npx"
+}
+\`\`\`
+`);
+
+      // Invalid server with frontmatter but no command field
+      fs.writeFileSync(path.join(mcpDir, 'no-command.md'), `---
+name: no-command
+description: Server without command
+---
+
+# No Command Server
+`);
+
+      // Point handler to local mcp dir
+      handler.mcpDir = mcpDir;
+      const servers = handler.getAllServers();
+
+      expect(servers).toHaveLength(1);
+      expect(servers[0].name).toBe('valid-server');
+      expect(servers[0].metadata.command).toBe('npx');
+    });
+
+    test('should return empty array when no servers have command', () => {
+      const mcpDir = path.join(tempDir, '.claude', 'mcp');
+      fs.mkdirSync(mcpDir, { recursive: true });
+
+      fs.writeFileSync(path.join(mcpDir, 'broken.md'), `
+# Broken Server
+No frontmatter here.
+`);
+
+      handler.mcpDir = mcpDir;
+      const servers = handler.getAllServers();
+      expect(servers).toHaveLength(0);
+    });
+  });
+
+  describe('Auto-sync on enable/disable', () => {
+    test('enable should call sync automatically', () => {
+      // Create a valid server file
+      const mcpDir = path.join(tempDir, '.claude', 'mcp');
+      fs.mkdirSync(mcpDir, { recursive: true });
+
+      fs.writeFileSync(path.join(mcpDir, 'auto-sync-server.md'), `---
+name: auto-sync-server
+command: npx
+args: ["-y", "auto-sync-pkg"]
+description: Auto sync test
+---
+
+# Auto Sync Server
+`);
+
+      handler.mcpDir = mcpDir;
+
+      const syncSpy = jest.spyOn(handler, 'sync').mockImplementation(() => {});
+
+      handler.enable('auto-sync-server');
+
+      expect(syncSpy).toHaveBeenCalled();
+      syncSpy.mockRestore();
+    });
+
+    test('enable with skipSync should not call sync', () => {
+      const mcpDir = path.join(tempDir, '.claude', 'mcp');
+      fs.mkdirSync(mcpDir, { recursive: true });
+
+      fs.writeFileSync(path.join(mcpDir, 'skip-sync-server.md'), `---
+name: skip-sync-server
+command: npx
+args: ["-y", "skip-sync-pkg"]
+description: Skip sync test
+---
+
+# Skip Sync Server
+`);
+
+      handler.mcpDir = mcpDir;
+
+      const syncSpy = jest.spyOn(handler, 'sync').mockImplementation(() => {});
+
+      handler.enable('skip-sync-server', { skipSync: true });
+
+      expect(syncSpy).not.toHaveBeenCalled();
+      syncSpy.mockRestore();
+    });
+
+    test('disable should call sync automatically', () => {
+      // Setup config with active server
+      const config = {
+        mcp: {
+          activeServers: ['test-disable']
+        }
+      };
+      handler.saveConfig(config);
+
+      const syncSpy = jest.spyOn(handler, 'sync').mockImplementation(() => {});
+
+      handler.disable('test-disable');
+
+      expect(syncSpy).toHaveBeenCalled();
+      syncSpy.mockRestore();
+    });
+
+    test('disable with skipSync should not call sync', () => {
+      const config = {
+        mcp: {
+          activeServers: ['test-disable-skip']
+        }
+      };
+      handler.saveConfig(config);
+
+      const syncSpy = jest.spyOn(handler, 'sync').mockImplementation(() => {});
+
+      handler.disable('test-disable-skip', { skipSync: true });
+
+      expect(syncSpy).not.toHaveBeenCalled();
+      syncSpy.mockRestore();
     });
   });
 });

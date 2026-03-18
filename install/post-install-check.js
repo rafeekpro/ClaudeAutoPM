@@ -242,7 +242,29 @@ class PostInstallChecker {
     });
 
     if (!mcpConfigured) {
-      this.results.nextSteps.push('Run: autopm mcp check (to see MCP requirements)');
+      // Scan for available server definitions
+      const mcpDir = path.join(this.projectRoot, '.claude', 'mcp');
+      const availableServers = [];
+      if (fs.existsSync(mcpDir)) {
+        const files = fs.readdirSync(mcpDir).filter(f => f.endsWith('.md') && f !== 'MCP-REGISTRY.md');
+        for (const file of files) {
+          try {
+            const content = fs.readFileSync(path.join(mcpDir, file), 'utf8');
+            const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+            if (fmMatch && fmMatch[1].includes('command:')) {
+              availableServers.push(path.basename(file, '.md'));
+            }
+          } catch (e) {
+            // skip unreadable files
+          }
+        }
+      }
+      if (availableServers.length > 0) {
+        this.results.nextSteps.push(`MCP servers available: ${availableServers.join(', ')}`);
+        this.results.nextSteps.push(`Enable: autopm mcp enable ${availableServers[0]}`);
+      } else {
+        this.results.nextSteps.push('Run: autopm mcp check (to see MCP requirements)');
+      }
     }
   }
 
