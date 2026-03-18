@@ -1257,7 +1257,30 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
         this.printSuccess('.mcp.json created for Claude Code');
 
         if (!hasActiveServers) {
-          this.printMsg('CYAN', '💡 Tip: Run "autopm mcp enable <server>" to activate servers');
+          // Scan for available server definitions
+          const mcpDir = path.join(this.targetDir, '.claude', 'mcp');
+          const availableServers = [];
+          if (fs.existsSync(mcpDir)) {
+            const files = fs.readdirSync(mcpDir).filter(f => f.endsWith('.md') && f !== 'MCP-REGISTRY.md');
+            for (const file of files) {
+              try {
+                const content = fs.readFileSync(path.join(mcpDir, file), 'utf8');
+                const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+                if (fmMatch && fmMatch[1].includes('command:')) {
+                  availableServers.push(path.basename(file, '.md'));
+                }
+              } catch (e) {
+                // skip unreadable files
+              }
+            }
+          }
+          if (availableServers.length > 0) {
+            console.log(`  📡 MCP Servers available: ${availableServers.join(', ')}`);
+            console.log(`     Enable: autopm mcp enable ${availableServers[0]}`);
+            console.log('     List all: autopm mcp list');
+          } else {
+            this.printMsg('CYAN', '💡 Tip: Run "autopm mcp enable <server>" to activate servers');
+          }
         }
       }
     } catch (error) {

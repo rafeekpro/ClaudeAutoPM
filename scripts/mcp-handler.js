@@ -172,7 +172,7 @@ class MCPHandler {
   /**
    * Enable an MCP server in the current project
    */
-  enable(serverName) {
+  enable(serverName, options = {}) {
     const server = this.getServer(serverName);
     if (!server) {
       console.error(`❌ Server '${serverName}' not found`);
@@ -201,6 +201,11 @@ class MCPHandler {
 
     console.log(`✅ Server '${serverName}' enabled`);
 
+    // Auto-sync unless explicitly skipped
+    if (!options.skipSync) {
+      this.sync();
+    }
+
     // Show next steps
     this.showNextSteps('enable', server);
   }
@@ -208,7 +213,7 @@ class MCPHandler {
   /**
    * Disable an MCP server in the current project
    */
-  disable(serverName) {
+  disable(serverName, options = {}) {
     const config = this.loadConfig();
 
     if (!config.mcp?.activeServers?.includes(serverName)) {
@@ -221,7 +226,11 @@ class MCPHandler {
     this.saveConfig(config);
 
     console.log(`✅ Server '${serverName}' disabled`);
-    console.log(`💡 Run 'autopm mcp sync' to update configuration`);
+
+    // Auto-sync unless explicitly skipped
+    if (!options.skipSync) {
+      this.sync();
+    }
   }
 
   /**
@@ -423,7 +432,7 @@ class MCPHandler {
         path: filePath,
         metadata
       };
-    });
+    }).filter(server => server.metadata && server.metadata.command);
   }
 
   /**
@@ -725,25 +734,20 @@ This server can be integrated with various agents and context pools.
       fs.writeFileSync(serverPath, serverContent, 'utf8');
       console.log(`   ✅ Created: .claude/mcp/${serverName}.md`);
 
-      // Step 4: Enable if requested
+      // Step 4: Enable if requested (sync happens automatically inside enable)
       if (options.enable) {
         console.log('\n4️⃣  Enabling server...');
         this.enable(serverName);
-        console.log('   ✅ Enabled in config.json');
-
-        console.log('\n5️⃣  Syncing configuration...');
-        this.sync();
-        console.log('   ✅ Updated: .claude/mcp-servers.json');
+        console.log('   ✅ Enabled and synced');
       }
 
       console.log(`\n🎉 MCP server '${serverName}' ready to use!`);
       console.log('\n📝 Next steps:');
       if (!options.enable) {
         console.log(`  1. Enable: autopm mcp enable ${serverName}`);
-        console.log('  2. Sync: autopm mcp sync');
       }
-      console.log(`  3. Configure environment: nano .claude/.env`);
-      console.log(`  4. Test connection: autopm mcp test ${serverName}`);
+      console.log(`  ${options.enable ? '1' : '2'}. Configure environment: nano .claude/.env`);
+      console.log(`  ${options.enable ? '2' : '3'}. Test connection: autopm mcp test ${serverName}`);
 
     } catch (error) {
       console.error('❌ Installation failed:', error.message);
@@ -2009,25 +2013,22 @@ ${pkg.repository?.url ? `- Repository: ${pkg.repository.url}` : ''}
     console.log('\n📋 Next Steps:\n');
 
     if (action === 'enable' || action === 'add') {
-      console.log('1. Run sync to update configuration:');
-      console.log('   autopm mcp sync\n');
-
       // Check if server needs environment variables
       if (server && server.metadata && server.metadata.env) {
         const envVars = Object.keys(server.metadata.env);
         if (envVars.length > 0) {
-          console.log('2. Configure required environment variables in .claude/.env:');
+          console.log('1. Configure required environment variables in .claude/.env:');
           envVars.forEach(varName => {
             const example = this._getEnvVarExample(server.name || server.metadata.name, varName);
             console.log(`   ${varName}=${example}`);
           });
           console.log();
-          console.log('3. Restart Claude Code to load the server\n');
-          console.log('4. Verify server status:');
-          console.log('   /mcp (in Claude Code)\n');
-        } else {
           console.log('2. Restart Claude Code to load the server\n');
           console.log('3. Verify server status:');
+          console.log('   /mcp (in Claude Code)\n');
+        } else {
+          console.log('1. Restart Claude Code to load the server\n');
+          console.log('2. Verify server status:');
           console.log('   /mcp (in Claude Code)\n');
         }
       }
