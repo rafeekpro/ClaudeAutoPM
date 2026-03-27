@@ -46,4 +46,4 @@ git commit -m "refactor: improve auth structure"
 ❌ "TODO: add tests"
 </prohibited>
 
-<full_docs>.claude/rules/tdd.enforcement.md</full_docs>
+<full_docs>.claude/rules/tdd.enforcement.xml</full_docs>

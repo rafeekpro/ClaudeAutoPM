@@ -72,7 +72,7 @@ class ContextOptimizer {
     // Essential rules that should never be archived
     this.essentialRules = [
       'agent-coordination.md',
-      'agent-mandatory-optimized.md',
+      'agent-mandatory.xml',
       'command-pipelines.md',
       'context-optimization.md',
       'datetime.md',
@@ -83,7 +83,7 @@ class ContextOptimizer {
       'naming-conventions.md',
       'standard-patterns.md',
       'strip-frontmatter.md',
-      'tdd.enforcement.md',
+      'tdd.enforcement.xml',
       'test-execution.md',
       'testing-standards.md'
     ];
@@ -373,7 +373,7 @@ Impact:
 Essential Rules (Never Archived):
   These 16 core rules are always kept:
   • agent-coordination.md
-  • agent-mandatory-optimized.md
+  • agent-mandatory.xml
   • command-pipelines.md
   • context-optimization.md
   • datetime.md
@@ -384,7 +384,7 @@ Essential Rules (Never Archived):
   • naming-conventions.md
   • standard-patterns.md
   • strip-frontmatter.md
-  • tdd.enforcement.md
+  • tdd.enforcement.xml
   • test-execution.md
   • testing-standards.md
 `);

@@ -1,0 +1,29 @@
+<rule id="agent-mandatory" priority="critical" enforcement="zero-tolerance">
+  <description>
+    Specialized agents MUST be used for all non-trivial tasks.
+    Check AGENT-REGISTRY.md before starting any complex work.
+  </description>
+
+  <selection-matrix>
+    <entry task="Python code"     agent="python-backend-engineer"      example="FastAPI endpoint" />
+    <entry task="React/UI"        agent="react-frontend-engineer"      example="Dashboard component" />
+    <entry task="Testing"         agent="test-runner"                  example="Run test suite" />
+    <entry task="Database"        agent="postgresql-expert"            example="Schema design" />
+    <entry task="DevOps"          agent="kubernetes-orchestrator"      example="Deploy app" />
+    <entry task="Code review"     agent="code-analyzer"                example="Bug detection" />
+    <entry task="Large files"     agent="file-analyzer"                example="Logs over 1000 lines" />
+    <entry task="GitHub ops"      agent="github-operations-specialist" example="PR management" />
+    <entry task="Frontend tests"  agent="frontend-testing-engineer"    example="Playwright tests" />
+  </selection-matrix>
+
+  <enforcement>
+    <rule>Before ANY complex task — check AGENT-REGISTRY.md for specialist</rule>
+    <rule>If specialist exists — USE IT. No exceptions.</rule>
+    <rule>Parallel agents allowed and encouraged for independent work streams</rule>
+  </enforcement>
+
+  <violations enforcement="auto-reject">
+    <violation>Doing complex work in main thread when specialist agent exists</violation>
+    <violation>Skipping agent lookup for non-trivial tasks</violation>
+  </violations>
+</rule>

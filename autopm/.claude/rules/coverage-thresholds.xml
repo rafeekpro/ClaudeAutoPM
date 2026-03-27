@@ -1,0 +1,43 @@
+<rule id="coverage-thresholds" priority="critical" enforcement="hard-gate">
+  <description>
+    Coverage thresholds are a hard gate. PRs that do not meet minimums are BLOCKED.
+    Check coverage after every GREEN phase, not just at PR time.
+  </description>
+
+  <thresholds>
+    <metric name="lines"      minimum="80" unit="percent" />
+    <metric name="branches"   minimum="75" unit="percent" />
+    <metric name="functions"  minimum="80" unit="percent" />
+    <metric name="statements" minimum="80" unit="percent" />
+  </thresholds>
+
+  <tooling>
+    <tool lang="python"         command="pytest-cov --cov-fail-under=80" />
+    <tool lang="javascript"     command="vitest --coverage" />
+    <tool lang="typescript"     command="jest --coverage" />
+    <tool lang="e2e-playwright" command="@playwright/test with istanbul" />
+  </tooling>
+
+  <enforcement>
+    <rule>Run coverage report after every GREEN step</rule>
+    <rule>If any threshold not met — write additional tests before proceeding</rule>
+    <rule>Never exclude files from coverage without comment in code AND PR description</rule>
+    <rule>PR description MUST include coverage table (see template below)</rule>
+  </enforcement>
+
+  <pr-template>
+    ## Coverage
+    | Metric     | Result | Threshold | Status |
+    |------------|--------|-----------|--------|
+    | Lines      | xx%    | 80%       | ✅/❌  |
+    | Branches   | xx%    | 75%       | ✅/❌  |
+    | Functions  | xx%    | 80%       | ✅/❌  |
+    | Statements | xx%    | 80%       | ✅/❌  |
+  </pr-template>
+
+  <violations enforcement="pr-blocked">
+    <violation>Any metric below threshold</violation>
+    <violation>Missing coverage table in PR description</violation>
+    <violation>Excluded files without documented justification</violation>
+  </violations>
+</rule>

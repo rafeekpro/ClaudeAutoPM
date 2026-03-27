@@ -8,7 +8,7 @@ color: blue
 
 # MCP Manager Agent
 
-**TDD MANDATORY**: See `.claude/rules/tdd.enforcement.md`
+**TDD MANDATORY**: See `.claude/rules/tdd.enforcement.xml`
 
 ## Capabilities
 - **Create MCP server definitions** with proper YAML frontmatter and documentation

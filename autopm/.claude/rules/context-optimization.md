@@ -8,7 +8,7 @@
 **Information Hierarchy**: Only critical information in main thread
 **Efficiency Target**: Agents return <20% of processed data
 
-Agent-to-task mapping: See `.claude/rules/agent-mandatory-optimized.md`
+Agent-to-task mapping: See `.claude/rules/agent-mandatory.xml`
 
 ## Context Firewall Pattern
 

@@ -1,0 +1,24 @@
+<rule id="context7" priority="critical" enforcement="zero-tolerance">
+  <description>
+    Context7 MUST be queried before writing ANY code involving a library,
+    framework, or external tool. Never rely on training data for APIs.
+  </description>
+
+  <steps>
+    <step order="1">Call mcp__context7__resolve-library-id with the library name</step>
+    <step order="2">Call mcp__context7__get-library-docs with the resolved ID</step>
+    <step order="3">Only then proceed with implementation</step>
+  </steps>
+
+  <triggers>
+    <trigger>Any new library or framework being used</trigger>
+    <trigger>Any API call implementation</trigger>
+    <trigger>Any Playwright test being written</trigger>
+    <trigger>Any infrastructure tool (Docker, K8s, Helm)</trigger>
+  </triggers>
+
+  <violations enforcement="auto-reject">
+    <violation>Writing library code without prior Context7 lookup</violation>
+    <violation>Assuming API signatures from training data</violation>
+  </violations>
+</rule>
