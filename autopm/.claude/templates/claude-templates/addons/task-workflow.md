@@ -12,7 +12,7 @@
 │  ❌ NO PARTIAL IMPLEMENTATIONS                                      │
 │  ❌ NO "TODO: ADD TESTS LATER"                                      │
 │                                                                     │
-│  See: .claude/rules/tdd.enforcement.md (HIGHEST PRIORITY)          │
+│  See: .claude/rules/tdd.enforcement.xml (HIGHEST PRIORITY)         │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 

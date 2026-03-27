@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.11.0] - 2026-03-27
+
+### Changed
+- **XML Rule Enforcement** - Converted critical enforcement rules from Markdown to XML format for stronger model compliance
+  - `tdd.enforcement.xml` — TDD cycle with phase gates and violation auto-reject
+  - `coverage-thresholds.xml` — Hard-gate coverage minimums (80/75/80/80%)
+  - `agent-mandatory.xml` — Agent selection matrix with enforcement
+  - `context7.xml` — Context7 query-before-code enforcement
+- **Ultra-concise CLAUDE.md** — Reduced `base.md` from 249 lines to 46 lines (81% reduction) using hybrid MD + XML @include pattern
+- **PM Commands** — New `pm-commands.md` with `issue-start`, `issue-finish`, `review-fix`, `backlog` commands and session-reset warning
+
+### Removed
+- `tdd.enforcement.md` — replaced by `.xml` (archived as `.md.bak`)
+- `agent-mandatory-optimized.md` — replaced by `.xml` (archived as `.md.bak`)
+- `context7-enforcement-optimized.md` — replaced by `.xml` (archived as `.md.bak`)
+
 ## [3.6.0] - 2025-02-25
 
 ### Added

@@ -36,7 +36,7 @@
 
 <quick_ref>
 <tdd>
-📖 Full: .claude/rules/tdd.enforcement.md
+📖 Full: .claude/rules/tdd.enforcement.xml
 🔴 RED: Write failing test FIRST
 ✅ GREEN: Minimal code to pass
 ♻️ REFACTOR: Improve while tests stay green
@@ -87,20 +87,17 @@ Keyword → File mapping:
 <rules>
 <rule id="tdd" priority="HIGHEST">
 TDD mandatory|No code before tests|RED→GREEN→REFACTOR
-📖 Optimized: .claude/rules/tdd.enforcement-optimized.md
-📖 Full: .claude/rules/tdd.enforcement.md
+📖 Full: .claude/rules/tdd.enforcement.xml
 </rule>
 
 <rule id="agents" priority="HIGHEST">
 Use agents for non-trivial tasks|Agent list: AGENT-REGISTRY.md
-📖 Optimized: .claude/rules/agent-mandatory-optimized.md
-📖 Full: .claude/rules/agent-mandatory.md
+📖 Full: .claude/rules/agent-mandatory.xml
 </rule>
 
 <rule id="context7" priority="HIGHEST">
 Query Context7 before implementing|mcp://context7/[lib]/[topic]
-📖 Optimized: .claude/rules/context7-enforcement-optimized.md
-📖 Full: .claude/rules/context7-enforcement.md
+📖 Full: .claude/rules/context7.xml
 </rule>
 
 <rule id="quality" priority="HIGH">

@@ -1,0 +1,45 @@
+<rule id="tdd" priority="critical" enforcement="zero-tolerance">
+  <description>
+    Test-Driven Development is MANDATORY for all implementations.
+    No production code may exist without a corresponding failing test written first.
+  </description>
+
+  <cycle>
+    <phase name="RED" order="1" status="required">
+      <action>Write a failing test that describes the desired behavior</action>
+      <action>Run test via @test-runner — MUST SEE FAILURE before proceeding</action>
+      <action>Commit: "test: add failing test for &lt;feature&gt;"</action>
+      <gate>Test MUST fail. If it passes immediately — rewrite the test.</gate>
+    </phase>
+
+    <phase name="GREEN" order="2" status="required">
+      <action>Write MINIMUM code to make the test pass</action>
+      <action>Run test via @test-runner — MUST SEE GREEN before proceeding</action>
+      <action>Commit: "feat: implement &lt;feature&gt;"</action>
+      <gate>Only the minimum code needed. No extra features.</gate>
+    </phase>
+
+    <phase name="REFACTOR" order="3" status="required">
+      <action>Improve structure, naming, remove duplication</action>
+      <action>Run ALL tests via @test-runner — ALL MUST STAY GREEN</action>
+      <action>Commit: "refactor: improve &lt;feature&gt; structure"</action>
+      <gate>All tests must remain green. No new features in this phase.</gate>
+    </phase>
+  </cycle>
+
+  <commit-pattern required="true">
+    <!-- Every feature MUST produce this commit sequence -->
+    <!-- refactor: improve feature structure  ♻️  -->
+    <!-- feat: implement feature              ✅  -->
+    <!-- test: add failing test for feature   🔴  -->
+  </commit-pattern>
+
+  <violations enforcement="auto-reject">
+    <violation>Writing code before tests</violation>
+    <violation>Committing "WIP" or "TODO: add tests later"</violation>
+    <violation>Skipping RED phase — even for trivial code</violation>
+    <violation>Skipping REFACTOR phase</violation>
+    <violation>Tests written after implementation</violation>
+    <violation>Mock services in tests — use real implementations only</violation>
+  </violations>
+</rule>

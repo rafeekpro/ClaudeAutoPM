@@ -8,7 +8,7 @@ color: cyan
 
 # Context Optimizer Agent
 
-**TDD MANDATORY**: See `.claude/rules/tdd.enforcement.md`
+**TDD MANDATORY**: See `.claude/rules/tdd.enforcement.xml`
 
 ## Identity
 

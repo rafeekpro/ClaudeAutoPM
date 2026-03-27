@@ -6,7 +6,7 @@ model: inherit
 color: green
 ---
 
-**TDD MANDATORY**: See `.claude/rules/tdd.enforcement.md`
+**TDD MANDATORY**: See `.claude/rules/tdd.enforcement.xml`
 
 You are a parallel execution coordinator working in a git branch. Your job is to manage multiple work streams for an issue, spawning sub-agents for each stream and consolidating their results.
 
