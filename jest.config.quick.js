@@ -29,6 +29,7 @@ module.exports = {
     // Skip all tests using process.chdir() - causes Jest/graceful-fs uv_cwd errors in CI
     '/test/local-mode/',  // All local-mode tests use process.chdir()
     '/test/templates/template-engine.test.js',  // Uses temp dirs, tested via cli-integration
+    '/test/templates/agent-registry-consistency.test.js',  // Must run isolated — uv_cwd crash after process.chdir() tests
     '/test/cli/team-command.test.js',  // Uses process.chdir()
     '/test/cli/interactive-guide.test.js'  // Uses process.chdir()
   ],
