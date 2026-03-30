@@ -17,7 +17,9 @@ function parseMetadata(content) {
     created: '',
     updated: '',
     parallel: '',
-    depends_on: ''
+    depends_on: '',
+    assignee: '',
+    assigned_to: ''
   };
 
   const yamlMatch = content.match(/^---\s*\n([\s\S]*?)\n---/);
@@ -127,11 +129,12 @@ function epicStatus(epicName) {
       const status = taskMetadata.status || 'open';
       const taskName = taskMetadata.name || `Task #${taskNum}`;
       const updated = taskMetadata.updated ? taskMetadata.updated.split('T')[0] : '\u2014';
+      const assignee = taskMetadata.assignee || taskMetadata.assigned_to || '\u2014';
 
       totalTasks++;
       if (isTaskClosed(status)) closedTasks++;
 
-      tasks.push({ num: taskNum, name: taskName, status, updated });
+      tasks.push({ num: taskNum, name: taskName, status, updated, assignee });
     }
   } catch (error) { /* skip */ }
 
@@ -154,21 +157,25 @@ function formatEpicStatus(epicName, data) {
   lines.push('');
 
   if (data.tasks.length > 0) {
-    lines.push('| # | Task | Status | Updated |');
-    lines.push('|---|------|--------|---------|');
+    lines.push('| # | Task | Status | Updated | Assignee |');
+    lines.push('|---|------|--------|---------|----------|');
     for (const t of data.tasks) {
-      lines.push(`| ${t.num} | ${t.name} | ${t.status} | ${t.updated} |`);
+      lines.push(`| ${t.num} | ${t.name} | ${t.status} | ${t.updated} | ${t.assignee} |`);
     }
   } else {
     lines.push('No tasks created yet.');
   }
 
   // Find next open task for suggestion
-  const nextOpen = data.tasks.find(t => t.status === 'open');
+  const nextOpen = data.tasks.find(t => {
+    const s = (t.status || '').toLowerCase();
+    return s === 'open' || s === 'todo' || s === '';
+  });
 
   // Recent Activity section
   try {
-    const { formatRecentActivity } = require('../../../../autopm/.claude/lib/event-logger');
+    const loggerPath = require('path').join(process.cwd(), '.claude', 'lib', 'event-logger');
+    const { formatRecentActivity } = require(loggerPath);
     lines.push('');
     lines.push(formatRecentActivity(7));
   } catch (e) { /* event logger not available */ }

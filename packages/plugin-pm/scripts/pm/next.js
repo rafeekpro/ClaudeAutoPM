@@ -4,110 +4,73 @@ const { logError } = require('./lib/logger');
 const { findAllEpicDirs } = require('./lib/epic-discovery');
 
 /**
- * PM Next Script (Node.js version)
- * Migrated from bash script with 100% backward compatibility
+ * PM Next Script
+ * Shows the single highest-priority open task in structured TODO format.
  */
 
 async function next() {
   const result = {
     availableTasks: [],
     found: 0,
-    suggestions: [],
+    recommended: null,
     messages: []
   };
 
-  // Helper function to add messages
   function addMessage(message) {
     result.messages.push(message);
-    // Only log if running as CLI
     if (require.main === module) {
       console.log(message);
     }
   }
 
-  // Header messages to match bash output exactly
-  addMessage('Getting status...');
-  addMessage('');
-  addMessage('');
-
-  addMessage('📋 Next Available Tasks');
-  addMessage('=======================');
-  addMessage('');
-
-  // Find tasks that are open and have no dependencies or whose dependencies are closed
   try {
     const availableTasks = await findAvailableTasks();
     result.availableTasks = availableTasks;
     result.found = availableTasks.length;
 
     if (availableTasks.length > 0) {
-      for (const task of availableTasks) {
-        addMessage(`✅ Ready: #${task.taskNum} - ${task.name}`);
-        addMessage(`   Epic: ${task.epicName}`);
-        if (task.parallel) {
-          addMessage('   🔄 Can run in parallel');
-        }
-        addMessage('');
-      }
-    } else {
-      addMessage('No available tasks found.');
+      const task = availableTasks[0];
+      result.recommended = task;
+
+      addMessage('## Next Task');
       addMessage('');
-
-      // Add suggestions
-      const suggestions = [
-        'Check blocked tasks: /pm:blocked',
-        'View all tasks: /pm:epic-list'
-      ];
-
-      result.suggestions = suggestions;
-
-      addMessage('💡 Suggestions:');
-      for (const suggestion of suggestions) {
-        addMessage(`  • ${suggestion}`);
-      }
+      addMessage(`### ${task.name}`);
+      addMessage(`**What:** ${task.description || 'See task details'}`);
+      addMessage(`**Why:** ${task.why || 'See task details'}`);
+      addMessage(`**Effort:** ${formatEffort(task.estimatedHours) || 'Unknown'}`);
+      addMessage(`**Priority:** ${task.priority || 'P2'}`);
+      addMessage(`**Epic:** ${task.epicName || '\u2014'}`);
+      addMessage(`**Depends on:** ${task.dependencies || '\u2014'}`);
+      addMessage(`**Files:** ${task.affectedFiles || '\u2014'}`);
+      addMessage('');
+      addMessage(`To start: /pm:issue-start ${task.taskNum}`);
+    } else {
+      addMessage('## Next Task');
+      addMessage('');
+      addMessage('No open tasks found.');
+      addMessage('');
+      addMessage('Create new work:');
+      addMessage('- /pm:prd-new "Feature Name" — create new PRD');
+      addMessage('- /pm:epic-decompose {epic} — decompose existing epic');
     }
   } catch (err) {
-    addMessage('No available tasks found.');
+    addMessage('## Next Task');
     addMessage('');
-    addMessage('💡 Suggestions:');
-    addMessage('  • Check blocked tasks: /pm:blocked');
-    addMessage('  • View all tasks: /pm:epic-list');
+    addMessage('No open tasks found.');
+    addMessage('');
+    addMessage('Create new work:');
+    addMessage('- /pm:prd-new "Feature Name" — create new PRD');
+    addMessage('- /pm:epic-decompose {epic} — decompose existing epic');
   }
-
-  addMessage('');
-
-  // Display TDD reminder if tasks are available
-  if (result.found > 0) {
-    displayTddReminder(addMessage);
-  }
-
-  addMessage(`📊 Summary: ${result.found} tasks ready to start`);
 
   return result;
 }
 
 /**
- * Display TDD reminder to ensure test-driven development practices
- * Extracted to maintain single responsibility and improve testability
- * @param {Function} addMessage - Function to add messages to the output
+ * Find available tasks sorted by priority, extracting structured metadata.
  */
-function displayTddReminder(addMessage) {
-  addMessage('⚠️  TDD REMINDER - Before starting work:');
-  addMessage('');
-  addMessage('   🚨 ALWAYS follow Test-Driven Development:');
-  addMessage('   1. RED: Write failing test first');
-  addMessage('   2. GREEN: Write minimal code to pass');
-  addMessage('   3. REFACTOR: Clean up while keeping tests green');
-  addMessage('');
-  addMessage('   See .claude/rules/tdd.enforcement.md for details');
-  addMessage('');
-}
-
-// Helper function to find available tasks
 async function findAvailableTasks() {
   const availableTasks = [];
-
-  // Use shared epic discovery utility
   const epicDirs = findAllEpicDirs();
 
   for (const epicDir of epicDirs) {
@@ -124,61 +87,147 @@ async function findAvailableTasks() {
         try {
           const content = fs.readFileSync(taskPath, 'utf8');
 
-          // Check if task is open (case-insensitive)
           const statusMatch = content.match(/^status:\s*(.+)$/m);
           const status = statusMatch ? statusMatch[1].trim().toLowerCase() : '';
 
-          // Skip non-open tasks (only open tasks or tasks without status are available)
           if (status !== 'open' && status !== '') {
             continue;
           }
 
-          // Check dependencies
           const depsMatch = content.match(/^depends_on:\s*\[(.*?)\]/m);
           const depsStr = depsMatch ? depsMatch[1].trim() : '';
 
-          // If no dependencies or empty dependencies, task is available
-          if (!depsStr || depsStr === '') {
-            const nameMatch = content.match(/^name:\s*(.+)$/m);
-            const name = nameMatch ? nameMatch[1].trim() : 'Unnamed Task';
-
-            const parallelMatch = content.match(/^parallel:\s*(.+)$/m);
-            const parallel = parallelMatch ? parallelMatch[1].trim() === 'true' : false;
-
-            const taskNum = path.basename(taskFile, '.md');
-
-            availableTasks.push({
-              taskNum,
-              name,
-              epicName,
-              parallel
-            });
+          if (depsStr && depsStr !== '') {
+            continue;
           }
+
+          const nameMatch = content.match(/^name:\s*(.+)$/m);
+          const name = nameMatch ? nameMatch[1].trim() : 'Unnamed Task';
+
+          const priorityMatch = content.match(/^priority:\s*(.+)$/m);
+          const priority = priorityMatch ? priorityMatch[1].trim() : null;
+
+          const hoursMatch = content.match(/^estimated_hours:\s*(.+)$/m);
+          const estimatedHours = hoursMatch ? hoursMatch[1].trim() : null;
+
+          const parallelMatch = content.match(/^parallel:\s*(.+)$/m);
+          const parallel = parallelMatch ? parallelMatch[1].trim() === 'true' : false;
+
+          // Extract description: first non-empty line after frontmatter
+          const description = extractDescription(content);
+
+          // Extract why/goal from content
+          const why = extractGoalOrObjective(content);
+
+          // Extract affected files section
+          const affectedFiles = extractAffectedFiles(content);
+
+          // Extract dependencies display string
+          const dependsDisplay = extractDependencies(content);
+
+          const taskNum = path.basename(taskFile, '.md');
+
+          availableTasks.push({
+            taskNum,
+            name,
+            epicName,
+            parallel,
+            priority,
+            estimatedHours,
+            description,
+            why,
+            affectedFiles,
+            dependencies: dependsDisplay
+          });
         } catch (err) {
-          // Log file read errors in DEBUG mode
           if (process.env.DEBUG) {
             console.error(`Error reading task file ${taskPath}:`, err.message);
           }
         }
       }
     } catch (err) {
-      // Log directory read errors in DEBUG mode
       if (process.env.DEBUG) {
         console.error(`Error reading epic directory ${epicPath}:`, err.message);
       }
     }
   }
 
+  // Sort by priority (P0 > P1 > P2 > P3 > unset)
+  availableTasks.sort((a, b) => {
+    const pa = parsePriority(a.priority);
+    const pb = parsePriority(b.priority);
+    return pa - pb;
+  });
+
   return availableTasks;
 }
 
-// Export for use as module
+function formatEffort(hours) {
+  if (!hours) return null;
+  const h = parseFloat(hours);
+  if (isNaN(h)) return hours;
+  if (h <= 2) return 'S';
+  if (h <= 8) return 'M';
+  return 'L';
+}
+
+function parsePriority(p) {
+  if (!p) return 99;
+  const match = p.match(/P(\d)/i);
+  return match ? parseInt(match[1], 10) : 99;
+}
+
+function extractDescription(content) {
+  // Get first non-empty line after closing frontmatter ---
+  const parts = content.split(/^---$/m);
+  if (parts.length >= 3) {
+    const body = parts.slice(2).join('---').trim();
+    const lines = body.split('\n');
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith('#')) {
+        return trimmed;
+      }
+    }
+  }
+  return null;
+}
+
+function extractGoalOrObjective(content) {
+  // Look for Goal or Objective section
+  const goalMatch = content.match(/^#+\s*(?:Goal|Objective|Why)\s*\n+([\s\S]*?)(?=\n#|\n---|\Z)/mi);
+  if (goalMatch) {
+    const firstLine = goalMatch[1].trim().split('\n')[0].trim();
+    if (firstLine) return firstLine;
+  }
+  return null;
+}
+
+function extractAffectedFiles(content) {
+  const match = content.match(/^#+\s*(?:Affected Files|Files|File Changes)\s*\n+([\s\S]*?)(?=\n#|\n---|\Z)/mi);
+  if (match) {
+    const lines = match[1].trim().split('\n')
+      .map(l => l.replace(/^[-*]\s*/, '').trim())
+      .filter(l => l);
+    if (lines.length > 0) return lines.slice(0, 5).join(', ');
+  }
+  return null;
+}
+
+function extractDependencies(content) {
+  const match = content.match(/^#+\s*(?:Dependencies|Depends on)\s*\n+([\s\S]*?)(?=\n#|\n---|\Z)/mi);
+  if (match) {
+    const firstLine = match[1].trim().split('\n')[0].trim();
+    if (firstLine) return firstLine;
+  }
+  return null;
+}
+
 module.exports = {
   next,
   findAvailableTasks
 };
 
-// CLI execution
 if (require.main === module) {
   module.exports.next().then(() => {
     process.exit(0);

@@ -114,7 +114,8 @@ async function status() {
 
   // Recent Activity section
   try {
-    const { formatRecentActivity } = require('../../../../autopm/.claude/lib/event-logger');
+    const loggerPath = require('path').join(process.cwd(), '.claude', 'lib', 'event-logger');
+    const { formatRecentActivity } = require(loggerPath);
     addMessage('');
     addMessage(formatRecentActivity(7));
   } catch (e) { /* event logger not available */ }

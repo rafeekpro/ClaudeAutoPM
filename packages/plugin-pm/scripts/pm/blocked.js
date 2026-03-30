@@ -39,7 +39,7 @@ function getBlockedTasks() {
             const statusMatch = taskContent.match(/^status:\s*(.*)$/m);
             const status = statusMatch ? statusMatch[1].trim() : '';
 
-            if (status !== 'open' && status !== '') continue;
+            if (status !== 'open' && status !== 'blocked' && status !== '') continue;
 
             const depsMatch = taskContent.match(/^depends_on:\s*(.*)$/m);
             if (!depsMatch) continue;
@@ -105,8 +105,6 @@ function formatBlockedOutput(data) {
 
   if (data.blockedTasks.length === 0) {
     lines.push('No blocked tasks found. All tasks with dependencies are resolved or in progress.');
-    lines.push('');
-    lines.push('Next: /pm:next');
   } else {
     lines.push('| # | Title | Blocker | Since | Epic |');
     lines.push('|---|-------|---------|-------|------|');
@@ -114,16 +112,22 @@ function formatBlockedOutput(data) {
       const blocker = `Waiting on #${task.openDependencies.join(', #')}`;
       lines.push(`| ${task.taskNum} | ${task.taskName} | ${blocker} | ${task.since} | ${task.epicName} |`);
     }
-
-    // Recent Activity section
-    try {
-      const { formatRecentActivity } = require('../../../../autopm/.claude/lib/event-logger');
-      lines.push('');
-      lines.push(formatRecentActivity(7));
-    } catch (e) { /* event logger not available */ }
-
     lines.push('');
     lines.push(`Total: ${data.totalBlocked} blocked items`);
+  }
+
+  // Recent Activity section (always shown)
+  try {
+    const loggerPath = require('path').join(process.cwd(), '.claude', 'lib', 'event-logger');
+    const { formatRecentActivity } = require(loggerPath);
+    lines.push('');
+    lines.push(formatRecentActivity(7));
+  } catch (e) { /* event logger not available */ }
+
+  lines.push('');
+  if (data.blockedTasks.length === 0) {
+    lines.push('Next: /pm:next');
+  } else {
     lines.push('Next: resolve blockers or /pm:next for alternative tasks');
   }
 
