@@ -1,0 +1,58 @@
+name: Bug Report
+description: Something isn't working correctly
+title: "[fix][scope] "
+labels: ["bug", "ai-ready"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: "Goal"
+      description: "What's broken and what should happen instead."
+      placeholder: "Fix epicSync.js creating issues without mandatory footer — every issue must include implementation rules."
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: "Context"
+      description: "Where does the bug occur? Steps to reproduce."
+      placeholder: |
+        - File: `autopm/.claude/lib/commands/pm/epicSync.js`
+        - Trigger: running `epicSync.js sync <epic-path>`
+        - Expected: issue body includes footer from `issue-mandatory-footer.md`
+        - Actual: footer is missing
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: "Acceptance Criteria"
+      description: "How to verify the fix."
+      placeholder: |
+        - [ ] epicSync creates issues WITH mandatory footer
+        - [ ] Test reproduces the bug (RED)
+        - [ ] Test passes after fix (GREEN)
+    validations:
+      required: true
+
+  - type: textarea
+    id: affected-files
+    attributes:
+      label: "Affected Files / Scope"
+      description: "Where the fix should be applied."
+      placeholder: |
+        - `autopm/.claude/lib/commands/pm/epicSync.js` — add footer reading
+        - `test/epicSync.test.js` — regression test
+    validations:
+      required: true
+
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: "Out of Scope"
+      description: "What NOT to change while fixing."
+      placeholder: "Do not refactor epicSync — only fix the footer issue."
+    validations:
+      required: false

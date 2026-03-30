@@ -1,0 +1,47 @@
+<rule id="issue-structure" priority="high" enforcement="required">
+  <description>
+    Every GitHub issue created by ClaudeAutoPM MUST follow the standard structure.
+    Issues without proper structure waste AI tokens and lead to scope creep.
+  </description>
+
+  <template>
+    <section name="goal" required="true">One sentence: WHAT and WHY</section>
+    <section name="context" required="true">Architecture location, files, dependencies</section>
+    <section name="acceptance-criteria" required="true">Measurable checkboxes, not prose</section>
+    <section name="technical-constraints" required="false">Stack, patterns, prohibitions</section>
+    <section name="affected-files" required="true">Exact file paths with change description</section>
+    <section name="out-of-scope" required="false">What NOT to touch</section>
+    <section name="suggested-approach" required="false">Brief implementation strategy</section>
+    <section name="definition-of-done" required="false">Quality gates (tests, lint, coverage)</section>
+  </template>
+
+  <title-convention>
+    <format>[type][scope] Imperative description</format>
+    <types>feat, fix, refactor, chore, test, docs, ci</types>
+    <examples>
+      <example>[feat][agent] Add retry logic to ResearcherAgent</example>
+      <example>[fix][api] Handle timeout in /ingest endpoint</example>
+      <example>[refactor][db] Extract VectorStore interface</example>
+      <example>[test][plugin] Add PluginManager install scenario tests</example>
+    </examples>
+  </title-convention>
+
+  <labels>
+    <label-group name="type">feature, bug, refactor, chore</label-group>
+    <label-group name="effort">S, M, L, XL</label-group>
+    <label-group name="ai-ready">true — issue is well-structured for AI execution</label-group>
+  </labels>
+
+  <key-principles>
+    <principle>Acceptance Criteria over narrative — AI understands checkboxes better than prose</principle>
+    <principle>Explicit scope always — say what NOT to touch or AI will "improve" neighbors</principle>
+    <principle>Name files, classes, functions — AI should not guess project structure</principle>
+    <principle>Link related issues — dependencies and blockers must be visible</principle>
+  </key-principles>
+
+  <violations enforcement="auto-reject">
+    <violation>Creating issues without Acceptance Criteria</violation>
+    <violation>Creating issues without Affected Files section</violation>
+    <violation>Vague goal without concrete deliverable</violation>
+  </violations>
+</rule>
