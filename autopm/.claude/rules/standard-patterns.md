@@ -27,11 +27,18 @@ Only check what's absolutely necessary:
 
 ### DateTime Handling
 
-```markdown
-Get current datetime: `date -u +"%Y-%m-%dT%H:%M:%SZ"`
+All timestamps MUST use real system time in ISO 8601 UTC format:
+
+```bash
+date -u +"%Y-%m-%dT%H:%M:%SZ"
+# Fallback: python3 -c "from datetime import datetime; print(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'))"
 ```
 
-Don't repeat full instructions - just reference `/rules/datetime.md` once.
+- **Never** use placeholder dates (`[Current ISO date/time]`, `YYYY-MM-DD`)
+- **Never** estimate dates — always get actual system time
+- **Always** use UTC (the `Z` suffix)
+- For new files: set both `created` and `updated`
+- For updates: update `updated` only, preserve `created`
 
 ### Error Messages
 

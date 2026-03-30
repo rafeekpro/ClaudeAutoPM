@@ -1,0 +1,32 @@
+<rule id="github-operations" priority="critical" enforcement="hard-gate">
+  <description>
+    GitHub CLI operations MUST follow safety checks.
+    Every issue MUST include mandatory footer. No exceptions.
+  </description>
+
+  <repo-protection>
+    <check>Before ANY write operation (issue create/edit, PR create, comment), verify remote origin</check>
+    <blocked-pattern>rlagowski/autopm</blocked-pattern>
+    <error>Cannot modify template repository. Fork first: git remote set-url origin YOUR_REPO_URL</error>
+    <applies-to>gh issue create, gh issue edit, gh issue comment, gh pr create</applies-to>
+  </repo-protection>
+
+  <mandatory-footer>
+    <source>.claude/templates/issue-mandatory-footer.md</source>
+    <rule>Append footer to EVERY issue body before gh issue create</rule>
+    <no-exceptions>true — applies to all issues: epic, task, bug, documentation</no-exceptions>
+    <method>cat .claude/templates/issue-mandatory-footer.md >> /tmp/issue-body.md</method>
+  </mandatory-footer>
+
+  <patterns>
+    <pattern name="auth">Trust gh CLI — don't pre-check. Handle failure with: "Run: gh auth login"</pattern>
+    <pattern name="output">Use --json for structured output when parsing</pattern>
+    <pattern name="atomic">One gh command per action, keep operations atomic</pattern>
+  </patterns>
+
+  <violations enforcement="auto-reject">
+    <violation>Creating issues without repo-protection check</violation>
+    <violation>Creating issues without mandatory footer appended</violation>
+    <violation>Writing to GitHub without verifying remote origin first</violation>
+  </violations>
+</rule>

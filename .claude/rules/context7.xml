@@ -17,6 +17,13 @@
     <trigger>Any infrastructure tool (Docker, K8s, Helm)</trigger>
   </triggers>
 
+  <emergency-fallback>
+    <step>ALERT: "Context7 MCP unavailable"</step>
+    <step>ASK user: WAIT (recommended) or PROCEED (risky)</step>
+    <step>If proceed: add comment "// WARNING: No Context7 verification"</step>
+    <step>FLAG: TODO re-verify when Context7 available</step>
+  </emergency-fallback>
+
   <violations enforcement="auto-reject">
     <violation>Writing library code without prior Context7 lookup</violation>
     <violation>Assuming API signatures from training data</violation>

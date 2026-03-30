@@ -1,5 +1,9 @@
 name: "CRUD Operations"
 description: "Create, Read, Update, Delete operations for a resource"
+prompt_templates:
+  - arch/stage1-architectural-planning.xml
+  - dev/stage2-code-generation.xml
+  - test/stage3-test-creation.xml
 patterns:
   - "crud"
   - "create"

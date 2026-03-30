@@ -16,6 +16,16 @@
     <entry task="Frontend tests"  agent="frontend-testing-engineer"    example="Playwright tests" />
   </selection-matrix>
 
+  <context-strategy>
+    <main-thread>coordination, decisions, user interaction, success/failure reporting</main-thread>
+    <agent-threads>file reading, code search, test execution, multi-file ops, verbose processing</agent-threads>
+    <return-rules>
+      <rule>Return only actionable insights — max 20% of processed data</rule>
+      <rule>Never dump raw output, logs, or full search results to main thread</rule>
+      <rule>Summarize findings; focus on decisions needed</rule>
+    </return-rules>
+  </context-strategy>
+
   <enforcement>
     <rule>Before ANY complex task — check AGENT-REGISTRY.md for specialist</rule>
     <rule>If specialist exists — USE IT. No exceptions.</rule>

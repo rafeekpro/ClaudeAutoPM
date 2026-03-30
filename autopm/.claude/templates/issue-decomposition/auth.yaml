@@ -1,5 +1,9 @@
 name: "Authentication Flow"
 description: "User authentication and authorization implementation"
+prompt_templates:
+  - arch/prd-to-epic.xml
+  - dev/stage2-code-generation.xml
+  - test/test-suite.xml
 patterns:
   - "auth"
   - "login"

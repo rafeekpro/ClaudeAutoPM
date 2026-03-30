@@ -34,6 +34,13 @@
     <!-- test: add failing test for feature   🔴  -->
   </commit-pattern>
 
+  <execution>
+    <rule>Always delegate test runs to @test-runner agent</rule>
+    <rule>Verbose output with full stack traces</rule>
+    <rule>Check test structure first before assuming code bugs</rule>
+    <rule>Cleanup after tests: pkill -f "jest|mocha|pytest" 2>/dev/null || true</rule>
+  </execution>
+
   <violations enforcement="auto-reject">
     <violation>Writing code before tests</violation>
     <violation>Committing "WIP" or "TODO: add tests later"</violation>

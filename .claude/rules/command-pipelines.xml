@@ -1,0 +1,72 @@
+<rule id="command-pipelines" priority="high" enforcement="sequence-required">
+  <description>
+    Mandatory command sequences for all workflows.
+    Steps MUST be executed in order. No skipping.
+  </description>
+
+  <pipeline name="project-init">
+    <step order="1">/pm:init — Initialize PM system</step>
+    <step order="2">/context:create — Build project documentation</step>
+    <step order="3">/testing:prime — Configure test framework</step>
+    <step order="4">/context:prime — Load context for work</step>
+  </pipeline>
+
+  <pipeline name="feature-development">
+    <step order="1">/pm:prd-new — Create requirements document</step>
+    <step order="2">/pm:prd-parse — Convert to technical epic</step>
+    <step order="3">/pm:epic-decompose — Break into parallel tasks</step>
+    <step order="4">/pm:epic-sync — Sync with GitHub</step>
+    <step order="5">/pm:epic-start — Launch parallel agents (TDD cycle, shared branch)</step>
+    <step order="6">/pm:epic-status — Monitor progress</step>
+    <step order="7">/pm:epic-merge — Merge when complete</step>
+  </pipeline>
+
+  <pipeline name="issue-resolution">
+    <step order="1">/pm:import — Import from GitHub</step>
+    <step order="2">/pm:issue-analyze — Identify work streams</step>
+    <step order="3">/pm:issue-start — Begin implementation (parallel-worker agent)</step>
+    <step order="4">/pm:issue-status — Check progress</step>
+    <step order="5">/pm:issue-close — Mark complete</step>
+  </pipeline>
+
+  <pipeline name="daily-workflow">
+    <morning>
+      <step order="1">/context:prime — Load project context</step>
+      <step order="2">/pm:standup — Review status and blockers</step>
+      <step order="3">/pm:next — Get task recommendation</step>
+    </morning>
+    <end-of-day>
+      <step order="1">/testing:run — Verify all tests pass</step>
+      <step order="2">/context:update — Update project context</step>
+      <step order="3">/pm:status — Review accomplishments</step>
+    </end-of-day>
+  </pipeline>
+
+  <pipeline name="code-review">
+    <step order="1">/code-rabbit — Paste review comments</step>
+    <step order="2">code-analyzer — Analyze each suggestion</step>
+    <step order="3">Implement fixes following TDD</step>
+    <step order="4">test-runner — Verify all changes</step>
+    <step order="5">Update PR with fixes</step>
+  </pipeline>
+
+  <prerequisites>
+    <requires command="pm:*">.pm/ directory (run /pm:init first)</requires>
+    <requires command="epic:*">PRD must exist (run /pm:prd-new first)</requires>
+    <requires command="issue:*">GitHub integration and valid issue ID</requires>
+    <requires command="testing:*">Test framework detected (run /testing:prime first)</requires>
+    <requires command="context:*">.claude/ directory must exist</requires>
+  </prerequisites>
+
+  <execution-rules>
+    <rule>Use real datetime: date -u +"%Y-%m-%dT%H:%M:%SZ"</rule>
+    <rule>Delegate to specialized agents (test-runner, code-analyzer, parallel-worker)</rule>
+    <rule>Ask before overwriting existing data</rule>
+  </execution-rules>
+
+  <violations enforcement="auto-reject">
+    <violation>Skipping steps in a mandatory pipeline</violation>
+    <violation>Starting epics without decomposition</violation>
+    <violation>Closing issues without test verification</violation>
+  </violations>
+</rule>

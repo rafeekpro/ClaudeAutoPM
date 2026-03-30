@@ -1,0 +1,73 @@
+<agent-registry version="1.2.0" total="44">
+  <selection-guide>
+    <rule>Planning/designing → "expert" or "architect" agents</rule>
+    <rule>Building/coding → "engineer" agents</rule>
+    <rule>UI components only → react-ui-expert | Full app → react-frontend-engineer</rule>
+    <rule>Dev environment → docker-containerization-expert | Production → kubernetes-orchestrator</rule>
+    <rule>Multi-cloud IaC → terraform-infrastructure-expert | Single cloud → specific cloud architect</rule>
+  </selection-guide>
+
+  <agents category="core">
+    <agent name="agent-manager" path="agents/core/agent-manager.md">Agent lifecycle management, documentation, registry maintenance</agent>
+    <agent name="file-analyzer" path="agents/core/file-analyzer.md">Analyze/summarize file contents, logs, verbose outputs to reduce context</agent>
+    <agent name="code-analyzer" path="agents/core/code-analyzer.md">Analyze code changes, trace logic flow, investigate bugs</agent>
+    <agent name="test-runner" path="agents/core/test-runner.md">Run tests, analyze results with log analysis and actionable insights</agent>
+    <agent name="parallel-worker" path="agents/core/parallel-worker.md">Execute parallel work streams in a git branch</agent>
+    <agent name="mcp-manager" path="agents/core/mcp-manager.md">MCP server install, config, process management, health checks</agent>
+    <agent name="context-optimizer" path="agents/core/context-optimizer.md">Context window efficiency, compaction, summarization, memory optimization</agent>
+  </agents>
+
+  <agents category="frameworks">
+    <agent name="react-ui-expert" path="agents/frameworks/react-ui-expert.md" params="framework:[mui|chakra|antd|bootstrap|headless]">UI components, design systems, styling, accessibility</agent>
+    <agent name="react-frontend-engineer" path="agents/frameworks/react-frontend-engineer.md">Full React app: routing, state management, API integration</agent>
+    <agent name="ux-design-expert" path="agents/frameworks/ux-design-expert.md">UX/UI design analysis, accessibility audits, design systems</agent>
+    <agent name="tailwindcss-expert" path="agents/frameworks/tailwindcss-expert.md">TailwindCSS utility-first styling, responsive design</agent>
+    <agent name="e2e-test-engineer" path="agents/frameworks/e2e-test-engineer.md" params="framework:[playwright|cypress]">E2E testing, visual testing, accessibility testing</agent>
+    <agent name="frontend-testing-engineer" path="agents/testing/frontend-testing-engineer.md">Frontend unit/integration tests: React, Vue, Angular</agent>
+    <agent name="nats-messaging-expert" path="agents/frameworks/nats-messaging-expert.md">NATS messaging: pub/sub, request/reply, queue groups</agent>
+    <agent name="message-queue-engineer" path="agents/integration/message-queue-engineer.md">Kafka, RabbitMQ, SQS/SNS, Redis Pub/Sub, SAGA patterns</agent>
+  </agents>
+
+  <agents category="languages">
+    <agent name="python-backend-expert" path="agents/languages/python-backend-expert.md" params="framework:[fastapi|flask|django]">Python architecture, framework selection, database design</agent>
+    <agent name="python-backend-engineer" path="agents/languages/python-backend-engineer.md">Day-to-day Python: features, bug fixes, refactoring, tests</agent>
+    <agent name="javascript-frontend-engineer" path="agents/languages/javascript-frontend-engineer.md">Modern JS/TS frontend with vanilla JS and browser APIs</agent>
+    <agent name="nodejs-backend-engineer" path="agents/languages/nodejs-backend-engineer.md">Node.js backend: Express, Fastify, NestJS</agent>
+    <agent name="bash-scripting-expert" path="agents/languages/bash-scripting-expert.md">Shell automation, sysadmin, CI/CD scripts</agent>
+  </agents>
+
+  <agents category="cloud">
+    <agent name="aws-cloud-architect" path="agents/cloud/aws-cloud-architect.md">AWS infrastructure design, deployment, management</agent>
+    <agent name="azure-cloud-architect" path="agents/cloud/azure-cloud-architect.md">Azure infrastructure design, deployment, management</agent>
+    <agent name="gcp-cloud-architect" path="agents/cloud/gcp-cloud-architect.md">GCP infrastructure design, deployment, management</agent>
+    <agent name="kubernetes-orchestrator" path="agents/cloud/kubernetes-orchestrator.md">K8s cluster design, deployment, workload management</agent>
+    <agent name="terraform-infrastructure-expert" path="agents/cloud/terraform-infrastructure-expert.md">IaC, Terraform modules, multi-cloud, state management, GitOps</agent>
+    <agent name="gcp-cloud-functions-engineer" path="agents/cloud/gcp-cloud-functions-engineer.md">Cloud Functions: HTTP, event-driven, serverless</agent>
+    <agent name="gemini-api-expert" path="agents/cloud/gemini-api-expert.md">Gemini API: text gen, multimodal, function calling</agent>
+    <agent name="openai-python-expert" path="agents/cloud/openai-python-expert.md">OpenAI SDK: GPT, embeddings, fine-tuning, assistants</agent>
+  </agents>
+
+  <agents category="devops">
+    <agent name="github-operations-specialist" path="agents/devops/github-operations-specialist.md">GitHub repos, workflows, Actions, issues, PRs</agent>
+    <agent name="azure-devops-specialist" path="agents/devops/azure-devops-specialist.md">Azure DevOps: work items, pipelines, boards, repos</agent>
+    <agent name="mcp-context-manager" path="agents/devops/mcp-context-manager.md">MCP context optimization, content curation, agent coordination</agent>
+    <agent name="docker-containerization-expert" path="agents/devops/docker-containerization-expert.md" params="use_case:[development|production]">Dockerfile, Compose, dev environments</agent>
+    <agent name="traefik-proxy-expert" path="agents/devops/traefik-proxy-expert.md">Traefik reverse proxy, load balancing, SSL, routing</agent>
+    <agent name="ssh-operations-expert" path="agents/devops/ssh-operations-expert.md">SSH remote management, key management, automation</agent>
+    <agent name="observability-engineer" path="agents/devops/observability-engineer.md">Prometheus, Grafana, ELK, Jaeger, APM, SLI/SLO</agent>
+  </agents>
+
+  <agents category="databases">
+    <agent name="postgresql-expert" path="agents/databases/postgresql-expert.md">PostgreSQL design, optimization, performance tuning</agent>
+    <agent name="mongodb-expert" path="agents/databases/mongodb-expert.md">MongoDB design, aggregation pipelines, optimization</agent>
+    <agent name="bigquery-expert" path="agents/databases/bigquery-expert.md">BigQuery data warehouse, SQL optimization, analytics</agent>
+    <agent name="cosmosdb-expert" path="agents/databases/cosmosdb-expert.md">Azure Cosmos DB design and optimization</agent>
+    <agent name="redis-expert" path="agents/databases/redis-expert.md">Redis caching, pub/sub, data structures</agent>
+  </agents>
+
+  <agents category="data-engineering">
+    <agent name="airflow-orchestration-expert" path="agents/data/airflow-orchestration-expert.md">Airflow DAGs, task dependencies, scheduling</agent>
+    <agent name="kedro-pipeline-expert" path="agents/data/kedro-pipeline-expert.md">Kedro pipelines, data catalog, project structure</agent>
+    <agent name="langgraph-workflow-expert" path="agents/data/langgraph-workflow-expert.md">LangGraph state machines, routing, multi-agent</agent>
+  </agents>
+</agent-registry>
