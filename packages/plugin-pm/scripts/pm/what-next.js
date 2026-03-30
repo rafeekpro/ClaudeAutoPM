@@ -5,25 +5,16 @@ const { logError, logWarning, logDebug } = require('./lib/logger');
 
 /**
  * PM What-Next Script
- * Intelligent context-aware suggestions for next steps
+ * Shows top 3 task candidates in structured TODO format with full context.
  */
-
-// ============================================================================
-// Configuration Constants
-// ============================================================================
 
 // Task file naming pattern (e.g., 001.md, 002.md)
 const TASK_FILE_PATTERN = /^\d{3}\.md$/;
 
 // Epic complexity detection thresholds
 const COMPLEXITY_THRESHOLDS = {
-  // Content length threshold (characters)
   LARGE_EPIC_SIZE: parseInt(process.env.PM_LARGE_EPIC_SIZE) || 5000,
-
-  // Task count thresholds
   MANY_TASKS: parseInt(process.env.PM_MANY_TASKS) || 20,
-
-  // Keywords indicating multi-layer architecture
   ARCHITECTURE_KEYWORDS: {
     frontend: ['frontend', 'ui', 'client', 'react', 'vue', 'angular'],
     backend: ['backend', 'api', 'server', 'service'],
@@ -34,30 +25,62 @@ const COMPLEXITY_THRESHOLDS = {
 };
 
 async function whatNext() {
-  console.log('');
-  console.log('🎯 What Should I Do Next?');
-  console.log('='.repeat(60));
-  console.log('');
-
-  // Analyze current project state
   const state = await analyzeProjectState();
-
-  // Generate contextual suggestions
   const suggestions = generateSuggestions(state);
 
-  // Display project status
+  // If we have open tasks, show structured top-3 format
+  if (state.openTasks.length > 0) {
+    displayStructuredTasks(state.openTasks, state);
+    return;
+  }
+
+  // Otherwise fall back to suggestion-based output
   displayProjectStatus(state);
   console.log('');
-
-  // Display suggestions
   displaySuggestions(suggestions, state);
-
-  console.log('');
-  console.log('💡 Tip: Run /pm:context to see detailed project status');
   console.log('');
 }
 
-// Analyze current project state
+/**
+ * Display top 3 open tasks in structured TODO format.
+ */
+function displayStructuredTasks(openTasks, state) {
+  // Sort by priority
+  const sorted = [...openTasks].sort((a, b) => {
+    const pa = parsePriority(a.priority);
+    const pb = parsePriority(b.priority);
+    return pa - pb;
+  });
+
+  const top3 = sorted.slice(0, 3);
+
+  console.log(`## What's Next? (Top ${top3.length} by priority)`);
+  console.log('');
+
+  top3.forEach((task, i) => {
+    const rank = i + 1;
+    const suffix = rank === 1 ? ' ⭐ Recommended' : '';
+    console.log(`### ${rank}. ${task.name}${suffix}`);
+    console.log(`**What:** ${task.description || 'See task details'}`);
+    console.log(`**Why:** ${task.why || 'See task details'}`);
+    console.log(`**Effort:** ${task.effort || 'Unknown'} | **Priority:** ${task.priority || 'P2'}`);
+    console.log(`**Epic:** ${task.epicName || '—'}`);
+    console.log(`**Depends on:** ${task.dependencies || '—'}`);
+    if (task.affectedFiles) {
+      console.log(`**Files:** ${task.affectedFiles}`);
+    }
+    console.log('');
+  });
+
+  if (top3.length > 0) {
+    console.log(`To start: /pm:issue-start ${top3[0].taskNum}`);
+  }
+}
+
+// ============================================================================
+// State Analysis
+// ============================================================================
+
 async function analyzeProjectState() {
   const state = {
     hasPRDs: false,
@@ -94,16 +117,12 @@ async function analyzeProjectState() {
     state.hasEpics = epicDirs.length > 0;
     state.epicCount = epicDirs.length;
 
-    // Analyze all epics in parallel for better performance
-    // This prevents blocking when projects have many epics/tasks
-    // Example: 10 epics × 50 tasks = 500 files processed in parallel
     const epicAnalysisPromises = epicDirs.map(epicName => {
       const epicPath = path.join('.claude/epics', epicName);
       return analyzeEpicAsync(epicPath, epicName)
         .catch(err => {
           logWarning(`Failed to analyze epic "${epicName}": ${err.message}`);
           logDebug(err.stack);
-          // Return a minimal fallback object to prevent Promise.all from failing
           return {
             name: epicName,
             path: epicPath,
@@ -123,16 +142,11 @@ async function analyzeProjectState() {
 
     const epicInfos = await Promise.all(epicAnalysisPromises);
 
-    // Aggregate results
     for (const epicInfo of epicInfos) {
       state.epics.push(epicInfo);
-
-      // Count tasks
       state.totalTaskCount += epicInfo.taskCount;
       state.completedTaskCount += epicInfo.completedCount;
       state.activeTaskCount += epicInfo.inProgressCount;
-
-      // Collect tasks
       state.inProgressTasks.push(...epicInfo.inProgressTasks);
       state.openTasks.push(...epicInfo.openTasks);
     }
@@ -154,7 +168,7 @@ async function analyzeProjectState() {
   return state;
 }
 
-// Analyze single epic (async version for parallel processing)
+// Analyze single epic (async for parallel processing)
 async function analyzeEpicAsync(epicPath, epicName) {
   const info = {
     name: epicName,
@@ -174,7 +188,6 @@ async function analyzeEpicAsync(epicPath, epicName) {
   try {
     await fsPromises.access(epicFile);
     info.hasEpicFile = true;
-
     const content = await fsPromises.readFile(epicFile, 'utf8');
     info.syncedToGitHub = /^github:/m.test(content);
   } catch (err) {
@@ -189,7 +202,6 @@ async function analyzeEpicAsync(epicPath, epicName) {
     info.hasTasks = taskFiles.length > 0;
     info.taskCount = taskFiles.length;
 
-    // Analyze all tasks in parallel
     const taskAnalysisPromises = taskFiles.map(async (taskFile) => {
       const taskPath = path.join(epicPath, taskFile);
       try {
@@ -200,18 +212,33 @@ async function analyzeEpicAsync(epicPath, epicName) {
         const nameMatch = content.match(/^name:\s*(.+)$/m);
         const taskName = nameMatch ? nameMatch[1].trim() : taskFile;
 
+        const priorityMatch = content.match(/^priority:\s*(.+)$/m);
+        const priority = priorityMatch ? priorityMatch[1].trim() : null;
+
+        const hoursMatch = content.match(/^estimated_hours:\s*(.+)$/m);
+        const estimatedHours = hoursMatch ? hoursMatch[1].trim() : null;
+
         const taskNum = taskFile.replace('.md', '');
 
-        return { status, taskName, taskNum };
+        // Extract rich metadata for structured output
+        const description = extractDescription(content);
+        const why = extractGoalOrObjective(content);
+        const affectedFiles = extractAffectedFiles(content);
+        const dependencies = extractDependencies(content);
+        const effort = formatEffort(estimatedHours);
+
+        return {
+          status, taskName, taskNum,
+          priority, estimatedHours, effort,
+          description, why, affectedFiles, dependencies
+        };
       } catch (err) {
-        // Ignore task read errors
         return null;
       }
     });
 
     const taskResults = await Promise.all(taskAnalysisPromises);
 
-    // Aggregate task results
     for (const result of taskResults) {
       if (!result) continue;
 
@@ -221,10 +248,26 @@ async function analyzeEpicAsync(epicPath, epicName) {
         info.completedCount++;
       } else if (status === 'in-progress' || status === 'in_progress') {
         info.inProgressCount++;
-        info.inProgressTasks.push({ epicName, taskNum, name: taskName });
+        info.inProgressTasks.push({
+          epicName, taskNum, name: taskName,
+          priority: result.priority,
+          description: result.description,
+          why: result.why,
+          effort: result.effort,
+          affectedFiles: result.affectedFiles,
+          dependencies: result.dependencies
+        });
       } else {
         info.openCount++;
-        info.openTasks.push({ epicName, taskNum, name: taskName });
+        info.openTasks.push({
+          epicName, taskNum, name: taskName,
+          priority: result.priority,
+          description: result.description,
+          why: result.why,
+          effort: result.effort,
+          affectedFiles: result.affectedFiles,
+          dependencies: result.dependencies
+        });
       }
     }
   } catch (err) {
@@ -249,7 +292,6 @@ function analyzeEpic(epicPath, epicName) {
     openTasks: []
   };
 
-  // Check for epic.md
   const epicFile = path.join(epicPath, 'epic.md');
   info.hasEpicFile = fs.existsSync(epicFile);
 
@@ -262,7 +304,6 @@ function analyzeEpic(epicPath, epicName) {
     }
   }
 
-  // Check for task files
   try {
     const taskFiles = fs.readdirSync(epicPath)
       .filter(f => TASK_FILE_PATTERN.test(f));
@@ -270,7 +311,6 @@ function analyzeEpic(epicPath, epicName) {
     info.hasTasks = taskFiles.length > 0;
     info.taskCount = taskFiles.length;
 
-    // Analyze each task
     for (const taskFile of taskFiles) {
       const taskPath = path.join(epicPath, taskFile);
       try {
@@ -304,16 +344,72 @@ function analyzeEpic(epicPath, epicName) {
 }
 
 // ============================================================================
+// Content Extraction Helpers
+// ============================================================================
+
+function parsePriority(p) {
+  if (!p) return 99;
+  const match = p.match(/P(\d)/i);
+  return match ? parseInt(match[1], 10) : 99;
+}
+
+function formatEffort(hours) {
+  if (!hours) return null;
+  const h = parseFloat(hours);
+  if (isNaN(h)) return hours;
+  if (h <= 2) return 'S';
+  if (h <= 8) return 'M';
+  return 'L';
+}
+
+function extractDescription(content) {
+  const parts = content.split(/^---$/m);
+  if (parts.length >= 3) {
+    const body = parts.slice(2).join('---').trim();
+    const lines = body.split('\n');
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith('#')) {
+        return trimmed;
+      }
+    }
+  }
+  return null;
+}
+
+function extractGoalOrObjective(content) {
+  const goalMatch = content.match(/^#+\s*(?:Goal|Objective|Why)\s*\n+([\s\S]*?)(?=\n#|\n---|\Z)/mi);
+  if (goalMatch) {
+    const firstLine = goalMatch[1].trim().split('\n')[0].trim();
+    if (firstLine) return firstLine;
+  }
+  return null;
+}
+
+function extractAffectedFiles(content) {
+  const match = content.match(/^#+\s*(?:Affected Files|Files|File Changes)\s*\n+([\s\S]*?)(?=\n#|\n---|\Z)/mi);
+  if (match) {
+    const lines = match[1].trim().split('\n')
+      .map(l => l.replace(/^[-*]\s*/, '').trim())
+      .filter(l => l);
+    if (lines.length > 0) return lines.slice(0, 5).join(', ');
+  }
+  return null;
+}
+
+function extractDependencies(content) {
+  const match = content.match(/^#+\s*(?:Dependencies|Depends on)\s*\n+([\s\S]*?)(?=\n#|\n---|\Z)/mi);
+  if (match) {
+    const firstLine = match[1].trim().split('\n')[0].trim();
+    if (firstLine) return firstLine;
+  }
+  return null;
+}
+
+// ============================================================================
 // Epic Complexity Detection
 // ============================================================================
 
-/**
- * Detect if an epic is complex enough to warrant splitting into sub-epics
- *
- * @param {string} epicContent - Content of the epic.md file
- * @param {object} epicInfo - Epic metadata (taskCount, etc.)
- * @returns {object} { isComplex: boolean, reasons: string[] }
- */
 function detectEpicComplexity(epicContent, epicInfo = {}) {
   const reasons = [];
 
@@ -323,30 +419,25 @@ function detectEpicComplexity(epicContent, epicInfo = {}) {
 
   const contentLower = epicContent.toLowerCase();
 
-  // 1. Check for multi-layer architecture (frontend + backend)
   const hasMultipleLayers = detectMultipleArchitectureLayers(contentLower);
   if (hasMultipleLayers.detected) {
     reasons.push(`Multiple architecture layers: ${hasMultipleLayers.layers.join(', ')}`);
   }
 
-  // 2. Check for large content size
   if (epicContent.length > COMPLEXITY_THRESHOLDS.LARGE_EPIC_SIZE) {
     reasons.push(`Large epic size: ${epicContent.length} characters (threshold: ${COMPLEXITY_THRESHOLDS.LARGE_EPIC_SIZE})`);
   }
 
-  // 3. Check for high estimated task count (if available)
   if (epicInfo.taskCount && epicInfo.taskCount > COMPLEXITY_THRESHOLDS.MANY_TASKS) {
     reasons.push(`Many tasks: ${epicInfo.taskCount} (threshold: ${COMPLEXITY_THRESHOLDS.MANY_TASKS})`);
   }
 
-  // 4. Check for infrastructure/deployment complexity
   const hasInfrastructure = COMPLEXITY_THRESHOLDS.ARCHITECTURE_KEYWORDS.infrastructure
     .some(keyword => contentLower.includes(keyword));
   if (hasInfrastructure) {
     reasons.push('Contains infrastructure/deployment components');
   }
 
-  // 5. Check for external integrations
   const hasIntegrations = COMPLEXITY_THRESHOLDS.ARCHITECTURE_KEYWORDS.integration
     .some(keyword => contentLower.includes(keyword));
   if (hasIntegrations) {
@@ -354,43 +445,36 @@ function detectEpicComplexity(epicContent, epicInfo = {}) {
   }
 
   return {
-    isComplex: reasons.length >= 2, // At least 2 complexity indicators
+    isComplex: reasons.length >= 2,
     reasons
   };
 }
 
-/**
- * Detect multiple architecture layers in epic content
- *
- * @param {string} contentLower - Lowercase epic content
- * @returns {object} { detected: boolean, layers: string[] }
- */
 function detectMultipleArchitectureLayers(contentLower) {
   const layers = [];
   const keywords = COMPLEXITY_THRESHOLDS.ARCHITECTURE_KEYWORDS;
 
-  // Check each layer
   for (const [layerName, layerKeywords] of Object.entries(keywords)) {
-    if (layerName === 'integration') continue; // Skip integration layer
-
+    if (layerName === 'integration') continue;
     const hasLayer = layerKeywords.some(keyword => contentLower.includes(keyword));
     if (hasLayer) {
       layers.push(layerName);
     }
   }
 
-  // Complex if has 2+ distinct layers (e.g., frontend + backend)
   return {
     detected: layers.length >= 2,
     layers
   };
 }
 
-// Generate suggestions based on state
+// ============================================================================
+// Suggestion Generation (fallback when no open tasks)
+// ============================================================================
+
 function generateSuggestions(state) {
   const suggestions = [];
 
-  // Scenario 1: No PRDs yet
   if (!state.hasPRDs) {
     suggestions.push({
       priority: 'high',
@@ -402,10 +486,9 @@ function generateSuggestions(state) {
       ],
       why: 'PRDs define requirements and guide the entire development process'
     });
-    return suggestions; // Stop here, nothing else makes sense yet
+    return suggestions;
   }
 
-  // Scenario 2: Have PRDs but no epics
   if (state.hasPRDs && !state.hasEpics) {
     for (const prd of state.prds) {
       suggestions.push({
@@ -422,16 +505,13 @@ function generateSuggestions(state) {
     return suggestions;
   }
 
-  // Scenario 3: Have epics that need decomposition
   const epicsNeedingDecomposition = state.epics.filter(e => e.hasEpicFile && !e.hasTasks);
   if (epicsNeedingDecomposition.length > 0) {
     for (const epic of epicsNeedingDecomposition) {
-      // Check if this is a complex epic that should be split
       const epicContent = tryReadFile(path.join('.claude/epics', epic.name, 'epic.md'));
       const complexityResult = detectEpicComplexity(epicContent, epic);
-      const isComplex = complexityResult.isComplex;
 
-      if (isComplex) {
+      if (complexityResult.isComplex) {
         suggestions.push({
           priority: 'high',
           recommended: true,
@@ -460,7 +540,6 @@ function generateSuggestions(state) {
     return suggestions;
   }
 
-  // Scenario 4: Have tasks but not synced to GitHub
   const epicsNeedingSync = state.epics.filter(e => e.hasTasks && !e.syncedToGitHub);
   if (epicsNeedingSync.length > 0) {
     for (const epic of epicsNeedingSync) {
@@ -478,26 +557,10 @@ function generateSuggestions(state) {
     return suggestions;
   }
 
-  // Scenario 5: Have synced tasks - ready to work
-  if (state.openTasks.length > 0) {
-    suggestions.push({
-      priority: 'high',
-      recommended: true,
-      title: 'Start Working on Tasks',
-      description: `You have ${state.openTasks.length} tasks ready to work on`,
-      commands: [
-        { cmd: '/pm:next', note: 'Shows highest priority available tasks' },
-        { cmd: `/pm:issue-start ${state.openTasks[0].taskNum}`, note: `Start: "${state.openTasks[0].name}"` }
-      ],
-      why: 'Begin implementation with TDD approach'
-    });
-  }
-
-  // Scenario 6: Have tasks in progress
   if (state.inProgressTasks.length > 0) {
     suggestions.push({
       priority: 'medium',
-      recommended: state.openTasks.length === 0,
+      recommended: true,
       title: 'Continue In-Progress Work',
       description: `You have ${state.inProgressTasks.length} tasks currently in progress`,
       commands: state.inProgressTasks.slice(0, 3).map(t => ({
@@ -508,12 +571,11 @@ function generateSuggestions(state) {
     });
   }
 
-  // Scenario 7: Everything done, suggest new features
   if (state.completedTaskCount === state.totalTaskCount && state.totalTaskCount > 0) {
     suggestions.push({
       priority: 'medium',
       recommended: true,
-      title: 'All Tasks Complete! 🎉',
+      title: 'All Tasks Complete!',
       description: 'Time to plan your next feature',
       commands: [
         { cmd: '/pm:prd-new next-feature', note: 'Start a new PRD for your next feature' },
@@ -523,7 +585,6 @@ function generateSuggestions(state) {
     });
   }
 
-  // Always available: Check status and context
   suggestions.push({
     priority: 'low',
     recommended: false,
@@ -540,41 +601,43 @@ function generateSuggestions(state) {
   return suggestions;
 }
 
-// Display project status summary
+// ============================================================================
+// Display Helpers (fallback mode)
+// ============================================================================
+
 function displayProjectStatus(state) {
-  console.log('📊 Current Project Status:');
+  console.log('## Project Status');
   console.log('');
 
   if (!state.hasPRDs && !state.hasEpics) {
-    console.log('  🆕 New project - Ready to start!');
+    console.log('New project - Ready to start!');
     return;
   }
 
   if (state.hasPRDs) {
-    console.log(`  📄 PRDs: ${state.prdCount} (${state.prds.join(', ')})`);
+    console.log(`- **PRDs:** ${state.prdCount} (${state.prds.join(', ')})`);
   }
 
   if (state.hasEpics) {
-    console.log(`  📚 Epics: ${state.epicCount}`);
-    console.log(`  ✅ Tasks: ${state.completedTaskCount} / ${state.totalTaskCount} completed`);
+    console.log(`- **Epics:** ${state.epicCount}`);
+    console.log(`- **Tasks:** ${state.completedTaskCount} / ${state.totalTaskCount} completed`);
 
     if (state.activeTaskCount > 0) {
-      console.log(`  🔄 In Progress: ${state.activeTaskCount} tasks`);
+      console.log(`- **In Progress:** ${state.activeTaskCount} tasks`);
     }
 
     if (state.openTasks.length > 0) {
-      console.log(`  📋 Ready: ${state.openTasks.length} tasks waiting`);
+      console.log(`- **Ready:** ${state.openTasks.length} tasks waiting`);
     }
   }
 
   if (state.hasConfig && state.provider) {
-    console.log(`  ⚙️  Provider: ${state.provider.charAt(0).toUpperCase() + state.provider.slice(1)}`);
+    console.log(`- **Provider:** ${state.provider.charAt(0).toUpperCase() + state.provider.slice(1)}`);
   }
 }
 
-// Display suggestions
-function displaySuggestions(suggestions, state) {
-  console.log('💡 Suggested Next Steps:');
+function displaySuggestions(suggestions) {
+  console.log('## Suggested Next Steps');
   console.log('');
 
   const highPriority = suggestions.filter(s => s.priority === 'high');
@@ -583,61 +646,49 @@ function displaySuggestions(suggestions, state) {
 
   let stepNum = 1;
 
-  // High priority suggestions
-  for (const suggestion of highPriority) {
-    displaySuggestion(suggestion, stepNum++);
+  for (const s of highPriority) {
+    displaySuggestion(s, stepNum++);
   }
 
-  // Medium priority suggestions
   if (mediumPriority.length > 0) {
+    console.log('### Also Available');
     console.log('');
-    console.log('  Also Available:');
-    console.log('  ' + '-'.repeat(56));
-    console.log('');
-    for (const suggestion of mediumPriority) {
-      displaySuggestion(suggestion, stepNum++, '  ');
+    for (const s of mediumPriority) {
+      displaySuggestion(s, stepNum++);
     }
   }
 
-  // Low priority suggestions (info only)
   if (lowPriority.length > 0 && highPriority.length === 0) {
+    console.log('### Information Commands');
     console.log('');
-    console.log('  Information Commands:');
-    console.log('  ' + '-'.repeat(56));
-    console.log('');
-    for (const suggestion of lowPriority) {
-      displaySuggestion(suggestion, stepNum++, '  ');
+    for (const s of lowPriority) {
+      displaySuggestion(s, stepNum++);
     }
   }
 }
 
-// Display single suggestion
-function displaySuggestion(suggestion, stepNum, indent = '') {
-  const marker = suggestion.recommended ? '⭐' : '○';
-
-  console.log(`${indent}${stepNum}. ${marker} ${suggestion.title}`);
-  console.log(`${indent}   ${suggestion.description}`);
-  console.log('');
+function displaySuggestion(suggestion, stepNum) {
+  const marker = suggestion.recommended ? '⭐' : '';
+  console.log(`${stepNum}. ${suggestion.title} ${marker}`.trim());
+  console.log(`   ${suggestion.description}`);
 
   for (const cmd of suggestion.commands) {
     if (cmd.cmd.startsWith('#')) {
-      console.log(`${indent}   ${cmd.cmd}`);
+      console.log(`   ${cmd.cmd}`);
     } else {
-      console.log(`${indent}   ${cmd.cmd}`);
+      console.log(`   ${cmd.cmd}`);
       if (cmd.note) {
-        console.log(`${indent}   → ${cmd.note}`);
+        console.log(`   > ${cmd.note}`);
       }
     }
   }
 
   if (suggestion.why) {
-    console.log(`${indent}   💭 ${suggestion.why}`);
+    console.log(`   Why: ${suggestion.why}`);
   }
-
   console.log('');
 }
 
-// Helper: Try to read file, return null on error
 function tryReadFile(filePath) {
   try {
     return fs.readFileSync(filePath, 'utf8');
