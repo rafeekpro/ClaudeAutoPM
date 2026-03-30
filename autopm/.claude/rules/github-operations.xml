@@ -24,9 +24,29 @@
     <pattern name="atomic">One gh command per action, keep operations atomic</pattern>
   </patterns>
 
+  <workflow-enforcement>
+    <rule>ALL code changes MUST go through a Pull Request — no direct commits to main</rule>
+    <rule>ALL PRs MUST pass CI (test, test-matrix) before merge</rule>
+    <rule>NEVER push directly to main — even for "small" fixes</rule>
+    <rule>NEVER run npm publish manually from CLI — use GitHub Actions workflows only</rule>
+    <rule>npm publish: trigger via git tag (v*) for root package, or workflow_dispatch for plugins</rule>
+    <rule>If branch protection must be temporarily relaxed, restore it IMMEDIATELY after merge</rule>
+  </workflow-enforcement>
+
+  <publish-rules>
+    <rule>Root package: git tag v{version} → push tag → npm-publish.yml runs automatically</rule>
+    <rule>Plugins: gh workflow run plugin-publish.yml -f plugin=all (or specific plugin name)</rule>
+    <rule>NEVER: npm publish --access public from local terminal</rule>
+    <rule>NEVER: bypass 2FA with manual token for publishing</rule>
+    <rule>All publish operations MUST use NPM_TOKEN secret configured in GitHub repo settings</rule>
+  </publish-rules>
+
   <violations enforcement="auto-reject">
     <violation>Creating issues without repo-protection check</violation>
     <violation>Creating issues without mandatory footer appended</violation>
     <violation>Writing to GitHub without verifying remote origin first</violation>
+    <violation>Pushing directly to main without a PR</violation>
+    <violation>Running npm publish from local CLI</violation>
+    <violation>Merging PRs without CI passing</violation>
   </violations>
 </rule>
