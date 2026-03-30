@@ -2,144 +2,133 @@ const fs = require('fs');
 const path = require('path');
 
 /**
- * PM Status Script (Node.js version)
- * Migrated from bash script with 100% backward compatibility
+ * PM Status Script
+ * Outputs markdown pipe tables for project status overview
  */
 
 async function status() {
   const result = {
-    prds: { total: 0, found: false },
-    epics: { total: 0, found: false },
-    tasks: { total: 0, open: 0, closed: 0, found: false },
+    prds: { total: 0, open: 0, inProgress: 0, done: 0, blocked: 0, found: false },
+    epics: { total: 0, open: 0, inProgress: 0, done: 0, blocked: 0, found: false },
+    tasks: { total: 0, open: 0, inProgress: 0, done: 0, blocked: 0, found: false },
     messages: []
   };
 
-  // Helper function to add messages
   function addMessage(message) {
     result.messages.push(message);
-    // Only log if running as CLI
     if (require.main === module) {
       console.log(message);
     }
   }
 
-  // Header messages to match bash output exactly
-  addMessage('Getting status...');
-  addMessage('');
-  addMessage('');
-  addMessage('📊 Project Status');
-  addMessage('================');
-  addMessage('');
-
-  // Check PRDs
-  addMessage('📄 PRDs:');
+  // Count PRDs by status
   try {
     if (fs.existsSync('.claude/prds') && fs.statSync('.claude/prds').isDirectory()) {
-      const prdFiles = fs.readdirSync('.claude/prds')
-        .filter(file => file.endsWith('.md'));
-
-      result.prds.total = prdFiles.length;
+      const prdFiles = fs.readdirSync('.claude/prds').filter(file => file.endsWith('.md'));
       result.prds.found = true;
-      addMessage(`  Total:        ${result.prds.total}`);
-    } else {
-      addMessage('  No PRDs found');
+
+      for (const file of prdFiles) {
+        result.prds.total++;
+        try {
+          const content = fs.readFileSync(path.join('.claude/prds', file), 'utf8');
+          const statusMatch = content.match(/^status:\s*(.+)$/m);
+          const s = statusMatch ? statusMatch[1].trim().toLowerCase() : 'backlog';
+
+          if (s === 'complete' || s === 'completed' || s === 'done') result.prds.done++;
+          else if (s === 'in-progress' || s === 'in_progress' || s === 'active') result.prds.inProgress++;
+          else if (s === 'blocked') result.prds.blocked++;
+          else result.prds.open++;
+        } catch (err) {
+          result.prds.open++;
+        }
+      }
     }
-  } catch (err) {
-    addMessage('  No PRDs found');
-  }
+  } catch (err) { /* no PRDs */ }
 
-  addMessage('');
-
-  // Check Epics
-  addMessage('📚 Epics:');
-  try {
-    if (fs.existsSync('.claude/epics') && fs.statSync('.claude/epics').isDirectory()) {
-      const epicDirs = fs.readdirSync('.claude/epics', { withFileTypes: true })
-        .filter(dirent => dirent.isDirectory())
-        .length;
-
-      result.epics.total = epicDirs;
-      result.epics.found = true;
-      addMessage(`  Total:        ${result.epics.total}`);
-    } else {
-      addMessage('  No epics found');
-    }
-  } catch (err) {
-    addMessage('  No epics found');
-  }
-
-  addMessage('');
-
-  // Check Tasks
-  addMessage('📝 Tasks:');
+  // Count Epics by status
   try {
     if (fs.existsSync('.claude/epics') && fs.statSync('.claude/epics').isDirectory()) {
       const epicDirs = fs.readdirSync('.claude/epics', { withFileTypes: true })
         .filter(dirent => dirent.isDirectory())
         .map(dirent => dirent.name);
 
-      let totalTasks = 0;
-      let openTasks = 0;
-      let closedTasks = 0;
+      result.epics.found = true;
 
-      for (const epicDir of epicDirs) {
-        const epicPath = path.join('.claude/epics', epicDir);
-
+      for (const epicName of epicDirs) {
+        result.epics.total++;
+        const epicFile = path.join('.claude/epics', epicName, 'epic.md');
         try {
-          const taskFiles = fs.readdirSync(epicPath)
-            .filter(file => /^[0-9].*\.md$/.test(file));
+          if (fs.existsSync(epicFile)) {
+            const content = fs.readFileSync(epicFile, 'utf8');
+            const statusMatch = content.match(/^status:\s*(.+)$/m);
+            const s = statusMatch ? statusMatch[1].trim().toLowerCase() : 'backlog';
 
-          for (const taskFile of taskFiles) {
-            totalTasks++;
-
-            try {
-              const taskPath = path.join(epicPath, taskFile);
-              const content = fs.readFileSync(taskPath, 'utf8');
-
-              // Check status line
-              const statusMatch = content.match(/^status:\s*(.+)$/m);
-              const status = statusMatch ? statusMatch[1].trim() : '';
-
-              if (status === 'closed') {
-                closedTasks++;
-              } else {
-                // Anything that's not explicitly closed is considered open
-                openTasks++;
-              }
-            } catch (err) {
-              // If we can't read the file, count as open
-              openTasks++;
-            }
+            if (s === 'completed' || s === 'complete' || s === 'done') result.epics.done++;
+            else if (s === 'in-progress' || s === 'in_progress' || s === 'active') result.epics.inProgress++;
+            else if (s === 'blocked') result.epics.blocked++;
+            else result.epics.open++;
+          } else {
+            result.epics.open++;
           }
         } catch (err) {
-          // Skip directories we can't read
+          result.epics.open++;
         }
+
+        // Count tasks within this epic
+        const epicPath = path.join('.claude/epics', epicName);
+        try {
+          const taskFiles = fs.readdirSync(epicPath).filter(file => /^[0-9].*\.md$/.test(file));
+
+          for (const taskFile of taskFiles) {
+            result.tasks.total++;
+            result.tasks.found = true;
+            try {
+              const content = fs.readFileSync(path.join(epicPath, taskFile), 'utf8');
+              const statusMatch = content.match(/^status:\s*(.+)$/m);
+              const s = statusMatch ? statusMatch[1].trim().toLowerCase() : 'open';
+
+              const depsMatch = content.match(/^depends_on:\s*\[(.+?)\]/m);
+              const hasDeps = depsMatch && depsMatch[1].trim().length > 0;
+
+              if (s === 'closed' || s === 'completed' || s === 'done') result.tasks.done++;
+              else if (s === 'in-progress' || s === 'in_progress' || s === 'active') result.tasks.inProgress++;
+              else if (s === 'blocked' || (s === 'open' && hasDeps)) result.tasks.blocked++;
+              else result.tasks.open++;
+            } catch (err) {
+              result.tasks.open++;
+            }
+          }
+        } catch (err) { /* skip */ }
       }
-
-      result.tasks.total = totalTasks;
-      result.tasks.open = openTasks;
-      result.tasks.closed = closedTasks;
-      result.tasks.found = totalTasks > 0;
-
-      addMessage(`  Open:        ${result.tasks.open}`);
-      addMessage(`  Closed:        ${result.tasks.closed}`);
-      addMessage(`  Total:        ${result.tasks.total}`);
-    } else {
-      addMessage('  No tasks found');
     }
-  } catch (err) {
-    addMessage('  No tasks found');
-  }
+  } catch (err) { /* no epics */ }
+
+  // Output markdown table
+  addMessage('## Project Status');
+  addMessage('');
+  addMessage('| Type | Total | Open | In Progress | Done | Blocked |');
+  addMessage('|------|-------|------|-------------|------|---------|');
+  addMessage(`| PRDs | ${result.prds.total} | ${result.prds.open} | ${result.prds.inProgress} | ${result.prds.done} | ${result.prds.blocked} |`);
+  addMessage(`| Epics | ${result.epics.total} | ${result.epics.open} | ${result.epics.inProgress} | ${result.epics.done} | ${result.epics.blocked} |`);
+  addMessage(`| Tasks | ${result.tasks.total} | ${result.tasks.open} | ${result.tasks.inProgress} | ${result.tasks.done} | ${result.tasks.blocked} |`);
+
+  // Recent Activity section
+  try {
+    const { formatRecentActivity } = require('../../../../autopm/.claude/lib/event-logger');
+    addMessage('');
+    addMessage(formatRecentActivity(7));
+  } catch (e) { /* event logger not available */ }
+
+  addMessage('');
+  addMessage('Next: /pm:next');
 
   return result;
 }
 
-// Export for use as module
 module.exports = status;
 
-// CLI execution
 if (require.main === module) {
-  status().then(result => {
+  status().then(() => {
     process.exit(0);
   }).catch(err => {
     console.error('Status failed:', err.message);

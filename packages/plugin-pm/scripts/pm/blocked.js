@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * PM Blocked Script - Node.js Implementation
- *
- * Migrated from blocked.sh to show blocked tasks with dependencies
- * Maintains full compatibility with the original bash implementation
+ * PM Blocked Script
+ * Outputs markdown pipe table for blocked tasks with dependencies
  */
 
 const fs = require('fs');
@@ -16,9 +14,7 @@ function getBlockedTasks() {
     totalBlocked: 0
   };
 
-  if (!fs.existsSync('.claude/epics')) {
-    return result;
-  }
+  if (!fs.existsSync('.claude/epics')) return result;
 
   try {
     const epicDirs = fs.readdirSync('.claude/epics', { withFileTypes: true })
@@ -40,23 +36,15 @@ function getBlockedTasks() {
           try {
             const taskContent = fs.readFileSync(taskFilePath, 'utf8');
 
-            // Check if task is open
             const statusMatch = taskContent.match(/^status:\s*(.*)$/m);
             const status = statusMatch ? statusMatch[1].trim() : '';
 
-            if (status !== 'open' && status !== '') {
-              continue; // Skip non-open tasks
-            }
+            if (status !== 'open' && status !== '') continue;
 
-            // Check for dependencies
             const depsMatch = taskContent.match(/^depends_on:\s*(.*)$/m);
-            if (!depsMatch) {
-              continue; // Skip tasks without dependencies
-            }
+            if (!depsMatch) continue;
 
             const depsString = depsMatch[1].trim();
-
-            // Parse dependencies - handle [1, 2, 3] format
             let dependencies = [];
             if (depsString.includes('[') && depsString.includes(']')) {
               const depsContent = depsString.replace(/[\[\]]/g, '').trim();
@@ -65,34 +53,26 @@ function getBlockedTasks() {
               }
             }
 
-            if (dependencies.length === 0) {
-              continue; // Skip if no valid dependencies found
-            }
+            if (dependencies.length === 0) continue;
 
-            // Get task name
             const nameMatch = taskContent.match(/^name:\s*(.*)$/m);
             const taskName = nameMatch ? nameMatch[1].trim() : `Task #${taskNum}`;
+
+            const updatedMatch = taskContent.match(/^updated:\s*(.*)$/m);
+            const since = updatedMatch ? updatedMatch[1].trim().split('T')[0] : '\u2014';
 
             // Check status of dependencies
             const openDependencies = [];
             for (const dep of dependencies) {
               const depFile = path.join(epicPath, `${dep}.md`);
-
               if (fs.existsSync(depFile)) {
                 try {
                   const depContent = fs.readFileSync(depFile, 'utf8');
                   const depStatusMatch = depContent.match(/^status:\s*(.*)$/m);
                   const depStatus = depStatusMatch ? depStatusMatch[1].trim() : '';
-
-                  if (depStatus === 'open' || depStatus === '') {
-                    openDependencies.push(dep);
-                  }
-                } catch (error) {
-                  // If we can't read the dependency file, consider it open/blocking
-                  openDependencies.push(dep);
-                }
+                  if (depStatus === 'open' || depStatus === '') openDependencies.push(dep);
+                } catch (error) { openDependencies.push(dep); }
               } else {
-                // Non-existent dependency files are considered blocking
                 openDependencies.push(dep);
               }
             }
@@ -103,60 +83,55 @@ function getBlockedTasks() {
                 taskName,
                 epicName,
                 dependencies,
-                openDependencies
+                openDependencies,
+                since
               });
-
               result.totalBlocked++;
             }
-          } catch (error) {
-            // Skip unreadable task files
-            continue;
-          }
+          } catch (error) { continue; }
         }
-      } catch (error) {
-        // Skip unreadable epic directories
-        continue;
-      }
+      } catch (error) { continue; }
     }
-  } catch (error) {
-    // Directory doesn't exist or can't be read
-  }
+  } catch (error) { /* skip */ }
 
   return result;
 }
 
 function formatBlockedOutput(data) {
-  let output = 'Getting tasks...\n\n\n';
-  output += '🚫 Blocked Tasks\n';
-  output += '================\n\n';
+  const lines = [];
+
+  lines.push('## Blocked Items');
+  lines.push('');
 
   if (data.blockedTasks.length === 0) {
-    output += 'No blocked tasks found!\n\n';
-    output += '💡 All tasks with dependencies are either completed or in progress.\n';
+    lines.push('No blocked tasks found. All tasks with dependencies are resolved or in progress.');
+    lines.push('');
+    lines.push('Next: /pm:next');
   } else {
+    lines.push('| # | Title | Blocker | Since | Epic |');
+    lines.push('|---|-------|---------|-------|------|');
     for (const task of data.blockedTasks) {
-      output += `⏸️ Task #${task.taskNum} - ${task.taskName}\n`;
-      output += `   Epic: ${task.epicName}\n`;
-      output += `   Blocked by: [${task.dependencies.join(', ')}]\n`;
-
-      if (task.openDependencies.length > 0) {
-        const waitingFor = task.openDependencies.map(dep => `#${dep}`).join(' ');
-        output += `   Waiting for:${waitingFor}\n`;
-      }
-
-      output += '\n';
+      const blocker = `Waiting on #${task.openDependencies.join(', #')}`;
+      lines.push(`| ${task.taskNum} | ${task.taskName} | ${blocker} | ${task.since} | ${task.epicName} |`);
     }
 
-    output += `📊 Total blocked: ${data.totalBlocked} tasks\n`;
+    // Recent Activity section
+    try {
+      const { formatRecentActivity } = require('../../../../autopm/.claude/lib/event-logger');
+      lines.push('');
+      lines.push(formatRecentActivity(7));
+    } catch (e) { /* event logger not available */ }
+
+    lines.push('');
+    lines.push(`Total: ${data.totalBlocked} blocked items`);
+    lines.push('Next: resolve blockers or /pm:next for alternative tasks');
   }
 
-  return output;
+  return lines.join('\n');
 }
 
-// CommonJS export for testing
 module.exports = getBlockedTasks;
 
-// CLI execution
 if (require.main === module) {
   const data = getBlockedTasks();
   console.log(formatBlockedOutput(data));

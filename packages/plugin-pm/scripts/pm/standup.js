@@ -2,347 +2,287 @@ const fs = require('fs');
 const path = require('path');
 
 /**
- * PM Standup Script (Node.js version)
- * Migrated from bash script with 100% backward compatibility
+ * PM Standup Script
+ * Outputs markdown pipe tables for daily standup report
  */
 
 async function standup() {
-  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+  const today = new Date().toISOString().split('T')[0];
 
   const result = {
     date: today,
-    activity: { prdCount: 0, epicCount: 0, taskCount: 0, updateCount: 0 },
+    completed: [],
     inProgress: [],
-    nextTasks: [],
+    blocked: [],
     stats: { totalTasks: 0, openTasks: 0, closedTasks: 0 },
     messages: []
   };
 
-  // Helper function to add messages
   function addMessage(message) {
     result.messages.push(message);
-    // Only log if running as CLI
     if (require.main === module) {
       console.log(message);
     }
   }
 
-  // Header messages to match bash output exactly
-  addMessage(`📅 Daily Standup - ${today}`);
-  addMessage('================================');
-  addMessage('');
+  const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000);
 
-  addMessage('Getting status...');
-  addMessage('');
-  addMessage('');
+  // Scan epics for task data
+  if (fs.existsSync('.claude/epics')) {
+    try {
+      const epicDirs = fs.readdirSync('.claude/epics', { withFileTypes: true })
+        .filter(dirent => dirent.isDirectory())
+        .map(dirent => dirent.name);
 
-  addMessage('📝 Today\'s Activity:');
-  addMessage('====================');
-  addMessage('');
+      for (const epicName of epicDirs) {
+        const epicPath = path.join('.claude/epics', epicName);
 
-  // Find files modified today
-  try {
-    const recentFiles = await findRecentFiles('.claude');
+        // Check epic status
+        const epicFile = path.join(epicPath, 'epic.md');
+        if (fs.existsSync(epicFile)) {
+          try {
+            const epicContent = fs.readFileSync(epicFile, 'utf8');
+            const statusMatch = epicContent.match(/^status:\s*(.*)$/m);
+            const epicStatus = statusMatch ? statusMatch[1].trim().toLowerCase() : '';
+            const nameMatch = epicContent.match(/^name:\s*(.*)$/m);
+            const name = nameMatch ? nameMatch[1].trim() : epicName;
+            const updatedMatch = epicContent.match(/^updated:\s*(.*)$/m);
+            const updated = updatedMatch ? updatedMatch[1].trim() : '';
 
-    // Count by type
-    for (const filePath of recentFiles) {
-      if (filePath.includes('/prds/')) {
-        result.activity.prdCount++;
-      } else if (filePath.endsWith('/epic.md')) {
-        result.activity.epicCount++;
-      } else if (/\/\d+\.md$/.test(filePath)) {
-        result.activity.taskCount++;
-      } else if (filePath.includes('/updates/')) {
-        result.activity.updateCount++;
+            if (epicStatus === 'in-progress' || epicStatus === 'in_progress' || epicStatus === 'active') {
+              result.inProgress.push({ item: name, type: 'epic', started: updated || '-', assignee: '@me' });
+            }
+          } catch (err) { /* skip */ }
+        }
+
+        // Check tasks
+        try {
+          const taskFiles = fs.readdirSync(epicPath).filter(file => /^[0-9].*\.md$/.test(file));
+
+          for (const taskFile of taskFiles) {
+            const taskPath = path.join(epicPath, taskFile);
+
+            try {
+              const content = fs.readFileSync(taskPath, 'utf8');
+              const statusMatch = content.match(/^status:\s*(.+)$/m);
+              const status = statusMatch ? statusMatch[1].trim().toLowerCase() : 'open';
+              const nameMatch = content.match(/^name:\s*(.+)$/m);
+              const taskName = nameMatch ? nameMatch[1].trim() : taskFile;
+              const updatedMatch = content.match(/^updated:\s*(.+)$/m);
+              const updated = updatedMatch ? updatedMatch[1].trim() : '';
+              const updatedDate = updated ? updated.split('T')[0] : '';
+
+              const depsMatch = content.match(/^depends_on:\s*\[(.+?)\]/m);
+              const hasDeps = depsMatch && depsMatch[1].trim().length > 0;
+
+              // Stats
+              result.stats.totalTasks++;
+              if (status === 'closed' || status === 'completed' || status === 'done') {
+                result.stats.closedTasks++;
+              } else {
+                result.stats.openTasks++;
+              }
+
+              // Recently completed (closed + modified in last 24h)
+              if (status === 'closed' || status === 'completed' || status === 'done') {
+                try {
+                  const stats = fs.statSync(taskPath);
+                  if (stats.mtime.getTime() > oneDayAgo) {
+                    result.completed.push({ item: taskName, type: 'task', completed: updatedDate || today });
+                  }
+                } catch (err) { /* skip */ }
+              }
+
+              // In progress tasks
+              if (status === 'in-progress' || status === 'in_progress' || status === 'active') {
+                result.inProgress.push({ item: taskName, type: 'task', started: updatedDate || '-', assignee: '@me' });
+              }
+
+              // Blocked tasks
+              if (hasDeps && (status === 'open' || status === 'blocked')) {
+                result.blocked.push({ item: taskName, blocker: `Depends on [${depsMatch[1].trim()}]`, since: updatedDate || '-' });
+              }
+            } catch (err) { /* skip task */ }
+          }
+        } catch (err) { /* skip epic dir */ }
       }
-    }
+    } catch (err) { /* no epics */ }
+  }
 
-    // Display activity counts
-    if (result.activity.prdCount > 0) {
-      addMessage(`  • Modified ${result.activity.prdCount} PRD(s)`);
-    }
-    if (result.activity.epicCount > 0) {
-      addMessage(`  • Updated ${result.activity.epicCount} epic(s)`);
-    }
-    if (result.activity.taskCount > 0) {
-      addMessage(`  • Worked on ${result.activity.taskCount} task(s)`);
-    }
-    if (result.activity.updateCount > 0) {
-      addMessage(`  • Posted ${result.activity.updateCount} progress update(s)`);
-    }
+  // Output markdown tables
+  addMessage('## Standup Report');
+  addMessage('');
 
-    if (recentFiles.length === 0) {
-      addMessage('  No activity recorded today');
+  // Completed section
+  addMessage('### Completed (since last standup)');
+  if (result.completed.length > 0) {
+    addMessage('| Item | Type | Completed |');
+    addMessage('|------|------|-----------|');
+    for (const c of result.completed) {
+      addMessage(`| ${c.item} | ${c.type} | ${c.completed} |`);
     }
-  } catch (err) {
-    addMessage('  No activity recorded today');
+  } else {
+    addMessage('No items completed since last standup.');
   }
 
   addMessage('');
-  addMessage('🔄 Currently In Progress:');
 
-  // Show active work items
-  try {
-    const inProgressItems = await findInProgressTasks();
-    result.inProgress = inProgressItems;
-
-    for (const item of inProgressItems) {
-      addMessage(`  • Issue #${item.issueNum} (${item.epicName}) - ${item.completion || '0%'} complete`);
+  // In Progress section
+  addMessage('### In Progress');
+  if (result.inProgress.length > 0) {
+    addMessage('| Item | Type | Started | Assignee |');
+    addMessage('|------|------|---------|----------|');
+    for (const ip of result.inProgress) {
+      addMessage(`| ${ip.item} | ${ip.type} | ${ip.started} | ${ip.assignee} |`);
     }
-  } catch (err) {
-    // Silently handle errors
+  } else {
+    addMessage('No items currently in progress.');
   }
 
   addMessage('');
-  addMessage('⏭️ Next Available Tasks:');
 
-  // Show top 3 available tasks
-  try {
-    const availableTasks = await findAvailableTasks(3);
-    result.nextTasks = availableTasks;
-
-    for (const task of availableTasks) {
-      addMessage(`  • #${task.taskNum} - ${task.name}`);
+  // Blocked section
+  addMessage('### Blocked');
+  if (result.blocked.length > 0) {
+    addMessage('| Item | Blocker | Since |');
+    addMessage('|------|---------|-------|');
+    for (const b of result.blocked) {
+      addMessage(`| ${b.item} | ${b.blocker} | ${b.since} |`);
     }
-  } catch (err) {
-    // Silently handle errors
+  } else {
+    addMessage('No blocked items.');
   }
+
+  // Recent Activity section
+  try {
+    const { formatRecentActivity } = require('../../../../autopm/.claude/lib/event-logger');
+    addMessage('');
+    addMessage(formatRecentActivity(7));
+  } catch (e) { /* event logger not available */ }
 
   addMessage('');
-  addMessage('📊 Quick Stats:');
-
-  // Calculate task statistics
-  try {
-    const stats = await calculateTaskStats();
-    result.stats = stats;
-
-    addMessage(`  Tasks:        ${stats.openTasks} open,        ${stats.closedTasks} closed,        ${stats.totalTasks} total`);
-  } catch (err) {
-    addMessage('  Tasks:        0 open,        0 closed,        0 total');
-  }
+  addMessage('Next: /pm:next');
 
   return result;
 }
 
-// Helper function to find files modified today
+// Helper functions kept for module compatibility
 async function findRecentFiles(directory) {
   const files = [];
-
-  if (!fs.existsSync(directory)) {
-    return files;
-  }
-
+  if (!fs.existsSync(directory)) return files;
   const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000);
 
   function scanDirectory(dir) {
     try {
       const items = fs.readdirSync(dir, { withFileTypes: true });
-
       for (const item of items) {
         const fullPath = path.join(dir, item.name);
-
         if (item.isDirectory()) {
           scanDirectory(fullPath);
         } else if (item.isFile() && item.name.endsWith('.md')) {
           try {
             const stats = fs.statSync(fullPath);
-            if (stats.mtime.getTime() > oneDayAgo) {
-              files.push(fullPath);
-            }
-          } catch (err) {
-            // Skip files we can't stat
-          }
+            if (stats.mtime.getTime() > oneDayAgo) files.push(fullPath);
+          } catch (err) { /* skip */ }
         }
       }
-    } catch (err) {
-      // Skip directories we can't read
-    }
+    } catch (err) { /* skip */ }
   }
 
   scanDirectory(directory);
   return files;
 }
 
-// Helper function to find tasks currently in progress
 async function findInProgressTasks() {
   const inProgress = [];
-
-  if (!fs.existsSync('.claude/epics')) {
-    return inProgress;
-  }
+  if (!fs.existsSync('.claude/epics')) return inProgress;
 
   try {
     const epicDirs = fs.readdirSync('.claude/epics', { withFileTypes: true })
-      .filter(dirent => dirent.isDirectory())
-      .map(dirent => dirent.name);
+      .filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);
 
     for (const epicName of epicDirs) {
       const updatesDir = path.join('.claude/epics', epicName, 'updates');
-
-      if (fs.existsSync(updatesDir)) {
-        try {
-          const updateDirs = fs.readdirSync(updatesDir, { withFileTypes: true })
-            .filter(dirent => dirent.isDirectory())
-            .map(dirent => dirent.name);
-
-          for (const issueNum of updateDirs) {
-            const progressFile = path.join(updatesDir, issueNum, 'progress.md');
-
-            if (fs.existsSync(progressFile)) {
-              try {
-                const content = fs.readFileSync(progressFile, 'utf8');
-                const completionMatch = content.match(/^completion:\s*(.+)$/m);
-                const completion = completionMatch ? completionMatch[1].trim() : '0%';
-
-                inProgress.push({
-                  issueNum,
-                  epicName,
-                  completion
-                });
-              } catch (err) {
-                // Skip files we can't read
-              }
-            }
-          }
-        } catch (err) {
-          // Skip directories we can't read
+      if (!fs.existsSync(updatesDir)) continue;
+      try {
+        const updateDirs = fs.readdirSync(updatesDir, { withFileTypes: true })
+          .filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);
+        for (const issueNum of updateDirs) {
+          const progressFile = path.join(updatesDir, issueNum, 'progress.md');
+          if (!fs.existsSync(progressFile)) continue;
+          try {
+            const content = fs.readFileSync(progressFile, 'utf8');
+            const completionMatch = content.match(/^completion:\s*(.+)$/m);
+            inProgress.push({ issueNum, epicName, completion: completionMatch ? completionMatch[1].trim() : '0%' });
+          } catch (err) { /* skip */ }
         }
-      }
+      } catch (err) { /* skip */ }
     }
-  } catch (err) {
-    // Silently handle errors
-  }
+  } catch (err) { /* skip */ }
 
   return inProgress;
 }
 
-// Helper function to find next available tasks
 async function findAvailableTasks(limit = 3) {
   const availableTasks = [];
-
-  if (!fs.existsSync('.claude/epics')) {
-    return availableTasks;
-  }
+  if (!fs.existsSync('.claude/epics')) return availableTasks;
 
   try {
     const epicDirs = fs.readdirSync('.claude/epics', { withFileTypes: true })
-      .filter(dirent => dirent.isDirectory())
-      .map(dirent => dirent.name);
+      .filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);
 
     for (const epicName of epicDirs) {
+      if (availableTasks.length >= limit) break;
       const epicPath = path.join('.claude/epics', epicName);
-
-      if (availableTasks.length >= limit) {
-        break;
-      }
-
       try {
-        const taskFiles = fs.readdirSync(epicPath)
-          .filter(file => /^[0-9].*\.md$/.test(file))
-          .sort();
-
+        const taskFiles = fs.readdirSync(epicPath).filter(file => /^[0-9].*\.md$/.test(file)).sort();
         for (const taskFile of taskFiles) {
-          if (availableTasks.length >= limit) {
-            break;
-          }
-
-          const taskPath = path.join(epicPath, taskFile);
-
+          if (availableTasks.length >= limit) break;
           try {
-            const content = fs.readFileSync(taskPath, 'utf8');
-
-            // Check if task is open
+            const content = fs.readFileSync(path.join(epicPath, taskFile), 'utf8');
             const statusMatch = content.match(/^status:\s*(.+)$/m);
             const status = statusMatch ? statusMatch[1].trim() : '';
-
-            if (status !== 'open' && status !== '') {
-              continue; // Skip non-open tasks
-            }
-
-            // Check dependencies
+            if (status !== 'open' && status !== '') continue;
             const depsMatch = content.match(/^depends_on:\s*\[(.*?)\]/m);
-            const deps = depsMatch ? depsMatch[1].trim() : '';
-
-            // If no dependencies or empty, task is available
-            if (!deps || deps === '') {
-              const nameMatch = content.match(/^name:\s*(.+)$/m);
-              const name = nameMatch ? nameMatch[1].trim() : 'Unnamed Task';
-              const taskNum = path.basename(taskFile, '.md');
-
-              availableTasks.push({
-                taskNum,
-                name,
-                epicName
-              });
-            }
-          } catch (err) {
-            // Skip files we can't read
-          }
+            if (depsMatch && depsMatch[1].trim()) continue;
+            const nameMatch = content.match(/^name:\s*(.+)$/m);
+            availableTasks.push({ taskNum: path.basename(taskFile, '.md'), name: nameMatch ? nameMatch[1].trim() : 'Unnamed Task', epicName });
+          } catch (err) { /* skip */ }
         }
-      } catch (err) {
-        // Skip directories we can't read
-      }
+      } catch (err) { /* skip */ }
     }
-  } catch (err) {
-    // Silently handle errors
-  }
+  } catch (err) { /* skip */ }
 
   return availableTasks;
 }
 
-// Helper function to calculate task statistics
 async function calculateTaskStats() {
   const stats = { totalTasks: 0, openTasks: 0, closedTasks: 0 };
-
-  if (!fs.existsSync('.claude/epics')) {
-    return stats;
-  }
+  if (!fs.existsSync('.claude/epics')) return stats;
 
   try {
     const epicDirs = fs.readdirSync('.claude/epics', { withFileTypes: true })
-      .filter(dirent => dirent.isDirectory())
-      .map(dirent => dirent.name);
+      .filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);
 
     for (const epicName of epicDirs) {
-      const epicPath = path.join('.claude/epics', epicName);
-
       try {
-        const taskFiles = fs.readdirSync(epicPath)
-          .filter(file => /^[0-9].*\.md$/.test(file));
-
+        const taskFiles = fs.readdirSync(path.join('.claude/epics', epicName)).filter(file => /^[0-9].*\.md$/.test(file));
         for (const taskFile of taskFiles) {
           stats.totalTasks++;
-
           try {
-            const taskPath = path.join(epicPath, taskFile);
-            const content = fs.readFileSync(taskPath, 'utf8');
-
-            // Check status line
+            const content = fs.readFileSync(path.join('.claude/epics', epicName, taskFile), 'utf8');
             const statusMatch = content.match(/^status:\s*(.+)$/m);
-            const status = statusMatch ? statusMatch[1].trim() : '';
-
-            if (status === 'closed') {
-              stats.closedTasks++;
-            } else {
-              stats.openTasks++;
-            }
-          } catch (err) {
-            // If we can't read the file, count as open
-            stats.openTasks++;
-          }
+            if (statusMatch && statusMatch[1].trim() === 'closed') stats.closedTasks++;
+            else stats.openTasks++;
+          } catch (err) { stats.openTasks++; }
         }
-      } catch (err) {
-        // Skip directories we can't read
-      }
+      } catch (err) { /* skip */ }
     }
-  } catch (err) {
-    // Silently handle errors
-  }
+  } catch (err) { /* skip */ }
 
   return stats;
 }
 
-// Export for use as module
 module.exports = {
   standup,
   findRecentFiles,
@@ -351,9 +291,8 @@ module.exports = {
   calculateTaskStats
 };
 
-// CLI execution
 if (require.main === module) {
-  module.exports.standup().then(result => {
+  module.exports.standup().then(() => {
     process.exit(0);
   }).catch(err => {
     console.error('Standup failed:', err.message);
