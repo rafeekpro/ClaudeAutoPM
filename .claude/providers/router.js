@@ -41,8 +41,8 @@ class ProviderRouter {
       return this.config.projectManagement.provider;
     }
 
-    // Default to GitHub if not configured
-    return 'github';
+    // Default to local if not configured (works without gh CLI or Azure)
+    return 'local';
   }
 
   /**
