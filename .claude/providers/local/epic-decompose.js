@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { readTemplate, generateMarkdown, resolveTemplatePath } = require('../../lib/template-reader');
 
 async function execute(options = {}, settings = {}) {
   const name = options.name;
@@ -45,15 +46,21 @@ async function execute(options = {}, settings = {}) {
     const title = task.title || `Task ${num}`;
     const description = task.description || '';
 
-    const content = `---
-name: "${title.replace(/"/g, '\\"')}"
-status: open
-created: ${now}
-updated: ${now}
----
+    let content;
+    const templatePath = resolveTemplatePath('task.xml', basePath);
 
-${description || `## Goal\n${title}\n\n## Acceptance Criteria\n- [ ] TODO`}
-`;
+    if (fs.existsSync(templatePath)) {
+      const template = readTemplate(templatePath);
+      content = generateMarkdown(template, {
+        number: num,
+        name: title,
+        epic: slug,
+        description: description || title,
+        'acceptance-criteria': '- [ ] TODO'
+      });
+    } else {
+      content = `---\nname: "${title.replace(/"/g, '\\"')}"\nstatus: open\ncreated: ${now}\nupdated: ${now}\n---\n\n${description || `## Description\n${title}\n\n## Acceptance Criteria\n- [ ] TODO`}\n`;
+    }
 
     fs.writeFileSync(taskFile, content, 'utf8');
     created.push({ number: num, title, path: taskFile });

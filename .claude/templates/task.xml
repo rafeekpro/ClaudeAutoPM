@@ -1,0 +1,23 @@
+<template id="task" version="1.0">
+  <frontmatter>
+    <field name="number" type="int" auto="true"/>
+    <field name="name" type="string" required="true"/>
+    <field name="status" type="enum" values="open,in_progress,done" default="open"/>
+    <field name="epic" type="string" default=""/>
+    <field name="priority" type="enum" values="P0,P1,P2,P3" default="P2"/>
+    <field name="estimated_hours" type="int" default="0"/>
+    <field name="created" type="datetime" auto="true"/>
+    <field name="updated" type="datetime" auto="true"/>
+  </frontmatter>
+
+  <sections>
+    <section name="description" heading="Description" required="true">What needs to be done</section>
+    <section name="acceptance-criteria" heading="Acceptance Criteria" required="true">Measurable checkboxes</section>
+    <section name="implementation-notes" heading="Implementation Notes" required="false">Technical approach</section>
+  </sections>
+
+  <validation>
+    <rule>description must be non-empty</rule>
+    <rule>at least 1 acceptance criterion checkbox (- [ ])</rule>
+  </validation>
+</template>

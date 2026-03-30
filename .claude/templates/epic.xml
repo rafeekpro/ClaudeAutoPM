@@ -1,0 +1,23 @@
+<template id="epic" version="1.0">
+  <frontmatter>
+    <field name="name" type="string" required="true"/>
+    <field name="status" type="enum" values="backlog,in_progress,completed" default="backlog"/>
+    <field name="prd" type="string" default=""/>
+    <field name="progress" type="int" default="0"/>
+    <field name="created" type="datetime" auto="true"/>
+    <field name="updated" type="datetime" auto="true"/>
+  </frontmatter>
+
+  <sections>
+    <section name="overview" heading="Overview" required="true">High-level epic summary</section>
+    <section name="architecture" heading="Architecture" required="false">System design and component layout</section>
+    <section name="tasks" heading="Tasks" required="true">Task breakdown with checkboxes</section>
+    <section name="dependencies" heading="Dependencies" required="false">External dependencies and blockers</section>
+    <section name="risks" heading="Risks" required="false">Technical risks and mitigations</section>
+  </sections>
+
+  <validation>
+    <rule>overview must be non-empty</rule>
+    <rule>at least 1 task listed</rule>
+  </validation>
+</template>

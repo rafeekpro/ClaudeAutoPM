@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { readTemplate, generateMarkdown, resolveTemplatePath } = require('../../lib/template-reader');
 
 function getIssuesDir(basePath) {
   return path.join(basePath || process.cwd(), '.claude', 'issues');
@@ -33,24 +34,31 @@ async function execute(options = {}, settings = {}) {
 
   const number = getNextNumber(issuesDir);
   const slug = slugify(title);
+  if (!slug) {
+    return { success: false, error: 'Could not generate valid slug from title' };
+  }
+
   const filename = `${number}-${slug}.md`;
   const filepath = path.join(issuesDir, filename);
-  const now = new Date().toISOString();
 
-  const content = `---
-number: ${number}
-name: "${title.replace(/"/g, '\\"')}"
-status: open
-labels: [${labels.join(', ')}]
-assignee: ""
-created: ${now}
-updated: ${now}
-started: ""
-completed: ""
----
+  // Use XML template if available, fallback to inline
+  let content;
+  const templatePath = resolveTemplatePath('issue.xml', basePath);
 
-${body || `## Goal\n${title}\n\n## Acceptance Criteria\n- [ ] TODO`}
-`;
+  if (fs.existsSync(templatePath)) {
+    const template = readTemplate(templatePath);
+    content = generateMarkdown(template, {
+      number,
+      name: title,
+      labels,
+      goal: body || title,
+      'acceptance-criteria': '- [ ] TODO',
+      'affected-files': '- TODO'
+    });
+  } else {
+    const now = new Date().toISOString();
+    content = `---\nnumber: ${number}\nname: "${title.replace(/"/g, '\\"')}"\nstatus: open\nlabels: [${labels.join(', ')}]\nassignee: ""\ncreated: ${now}\nupdated: ${now}\nstarted: ""\ncompleted: ""\n---\n\n${body || `## Goal\n${title}\n\n## Acceptance Criteria\n- [ ] TODO`}\n`;
+  }
 
   fs.writeFileSync(filepath, content, 'utf8');
 
@@ -65,7 +73,7 @@ ${body || `## Goal\n${title}\n\n## Acceptance Criteria\n- [ ] TODO`}
       url: `file://${filepath}`
     },
     actions: [`Created local issue #${number}: ${filename}`],
-    timestamp: now
+    timestamp: new Date().toISOString()
   };
 }
 
