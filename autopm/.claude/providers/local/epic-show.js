@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { parseFrontmatter } = require('../../lib/frontmatter');
 
-async function execute(options = {}) {
+async function execute(options = {}, settings = {}) {
   const name = options.name;
   if (!name) {
     return { success: false, error: 'Epic name is required' };
@@ -13,7 +13,8 @@ async function execute(options = {}) {
     return { success: false, error: `Invalid epic name: "${name}"` };
   }
 
-  const epicsDir = path.join(process.cwd(), '.claude', 'epics');
+  const basePath = settings.basePath || process.cwd();
+  const epicsDir = path.join(basePath, '.claude', 'epics');
   const epicDir = path.join(epicsDir, slug);
   const filepath = path.join(epicDir, 'epic.md');
 

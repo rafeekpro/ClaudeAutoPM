@@ -5,11 +5,11 @@ function slugify(title) {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50);
 }
 
-function getEpicsDir() {
-  return path.join(process.cwd(), '.claude', 'epics');
+function getEpicsDir(basePath) {
+  return path.join(basePath || process.cwd(), '.claude', 'epics');
 }
 
-async function execute(options = {}) {
+async function execute(options = {}, settings = {}) {
   const title = options.title || options.name;
   if (!title) {
     return { success: false, error: 'Title is required' };
@@ -17,6 +17,7 @@ async function execute(options = {}) {
 
   const prd = options.prd || '';
   const body = options.body || '';
+  const basePath = settings.basePath || process.cwd();
 
   const slug = slugify(title);
   if (!slug) {
@@ -26,7 +27,7 @@ async function execute(options = {}) {
     return { success: false, error: `Invalid slug generated: "${slug}"` };
   }
 
-  const epicDir = path.join(getEpicsDir(), slug);
+  const epicDir = path.join(getEpicsDir(basePath), slug);
   const filepath = path.join(epicDir, 'epic.md');
 
   if (fs.existsSync(filepath)) {

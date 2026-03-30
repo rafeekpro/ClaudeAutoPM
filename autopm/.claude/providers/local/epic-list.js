@@ -2,12 +2,13 @@ const fs = require('fs');
 const path = require('path');
 const { parseFrontmatter } = require('../../lib/frontmatter');
 
-function getEpicsDir() {
-  return path.join(process.cwd(), '.claude', 'epics');
+function getEpicsDir(basePath) {
+  return path.join(basePath || process.cwd(), '.claude', 'epics');
 }
 
-async function execute(options = {}) {
-  const epicsDir = getEpicsDir();
+async function execute(options = {}, settings = {}) {
+  const basePath = settings.basePath || process.cwd();
+  const epicsDir = getEpicsDir(basePath);
 
   if (!fs.existsSync(epicsDir)) {
     return { success: true, epics: [], count: 0 };

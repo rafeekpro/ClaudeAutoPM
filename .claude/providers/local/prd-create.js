@@ -5,11 +5,11 @@ function slugify(title) {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50);
 }
 
-function getPrdsDir() {
-  return path.join(process.cwd(), '.claude', 'prds');
+function getPrdsDir(basePath) {
+  return path.join(basePath || process.cwd(), '.claude', 'prds');
 }
 
-async function execute(options = {}) {
+async function execute(options = {}, settings = {}) {
   const title = options.title || options.name;
   if (!title) {
     return { success: false, error: 'Title is required' };
@@ -18,6 +18,7 @@ async function execute(options = {}) {
   const priority = options.priority || 'P2';
   const timeline = options.timeline || '';
   const body = options.body || '';
+  const basePath = settings.basePath || process.cwd();
 
   const slug = slugify(title);
   if (!slug) {
@@ -27,7 +28,7 @@ async function execute(options = {}) {
     return { success: false, error: `Invalid slug generated: "${slug}"` };
   }
 
-  const prdsDir = getPrdsDir();
+  const prdsDir = getPrdsDir(basePath);
   if (!fs.existsSync(prdsDir)) {
     fs.mkdirSync(prdsDir, { recursive: true });
   }

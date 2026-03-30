@@ -21,8 +21,9 @@ function parseIssueFrontmatter(content) {
   return fm;
 }
 
-async function execute(options = {}) {
-  const issuesDir = path.join(process.cwd(), '.claude', 'issues');
+async function execute(options = {}, settings = {}) {
+  const basePath = settings.basePath || process.cwd();
+  const issuesDir = path.join(basePath, '.claude', 'issues');
 
   if (!fs.existsSync(issuesDir)) {
     return { success: true, issues: [], count: 0 };

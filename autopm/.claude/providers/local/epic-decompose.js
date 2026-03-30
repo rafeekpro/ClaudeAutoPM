@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-async function execute(options = {}) {
+async function execute(options = {}, settings = {}) {
   const name = options.name;
   if (!name) {
     return { success: false, error: 'Epic name is required' };
@@ -17,7 +17,8 @@ async function execute(options = {}) {
     return { success: false, error: 'Tasks array is required' };
   }
 
-  const epicsDir = path.join(process.cwd(), '.claude', 'epics');
+  const basePath = settings.basePath || process.cwd();
+  const epicsDir = path.join(basePath, '.claude', 'epics');
   const epicDir = path.join(epicsDir, slug);
   const epicFile = path.join(epicDir, 'epic.md');
 
