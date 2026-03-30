@@ -124,6 +124,8 @@ function checkRepoProtection() {
     }
   } catch (e) {
     if (e.message.includes('template repository')) throw e;
+    // No remote origin — warn but allow (local-only repos)
+    console.warn('⚠️  Could not verify remote origin. Proceeding without repo protection check.');
   }
 }
 
@@ -132,10 +134,10 @@ function checkRepoProtection() {
  */
 function readMandatoryFooter() {
   const footerPath = path.join(process.cwd(), '.claude/templates/issue-mandatory-footer.md');
-  if (fs.existsSync(footerPath)) {
-    return '\n\n' + fs.readFileSync(footerPath, 'utf8');
+  if (!fs.existsSync(footerPath)) {
+    throw new Error(`Mandatory footer template not found: ${footerPath}. Run 'autopm install' to restore it.`);
   }
-  return '';
+  return '\n\n' + fs.readFileSync(footerPath, 'utf8');
 }
 
 /**

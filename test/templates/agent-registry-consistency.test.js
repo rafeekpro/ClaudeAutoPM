@@ -40,6 +40,12 @@ describe('Agent Registry Consistency', () => {
   let mdAgents;
 
   beforeAll(() => {
+    if (!fs.existsSync(REGISTRY_XML)) {
+      throw new Error(`agent-registry.xml not found at ${REGISTRY_XML}`);
+    }
+    if (!fs.existsSync(REGISTRY_MD)) {
+      throw new Error(`AGENT-REGISTRY.md not found at ${REGISTRY_MD}`);
+    }
     xmlContent = fs.readFileSync(REGISTRY_XML, 'utf8');
     mdContent = fs.readFileSync(REGISTRY_MD, 'utf8');
     xmlAgents = parseXmlAgents(xmlContent);

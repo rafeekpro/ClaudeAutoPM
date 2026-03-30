@@ -5,7 +5,7 @@
 
 > **MANDATORY:** Every issue created by PM commands MUST include the mandatory implementation
 > rules footer from `.claude/templates/issue-mandatory-footer.md`.
-> See `.claude/rules/issue-mandatory-sections.md` for details.
+> See `.claude/rules/github-operations.xml` for details.
 
 ## pm:issue-start <issue_number> [--analyze]
 

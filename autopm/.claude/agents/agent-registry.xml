@@ -18,7 +18,7 @@
   </agents>
 
   <agents category="frameworks">
-    <agent name="react-ui-expert" path="agents/frameworks/react-ui-expert.md" params="framework:[mui|chakra|antd|bootstrap|headless]">UI components, design systems, styling, accessibility</agent>
+    <agent name="react-ui-expert" path="agents/frameworks/react-ui-expert.md" params="style_system:[mui|chakra|antd|bootstrap|headless]">UI components, design systems, styling, accessibility</agent>
     <agent name="react-frontend-engineer" path="agents/frameworks/react-frontend-engineer.md">Full React app: routing, state management, API integration</agent>
     <agent name="ux-design-expert" path="agents/frameworks/ux-design-expert.md">UX/UI design analysis, accessibility audits, design systems</agent>
     <agent name="tailwindcss-expert" path="agents/frameworks/tailwindcss-expert.md">TailwindCSS utility-first styling, responsive design</agent>
