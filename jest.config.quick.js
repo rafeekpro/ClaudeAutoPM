@@ -11,7 +11,8 @@ module.exports = {
     '**/test/local-mode/local-prd-epic.test.js',
     '**/test/core/PluginManager.test.js',
     '**/test/installation/generate-agent-xml.test.js',
-    '**/test/installation/e2e-scenarios.test.js'
+    '**/test/installation/e2e-scenarios.test.js',
+    '**/test/templates/template-reader.test.js'
   ],
 
   testPathIgnorePatterns: [

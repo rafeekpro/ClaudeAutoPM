@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { readTemplate, generateMarkdown, resolveTemplatePath } = require('../../lib/template-reader');
 
 function slugify(title) {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50);
@@ -37,18 +38,20 @@ async function execute(options = {}, settings = {}) {
   fs.mkdirSync(epicDir, { recursive: true });
 
   const now = new Date().toISOString();
+  let content;
+  const templatePath = resolveTemplatePath('epic.xml', basePath);
 
-  const content = `---
-name: "${title.replace(/"/g, '\\"')}"
-status: backlog
-prd: "${prd}"
-progress: 0
-created: ${now}
-updated: ${now}
----
-
-${body || `## Overview\n${title}\n\n## Tasks\n- [ ] TODO`}
-`;
+  if (fs.existsSync(templatePath)) {
+    const template = readTemplate(templatePath);
+    content = generateMarkdown(template, {
+      name: title,
+      prd,
+      overview: body || title,
+      tasks: '- [ ] TODO'
+    });
+  } else {
+    content = `---\nname: "${title.replace(/"/g, '\\"')}"\nstatus: backlog\nprd: "${prd}"\nprogress: 0\ncreated: ${now}\nupdated: ${now}\n---\n\n${body || `## Overview\n${title}\n\n## Tasks\n- [ ] TODO`}\n`;
+  }
 
   fs.writeFileSync(filepath, content, 'utf8');
 

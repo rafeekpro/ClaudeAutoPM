@@ -1,0 +1,25 @@
+<template id="prd" version="1.0">
+  <frontmatter>
+    <field name="name" type="string" required="true"/>
+    <field name="status" type="enum" values="draft,review,approved,rejected" default="draft"/>
+    <field name="priority" type="enum" values="P0,P1,P2,P3" default="P2"/>
+    <field name="timeline" type="string" default="TBD"/>
+    <field name="author" type="string" default=""/>
+    <field name="created" type="datetime" auto="true"/>
+    <field name="updated" type="datetime" auto="true"/>
+  </frontmatter>
+
+  <sections>
+    <section name="objective" heading="Objective" required="true">What we want to achieve and why</section>
+    <section name="background" heading="Background" required="false">Context and motivation</section>
+    <section name="requirements" heading="Requirements" required="true">Functional and non-functional requirements</section>
+    <section name="success-criteria" heading="Success Criteria" required="true">Measurable outcomes</section>
+    <section name="risks" heading="Risks" required="false">Technical and business risks</section>
+  </sections>
+
+  <validation>
+    <rule>objective must be non-empty</rule>
+    <rule>at least 1 requirement listed</rule>
+    <rule>at least 1 success criterion</rule>
+  </validation>
+</template>

@@ -1,0 +1,27 @@
+<template id="issue" version="1.0">
+  <frontmatter>
+    <field name="number" type="int" auto="true"/>
+    <field name="name" type="string" required="true"/>
+    <field name="status" type="enum" values="open,in_progress,closed" default="open"/>
+    <field name="labels" type="array" default="[]"/>
+    <field name="assignee" type="string" default=""/>
+    <field name="created" type="datetime" auto="true"/>
+    <field name="updated" type="datetime" auto="true"/>
+    <field name="started" type="datetime"/>
+    <field name="completed" type="datetime"/>
+  </frontmatter>
+
+  <sections>
+    <section name="goal" heading="Goal" required="true">One sentence: WHAT and WHY</section>
+    <section name="acceptance-criteria" heading="Acceptance Criteria" required="true">Measurable checkboxes</section>
+    <section name="affected-files" heading="Affected Files" required="true">Exact file paths with change description</section>
+    <section name="constraints" heading="Technical Constraints" required="false">Stack, patterns, prohibitions</section>
+    <section name="out-of-scope" heading="Out of Scope" required="false">What NOT to touch</section>
+    <section name="approach" heading="Suggested Approach" required="false">Brief implementation strategy</section>
+  </sections>
+
+  <validation>
+    <rule>goal must be non-empty</rule>
+    <rule>at least 1 acceptance criterion checkbox (- [ ])</rule>
+  </validation>
+</template>
