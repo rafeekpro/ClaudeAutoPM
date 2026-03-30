@@ -165,10 +165,13 @@ ${this.colors.BOLD}Options:${this.colors.NC}
   --scenario=NAME    Use predefined installation scenario
 
 ${this.colors.BOLD}Scenarios:${this.colors.NC}
-  minimal            Sequential execution, no Docker/K8s
-  docker             Adaptive execution with Docker only
-  full               Adaptive execution with all features (recommended)
-  performance        Hybrid parallel execution for power users
+  lite               Local PM only, minimal tokens (2 plugins)
+  github             GitHub integration (4 plugins)
+  azure              Azure DevOps integration (4 plugins)
+  docker             Containerized dev with GitHub (7 plugins)
+  full               Full DevOps with GitHub (recommended, 10 plugins)
+  full-azure         Full DevOps with GitHub + Azure (11 plugins)
+  performance        Maximum parallelization (12 plugins)
 
 ${this.colors.BOLD}Examples:${this.colors.NC}
   install.sh                    Install in current directory
@@ -483,11 +486,11 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
 
     // Option 3: Docker-only (requires Docker)
     if (availableTools.docker) {
-      console.log(`${this.colors.CYAN}3. Docker${this.colors.NC} - Containerized development (GitHub + Azure)
+      console.log(`${this.colors.CYAN}3. Docker${this.colors.NC} - Containerized development (GitHub)
    • Adaptive execution (smart sequential/parallel choice)
    • Docker containers for development environment
-   • Both GitHub and Azure DevOps integration
-   ${this.colors.DIM}• Plugins: core, languages, frameworks, testing, devops, pm, pm-github, pm-azure (8 plugins)${this.colors.NC}
+   • GitHub integration included
+   ${this.colors.DIM}• Plugins: core, languages, frameworks, testing, devops, pm, pm-github (7 plugins)${this.colors.NC}
 `);
     } else {
       console.log(`${this.colors.DIM}3. Docker${this.colors.NC} ${this.colors.RED}(Docker not installed)${this.colors.NC}
@@ -499,9 +502,9 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
       console.log(`${this.colors.GREEN}4. Full DevOps${this.colors.NC} - Complete CI/CD pipeline ${this.colors.BOLD}(RECOMMENDED)${this.colors.NC}
    • Adaptive execution with Docker-first priority
    • Kubernetes + cloud deployment ready
-   • Both GitHub and Azure DevOps integration
+   • GitHub integration included
    • Best for: Production applications, enterprise projects
-   ${this.colors.DIM}• Plugins: core, languages, frameworks, testing, devops, cloud, databases, pm, pm-github, pm-azure, ai (11 plugins)${this.colors.NC}
+   ${this.colors.DIM}• Plugins: core, languages, frameworks, testing, devops, cloud, databases, pm, pm-github, ai (10 plugins)${this.colors.NC}
 `);
     } else if (availableTools.docker) {
       console.log(`${this.colors.DIM}4. Full DevOps${this.colors.NC} ${this.colors.RED}(kubectl not installed)${this.colors.NC}
@@ -516,9 +519,9 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
       console.log(`${this.colors.YELLOW}5. Performance${this.colors.NC} - Maximum parallel execution
    • Hybrid strategy: up to 5 parallel agents
    • Advanced context isolation and security
-   • Both GitHub and Azure DevOps integration
+   • GitHub integration included
    • Best for: Large projects, power users
-   ${this.colors.DIM}• Plugins: ALL (13 plugins including pm-github, pm-azure, data, ml)${this.colors.NC}
+   ${this.colors.DIM}• Plugins: ALL except Azure (12 plugins including data, ml)${this.colors.NC}
 `);
     } else if (availableTools.docker) {
       console.log(`${this.colors.DIM}5. Performance${this.colors.NC} ${this.colors.RED}(kubectl not installed)${this.colors.NC}
@@ -650,9 +653,19 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
           docker: { enabled: true, first: false },
           kubernetes: { enabled: false }
         },
-        plugins: ['plugin-core', 'plugin-languages', 'plugin-frameworks', 'plugin-testing', 'plugin-devops', 'plugin-pm', 'plugin-pm-github', 'plugin-pm-azure']
+        plugins: ['plugin-core', 'plugin-languages', 'plugin-frameworks', 'plugin-testing', 'plugin-devops', 'plugin-pm', 'plugin-pm-github']
       },
       full: {
+        version: version,
+        installed: new Date().toISOString(),
+        execution_strategy: 'adaptive',
+        tools: {
+          docker: { enabled: true, first: true },
+          kubernetes: { enabled: true }
+        },
+        plugins: ['plugin-core', 'plugin-languages', 'plugin-frameworks', 'plugin-testing', 'plugin-devops', 'plugin-cloud', 'plugin-databases', 'plugin-pm', 'plugin-pm-github', 'plugin-ai']
+      },
+      'full-azure': {
         version: version,
         installed: new Date().toISOString(),
         execution_strategy: 'adaptive',
@@ -671,7 +684,7 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
           docker: { enabled: true, first: false },
           kubernetes: { enabled: true }
         },
-        plugins: ['plugin-core', 'plugin-languages', 'plugin-frameworks', 'plugin-testing', 'plugin-devops', 'plugin-cloud', 'plugin-databases', 'plugin-data', 'plugin-pm', 'plugin-pm-github', 'plugin-pm-azure', 'plugin-ai', 'plugin-ml']
+        plugins: ['plugin-core', 'plugin-languages', 'plugin-frameworks', 'plugin-testing', 'plugin-devops', 'plugin-cloud', 'plugin-databases', 'plugin-data', 'plugin-pm', 'plugin-pm-github', 'plugin-ai', 'plugin-ml']
       }
     };
 

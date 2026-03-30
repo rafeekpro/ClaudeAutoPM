@@ -359,17 +359,20 @@ MCP_LOG_LEVEL=info
 
     console.log('');
 
-    // Azure DevOps (Optional)
-    this.printMsg('GREEN', '🔷 Azure DevOps Configuration (Optional)');
-    this.options.azureDevOpsEnabled = await this.confirm(
-      'Would you like to configure Azure DevOps integration?',
-      false
-    );
+    // Azure DevOps (Only when Azure plugin is installed)
+    const hasAzurePlugin = this.installedPlugins && this.installedPlugins.includes('plugin-pm-azure');
+    if (hasAzurePlugin) {
+      this.printMsg('GREEN', '🔷 Azure DevOps Configuration');
+      this.options.azureDevOpsEnabled = await this.confirm(
+        'Would you like to configure Azure DevOps integration?',
+        false
+      );
 
-    if (this.options.azureDevOpsEnabled) {
-      this.options.azureDevOpsPat = await this.getInput('Azure DevOps Personal Access Token', '', 'token');
-      this.options.azureDevOpsOrg = await this.getInput('Azure DevOps Organization');
-      this.options.azureDevOpsProject = await this.getInput('Azure DevOps Project');
+      if (this.options.azureDevOpsEnabled) {
+        this.options.azureDevOpsPat = await this.getInput('Azure DevOps Personal Access Token', '', 'token');
+        this.options.azureDevOpsOrg = await this.getInput('Azure DevOps Organization');
+        this.options.azureDevOpsProject = await this.getInput('Azure DevOps Project');
+      }
     }
   }
 
