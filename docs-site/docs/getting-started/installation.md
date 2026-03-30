@@ -1,11 +1,11 @@
 ---
 title: Installation
-description: Complete installation guide for ClaudeAutoPM with all scenarios and configuration options
+description: Complete installation guide for ClaudeAutoPM v3.14.0 with all scenarios and configuration options
 ---
 
 # Installation Guide
 
-This guide covers all installation methods and configuration options for ClaudeAutoPM.
+This guide covers npm/npx installation methods and configuration options for ClaudeAutoPM v3.14.0. For the shell-based installer, see `install/install.sh`.
 
 ## System Requirements
 
@@ -13,7 +13,7 @@ This guide covers all installation methods and configuration options for ClaudeA
 
 | Requirement | Minimum Version |
 |-------------|-----------------|
-| Node.js | >= 16.0.0 |
+| Node.js | >= 16.0.0 (>= 18.0.0 recommended; plugins require 18+) |
 | npm | >= 8.0.0 |
 | Git | Latest stable |
 
@@ -25,15 +25,14 @@ This guide covers all installation methods and configuration options for ClaudeA
 
 ### Optional Dependencies
 
-- **Docker**: For Docker-first development scenarios
-- **Kubernetes CLI (kubectl)**: For K8s testing
-- **GitHub CLI (gh)**: Automatically installed during setup if needed
+- **Docker**: For Docker-first development scenarios (3-6: Docker, Full, Full-Azure, Performance)
+- **Kubernetes CLI (kubectl)**: For full, full-azure, and performance scenarios (4-6)
+- **GitHub CLI (gh)**: For GitHub provider sync
+- **Azure CLI (az)**: For Azure DevOps provider sync
 
 ## Installation Methods
 
 ### Global Installation (Recommended)
-
-The npm-based global installation is the fastest and most reliable method:
 
 ```bash
 # Install ClaudeAutoPM globally
@@ -45,173 +44,156 @@ autopm --version
 # Navigate to your project
 cd your-project
 
-# Install the framework
+# Install the framework (interactive scenario selection)
 autopm install
 ```
 
 ### Using npx (No Global Install)
 
-If you prefer not to install globally:
-
 ```bash
-# Run directly without installation
 npx claude-autopm install
-
-# Other commands work the same way
 npx claude-autopm merge
 npx claude-autopm setup-env
 ```
 
-### Legacy Shell Installation
+### Non-Interactive Installation
 
-For environments where npm is not available:
-
-**Unix/Linux/macOS:**
 ```bash
-curl -sSL https://raw.githubusercontent.com/rafeekpro/ClaudeAutoPM/main/install/install.sh | bash
+# Install with a specific scenario
+autopm install --scenario=lite
+autopm install --scenario=github
+autopm install --scenario=full-azure
 ```
-
-**Windows PowerShell:**
-```powershell
-iwr -useb https://raw.githubusercontent.com/rafeekpro/ClaudeAutoPM/main/install/install.sh | iex
-```
-
-::: warning Note
-Legacy shell installation is provided for compatibility. npm installation is recommended for better reliability and automatic updates.
-:::
 
 ## Installation Scenarios
 
-During interactive installation, you'll choose from six pre-configured scenarios:
+ClaudeAutoPM offers 7 predefined scenarios + Custom. Each installs a different set of plugins from the `@claudeautopm` npm scope.
 
 ### 0. Lite
 
-**Best for**: Quick setup, minimal context usage
+**Best for**: Local-first PM, learning, minimal context usage
 
 ```bash
-autopm install --yes --config lite
+autopm install --scenario=lite
 ```
 
-- Core PM essentials only (~50 commands)
-- Minimal context footprint
-- No Docker or Kubernetes
-- Sequential execution strategy
+- Local PM only, no provider sync
+- Core + PM essentials (~32 commands)
+- Lowest context footprint (73% fewer agent tokens vs full)
+- Plugins: `plugin-core`, `plugin-pm` (2 plugins)
 
-### 1. Standard (Default)
+### 1. GitHub (Default)
 
-**Best for**: Most projects, balanced features
+**Best for**: GitHub-based projects
 
 ```bash
-autopm install --yes --config standard
+autopm install --scenario=github
 ```
 
-- Core + languages + PM commands (~55 commands)
-- Native tooling support
-- Sequential or adaptive execution
-- Recommended starting point
+- Core + languages + PM + GitHub sync (~50 commands)
+- Issues, PRs, and workflow sync
+- 59% fewer agent tokens vs full
+- Plugins: `plugin-core`, `plugin-languages`, `plugin-pm`, `plugin-pm-github` (4 plugins)
 
 ### 2. Azure
 
-**Best for**: Teams using Azure DevOps
+**Best for**: Azure DevOps projects
 
 ```bash
-autopm install --yes --config azure
+autopm install --scenario=azure
 ```
 
-- Standard + Azure DevOps integration (~95 commands)
-- Work item synchronization
-- Azure Boards integration
-- Sprint and iteration support
+- Core + languages + PM + Azure sync (~70 commands)
+- Work items, sprints, and feature sync
+- Plugins: `plugin-core`, `plugin-languages`, `plugin-pm`, `plugin-pm-azure` (4 plugins)
 
 ### 3. Docker
 
-**Best for**: Containerized development environments
+**Best for**: Containerized development (requires Docker)
 
 ```bash
-autopm install --yes --config docker
+autopm install --scenario=docker
 ```
 
-- Full PM + Docker-first development
-- 7 plugins enabled
-- Container orchestration support
-- Adaptive execution strategy
+- Adaptive execution (smart sequential/parallel choice)
+- Docker containers for development environment
+- GitHub integration included
+- Plugins: `plugin-core`, `plugin-languages`, `plugin-frameworks`, `plugin-testing`, `plugin-devops`, `plugin-pm`, `plugin-pm-github` (7 plugins)
 
 ### 4. Full DevOps (Recommended for Teams)
 
-**Best for**: Production deployments, enterprise teams
+**Best for**: Production applications, enterprise projects (requires Docker + kubectl)
 
 ```bash
-autopm install --yes --config devops
+autopm install --scenario=full
 ```
 
-- Complete CI/CD pipeline support
-- 10 plugins enabled
-- Kubernetes-native testing
-- Security scanning with Trivy
-- Helm chart support
+- Adaptive execution with Docker-first priority
+- Kubernetes + cloud deployment ready
+- GitHub integration included
+- Plugins: `plugin-core`, `plugin-languages`, `plugin-frameworks`, `plugin-testing`, `plugin-devops`, `plugin-cloud`, `plugin-databases`, `plugin-pm`, `plugin-pm-github`, `plugin-ai` (10 plugins)
 
-### 5. Performance
+### 5. Full Azure
 
-**Best for**: Power users, complex projects
+**Best for**: Enterprise teams using both GitHub and Azure DevOps (requires Docker + kubectl)
 
 ```bash
-autopm install --yes --config performance
+autopm install --scenario=full-azure
 ```
 
-- Maximum parallel execution
-- 12 plugins enabled
-- Hybrid parallel strategy
-- Advanced optimization features
+- Everything in Full DevOps plus Azure DevOps integration
+- Plugins: `plugin-core`, `plugin-languages`, `plugin-frameworks`, `plugin-testing`, `plugin-devops`, `plugin-cloud`, `plugin-databases`, `plugin-pm`, `plugin-pm-github`, `plugin-pm-azure`, `plugin-ai` (11 plugins)
 
-### 6. Custom
+### 6. Performance
+
+**Best for**: Large projects, power users (requires Docker + kubectl)
+
+```bash
+autopm install --scenario=performance
+```
+
+- Hybrid strategy: up to 5 parallel agents
+- Advanced context isolation and security
+- All plugins except Azure (12 plugins including `plugin-data`, `plugin-ml`)
+
+### 7. Custom
 
 **Best for**: Specific requirements
 
-```bash
-autopm install --yes --config custom
-```
-
-Allows you to provide your own configuration file.
+Allows manual configuration of execution strategy, agents, and workflows.
 
 ## Scenario Comparison
 
-| Feature | Lite | Standard | Azure | Docker | DevOps | Performance |
-|---------|------|----------|-------|--------|--------|-------------|
-| Commands | ~50 | ~55 | ~95 | ~85 | ~100 | ~120 |
-| Docker | - | - | - | Yes | Yes | Yes |
-| Kubernetes | - | - | - | - | Yes | Yes |
-| Azure DevOps | - | - | Yes | - | Yes | Yes |
-| Parallel Exec | - | - | - | Adaptive | Adaptive | Hybrid |
+| Feature | Lite | GitHub | Azure | Docker | Full | Full-Azure | Performance |
+|---------|------|--------|-------|--------|------|------------|-------------|
+| Plugins | 2 | 4 | 4 | 7 | 10 | 11 | 12 |
+| Provider | local | github | azure | github | github | github+azure | github |
+| Docker | - | - | - | Yes | Yes | Yes | Yes |
+| Kubernetes | - | - | - | - | Yes | Yes | Yes |
+| Execution | sequential | sequential | sequential | adaptive | adaptive | adaptive | hybrid |
+| Token savings | 73% | 59% | ~59% | ~30% | baseline | baseline | - |
 
-## Non-Interactive Installation
+## Token Savings
 
-For CI/CD pipelines and automated setups:
+ClaudeAutoPM uses a plugin architecture specifically to reduce context window usage. Only installed plugin agents are injected into `agent-registry.xml`:
 
-```bash
-# Minimal setup
-autopm install --yes --config lite --no-env --no-hooks
+- **Lite**: 73% fewer agent tokens than full — ideal for simple PM tasks
+- **GitHub**: 59% fewer tokens — good balance for most projects
+- **Full/Performance**: All agents available, maximum capability
 
-# Standard with GitHub Actions
-autopm install -y -c standard --cicd github-actions
+The dynamic `agent-registry.xml` uses `PLUGIN_AGENTS_START`/`PLUGIN_AGENTS_END` markers. The installer injects only the agents from your selected plugins between these markers.
 
-# DevOps setup
-autopm install -y -c devops --cicd azure-devops
+## Local Provider (Default)
 
-# Skip specific steps
-autopm install -y -c performance --no-env --no-hooks
-```
+The lite scenario uses a **local provider** for issue tracking without any external service. Local issue files are stored in `.claude/issues/` and support:
 
-### Available CLI Options
+- `issue-create` - Create issues locally
+- `issue-list` - List all local issues
+- `issue-show` - View issue details
+- `issue-start` - Begin work on an issue
+- `issue-close` - Close a completed issue
 
-| Option | Short | Description |
-|--------|-------|-------------|
-| `--yes` | `-y` | Auto-accept all prompts (non-interactive) |
-| `--config` | `-c` | Preset: `lite`, `standard`, `azure`, `docker`, `devops`, `performance` |
-| `--cicd` | | CI/CD system: `github-actions`, `azure-devops`, `gitlab-ci`, `jenkins`, `none` |
-| `--no-env` | | Skip .env setup |
-| `--no-hooks` | | Skip git hooks installation |
-| `--no-backup` | | Skip creating backups |
-| `--verbose` | | Enable verbose output |
+No GitHub CLI or Azure CLI required. Upgrade to a synced provider later by re-running `autopm install` with a different scenario.
 
 ## Post-Installation Setup
 
@@ -224,33 +206,19 @@ After installation, complete these setup steps:
 /pm:init
 ```
 
-This command will:
-- Install GitHub CLI if needed
-- Authenticate with GitHub
-- Create necessary directories
-- Update `.gitignore`
+This creates the `.claude/` directory tree (prds/, epics/, issues/, etc.) and configures your selected provider.
 
 ### 2. Configure Environment (Optional)
 
 ```bash
-# Interactive environment setup
 autopm setup-env
-
-# Or configure a specific directory
-autopm setup-env ~/my-project
 ```
 
 ### 3. Enable MCP Servers (Optional)
 
 ```bash
-# List available MCP servers
 autopm mcp list
-
-# Enable recommended servers
 autopm mcp enable context7
-autopm mcp enable github-mcp
-
-# Sync configuration
 autopm mcp sync
 ```
 
@@ -259,22 +227,21 @@ autopm mcp sync
 ### Check Installed Files
 
 ```bash
-# Verify ClaudeAutoPM CLI
 autopm --version
-
-# Check directory structure
 ls -la .claude/
 ```
 
 Expected structure:
 ```
 .claude/
-├── agents/           # AI agent definitions
-├── commands/         # Command definitions
-├── rules/            # Development rules
-├── scripts/          # Utility scripts
-├── checklists/       # Quality checklists
-└── context/          # Project context
+├── agents/              # AI agent definitions
+│   └── agent-registry.xml  # Dynamic registry
+├── commands/            # Command definitions
+├── rules/               # 8 XML rules + MD references
+├── providers/           # Provider scripts (local/)
+├── scripts/             # Utility scripts
+├── hooks/               # Enforcement hooks
+└── config.json          # Scenario configuration
 ```
 
 ### Test Core Commands
@@ -289,7 +256,6 @@ In Claude Code:
 
 ### Permission Denied Errors
 
-**Linux/macOS:**
 ```bash
 # Fix npm permissions
 sudo chown -R $(whoami) ~/.npm
@@ -299,58 +265,22 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
 nvm install node
 ```
 
-**Windows:**
-```powershell
-# Run PowerShell as Administrator
-npm install -g claude-autopm
-```
-
 ### Node.js Version Issues
 
 ```bash
-# Check current version
 node --version
-
-# Upgrade using n
 npm install -g n
 n latest
-
-# Or use nvm
-nvm install node
-nvm use node
 ```
 
 ### Installation Hangs
 
 ```bash
-# Clear npm cache
 npm cache clean --force
-
-# Use verbose mode for debugging
 autopm install --verbose
-
-# Skip problematic steps
-autopm install --no-env --no-hooks
 ```
-
-### Git Not Found
-
-**Linux (Ubuntu/Debian):**
-```bash
-sudo apt update && sudo apt install git
-```
-
-**macOS:**
-```bash
-xcode-select --install
-```
-
-**Windows:**
-Download from https://git-scm.com/download/win
 
 ## Updates and Maintenance
-
-### Updating ClaudeAutoPM
 
 ```bash
 # Update global package
@@ -363,24 +293,7 @@ autopm update
 autopm install --no-backup
 ```
 
-### Backup and Recovery
-
-ClaudeAutoPM automatically creates backups during updates:
-
-```bash
-# Backups stored in:
-.claude/.backups/
-
-# Manual backup
-cp -r .claude .claude.backup.$(date +%Y%m%d)
-
-# Restore from backup
-cp -r .claude.backup.20240314 .claude
-```
-
 ## Next Steps
-
-With ClaudeAutoPM installed, proceed to:
 
 - [Your First Project](./first-project.md) - Create your first PRD and start development
 - [Configuration](./configuration.md) - Customize your setup

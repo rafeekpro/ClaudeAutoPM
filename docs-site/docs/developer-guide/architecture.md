@@ -1,17 +1,17 @@
 ---
 title: Architecture
-description: ClaudeAutoPM project architecture, directory structure, and system design
+description: ClaudeAutoPM v3.14.0 project architecture, plugin system, providers, and XML rules
 ---
 
 # Project Architecture
 
-ClaudeAutoPM follows a modular architecture designed for extensibility, maintainability, and clear separation of concerns. This document explains the project structure and key architectural decisions.
+ClaudeAutoPM v3.14.0 follows a plugin-based architecture with 13 npm packages, a provider router for issue tracking, and an XML rules system for token-efficient context loading.
 
 ## High-Level Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                         ClaudeAutoPM                            │
+│                     ClaudeAutoPM v3.14.0                        │
 ├─────────────────────────────────────────────────────────────────┤
 │  CLI Layer (bin/)                                               │
 │  ├── autopm.js (main entry point)                               │
@@ -27,341 +27,224 @@ ClaudeAutoPM follows a modular architecture designed for extensibility, maintain
 │  Plugin System (lib/plugins/)                                   │
 │  └── PluginManager (discovery, loading, installation)           │
 ├─────────────────────────────────────────────────────────────────┤
-│  Provider Layer (lib/providers/)                                │
-│  ├── GitHubProvider (issues, PRs, workflows)                    │
-│  └── AzureDevOpsProvider (work items, boards)                   │
+│  Provider Router (.claude/providers/router.js)                  │
+│  ├── LocalProvider   (providers/local/)    ← default            │
+│  ├── GitHubProvider  (lib/providers/)      ← plugin-pm-github   │
+│  └── AzureProvider   (lib/providers/)      ← plugin-pm-azure   │
 ├─────────────────────────────────────────────────────────────────┤
-│  Packages (packages/)                                           │
-│  ├── plugin-core       │ plugin-pm                              │
-│  ├── plugin-languages  │ plugin-frameworks                      │
-│  ├── plugin-devops     │ plugin-cloud                           │
-│  └── ... additional plugins                                     │
+│  13 Plugin Packages (packages/plugin-*)                          │
+│  ├── plugin-core (7 agents)    │ plugin-pm (commands)           │
+│  ├── plugin-languages (5)      │ plugin-frameworks (4)          │
+│  ├── plugin-devops (7)         │ plugin-cloud (8)               │
+│  ├── plugin-databases (6)      │ plugin-testing (1)             │
+│  ├── plugin-ai (8)             │ plugin-ml (10)                 │
+│  ├── plugin-data (3)           │ plugin-pm-github               │
+│  └── plugin-pm-azure                                            │
 ├─────────────────────────────────────────────────────────────────┤
-│  Framework Resources (autopm/.claude/)                          │
-│  ├── agents/           │ commands/                              │
-│  ├── rules/            │ hooks/                                 │
-│  ├── scripts/          │ templates/                             │
-│  └── mcp/              │ examples/                              │
+│  Rules System (8 XML auto-loaded + 3 MD reference)              │
+│  ├── tdd.enforcement.xml       │ coverage-thresholds.xml        │
+│  ├── agent-mandatory.xml       │ context7.xml                   │
+│  ├── github-operations.xml     │ naming-conventions.xml         │
+│  ├── command-pipelines.xml     │ issue-structure.xml            │
+│  └── standard-patterns.md, git-strategy.md,                    │
+│       frontmatter-operations.md                                 │
+├─────────────────────────────────────────────────────────────────┤
+│  Dynamic Agent Registry (agent-registry.xml)                    │
+│  ├── 7 core agents (always present)                             │
+│  └── PLUGIN_AGENTS_START/END markers for injected agents        │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-## Directory Structure
+## Plugin System
 
-### `/lib` - Core Library
+### 13 Plugin Packages
 
-The core library contains all business logic and system functionality.
-
-```
-lib/
-├── cli/
-│   └── commands/           # CLI command implementations
-│       ├── agent.js        # Agent-related commands
-│       ├── config.js       # Configuration commands
-│       ├── context.js      # Context management
-│       ├── epic.js         # Epic management
-│       ├── issue.js        # Issue management
-│       ├── pm.js           # Project management
-│       ├── prd.js          # PRD operations
-│       └── task.js         # Task operations
-├── plugins/
-│   └── PluginManager.js    # Plugin lifecycle management
-├── providers/
-│   ├── GitHubProvider.js   # GitHub API integration
-│   └── AzureDevOpsProvider.js # Azure DevOps API
-├── services/
-│   ├── AgentService.js     # Agent operations
-│   ├── ContextService.js   # Context management
-│   ├── EpicService.js      # Epic operations
-│   ├── IssueService.js     # Issue operations
-│   ├── PRDService.js       # PRD operations
-│   ├── TaskService.js      # Task operations
-│   ├── UtilityService.js   # Helper utilities
-│   ├── WorkflowService.js  # Workflow orchestration
-│   └── interfaces.js       # Service interfaces
-├── config/
-│   └── ConfigManager.js    # Configuration management
-├── utils/
-│   ├── CircuitBreaker.js   # Fault tolerance
-│   ├── Encryption.js       # Security utilities
-│   ├── RateLimiter.js      # API rate limiting
-│   └── ServiceFactory.js   # Dependency injection
-├── ai-providers/
-│   ├── AbstractAIProvider.js  # Base AI provider
-│   ├── ClaudeProvider.js      # Claude API integration
-│   └── TemplateProvider.js    # Template-based responses
-└── *.js                    # Additional utilities
-```
-
-### `/packages` - Plugin Packages
-
-ClaudeAutoPM uses npm workspaces for modular plugin architecture.
+All plugins are published under the `@claudeautopm` scope on npm and managed via npm workspaces:
 
 ```
 packages/
-├── plugin-core/            # Core framework functionality
-│   ├── agents/             # Core agents
-│   │   └── core/           # agent-manager, code-analyzer, etc.
-│   ├── commands/           # Core commands
-│   ├── rules/              # Framework rules
-│   ├── hooks/              # Enforcement hooks
-│   ├── scripts/            # Utility scripts
-│   └── plugin.json         # Plugin manifest
-├── plugin-pm/              # Project management features
-│   ├── agents/
-│   ├── commands/
-│   └── plugin.json
-├── plugin-languages/       # Language-specific agents
-│   ├── agents/
-│   │   └── languages/      # nodejs, python, bash experts
-│   └── plugin.json
-├── plugin-frameworks/      # Framework specialists
-├── plugin-devops/          # DevOps and CI/CD
-├── plugin-cloud/           # Cloud platform agents
-├── plugin-databases/       # Database specialists
-├── plugin-testing/         # Testing specialists
-├── plugin-data/            # Data engineering
-├── plugin-ai/              # AI/ML integration
-└── plugin-ml/              # Machine learning
+├── plugin-core/         # 7 core agents, core commands, rules, hooks
+├── plugin-pm/           # PM commands (prd, epic, issue, workflow)
+├── plugin-pm-github/    # GitHub provider integration
+├── plugin-pm-azure/     # Azure DevOps provider integration
+├── plugin-languages/    # 5 language specialist agents (see plugin.json)
+├── plugin-frameworks/   # 4 framework specialist agents (see plugin.json)
+├── plugin-devops/       # 7 DevOps agents: Docker, CI/CD, observability (see plugin.json)
+├── plugin-cloud/        # 8 cloud/infra agents: AWS, Azure, GCP, K8s, Terraform (see plugin.json)
+├── plugin-databases/    # 6 database specialist agents
+├── plugin-testing/      # 1 frontend testing engineer agent (see plugin.json)
+├── plugin-ai/           # 8 AI/ML integration agents
+├── plugin-data/         # 3 data pipeline agents
+└── plugin-ml/           # 10 machine learning agents
 ```
 
-### `/autopm` - Framework Resources
+### Plugin Manifest (plugin.json)
 
-Resources copied to user projects during installation.
-
-```
-autopm/
-└── .claude/
-    ├── agents/              # Agent definitions
-    │   ├── core/            # Essential agents
-    │   ├── languages/       # Language experts
-    │   ├── frameworks/      # Framework specialists
-    │   ├── cloud/           # Cloud architects
-    │   ├── devops/          # DevOps specialists
-    │   ├── databases/       # Database experts
-    │   ├── data/            # Data engineering
-    │   ├── testing/         # Testing specialists
-    │   ├── decision-matrices/ # Decision tools
-    │   └── AGENT-REGISTRY.md  # Agent catalog
-    ├── commands/            # Command definitions
-    │   ├── config/          # Configuration commands
-    │   ├── context/         # Context commands
-    │   └── mcp/             # MCP commands
-    ├── rules/               # Development rules
-    │   ├── tdd.enforcement.md
-    │   ├── naming-conventions.md
-    │   └── ...
-    ├── hooks/               # Enforcement hooks
-    ├── scripts/             # Utility scripts
-    │   └── lib/             # Script libraries
-    ├── templates/           # File templates
-    │   ├── claude-templates/
-    │   ├── prds/
-    │   └── strategies-templates/
-    ├── mcp/                 # MCP server configs
-    ├── examples/            # Usage examples
-    ├── guides/              # User guides
-    ├── quick-ref/           # Quick reference docs
-    └── providers/           # Provider configs
-```
-
-### `/.claude` - Project Maintenance
-
-The project's own Claude configuration for self-maintenance.
-
-```
-.claude/
-├── agents/                  # Project-specific agents
-│   ├── core/                # Maintenance agents
-│   └── project-maintenance/ # Custom agents
-├── commands/                # Maintenance commands
-├── rules/                   # Development rules
-├── hooks/                   # Pre-commit hooks
-└── DEVELOPMENT-STANDARDS.md # Standards reference
-```
-
-## Key Architectural Components
-
-### Plugin Manager
-
-The `PluginManager` class handles the complete plugin lifecycle:
-
-```javascript
-// lib/plugins/PluginManager.js
-class PluginManager extends EventEmitter {
-  constructor(options = {}) {
-    this.plugins = new Map();    // Discovered plugins
-    this.agents = new Map();     // Registered agents
-    this.hooks = new Map();      // Plugin hooks
-  }
-
-  async initialize() {
-    await this.discoverPlugins();  // Find plugins in node_modules
-    await this.validatePlugins();  // Check compatibility
-  }
-
-  async loadPlugin(pluginName) {
-    // Load and register plugin agents
-  }
-
-  async installPlugin(pluginName) {
-    // Install agents, commands, rules, hooks, scripts
-  }
-}
-```
-
-### Service Layer
-
-Services encapsulate business logic with consistent interfaces:
-
-```javascript
-// lib/services/interfaces.js
-class IEpicService {
-  async list(options) { }
-  async show(id) { }
-  async create(data) { }
-  async update(id, data) { }
-  async sync(id) { }
-}
-```
-
-### Provider Pattern
-
-Providers abstract external service integrations:
-
-```javascript
-// lib/providers/GitHubProvider.js
-class GitHubProvider {
-  constructor(config) {
-    this.octokit = new Octokit({ auth: config.token });
-  }
-
-  async getIssue(owner, repo, number) { }
-  async createIssue(owner, repo, data) { }
-  async updateIssue(owner, repo, number, data) { }
-}
-```
-
-## Plugin Schema (v2.0)
-
-Plugins use a standardized JSON schema:
+Each plugin defines its contents in a `plugin.json` file using Schema v2.0:
 
 ```json
 {
   "name": "@claudeautopm/plugin-core",
   "version": "2.0.0",
   "displayName": "Core Framework",
-  "description": "Core framework functionality",
   "schemaVersion": "2.0",
   "metadata": {
     "category": "Core Framework",
-    "author": "ClaudeAutoPM Team",
-    "keywords": ["core", "framework", "agents"],
     "required": true
   },
   "agents": [
     {
       "name": "agent-manager",
       "file": "agents/core/agent-manager.md",
-      "category": "core",
-      "description": "Agent lifecycle management",
-      "version": "1.0.0",
-      "tags": ["core", "agents"]
+      "category": "core"
     }
   ],
   "commands": [...],
   "rules": [...],
   "hooks": [...],
   "scripts": [...],
-  "dependencies": {
-    "required": [],
-    "optional": []
-  },
-  "features": {
-    "tdd_enforcement": { "enabled": true }
-  },
+  "dependencies": { "required": [], "optional": [] },
   "compatibleWith": ">=3.0.0"
 }
 ```
 
-## Agent Architecture
+### Plugin Manager
 
-Agents follow a standardized structure with frontmatter and markdown:
+```javascript
+class PluginManager extends EventEmitter {
+  async initialize() {
+    await this.discoverPlugins();   // Monorepo: scan packages/; installed projects: scan node_modules/@claudeautopm/
+    await this.validatePlugins();   // Check version compatibility
+  }
 
-```markdown
----
-name: code-analyzer
-description: Code analysis and bug detection
-tools: Glob, Grep, LS, Read, Task, Agent
-model: inherit
-color: blue
----
-
-# Code Analyzer
-
-You are a senior code analyst...
-
-## TDD Methodology (MANDATORY)
-...
-
-## Documentation Queries
-- `mcp://context7/analysis/patterns`
-
-## Core Expertise
-...
-
-## Self-Verification Protocol
-...
+  async installPlugin(pluginName) {
+    // Install agents, commands, rules, hooks, scripts to .claude/
+  }
+}
 ```
 
-## Command Architecture
+## Provider System
 
-Commands use a template structure:
+ClaudeAutoPM supports three issue tracking providers, selected by installation scenario.
+
+### Provider Router
+
+The provider router (`providers/router.js`) auto-selects the active provider based on `.claude/config.json`:
+
+```
+config.json → PROVIDER: "local" | "github" | "azure"
+    │
+    ▼
+router.js → delegates to appropriate provider
+    │
+    ├── local/   → File-based issue tracking (no external service)
+    ├── github/  → GitHub Issues via gh CLI
+    └── azure/   → Azure DevOps work items via az CLI
+```
+
+### Local Provider (Default)
+
+The local provider stores issue data in `.claude/issues/` and provider scripts in `.claude/providers/local/`:
+
+- `issue-create.js` - Create local issues
+- `issue-list.js` - List issues from local store
+- `issue-show.js` - Display issue details
+- `issue-start.js` - Mark issue as in-progress
+- `issue-close.js` - Close completed issues
+
+No external service or authentication required. This is the default for the `lite` scenario.
+
+### Provider Selection by Scenario
+
+| Scenario | Provider |
+|----------|----------|
+| lite | local |
+| github | github |
+| azure | azure |
+| docker | github |
+| full | github |
+| full-azure | github + azure |
+| performance | github |
+
+## XML Rules System
+
+ClaudeAutoPM uses 8 XML rules that are auto-loaded into the system prompt via `@include` directives in CLAUDE.md:
 
 ```markdown
----
-allowed-tools: Bash, Read, Write, LS
----
-
-# Command Name
-
-## Usage
-/namespace:command [arguments]
-
-## Quick Check
-[Prerequisites validation]
-
-## Instructions
-[Step-by-step execution]
-
-## Output
-[Expected output format]
+# CLAUDE.md
+@include .claude/rules/tdd.enforcement.xml
+@include .claude/rules/coverage-thresholds.xml
+@include .claude/rules/agent-mandatory.xml
+@include .claude/rules/context7.xml
+@include .claude/rules/github-operations.xml
+@include .claude/rules/naming-conventions.xml
+@include .claude/rules/command-pipelines.xml
+@include .claude/rules/issue-structure.xml
 ```
+
+XML format was chosen over markdown for rules because:
+- Stronger enforcement by the model (XML tags are treated as structured instructions)
+- More compact representation (fewer tokens)
+- Clear nesting and hierarchy
+
+Three additional MD rules are available as reference but not auto-loaded:
+- `standard-patterns.md` - Output formats, error messages
+- `git-strategy.md` - Branch-based workflow
+- `frontmatter-operations.md` - YAML frontmatter read/write
+
+## Dynamic Agent Registry
+
+The `agent-registry.xml` file is the single source of truth for available agents:
+
+```xml
+<agent-registry version="2.0.0" core-agents="7">
+  <agents category="core">
+    <agent name="agent-manager" path="agents/core/agent-manager.md">...</agent>
+    <agent name="file-analyzer" path="agents/core/file-analyzer.md">...</agent>
+    <agent name="code-analyzer" path="agents/core/code-analyzer.md">...</agent>
+    <agent name="test-runner" path="agents/core/test-runner.md">...</agent>
+    <agent name="parallel-worker" path="agents/core/parallel-worker.md">...</agent>
+    <agent name="mcp-manager" path="agents/core/mcp-manager.md">...</agent>
+    <agent name="context-optimizer" path="agents/core/context-optimizer.md">...</agent>
+  </agents>
+
+  <!-- PLUGIN_AGENTS_START -->
+  <!-- Injected by install.js based on installed plugins -->
+  <!-- PLUGIN_AGENTS_END -->
+</agent-registry>
+```
+
+During installation, `install.js` reads each plugin's `plugin.json`, extracts agent definitions, and injects them between the markers. This means a lite install has zero plugin agent entries (saving tokens), while a full install has 45+ entries.
 
 ## Data Flow
 
 ### Installation Flow
 
 ```
-User runs: autopm install
+User runs: autopm install --scenario=github
     │
     ▼
-bin/autopm.js (CLI entry)
+install.js → selectScenario() → generateConfig()
     │
     ▼
 PluginManager.initialize()
     │
-    ├─► discoverPlugins() ─► Scan node_modules/@claudeautopm/
-    │
-    ├─► validatePlugins() ─► Check version compatibility
+    ├── discoverPlugins() → Scan packages/ (monorepo) or node_modules/@claudeautopm/
+    ├── validatePlugins() → Check compatibility
     │
     ▼
-PluginManager.installPlugin()
+For each plugin in scenario:
+    ├── installAgents()   → Copy to .claude/agents/
+    ├── installCommands() → Copy to .claude/commands/
+    ├── installRules()    → Copy to .claude/rules/
+    ├── installHooks()    → Copy to .claude/hooks/
+    └── installScripts()  → Copy to scripts/
     │
-    ├─► installAgents()   ─► Copy to .claude/agents/
-    ├─► installCommands() ─► Copy to .claude/commands/
-    ├─► installRules()    ─► Copy to .claude/rules/
-    ├─► installHooks()    ─► Copy to .claude/hooks/
-    └─► installScripts()  ─► Copy to scripts/
+    ▼
+Generate agent-registry.xml with plugin agents injected
+    │
+    ▼
+Generate CLAUDE.md with @include directives
 ```
 
 ### Command Execution Flow
@@ -376,73 +259,57 @@ Claude reads: .claude/commands/pm/epic-list.md
 Validates prerequisites (Quick Check)
     │
     ▼
+Provider router selects: local | github | azure
+    │
+    ▼
 Executes instructions using allowed-tools
     │
     ▼
 Formats output per command specification
 ```
 
-### Agent Delegation Flow
+## Token Optimization
 
-```
-User requests: "Analyze this code for bugs"
-    │
-    ▼
-Claude identifies: Use @code-analyzer agent
-    │
-    ▼
-Invokes via Task tool with agent specification
-    │
-    ▼
-Agent executes with permitted tools
-    │
-    ▼
-Returns summarized results (<20% of context)
-```
+The architecture is designed to minimize context window usage:
+
+1. **Plugin-based agents** - Only installed agents are in the registry
+2. **XML rules** - More compact than markdown equivalents
+3. **Dynamic registry** - `PLUGIN_AGENTS_START/END` markers avoid loading unused agents
+4. **Core-only default** - Lite scenario loads only 7 agent definitions
+
+Result: Lite installs use 73% fewer agent tokens than full installs.
 
 ## Design Decisions
 
-### Why npm Workspaces?
+### Why Plugin Architecture?
+- Selective installation reduces context footprint
+- Independent versioning per plugin
+- CI-only npm publish ensures quality
+- PR-only workflow for all changes
 
-- Modular plugin architecture
-- Independent versioning
-- Selective installation
-- Clear dependency boundaries
+### Why XML for Rules?
+- Stronger model adherence to structured XML
+- More token-efficient than markdown
+- Clear hierarchy for nested rules
 
-### Why Markdown for Agents/Commands?
+### Why Local Provider Default?
+- Zero external dependencies for new users
+- Works offline
+- Easy upgrade path to GitHub/Azure later
 
-- Human-readable specifications
-- Easy to modify and extend
-- Version control friendly
-- No compilation required
-
-### Why Event Emitters in PluginManager?
-
-- Decoupled logging and monitoring
-- Easy to add telemetry
-- Non-blocking operations
-- Flexible event handling
-
-### Why Service Layer Pattern?
-
-- Testable business logic
-- Provider abstraction
-- Consistent interfaces
-- Dependency injection support
+### Why Dynamic Agent Registry?
+- Single source of truth for agent availability
+- Install-time generation avoids runtime overhead
+- Marker-based injection is simple and reliable
 
 ## Security Considerations
 
-1. **Token Management**: API tokens stored in environment variables
+1. **Token Management**: API tokens in environment variables only
 2. **Input Validation**: All user inputs validated before processing
 3. **Rate Limiting**: Built-in rate limiter for API calls
 4. **Circuit Breaker**: Fault tolerance for external services
-
-## Performance Considerations
-
-1. **Context Efficiency**: Agents return <20% of processed data
-2. **Lazy Loading**: Plugins loaded on demand
-3. **Caching**: Provider responses cached where appropriate
-4. **Parallel Execution**: Agents can work in parallel streams
+5. **PR-only workflow**: All changes require pull request review
+6. **CI-only publish**: npm packages published only through GitHub Actions
 
 ## Next Steps
 

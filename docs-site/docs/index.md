@@ -4,8 +4,8 @@ layout: home
 
 hero:
   name: "ClaudeAutoPM"
-  text: "Automated Project Management"
-  tagline: Ship faster and better with spec-driven development and AI agents
+  text: "Plugin-Based AI Project Management"
+  tagline: Ship faster with spec-driven development, 7 core agents, and 13 optional plugins — v3.14.0
   actions:
     - theme: brand
       text: Get Started
@@ -18,24 +18,24 @@ hero:
       link: https://github.com/rafeekpro/ClaudeAutoPM
 
 features:
-  - icon: 🚀
-    title: Quick Setup
-    details: Get started in 5 minutes with our interactive guide. No extensive documentation reading required.
+  - icon: 🔌
+    title: Plugin Architecture
+    details: 13 plugins under @claudeautopm scope on npm. Install only what you need — lite uses 73% fewer tokens than full.
   - icon: 🤖
-    title: AI-Powered Agents
-    details: 96 professional CLI commands with parallel AI agent execution for maximum efficiency.
+    title: 7 Core + 50+ Plugin Agents
+    details: 7 always-available core agents plus 50+ specialized agents installed on demand via plugins.
   - icon: 🔗
-    title: Multi-Provider Support
-    details: Seamless integration with GitHub Issues and Azure DevOps for complete project management.
+    title: Three Providers
+    details: Local issue tracking (default), GitHub Issues, and Azure DevOps. Provider router auto-selects based on config.
   - icon: 📊
     title: Spec-Driven Development
     details: Transform PRDs into epics, epics into issues, and issues into production code with full traceability.
   - icon: ⚡
-    title: Smart Context Management
-    details: Never lose track of your work with intelligent context preservation and optimization.
+    title: Token-Optimized Context
+    details: 8 XML rules auto-loaded via @include. Dynamic agent-registry.xml injects only installed plugin agents.
   - icon: 🔄
-    title: Automated Workflows
-    details: From requirements to deployment - automate your entire development pipeline.
+    title: 7 Install Scenarios
+    details: From lite (2 plugins) to performance (12 plugins). Choose your footprint — no Docker required for basic PM.
 
 ---
 
@@ -105,9 +105,10 @@ autopm guide
 
 ClaudeAutoPM transforms your development workflow by:
 
-- **Automating project management** - From PRD to production with full traceability
+- **Plugin-based architecture** - 13 plugins on npm, install only what you need
+- **Local-first PM** - Default local provider tracks issues without GitHub or Azure
+- **Token-efficient context** - XML rules and dynamic agent registry minimize prompt size
 - **Parallel agent execution** - Multiple specialized AI agents working simultaneously
-- **Provider flexibility** - Works with your existing GitHub or Azure DevOps setup
-- **Context optimization** - Intelligent management prevents information loss
+- **Provider flexibility** - Local, GitHub, or Azure DevOps via a unified provider router
 
 </div>
