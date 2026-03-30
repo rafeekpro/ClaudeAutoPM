@@ -10,7 +10,7 @@ async function execute(options = {}, settings = {}) {
 
   const slug = path.basename(name.replace(/\.md$/, ''));
   if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
-    return { success: false, error: `Invalid PRD name "${name}". Use the slug (lowercase, hyphens). Run /pm:prd-list to see available PRDs.` };
+    return { success: false, error: `Invalid PRD name "${name}". Use the slug (lowercase letters, numbers, hyphens). Run /pm:prd-list to see available PRDs.` };
   }
 
   const basePath = settings.basePath || process.cwd();

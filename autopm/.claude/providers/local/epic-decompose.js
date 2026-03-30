@@ -11,7 +11,7 @@ async function execute(options = {}, settings = {}) {
 
   const slug = path.basename(name);
   if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
-    return { success: false, error: `Invalid epic name "${name}". Use the slug (lowercase, hyphens). Run /pm:epic-list to see available epics.` };
+    return { success: false, error: `Invalid epic name "${name}". Use the slug (lowercase letters, numbers, hyphens). Run /pm:epic-list to see available epics.` };
   }
 
   const tasks = options.tasks;
