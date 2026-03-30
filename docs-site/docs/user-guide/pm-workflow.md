@@ -1,15 +1,13 @@
 ---
 title: PM Workflow
-description: Complete project management workflow from PRD creation to production deployment using ClaudeAutoPM.
+description: Complete project management workflow using ClaudeAutoPM v3.14.0 with local, GitHub, and Azure providers.
 ---
 
 # PM Workflow
 
-This guide walks you through the complete project management workflow in ClaudeAutoPM. You will learn how to take a feature idea from initial concept through to production code, with full traceability at every step.
+This guide walks through the complete project management workflow in ClaudeAutoPM, covering all three providers: local (default), GitHub, and Azure DevOps.
 
 ## The Development Lifecycle
-
-ClaudeAutoPM follows a structured development lifecycle:
 
 ```
 PRD (Product Requirements Document)
@@ -18,7 +16,7 @@ Epic (Technical Breakdown)
     ↓
 Tasks (Atomic Work Units)
     ↓
-GitHub Issues / Azure Work Items
+Issues (Local / GitHub / Azure)
     ↓
 Development & Code
     ↓
@@ -27,29 +25,83 @@ Completion & Sync
 
 Each stage builds on the previous one, maintaining traceability from requirements to implementation.
 
+## Providers
+
+ClaudeAutoPM supports three issue tracking providers. The active provider is set during installation and stored in `.claude/config.json`.
+
+| Provider | Scenario | Requires | Storage |
+|----------|----------|----------|---------|
+| **local** | lite | Nothing | `.claude/providers/local/` |
+| **github** | github, docker, full, performance | `gh` CLI | GitHub Issues |
+| **azure** | azure, full-azure | `az` CLI | Azure DevOps Work Items |
+
+### Switching Providers
+
+Re-run installation with a different scenario:
+
+```bash
+# Switch from local to GitHub
+autopm install --scenario=github
+
+# Add Azure alongside GitHub
+autopm install --scenario=full-azure
+```
+
+## Local Issue Tracking (Default)
+
+The local provider works without any external service. Issues are stored as files.
+
+### Creating Local Issues
+
+```bash
+# In Claude Code:
+/pm:prd-new user-authentication
+/pm:prd-parse user-authentication
+/pm:epic-sync user-authentication    # Creates local issues
+```
+
+### Local Issue Commands
+
+```bash
+/pm:issue-start 1      # Start work on local issue #1
+/pm:issue-show 1       # View issue details
+/pm:issue-close 1      # Close completed issue
+/pm:status              # View all issues and progress
+```
+
+Local issues support the full workflow (create, list, show, start, close) without GitHub or Azure credentials. This is ideal for:
+
+- Solo developers who do not need external sync
+- Learning ClaudeAutoPM before connecting to a provider
+- Offline development
+- Quick prototyping
+
+### Upgrading from Local to GitHub
+
+When you are ready to sync with GitHub:
+
+```bash
+# Re-install with GitHub scenario
+autopm install --scenario=github
+
+# Then sync existing epics
+/pm:epic-sync user-authentication
+```
+
+Existing local issues are preserved. The sync command creates corresponding GitHub Issues.
+
 ## Creating a PRD
-
-A PRD (Product Requirements Document) captures what you want to build and why. It serves as the source of truth for a feature.
-
-### Starting a New PRD
-
-Use the interactive brainstorming session to create a comprehensive PRD:
 
 ```bash
 /pm:prd-new user-authentication
 ```
 
-This command launches an interactive session that helps you define:
+This launches an interactive session to define:
 
-- **Feature overview** - What problem does this solve?
-- **User stories** - Who benefits and how?
-- **Technical requirements** - What constraints exist?
-- **Success criteria** - How do we know it's done?
-- **Dependencies** - What does this rely on?
+- Feature overview, user stories, technical requirements
+- Success criteria and dependencies
 
-### PRD Structure
-
-PRDs are stored in `.claude/prd/` with the following structure:
+PRDs are stored in `.claude/prd/` with YAML frontmatter:
 
 ```markdown
 ---
@@ -60,391 +112,204 @@ updated: 2024-01-15T10:30:00Z
 ---
 
 # User Authentication System
-
-## Overview
-Enable users to securely log in and manage their sessions.
-
-## User Stories
-- As a user, I want to log in with email/password
-- As a user, I want to reset my forgotten password
-- As an admin, I want to view login activity
-
-## Technical Requirements
-- JWT-based authentication
-- Secure password hashing with bcrypt
-- Session management with refresh tokens
-
-## Success Criteria
-- Users can register and log in
-- Password reset flow works end-to-end
-- All auth endpoints have 95%+ test coverage
+...
 ```
 
 ### Managing PRDs
 
-View and manage your PRDs with these commands:
-
 ```bash
-# List all PRDs
-/pm:prd-list
-
-# Show a specific PRD
-/pm:prd-show user-authentication
-
-# Edit an existing PRD
-/pm:prd-edit user-authentication
-
-# Check PRD implementation status
-/pm:prd-status user-authentication
+/pm:prd-list                          # List all PRDs
+/pm:prd-show user-authentication      # Show details
+/pm:prd-edit user-authentication      # Edit
+/pm:prd-status user-authentication    # Check status
 ```
 
 ## Parsing PRD to Epic
-
-Once your PRD is complete, parse it into an actionable epic with technical tasks:
 
 ```bash
 /pm:prd-parse user-authentication
 ```
 
-### What Parsing Does
+This analyzes the PRD and creates:
 
-The parse command:
-
-1. **Analyzes the PRD** - Extracts requirements and constraints
-2. **Creates an Epic** - Technical breakdown of the feature
-3. **Generates Tasks** - Atomic work units with clear deliverables
-4. **Estimates Effort** - Suggests story points or hours
-5. **Identifies Dependencies** - Maps task relationships
-
-### Epic Structure
-
-Epics are created in `.claude/epics/` with linked tasks:
-
-```markdown
----
-name: user-authentication
-prd: user-authentication
-status: backlog
-progress: 0%
-created: 2024-01-15T11:00:00Z
----
-
-# Epic: User Authentication System
-
-## Overview
-Implement complete authentication system based on PRD requirements.
-
-## Tasks
-1. Setup authentication module structure
-2. Implement JWT token generation
-3. Create login endpoint
-4. Create registration endpoint
-5. Implement password reset flow
-6. Add session management
-7. Write integration tests
-8. Security audit and hardening
-```
-
-### Task Files
-
-Each task gets its own file in `.claude/epics/user-authentication/`:
-
-```markdown
----
-name: implement-jwt-tokens
-epic: user-authentication
-status: open
-priority: high
-estimated: 4h
-dependencies: []
----
-
-# Task: Implement JWT Token Generation
-
-## Description
-Create JWT token generation and validation utilities.
-
-## Acceptance Criteria
-- [ ] Token generation with configurable expiry
-- [ ] Token validation with signature verification
-- [ ] Refresh token implementation
-- [ ] Unit tests with 100% coverage
-
-## Technical Notes
-- Use jsonwebtoken library
-- Store secrets in environment variables
-- Implement token rotation for security
-```
+1. An epic file in `.claude/epics/`
+2. Individual task files in `.claude/epics/user-authentication/`
+3. Effort estimates and dependency mapping
 
 ## Starting Work on an Epic
-
-When ready to begin development, start the epic:
 
 ```bash
 /pm:epic-start user-authentication
 ```
 
-### What Epic Start Does
+This command:
 
-1. **Changes epic status** to `in-progress`
-2. **Creates feature branch** from main
-3. **Syncs to provider** (GitHub or Azure)
-4. **Loads context** for development
-5. **Suggests first task** to work on
+1. Changes epic status to `in-progress`
+2. Creates a feature branch from main
+3. Syncs to the active provider (local, GitHub, or Azure)
+4. Loads context for development
+5. Suggests the first task
 
-### Syncing with GitHub
-
-For GitHub users, the epic and tasks sync to Issues:
+### Syncing with Providers
 
 ```bash
-# Initial sync creates GitHub issues
+# Sync to active provider (auto-detected)
 /pm:epic-sync user-authentication
 
-# Shows current sync status
+# View sync status
 /pm:status
 ```
 
-Each task becomes a GitHub Issue with:
-- Labels matching epic name
-- Proper description and acceptance criteria
-- Links back to local files
+**With GitHub provider**: Each task becomes a GitHub Issue with labels, description, and acceptance criteria.
 
-### Syncing with Azure DevOps
+**With Azure provider**: Tasks become Azure DevOps work items with sprint assignment.
 
-For Azure DevOps users, use the Azure-specific commands:
-
-```bash
-# Create feature in Azure DevOps
-/azure:feature-new user-authentication
-
-# Sync tasks as work items
-/azure:sync-all
-
-# View sprint status
-/azure:sprint-status
-```
+**With local provider**: Tasks are stored as local issue files.
 
 ## Working on Tasks
 
 ### Finding Your Next Task
 
 ```bash
-# Get recommended next task
-/pm:next
-
-# See all in-progress items
-/pm:in-progress
-
-# View blocked items
-/pm:blocked
+/pm:next            # Get recommended next task
+/pm:in-progress     # See all in-progress items
+/pm:blocked         # View blocked items
 ```
 
 ### Starting a Task
 
 ```bash
-# Start work on a specific issue
 /pm:issue-start 123
 ```
 
-This command:
-- Assigns the issue to you
-- Changes status to `in-progress`
-- Creates a working branch
-- Loads relevant context
-
-### During Development
-
-While working, keep your task updated:
-
-```bash
-# Update task with progress notes
-/pm:issue-edit 123 --add-comment "Completed JWT generation, starting validation"
-
-# Check overall project status
-/pm:status
-
-# View current task details
-/pm:issue-show 123
-```
+This assigns the issue, changes status to `in-progress`, creates a working branch, and loads context.
 
 ### Completing a Task
 
-When a task is complete:
-
 ```bash
-# Close the issue with a comment
 /pm:issue-close 123 "Implemented JWT tokens with full test coverage"
 ```
 
-The system automatically:
-- Updates local task status to `closed`
-- Syncs completion to GitHub/Azure
-- Links any associated PRs
-- Updates epic progress
+The system automatically updates the local task status, syncs completion to the active provider, and updates epic progress.
 
 ## Tracking Progress
 
 ### Project Status
 
-Get a comprehensive view of your project:
-
 ```bash
 /pm:status
 ```
 
-Output shows:
-- Current sprint information
-- Open vs completed tasks
-- In-progress work
-- Blocked items
-- Epic progress percentages
+Shows current sprint information, open vs completed tasks, in-progress work, blocked items, and epic progress.
 
 ### Daily Standup
-
-Generate a standup report:
 
 ```bash
 /pm:standup
 ```
 
-This produces a formatted report:
-```
-Daily Standup - 2024-01-16
-
-Yesterday:
-- Completed JWT token implementation (#123)
-- Fixed password hashing issue (#124)
-
-Today:
-- Start login endpoint (#125)
-- Code review for auth middleware (#126)
-
-Blockers:
-- Waiting for security team review on token rotation
-```
+Generates a formatted report with yesterday's completions, today's plan, and blockers.
 
 ### Epic Progress
 
-Track progress on specific epics:
-
 ```bash
-# View epic details and progress
 /pm:epic-show user-authentication
-
-# Get detailed status
 /pm:epic-status user-authentication
 ```
 
-## Epic Lifecycle Management
-
-### Refreshing Epic Status
-
-Sync local state with provider:
+## Epic Lifecycle
 
 ```bash
-/pm:epic-refresh user-authentication
-```
-
-### Splitting Large Epics
-
-If an epic becomes too large:
-
-```bash
+/pm:epic-refresh user-authentication    # Sync state with provider
 /pm:epic-split user-authentication --tasks 1,2,3 --new-epic auth-core
-```
-
-### Merging Related Epics
-
-Combine epics that should be together:
-
-```bash
 /pm:epic-merge small-auth-epic user-authentication
+/pm:epic-close user-authentication      # Close when all tasks done
 ```
-
-### Closing Completed Epics
-
-When all tasks are done:
-
-```bash
-/pm:epic-close user-authentication
-```
-
-This:
-- Validates all tasks are complete
-- Updates PRD status
-- Archives the epic
-- Generates completion report
 
 ## Complete Workflow Example
 
-Here is a complete example from start to finish:
+### With Local Provider (Lite)
 
 ```bash
-# 1. Create the PRD
+autopm install --scenario=lite
+
+/pm:init
 /pm:prd-new payment-integration
-
-# 2. Brainstorm and refine (interactive)
-# ... answer prompts about requirements ...
-
-# 3. Parse into epic and tasks
 /pm:prd-parse payment-integration
-
-# 4. Review generated tasks
-/pm:epic-show payment-integration
-
-# 5. Start the epic
 /pm:epic-start payment-integration
-
-# 6. Sync to GitHub
-/pm:epic-sync payment-integration
-
-# 7. Work on first task
-/pm:issue-start 201
-
-# 8. Complete the task
-/pm:issue-close 201 "Payment provider SDK integrated"
-
-# 9. Get next task
+/pm:issue-start 1
+# ... develop ...
+/pm:issue-close 1 "Payment SDK integrated"
 /pm:next
-
-# 10. Continue until epic complete...
-
-# 11. Close the epic
+# ... continue until done ...
 /pm:epic-close payment-integration
+```
 
-# 12. Verify completion
-/pm:prd-status payment-integration
+### With GitHub Provider
+
+```bash
+autopm install --scenario=github
+
+/pm:init                                   # Configures GitHub CLI
+/pm:prd-new payment-integration
+/pm:prd-parse payment-integration
+/pm:epic-sync payment-integration          # Creates GitHub Issues
+/pm:epic-start payment-integration
+/pm:issue-start 201                        # GitHub issue #201
+/pm:issue-close 201 "Payment SDK integrated"
+/pm:next
+/pm:epic-close payment-integration
+```
+
+### With Azure Provider
+
+```bash
+autopm install --scenario=azure
+
+/pm:init
+/pm:prd-new payment-integration
+/pm:prd-parse payment-integration
+/azure:feature-new payment-integration     # Azure Feature
+/azure:sync-all                            # Azure Work Items
+/pm:epic-start payment-integration
+# ... develop ...
+/pm:epic-close payment-integration
 ```
 
 ## Provider-Specific Notes
 
-### GitHub Workflow
+### Local Provider
+- No external service required
+- Issues stored in `.claude/providers/local/`
+- Full workflow support (create, list, show, start, close)
+- No authentication needed
 
-- Issues are created in your repository
+### GitHub Provider
+- Issues created in your repository
 - Labels group issues by epic
 - Milestones can track releases
 - Pull requests link to issues automatically
+- Requires `gh` CLI authenticated
 
-### Azure DevOps Workflow
-
+### Azure DevOps Provider
 - Features map to Azure Features
 - User Stories contain task items
 - Work items track in sprints
 - Boards update automatically
-
-See the [Azure DevOps Integration](/commands/azure-devops) for detailed Azure-specific commands.
+- Requires `az` CLI authenticated
+- Decoupled from Docker/Full scenarios (use `azure` or `full-azure` scenario)
 
 ## Best Practices
 
-1. **Write detailed PRDs** - The better your requirements, the better the generated tasks
-2. **Keep tasks atomic** - Each task should be completable in a day or less
-3. **Update regularly** - Sync status to keep everything accurate
-4. **Use standup reports** - They help you and your team stay aligned
-5. **Close when done** - Completed epics help track velocity
+1. **Start with local** - Use lite scenario to learn the workflow before connecting to GitHub/Azure
+2. **Write detailed PRDs** - Better requirements produce better generated tasks
+3. **Keep tasks atomic** - Each task should be completable in a day or less
+4. **Update regularly** - Sync status to keep everything accurate
+5. **Use standup reports** - They help you and your team stay aligned
+6. **Close when done** - Completed epics help track velocity
 
 ## Next Steps
 
-Now that you understand the workflow:
-- Learn about [available commands](./commands-overview)
-- Explore [AI agents](./agents-overview) for development assistance
-- Review [best practices](./best-practices) for optimal usage
+- [Available Commands](./commands-overview) - Full command reference
+- [AI Agents](/agents/selection-guide) - Agent selection guide
+- [Installation](/getting-started/installation) - Change scenarios

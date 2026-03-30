@@ -1,316 +1,81 @@
 # Agent Selection Guide
 
-ClaudeAutoPM provides over 35 specialized AI agents to assist with different aspects of software development. This guide helps you choose the right agent for your task based on technology stack, use case, and project requirements.
+ClaudeAutoPM provides 7 core agents (always available) plus 50+ specialized plugin agents. This guide helps you choose the right agent for your task.
+
+## Core vs Plugin Agents
+
+**Core agents** are available in every installation scenario, including lite. They handle fundamental development tasks.
+
+**Plugin agents** require the corresponding plugin to be installed. If you try to use a plugin agent that is not installed, it will not be available in the agent registry.
 
 ## Quick Selection Matrix
 
-### By Technology Stack
+### Core Agents (Always Available)
 
-| Technology | Recommended Agent | Use Case |
-|------------|------------------|----------|
-| **React** | `@react-ui-expert` | React components, hooks, state management |
-| **Python Backend** | `@python-backend-expert` | FastAPI, Django, Flask development |
-| **Docker** | `@docker-containerization-expert` | Containerization, Docker Compose |
-| **Kubernetes** | `@kubernetes-orchestrator` | K8s deployments, Helm charts |
-| **AWS** | `@aws-cloud-architect` | AWS services, infrastructure |
-| **Azure** | `@azure-cloud-architect` | Azure resources, ARM templates |
-| **PostgreSQL** | `@postgresql-expert` | Database design, queries, optimization |
-| **MongoDB** | `@mongodb-expert` | NoSQL schemas, aggregations |
-| **Testing** | `@e2e-test-engineer` | End-to-end testing, test automation |
+| Task | Agent | When to Use |
+|------|-------|-------------|
+| Code review / bugs | `@code-analyzer` | Pre-commit reviews, security scanning, architecture analysis |
+| Run tests | `@test-runner` | Test execution, failure analysis, coverage reports |
+| Analyze files | `@file-analyzer` | Large log files, documentation review, config analysis |
+| Parallel work | `@parallel-worker` | Multi-file operations, complex workflows |
+| Create agents | `@agent-manager` | New agent creation, registry maintenance |
+| MCP servers | `@mcp-manager` | MCP setup, configuration, health checks |
+| Context optimization | `@context-optimizer` | Reduce context usage, prompt optimization |
+
+### Plugin Agents by Technology
+
+| Technology | Agent | Plugin Required |
+|------------|-------|-----------------|
+| React | `@react-ui-expert` | plugin-frameworks |
+| Python Backend | `@python-backend-expert` | plugin-languages |
+| Node.js Backend | `@nodejs-backend-engineer` | plugin-languages |
+| Docker | `@docker-containerization-expert` | plugin-devops |
+| Kubernetes | `@kubernetes-orchestrator` | plugin-devops |
+| GitHub Actions | `@github-operations-specialist` | plugin-devops |
+| AWS | `@aws-cloud-architect` | plugin-cloud |
+| Azure | `@azure-cloud-architect` | plugin-cloud |
+| GCP | `@gcp-cloud-architect` | plugin-cloud |
+| PostgreSQL | `@postgresql-expert` | plugin-databases |
+| MongoDB | `@mongodb-expert` | plugin-databases |
+| Terraform | `@terraform-infrastructure-expert` | plugin-cloud |
+| Playwright | `@e2e-test-engineer` | plugin-frameworks |
 
 ### By Task Type
 
-| Task | Agent | Description |
-|------|-------|-------------|
-| **Code Review** | `@code-analyzer` | Find bugs, security issues, optimizations |
-| **Create Tests** | `@test-runner` | Generate and execute test suites |
-| **Build UI** | `@react-ui-expert` | Create React components with modern patterns |
-| **API Development** | `@python-backend-expert` | Design and implement REST/GraphQL APIs |
-| **DevOps Setup** | `@github-operations-specialist` | CI/CD pipelines, GitHub Actions |
-| **Database Design** | `@postgresql-expert` | Schema design, migrations, optimization |
-| **Cloud Architecture** | `@aws-cloud-architect` | Design scalable cloud solutions |
-| **Container Setup** | `@docker-containerization-expert` | Dockerize applications |
-| **Security Audit** | `@code-analyzer` | Security vulnerability scanning |
+| Task | Agent | Core? |
+|------|-------|-------|
+| Code review | `@code-analyzer` | Yes |
+| Run tests | `@test-runner` | Yes |
+| Build UI | `@react-ui-expert` | No (plugin-frameworks) |
+| API development | `@python-backend-expert` | No (plugin-languages) |
+| DevOps/CI | `@github-operations-specialist` | No (plugin-devops) |
+| Database design | `@postgresql-expert` | No (plugin-databases) |
+| Cloud architecture | `@aws-cloud-architect` | No (plugin-cloud) |
+| Containerization | `@docker-containerization-expert` | No (plugin-devops) |
 
-## Core Agents
+## Decision Flowchart
 
-### agent-manager
-**Location**: `.claude/agents/core/agent-manager.md`
-**Purpose**: Manage agent lifecycle and creation
-**When to use**:
-- Creating new custom agents
-- Analyzing agent performance
-- Updating agent registry
+### Choosing by Scope
 
-```markdown
-@agent-manager create a new agent for GraphQL development
+```
+1. Is this a code review, test, or file analysis?
+   YES → Use core agents (always available)
+
+2. Is this framework/language-specific?
+   YES → Check if the required plugin is installed
+   NO  → Use @code-analyzer as fallback
+
+3. Is this infrastructure/cloud work?
+   YES → Requires plugin-devops or plugin-cloud
 ```
 
-### code-analyzer
-**Location**: `.claude/agents/core/code-analyzer.md`
-**Purpose**: Analyze code for issues and improvements
-**When to use**:
-- Pre-commit code review
-- Security vulnerability scanning
-- Performance optimization analysis
-- Bug investigation
+### Choosing by Role
 
-```markdown
-@code-analyzer review this file for security issues and performance problems
 ```
-
-### test-runner
-**Location**: `.claude/agents/core/test-runner.md`
-**Purpose**: Execute and analyze test results
-**When to use**:
-- Running test suites
-- Analyzing test failures
-- Generating test reports
-- Creating new tests
-
-```markdown
-@test-runner execute all tests and provide detailed failure analysis
-```
-
-### file-analyzer
-**Location**: `.claude/agents/core/file-analyzer.md`
-**Purpose**: Summarize large files to reduce context
-**When to use**:
-- Analyzing large log files
-- Summarizing documentation
-- Processing test outputs
-- Reviewing configuration files
-
-```markdown
-@file-analyzer summarize the key issues in this 5000-line log file
-```
-
-## Frontend Development Agents
-
-### react-ui-expert
-**Purpose**: React development with modern patterns
-**Expertise**:
-- React 18+ features
-- Hooks and custom hooks
-- State management (Redux, Zustand, Context)
-- Component patterns
-- Performance optimization
-
-```markdown
-@react-ui-expert build a data table component with sorting and filtering
-```
-
-### javascript-frontend-engineer
-**Purpose**: General JavaScript frontend development
-**Expertise**:
-- Vanilla JavaScript
-- DOM manipulation
-- Browser APIs
-- Module systems
-- Build tools
-
-```markdown
-@javascript-frontend-engineer optimize this JavaScript for performance
-```
-
-## Backend Development Agents
-
-### python-backend-expert
-**Purpose**: Python backend development
-**Expertise**:
-- FastAPI, Django, Flask
-- Async programming
-- Database integration
-- REST/GraphQL APIs
-- Testing with pytest
-
-```markdown
-@python-backend-expert create a FastAPI endpoint with authentication
-```
-
-### nodejs-backend-engineer
-**Purpose**: Node.js backend development
-**Expertise**:
-- Express, NestJS, Koa
-- Middleware patterns
-- Database integration
-- Real-time features
-- Microservices
-
-```markdown
-@nodejs-backend-engineer implement WebSocket server with Socket.io
-```
-
-## Database Agents
-
-### postgresql-expert
-**Purpose**: PostgreSQL database management
-**Expertise**:
-- Schema design
-- Query optimization
-- Indexes and performance
-- Migrations
-- Advanced features (JSONB, full-text search)
-
-```markdown
-@postgresql-expert optimize this slow query with proper indexes
-```
-
-### mongodb-expert
-**Purpose**: MongoDB NoSQL development
-**Expertise**:
-- Document design
-- Aggregation pipelines
-- Indexing strategies
-- Sharding
-- Performance tuning
-
-```markdown
-@mongodb-expert design schema for user activity tracking
-```
-
-## DevOps Agents
-
-### docker-containerization-expert
-**Purpose**: Docker and containerization
-**Expertise**:
-- Dockerfile optimization
-- Docker Compose
-- Multi-stage builds
-- Security best practices
-- Volume management
-
-```markdown
-@docker-containerization-expert create optimized Dockerfile for Python app
-```
-
-### kubernetes-orchestrator
-**Purpose**: Kubernetes deployment and management
-**Expertise**:
-- Deployment configurations
-- Service mesh
-- Helm charts
-- Scaling strategies
-- Security policies
-
-```markdown
-@kubernetes-orchestrator create Helm chart for microservices deployment
-```
-
-### github-operations-specialist
-**Purpose**: GitHub Actions and CI/CD
-**Expertise**:
-- Workflow creation
-- Actions marketplace
-- Release automation
-- Security scanning
-- Matrix testing
-
-```markdown
-@github-operations-specialist create CI/CD pipeline with testing and deployment
-```
-
-## Cloud Architecture Agents
-
-### aws-cloud-architect
-**Purpose**: AWS infrastructure design
-**Expertise**:
-- EC2, Lambda, ECS/EKS
-- S3, RDS, DynamoDB
-- VPC, Security Groups
-- CloudFormation, CDK
-- Cost optimization
-
-```markdown
-@aws-cloud-architect design serverless architecture for image processing
-```
-
-### azure-cloud-architect
-**Purpose**: Azure infrastructure design
-**Expertise**:
-- Azure VMs, AKS, Functions
-- Storage accounts, SQL Database
-- Virtual Networks, NSGs
-- ARM templates, Bicep
-- Azure DevOps integration
-
-```markdown
-@azure-cloud-architect setup AKS cluster with monitoring
-```
-
-### gcp-cloud-architect
-**Purpose**: Google Cloud Platform design
-**Expertise**:
-- Compute Engine, GKE, Cloud Run
-- Cloud Storage, Cloud SQL
-- VPC, Firewall rules
-- Terraform, Deployment Manager
-- BigQuery, Pub/Sub
-
-```markdown
-@gcp-cloud-architect implement event-driven architecture with Pub/Sub
-```
-
-## Testing Agents
-
-### e2e-test-engineer
-**Purpose**: End-to-end testing
-**Expertise**:
-- Playwright, Cypress, Selenium
-- Test automation frameworks
-- CI/CD integration
-- Cross-browser testing
-- Performance testing
-
-```markdown
-@e2e-test-engineer create Playwright tests for checkout flow
-```
-
-### playwright-test-engineer
-**Purpose**: Playwright-specific testing
-**Expertise**:
-- Playwright API
-- Page object model
-- Visual testing
-- API testing
-- Mobile testing
-
-```markdown
-@playwright-test-engineer implement visual regression tests
-```
-
-## Decision Matrices
-
-### Choosing a UI Framework Agent
-
-```mermaid
-graph TD
-    A[UI Development] --> B{Framework?}
-    B -->|React| C[@react-ui-expert]
-    B -->|Vue| D[@javascript-frontend-engineer]
-    B -->|Angular| D
-    B -->|Vanilla JS| D
-    C --> E{Styling?}
-    E -->|Tailwind| F[@tailwindcss-expert]
-    E -->|Material UI| G[@mui-react-expert]
-    E -->|Ant Design| H[@antd-react-expert]
-```
-
-### Choosing a Backend Agent
-
-```mermaid
-graph TD
-    A[Backend Development] --> B{Language?}
-    B -->|Python| C[@python-backend-expert]
-    B -->|Node.js| D[@nodejs-backend-engineer]
-    B -->|Go| E[@code-analyzer + Custom]
-    C --> F{Framework?}
-    F -->|FastAPI| G[Use @python-backend-expert]
-    F -->|Django| G
-    F -->|Flask| G
-    D --> H{Framework?}
-    H -->|Express| I[Use @nodejs-backend-engineer]
-    H -->|NestJS| I
+Planning/designing?     → Use "expert" or "architect" agents (plugins)
+Building/coding?        → Use "engineer" agents (plugins)
+Reviewing/analyzing?    → Use core agents
+Testing?                → Use @test-runner (core)
 ```
 
 ## Agent Combinations
@@ -318,142 +83,75 @@ graph TD
 ### Full Stack Development
 
 ```markdown
-# Frontend + Backend + Database
-@react-ui-expert create user dashboard
-@python-backend-expert create API endpoints
-@postgresql-expert design database schema
+@code-analyzer review code quality          # Core
+@react-ui-expert create user dashboard      # plugin-frameworks
+@python-backend-expert create API endpoints # plugin-languages
+@postgresql-expert design database schema   # plugin-databases
 ```
 
 ### DevOps Pipeline
 
 ```markdown
-# Containerization + CI/CD + Cloud
-@docker-containerization-expert dockerize application
-@github-operations-specialist setup GitHub Actions
-@kubernetes-orchestrator deploy to K8s
+@test-runner execute all tests                          # Core
+@docker-containerization-expert dockerize application   # plugin-devops
+@github-operations-specialist setup GitHub Actions      # plugin-devops
+@kubernetes-orchestrator deploy to K8s                  # plugin-devops
 ```
 
 ### Testing Suite
 
 ```markdown
-# Unit + Integration + E2E
-@test-runner create unit tests
-@code-analyzer verify test coverage
-@e2e-test-engineer create end-to-end tests
+@test-runner create unit tests             # Core
+@code-analyzer verify test coverage        # Core
+@e2e-test-engineer create end-to-end tests # plugin-frameworks
 ```
 
-## Custom Agent Creation
+## Checking Available Agents
 
-When existing agents don't meet your needs:
+Your available agents depend on your installation scenario:
 
-```markdown
-@agent-manager create a custom agent for [specific technology/task]
+| Scenario | Core Agents | Plugin Agents |
+|----------|-------------|---------------|
+| lite | 7 | 0 |
+| github | 7 | 6 (languages) |
+| azure | 7 | 6 (languages) |
+| docker | 7 | ~22 |
+| full | 7 | ~45 |
+| performance | 7 | ~50 |
 
-# Example:
-@agent-manager create a GraphQL specialist agent with:
-- Apollo Server expertise
-- Schema design patterns
-- Resolver optimization
-- Subscription handling
+To see which agents are available, check your `agent-registry.xml`:
+
+```bash
+cat .claude/agents/agent-registry.xml
 ```
 
 ## Best Practices
 
-### 1. Start Specific
+### 1. Start with Core Agents
+Always try core agents first. They handle most common tasks without needing plugins.
+
+### 2. Be Specific
 Choose the most specific agent for your task:
-- ❌ `@code-analyzer` for React component
-- ✅ `@react-ui-expert` for React component
+- Use `@react-ui-expert` for React work, not `@code-analyzer`
+- Use `@postgresql-expert` for database queries, not a generic agent
 
-### 2. Combine Agents
-Use multiple agents for complex tasks:
-```markdown
-@code-analyzer review for issues
-@test-runner verify with tests
-@docker-containerization-expert prepare for deployment
-```
-
-### 3. Context Matters
-Provide context to agents:
+### 3. Provide Context
 ```markdown
 # Good
-@postgresql-expert optimize query for table with 10M rows
+@postgresql-expert optimize query for table with 10M rows, joining users and orders
 
-# Better
-@postgresql-expert optimize this e-commerce order query:
-- Orders table: 10M rows
-- Needs to join with users and products
-- Used for real-time dashboard
+# Better than
+@postgresql-expert optimize this query
 ```
 
-### 4. Iterative Refinement
-Work iteratively with agents:
-```markdown
-1. @python-backend-expert create initial API
-2. @code-analyzer review for improvements
-3. @test-runner add test coverage
-4. @docker-containerization-expert containerize
+### 4. Check Plugin Availability
+If an agent does not respond, verify the plugin is installed:
+```bash
+cat .claude/config.json | grep plugins
 ```
-
-## Performance Considerations
-
-### Agent Efficiency Ranking
-
-| Agent | Context Usage | Speed | Best For |
-|-------|---------------|-------|----------|
-| `@file-analyzer` | Low | Fast | Large files |
-| `@code-analyzer` | Medium | Medium | Code review |
-| `@react-ui-expert` | Medium | Fast | React development |
-| `@kubernetes-orchestrator` | High | Slow | Complex deployments |
-| `@aws-cloud-architect` | High | Slow | Infrastructure design |
-
-### Parallel vs Sequential
-
-**Parallel Execution** (when enabled):
-```markdown
-# These run simultaneously
-@code-analyzer review backend/
-@test-runner execute tests
-@docker-containerization-expert build images
-```
-
-**Sequential Execution**:
-```markdown
-# These run one after another
-@code-analyzer review and fix issues
-THEN @test-runner verify fixes
-THEN @docker-containerization-expert deploy
-```
-
-## Troubleshooting
-
-### Agent Not Responding
-
-```markdown
-# Check if agent exists
-ls .claude/agents/ | grep agent-name
-
-# Try core agent instead
-@code-analyzer [fallback for specialized agent]
-```
-
-### Wrong Agent Selected
-
-```markdown
-# Be more specific
-@python-backend-expert for FastAPI development
-NOT @code-analyzer for FastAPI development
-```
-
-### Agent Limitations
-
-Some agents have specific limitations:
-- Cloud agents need credentials configured
-- Test agents need test framework installed
-- DevOps agents need tools (Docker, kubectl)
 
 ## Related Pages
 
-- [Custom Agents](Custom-Agents)
-- [Testing Strategies](Testing-Strategies)
-- [Docker First Development](Docker-First-Development)
-- [PM Commands](PM-Commands)
+- [Agent Registry](./registry) - Complete agent listing
+- [Plugin Development](/developer-guide/plugin-development) - Create plugins
+- [Installation](/getting-started/installation) - Scenario selection
