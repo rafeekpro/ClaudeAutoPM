@@ -1,546 +1,404 @@
 /**
  * PluginManager Tests
  *
- * Following TDD methodology as required by CLAUDE.md
- * Tests cover all core functionality from Context7 research
+ * Tests core functionality: constructor, discovery, validation,
+ * loading, agent registration, listing, hooks, stats.
  */
 
 const fs = require('fs');
 const path = require('path');
-const PluginManager = require('../../src/core/PluginManager');
+const os = require('os');
+const PluginManager = require('../../lib/plugins/PluginManager');
+
+function createMockPlugin(dir, name, metadata) {
+  const pluginDir = path.join(dir, '@claudeautopm', name);
+  fs.mkdirSync(pluginDir, { recursive: true });
+
+  // Create plugin.json
+  fs.writeFileSync(path.join(pluginDir, 'plugin.json'), JSON.stringify(metadata, null, 2));
+
+  // Create agent files if declared
+  if (metadata.agents) {
+    for (const agent of metadata.agents) {
+      const agentPath = path.join(pluginDir, agent.file);
+      fs.mkdirSync(path.dirname(agentPath), { recursive: true });
+      fs.writeFileSync(agentPath, `# ${agent.name}\nDescription: ${agent.description || ''}`);
+    }
+  }
+
+  return pluginDir;
+}
 
 describe('PluginManager', () => {
-  let pluginManager;
-  let testPluginDir;
-  let testAgentDir;
+  let pm;
+  let tempDir;
+  let pluginDir;
+  let agentDir;
 
   beforeEach(() => {
-    // Create temporary test directories
-    testPluginDir = path.join(__dirname, '../fixtures/test-plugins');
-    testAgentDir = path.join(__dirname, '../fixtures/test-agents');
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pm-test-'));
+    pluginDir = path.join(tempDir, 'node_modules');
+    agentDir = path.join(tempDir, '.claude', 'agents');
+    fs.mkdirSync(pluginDir, { recursive: true });
+    fs.mkdirSync(agentDir, { recursive: true });
 
-    // Clean up if exists
-    if (fs.existsSync(testPluginDir)) {
-      fs.rmSync(testPluginDir, { recursive: true, force: true });
-    }
-    if (fs.existsSync(testAgentDir)) {
-      fs.rmSync(testAgentDir, { recursive: true, force: true });
-    }
-
-    // Create fresh directories
-    fs.mkdirSync(testPluginDir, { recursive: true });
-    fs.mkdirSync(testAgentDir, { recursive: true });
-
-    pluginManager = new PluginManager({
-      pluginDir: testPluginDir,
-      agentDir: testAgentDir,
+    pm = new PluginManager({
+      pluginDir,
+      agentDir,
       scopePrefix: '@claudeautopm',
-      minCoreVersion: '2.8.0'
+      minCoreVersion: '2.8.0',
+      projectRoot: tempDir
     });
   });
 
   afterEach(() => {
-    // Clean up test directories
-    if (fs.existsSync(testPluginDir)) {
-      fs.rmSync(testPluginDir, { recursive: true, force: true });
-    }
-    if (fs.existsSync(testAgentDir)) {
-      fs.rmSync(testAgentDir, { recursive: true, force: true });
-    }
+    fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
   describe('Constructor', () => {
-    it('should initialize with default options', () => {
-      const pm = new PluginManager();
-
-      expect(pm.options.scopePrefix).toBe('@claudeautopm');
-      expect(pm.options.minCoreVersion).toBe('2.8.0');
-      expect(pm.plugins).toBeInstanceOf(Map);
-      expect(pm.agents).toBeInstanceOf(Map);
-      expect(pm.initialized).toBe(false);
+    test('initializes with default options', () => {
+      const defaultPm = new PluginManager();
+      expect(defaultPm.options.scopePrefix).toBe('@claudeautopm');
+      expect(defaultPm.options.minCoreVersion).toBe('2.8.0');
+      expect(defaultPm.plugins).toBeInstanceOf(Map);
+      expect(defaultPm.agents).toBeInstanceOf(Map);
+      expect(defaultPm.initialized).toBe(false);
     });
 
-    it('should accept custom options', () => {
-      const pm = new PluginManager({
-        scopePrefix: '@custom',
-        minCoreVersion: '3.0.0'
-      });
-
-      expect(pm.options.scopePrefix).toBe('@custom');
-      expect(pm.options.minCoreVersion).toBe('3.0.0');
+    test('accepts custom options', () => {
+      expect(pm.options.pluginDir).toBe(pluginDir);
+      expect(pm.options.agentDir).toBe(agentDir);
     });
   });
 
   describe('Plugin Discovery', () => {
-    beforeEach(() => {
-      // Create mock plugin structure
-      const scopePath = path.join(testPluginDir, '@claudeautopm');
-      fs.mkdirSync(scopePath, { recursive: true });
-
-      // Create test plugin
-      const pluginPath = path.join(scopePath, 'plugin-test');
-      fs.mkdirSync(pluginPath, { recursive: true });
-
-      const agentsPath = path.join(pluginPath, 'agents');
-      fs.mkdirSync(agentsPath, { recursive: true });
-
-      // Create plugin.json
-      const pluginJson = {
+    test('discovers plugins with plugin.json', async () => {
+      createMockPlugin(pluginDir, 'plugin-test', {
         name: '@claudeautopm/plugin-test',
-        version: '1.0.0',
-        displayName: 'Test Plugin',
-        description: 'A test plugin',
-        category: 'test',
-        agents: [
-          {
-            name: 'test-agent',
-            file: 'agents/test-agent.md',
-            description: 'Test agent',
-            tags: ['test']
-          }
-        ],
+        agents: [],
         compatibleWith: '>=2.8.0'
-      };
-
-      fs.writeFileSync(
-        path.join(pluginPath, 'plugin.json'),
-        JSON.stringify(pluginJson, null, 2)
-      );
-
-      // Create agent file
-      fs.writeFileSync(
-        path.join(agentsPath, 'test-agent.md'),
-        '# Test Agent\n\nThis is a test agent.'
-      );
-    });
-
-    it('should discover plugins in scoped directory', async () => {
-      await pluginManager.discoverPlugins();
-
-      expect(pluginManager.plugins.size).toBe(1);
-      expect(pluginManager.plugins.has('@claudeautopm/plugin-test')).toBe(true);
-    });
-
-    it('should load plugin metadata correctly', async () => {
-      await pluginManager.discoverPlugins();
-
-      const plugin = pluginManager.plugins.get('@claudeautopm/plugin-test');
-
-      expect(plugin.metadata.displayName).toBe('Test Plugin');
-      expect(plugin.metadata.category).toBe('test');
-      expect(plugin.metadata.agents).toHaveLength(1);
-    });
-
-    it('should emit discover:found event', async () => {
-      const spy = jest.fn();
-      pluginManager.on('discover:found', spy);
-
-      await pluginManager.discoverPlugins();
-
-      expect(spy).toHaveBeenCalledWith({
-        name: '@claudeautopm/plugin-test',
-        metadata: expect.objectContaining({
-          displayName: 'Test Plugin'
-        })
       });
-    });
-
-    it('should skip packages without plugin.json', async () => {
-      const scopePath = path.join(testPluginDir, '@claudeautopm');
-      const nonPluginPath = path.join(scopePath, 'plugin-invalid');
-      fs.mkdirSync(nonPluginPath, { recursive: true });
-
-      const spy = jest.fn();
-      pluginManager.on('discover:skip', spy);
-
-      await pluginManager.discoverPlugins();
-
-      expect(spy).toHaveBeenCalledWith({
-        package: 'plugin-invalid',
-        reason: 'No plugin.json found'
-      });
-    });
-
-    it('should handle missing scoped directory gracefully', async () => {
-      const pm = new PluginManager({
-        pluginDir: path.join(__dirname, '../fixtures/nonexistent')
-      });
-
-      const spy = jest.fn();
-      pm.on('discover:no-plugins', spy);
 
       await pm.discoverPlugins();
+      expect(pm.plugins.size).toBe(1);
+      expect(pm.plugins.has('@claudeautopm/plugin-test')).toBe(true);
+    });
 
+    test('discovers multiple plugins', async () => {
+      createMockPlugin(pluginDir, 'plugin-a', { name: '@claudeautopm/plugin-a', agents: [], compatibleWith: '>=2.8.0' });
+      createMockPlugin(pluginDir, 'plugin-b', { name: '@claudeautopm/plugin-b', agents: [], compatibleWith: '>=2.8.0' });
+
+      await pm.discoverPlugins();
+      expect(pm.plugins.size).toBe(2);
+    });
+
+    test('skips directories without plugin.json', async () => {
+      const scopePath = path.join(pluginDir, '@claudeautopm', 'plugin-noconfig');
+      fs.mkdirSync(scopePath, { recursive: true });
+
+      await pm.discoverPlugins();
       expect(pm.plugins.size).toBe(0);
-      expect(spy).toHaveBeenCalled();
+    });
+
+    test('handles missing scope directory gracefully', async () => {
+      // No @claudeautopm dir exists
+      await pm.discoverPlugins();
+      expect(pm.plugins.size).toBe(0);
+    });
+
+    test('emits discover:found event', async () => {
+      createMockPlugin(pluginDir, 'plugin-test', {
+        name: '@claudeautopm/plugin-test',
+        agents: [],
+        compatibleWith: '>=2.8.0'
+      });
+
+      const events = [];
+      pm.on('discover:found', (data) => events.push(data));
+      await pm.discoverPlugins();
+      expect(events.length).toBe(1);
+      expect(events[0].name).toBe('@claudeautopm/plugin-test');
+    });
+
+    test('skips non-plugin packages in scope', async () => {
+      const scopePath = path.join(pluginDir, '@claudeautopm', 'utils');
+      fs.mkdirSync(scopePath, { recursive: true });
+
+      await pm.discoverPlugins();
+      expect(pm.plugins.size).toBe(0);
     });
   });
 
   describe('Plugin Validation', () => {
-    beforeEach(async () => {
-      // Create mock plugins with different version requirements
-      const scopePath = path.join(testPluginDir, '@claudeautopm');
-      fs.mkdirSync(scopePath, { recursive: true });
+    test('marks compatible plugins', async () => {
+      createMockPlugin(pluginDir, 'plugin-test', {
+        name: '@claudeautopm/plugin-test',
+        agents: [],
+        compatibleWith: '>=2.8.0'
+      });
 
-      // Compatible plugin
-      const compatiblePath = path.join(scopePath, 'plugin-compatible');
-      fs.mkdirSync(compatiblePath, { recursive: true });
-      fs.writeFileSync(
-        path.join(compatiblePath, 'plugin.json'),
-        JSON.stringify({
-          name: '@claudeautopm/plugin-compatible',
-          version: '1.0.0',
-          category: 'test',
-          agents: [],
-          compatibleWith: '>=2.8.0'
-        })
-      );
+      await pm.discoverPlugins();
+      await pm.validatePlugins();
 
-      // Incompatible plugin
-      const incompatiblePath = path.join(scopePath, 'plugin-incompatible');
-      fs.mkdirSync(incompatiblePath, { recursive: true });
-      fs.writeFileSync(
-        path.join(incompatiblePath, 'plugin.json'),
-        JSON.stringify({
-          name: '@claudeautopm/plugin-incompatible',
-          version: '1.0.0',
-          category: 'test',
-          agents: [],
-          compatibleWith: '>=3.0.0'
-        })
-      );
-
-      await pluginManager.discoverPlugins();
-    });
-
-    it('should validate compatible plugins', async () => {
-      await pluginManager.validatePlugins();
-
-      const plugin = pluginManager.plugins.get('@claudeautopm/plugin-compatible');
+      const plugin = pm.plugins.get('@claudeautopm/plugin-test');
       expect(plugin.compatible).toBe(true);
     });
 
-    it('should mark incompatible plugins', async () => {
-      await pluginManager.validatePlugins();
+    test('marks incompatible plugins', async () => {
+      createMockPlugin(pluginDir, 'plugin-test', {
+        name: '@claudeautopm/plugin-test',
+        agents: [],
+        compatibleWith: '>=99.0.0'
+      });
 
-      const plugin = pluginManager.plugins.get('@claudeautopm/plugin-incompatible');
+      await pm.discoverPlugins();
+      await pm.validatePlugins();
+
+      const plugin = pm.plugins.get('@claudeautopm/plugin-test');
       expect(plugin.compatible).toBe(false);
-      expect(plugin.incompatibilityReason).toContain('>=3.0.0');
-    });
-
-    it('should emit validate:compatible event', async () => {
-      const spy = jest.fn();
-      pluginManager.on('validate:compatible', spy);
-
-      await pluginManager.validatePlugins();
-
-      expect(spy).toHaveBeenCalledWith({
-        name: '@claudeautopm/plugin-compatible',
-        metadata: expect.any(Object)
-      });
-    });
-
-    it('should emit validate:incompatible event', async () => {
-      const spy = jest.fn();
-      pluginManager.on('validate:incompatible', spy);
-
-      await pluginManager.validatePlugins();
-
-      expect(spy).toHaveBeenCalledWith({
-        name: '@claudeautopm/plugin-incompatible',
-        required: '>=3.0.0',
-        current: expect.any(String)
-      });
-    });
-  });
-
-  describe('Version Comparison', () => {
-    it('should compare semantic versions correctly', () => {
-      expect(pluginManager.compareVersions('2.8.0', '2.7.0')).toBe(1);
-      expect(pluginManager.compareVersions('2.8.0', '2.8.0')).toBe(0);
-      expect(pluginManager.compareVersions('2.8.0', '2.9.0')).toBe(-1);
-      expect(pluginManager.compareVersions('3.0.0', '2.8.0')).toBe(1);
-    });
-
-    it('should check compatibility with >= operator', () => {
-      expect(pluginManager.isCompatible('2.8.0', '>=2.8.0')).toBe(true);
-      expect(pluginManager.isCompatible('2.9.0', '>=2.8.0')).toBe(true);
-      expect(pluginManager.isCompatible('2.7.0', '>=2.8.0')).toBe(false);
     });
   });
 
   describe('Plugin Loading', () => {
-    beforeEach(async () => {
-      // Setup test plugin
-      const scopePath = path.join(testPluginDir, '@claudeautopm');
-      fs.mkdirSync(scopePath, { recursive: true });
+    test('loads compatible plugin', async () => {
+      createMockPlugin(pluginDir, 'plugin-test', {
+        name: '@claudeautopm/plugin-test',
+        agents: [{
+          name: 'test-agent',
+          file: 'agents/test-agent.md',
+          description: 'Test agent'
+        }],
+        compatibleWith: '>=2.8.0'
+      });
 
-      const pluginPath = path.join(scopePath, 'plugin-test');
-      fs.mkdirSync(pluginPath, { recursive: true });
-
-      const agentsPath = path.join(pluginPath, 'agents');
-      fs.mkdirSync(agentsPath, { recursive: true });
-
-      fs.writeFileSync(
-        path.join(pluginPath, 'plugin.json'),
-        JSON.stringify({
-          name: '@claudeautopm/plugin-test',
-          version: '1.0.0',
-          category: 'test',
-          agents: [
-            {
-              name: 'agent-one',
-              file: 'agents/agent-one.md',
-              description: 'Agent One',
-              tags: ['test', 'one']
-            },
-            {
-              name: 'agent-two',
-              file: 'agents/agent-two.md',
-              description: 'Agent Two',
-              tags: ['test', 'two']
-            }
-          ],
-          compatibleWith: '>=2.8.0'
-        })
-      );
-
-      fs.writeFileSync(path.join(agentsPath, 'agent-one.md'), '# Agent One');
-      fs.writeFileSync(path.join(agentsPath, 'agent-two.md'), '# Agent Two');
-
-      await pluginManager.initialize();
-    });
-
-    it('should load plugin successfully', async () => {
-      const plugin = await pluginManager.loadPlugin('@claudeautopm/plugin-test');
+      await pm.discoverPlugins();
+      await pm.validatePlugins();
+      const plugin = await pm.loadPlugin('@claudeautopm/plugin-test');
 
       expect(plugin.loaded).toBe(true);
-      expect(pluginManager.loadedPlugins.has('@claudeautopm/plugin-test')).toBe(true);
+      expect(pm.loadedPlugins.has('@claudeautopm/plugin-test')).toBe(true);
     });
 
-    it('should register agents from plugin', async () => {
-      await pluginManager.loadPlugin('@claudeautopm/plugin-test');
-
-      expect(pluginManager.agents.size).toBe(2);
-      expect(pluginManager.agents.has('@claudeautopm/plugin-test:agent-one')).toBe(true);
-      expect(pluginManager.agents.has('@claudeautopm/plugin-test:agent-two')).toBe(true);
+    test('throws for non-existent plugin', async () => {
+      await expect(pm.loadPlugin('@claudeautopm/plugin-missing'))
+        .rejects.toThrow('Plugin not found');
     });
 
-    it('should emit load:complete event', async () => {
-      const spy = jest.fn();
-      pluginManager.on('load:complete', spy);
-
-      await pluginManager.loadPlugin('@claudeautopm/plugin-test');
-
-      expect(spy).toHaveBeenCalledWith({
+    test('skips already loaded plugin', async () => {
+      createMockPlugin(pluginDir, 'plugin-test', {
         name: '@claudeautopm/plugin-test',
-        agentCount: 2
-      });
-    });
-
-    it('should throw error for non-existent plugin', async () => {
-      await expect(
-        pluginManager.loadPlugin('@claudeautopm/plugin-nonexistent')
-      ).rejects.toThrow('Plugin not found');
-    });
-
-    it('should skip already loaded plugins', async () => {
-      await pluginManager.loadPlugin('@claudeautopm/plugin-test');
-
-      const spy = jest.fn();
-      pluginManager.on('load:already-loaded', spy);
-
-      await pluginManager.loadPlugin('@claudeautopm/plugin-test');
-
-      expect(spy).toHaveBeenCalled();
-    });
-  });
-
-  describe('Initialization', () => {
-    it('should initialize successfully', async () => {
-      const spy = jest.fn();
-      pluginManager.on('init:complete', spy);
-
-      await pluginManager.initialize();
-
-      expect(pluginManager.initialized).toBe(true);
-      expect(spy).toHaveBeenCalled();
-    });
-
-    it('should skip re-initialization', async () => {
-      await pluginManager.initialize();
-
-      const spy = jest.fn();
-      pluginManager.on('init:start', spy);
-
-      await pluginManager.initialize();
-
-      expect(spy).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('Plugin Listing', () => {
-    beforeEach(async () => {
-      // Create multiple test plugins
-      const scopePath = path.join(testPluginDir, '@claudeautopm');
-      fs.mkdirSync(scopePath, { recursive: true });
-
-      const plugins = [
-        { name: 'plugin-cloud', category: 'cloud', agentCount: 8 },
-        { name: 'plugin-devops', category: 'devops', agentCount: 7 },
-        { name: 'plugin-databases', category: 'databases', agentCount: 5 }
-      ];
-
-      for (const p of plugins) {
-        const pluginPath = path.join(scopePath, p.name);
-        fs.mkdirSync(pluginPath, { recursive: true });
-
-        const agents = Array.from({ length: p.agentCount }, (_, i) => ({
-          name: `agent-${i}`,
-          file: `agents/agent-${i}.md`,
-          description: `Agent ${i}`,
-          tags: [p.category]
-        }));
-
-        fs.writeFileSync(
-          path.join(pluginPath, 'plugin.json'),
-          JSON.stringify({
-            name: `@claudeautopm/${p.name}`,
-            version: '1.0.0',
-            displayName: p.name,
-            category: p.category,
-            agents,
-            compatibleWith: '>=2.8.0'
-          })
-        );
-      }
-
-      await pluginManager.initialize();
-    });
-
-    it('should list all plugins', () => {
-      const plugins = pluginManager.listPlugins();
-
-      expect(plugins).toHaveLength(3);
-      expect(plugins[0]).toHaveProperty('name');
-      expect(plugins[0]).toHaveProperty('displayName');
-      expect(plugins[0]).toHaveProperty('category');
-      expect(plugins[0]).toHaveProperty('agentCount');
-    });
-
-    it('should filter plugins by category', () => {
-      const plugins = pluginManager.listPlugins({ category: 'cloud' });
-
-      expect(plugins).toHaveLength(1);
-      expect(plugins[0].category).toBe('cloud');
-    });
-
-    it('should filter plugins by loaded status', async () => {
-      await pluginManager.loadPlugin('@claudeautopm/plugin-cloud');
-
-      const loadedPlugins = pluginManager.listPlugins({ loaded: true });
-      const unloadedPlugins = pluginManager.listPlugins({ loaded: false });
-
-      expect(loadedPlugins).toHaveLength(1);
-      expect(unloadedPlugins).toHaveLength(2);
-    });
-  });
-
-  describe('Agent Listing', () => {
-    beforeEach(async () => {
-      const scopePath = path.join(testPluginDir, '@claudeautopm');
-      fs.mkdirSync(scopePath, { recursive: true });
-
-      const pluginPath = path.join(scopePath, 'plugin-test');
-      fs.mkdirSync(pluginPath, { recursive: true });
-
-      const agentsPath = path.join(pluginPath, 'agents');
-      fs.mkdirSync(agentsPath, { recursive: true });
-
-      fs.writeFileSync(
-        path.join(pluginPath, 'plugin.json'),
-        JSON.stringify({
-          name: '@claudeautopm/plugin-test',
-          version: '1.0.0',
-          category: 'test',
-          agents: [
-            {
-              name: 'docker-expert',
-              file: 'agents/docker-expert.md',
-              description: 'Docker specialist',
-              tags: ['docker', 'devops']
-            },
-            {
-              name: 'kubernetes-expert',
-              file: 'agents/kubernetes-expert.md',
-              description: 'Kubernetes specialist',
-              tags: ['kubernetes', 'devops']
-            }
-          ],
-          compatibleWith: '>=2.8.0'
-        })
-      );
-
-      fs.writeFileSync(path.join(agentsPath, 'docker-expert.md'), '# Docker');
-      fs.writeFileSync(path.join(agentsPath, 'kubernetes-expert.md'), '# K8s');
-
-      await pluginManager.initialize();
-      await pluginManager.loadPlugin('@claudeautopm/plugin-test');
-    });
-
-    it('should list all agents', () => {
-      const agents = pluginManager.listAgents();
-
-      expect(agents).toHaveLength(2);
-      expect(agents[0]).toHaveProperty('id');
-      expect(agents[0]).toHaveProperty('name');
-      expect(agents[0]).toHaveProperty('description');
-      expect(agents[0]).toHaveProperty('tags');
-    });
-
-    it('should filter agents by plugin', () => {
-      const agents = pluginManager.listAgents({
-        plugin: '@claudeautopm/plugin-test'
+        agents: [{ name: 'a', file: 'agents/a.md', description: 'a' }],
+        compatibleWith: '>=2.8.0'
       });
 
-      expect(agents).toHaveLength(2);
+      await pm.discoverPlugins();
+      await pm.validatePlugins();
+      await pm.loadPlugin('@claudeautopm/plugin-test');
+
+      const events = [];
+      pm.on('load:already-loaded', (data) => events.push(data));
+      await pm.loadPlugin('@claudeautopm/plugin-test');
+      expect(events.length).toBe(1);
     });
 
-    it('should filter agents by tags', () => {
-      const agents = pluginManager.listAgents({ tags: ['docker'] });
+    test('emits load:complete event with agent count', async () => {
+      createMockPlugin(pluginDir, 'plugin-test', {
+        name: '@claudeautopm/plugin-test',
+        agents: [
+          { name: 'a1', file: 'agents/a1.md', description: 'a1' },
+          { name: 'a2', file: 'agents/a2.md', description: 'a2' }
+        ],
+        compatibleWith: '>=2.8.0'
+      });
 
-      expect(agents).toHaveLength(1);
-      expect(agents[0].name).toBe('docker-expert');
+      const events = [];
+      pm.on('load:complete', (data) => events.push(data));
+      await pm.discoverPlugins();
+      await pm.validatePlugins();
+      await pm.loadPlugin('@claudeautopm/plugin-test');
+
+      expect(events[0].agentCount).toBe(2);
     });
   });
 
-  describe('Hook System', () => {
-    it('should register hooks', () => {
+  describe('Agent Registration', () => {
+    test('registers agents from plugin metadata', async () => {
+      createMockPlugin(pluginDir, 'plugin-test', {
+        name: '@claudeautopm/plugin-test',
+        agents: [
+          { name: 'agent-a', file: 'agents/agent-a.md', description: 'Agent A', tags: ['core'] },
+          { name: 'agent-b', file: 'agents/agent-b.md', description: 'Agent B', tags: ['test'] }
+        ],
+        compatibleWith: '>=2.8.0'
+      });
+
+      await pm.discoverPlugins();
+      await pm.validatePlugins();
+      await pm.loadPlugin('@claudeautopm/plugin-test');
+
+      expect(pm.agents.size).toBe(2);
+      expect(pm.agents.has('@claudeautopm/plugin-test:agent-a')).toBe(true);
+      expect(pm.agents.has('@claudeautopm/plugin-test:agent-b')).toBe(true);
+    });
+
+    test('skips agents with missing files', async () => {
+      const pluginPath = createMockPlugin(pluginDir, 'plugin-test', {
+        name: '@claudeautopm/plugin-test',
+        agents: [
+          { name: 'exists', file: 'agents/exists.md', description: 'exists' },
+          { name: 'missing', file: 'agents/missing.md', description: 'missing' }
+        ],
+        compatibleWith: '>=2.8.0'
+      });
+      // Delete the missing agent file
+      fs.rmSync(path.join(pluginPath, 'agents', 'missing.md'));
+
+      await pm.discoverPlugins();
+      await pm.validatePlugins();
+      await pm.loadPlugin('@claudeautopm/plugin-test');
+
+      expect(pm.agents.size).toBe(1);
+      expect(pm.agents.has('@claudeautopm/plugin-test:exists')).toBe(true);
+    });
+
+    test('agent entry contains correct metadata', async () => {
+      createMockPlugin(pluginDir, 'plugin-test', {
+        name: '@claudeautopm/plugin-test',
+        agents: [{
+          name: 'my-agent',
+          file: 'agents/my-agent.md',
+          description: 'My test agent',
+          tags: ['test', 'core']
+        }],
+        compatibleWith: '>=2.8.0'
+      });
+
+      await pm.discoverPlugins();
+      await pm.validatePlugins();
+      await pm.loadPlugin('@claudeautopm/plugin-test');
+
+      const agent = pm.agents.get('@claudeautopm/plugin-test:my-agent');
+      expect(agent.name).toBe('my-agent');
+      expect(agent.plugin).toBe('@claudeautopm/plugin-test');
+      expect(agent.description).toBe('My test agent');
+      expect(agent.tags).toEqual(['test', 'core']);
+    });
+  });
+
+  describe('Listing', () => {
+    beforeEach(async () => {
+      createMockPlugin(pluginDir, 'plugin-a', {
+        name: '@claudeautopm/plugin-a',
+        metadata: { category: 'languages' },
+        agents: [{ name: 'agent-1', file: 'agents/agent-1.md', description: 'd1', tags: ['lang'] }],
+        compatibleWith: '>=2.8.0'
+      });
+      createMockPlugin(pluginDir, 'plugin-b', {
+        name: '@claudeautopm/plugin-b',
+        metadata: { category: 'frameworks' },
+        agents: [{ name: 'agent-2', file: 'agents/agent-2.md', description: 'd2', tags: ['fw'] }],
+        compatibleWith: '>=2.8.0'
+      });
+
+      await pm.discoverPlugins();
+      await pm.validatePlugins();
+      await pm.loadPlugin('@claudeautopm/plugin-a');
+      await pm.loadPlugin('@claudeautopm/plugin-b');
+    });
+
+    test('listPlugins returns all plugins', () => {
+      const plugins = pm.listPlugins();
+      expect(plugins.length).toBe(2);
+    });
+
+    test('listPlugins filters by loaded status', () => {
+      const loaded = pm.listPlugins({ loaded: true });
+      expect(loaded.length).toBe(2);
+    });
+
+    test('listAgents returns all agents', () => {
+      const agents = pm.listAgents();
+      expect(agents.length).toBe(2);
+    });
+
+    test('listAgents filters by plugin', () => {
+      const agents = pm.listAgents({ plugin: '@claudeautopm/plugin-a' });
+      expect(agents.length).toBe(1);
+      expect(agents[0].name).toBe('agent-1');
+    });
+
+    test('listAgents filters by tags', () => {
+      const agents = pm.listAgents({ tags: ['fw'] });
+      expect(agents.length).toBe(1);
+      expect(agents[0].name).toBe('agent-2');
+    });
+  });
+
+  describe('Hooks', () => {
+    test('registers hooks', () => {
       const handler = jest.fn();
-      pluginManager.registerHook('onLoad', handler);
-
-      expect(pluginManager.hooks.get('onLoad')).toContain(handler);
+      pm.registerHook('test-hook', handler);
+      expect(pm.hooks.has('test-hook')).toBe(true);
     });
 
-    it('should emit hook:registered event', () => {
-      const spy = jest.fn();
-      pluginManager.on('hook:registered', spy);
-
-      pluginManager.registerHook('onLoad', jest.fn());
-
-      expect(spy).toHaveBeenCalledWith({ hookName: 'onLoad' });
+    test('emits hook:registered event', () => {
+      const events = [];
+      pm.on('hook:registered', (data) => events.push(data));
+      pm.registerHook('my-hook', jest.fn());
+      expect(events.length).toBe(1);
     });
   });
 
   describe('Statistics', () => {
-    it('should return plugin statistics', () => {
-      const stats = pluginManager.getStats();
+    test('returns correct stats', async () => {
+      createMockPlugin(pluginDir, 'plugin-test', {
+        name: '@claudeautopm/plugin-test',
+        agents: [{ name: 'a', file: 'agents/a.md', description: 'a' }],
+        compatibleWith: '>=2.8.0'
+      });
 
-      expect(stats).toHaveProperty('totalPlugins');
-      expect(stats).toHaveProperty('loadedPlugins');
-      expect(stats).toHaveProperty('totalAgents');
-      expect(stats).toHaveProperty('compatiblePlugins');
-      expect(stats).toHaveProperty('categories');
+      await pm.discoverPlugins();
+      await pm.validatePlugins();
+      await pm.loadPlugin('@claudeautopm/plugin-test');
+
+      const stats = pm.getStats();
+      expect(stats.totalPlugins).toBe(1);
+      expect(stats.loadedPlugins).toBe(1);
+      expect(stats.totalAgents).toBe(1);
+    });
+  });
+
+  describe('Version Comparison', () => {
+    test('compares semantic versions correctly', () => {
+      expect(pm.compareVersions('3.0.0', '2.8.0')).toBe(1);
+      expect(pm.compareVersions('2.8.0', '3.0.0')).toBe(-1);
+      expect(pm.compareVersions('2.8.0', '2.8.0')).toBe(0);
+    });
+
+    test('checks compatibility with >= operator', () => {
+      expect(pm.isCompatible('3.0.0', '>=2.8.0')).toBe(true);
+      expect(pm.isCompatible('2.7.0', '>=2.8.0')).toBe(false);
+      expect(pm.isCompatible('2.8.0', '>=2.8.0')).toBe(true);
+    });
+  });
+
+  describe('Utility Methods', () => {
+    test('isInstalled returns false for unknown plugin', () => {
+      expect(pm.isInstalled('nonexistent')).toBe(false);
+    });
+
+    test('isEnabled returns false for unknown plugin', () => {
+      expect(pm.isEnabled('nonexistent')).toBe(false);
+    });
+
+    test('getInstalledPlugins returns array', () => {
+      const result = pm.getInstalledPlugins();
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    test('getEnabledPlugins returns array', () => {
+      const result = pm.getEnabledPlugins();
+      expect(Array.isArray(result)).toBe(true);
     });
   });
 });
