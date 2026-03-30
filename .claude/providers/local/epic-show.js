@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { parseFrontmatter } = require('./prd-list');
+const { parseFrontmatter } = require('../../lib/frontmatter');
 
 async function execute(options = {}) {
   const name = options.name;
@@ -8,34 +8,36 @@ async function execute(options = {}) {
     return { success: false, error: 'Epic name is required' };
   }
 
+  const slug = path.basename(name);
+  if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
+    return { success: false, error: `Invalid epic name: "${name}"` };
+  }
+
   const epicsDir = path.join(process.cwd(), '.claude', 'epics');
-  const epicDir = path.join(epicsDir, name);
+  const epicDir = path.join(epicsDir, slug);
   const filepath = path.join(epicDir, 'epic.md');
 
   if (!fs.existsSync(filepath)) {
-    return { success: false, error: `Epic "${name}" not found` };
+    return { success: false, error: `Epic "${slug}" not found` };
   }
 
   const content = fs.readFileSync(filepath, 'utf8');
-  const fm = parseFrontmatter(content);
+  const { frontmatter: fm, body } = parseFrontmatter(content);
 
-  const bodyMatch = content.match(/^---[\s\S]*?---\r?\n?([\s\S]*)$/);
-  const body = bodyMatch ? bodyMatch[1].trim() : '';
-
-  // List task files
+  // List task files (numbered .md files only)
   const taskFiles = fs.readdirSync(epicDir).filter(f =>
-    f.endsWith('.md') && f !== 'epic.md'
+    /^\d+\.md$/.test(f)
   ).sort();
 
   const tasks = [];
   for (const file of taskFiles) {
     const taskContent = fs.readFileSync(path.join(epicDir, file), 'utf8');
-    const taskFm = parseFrontmatter(taskContent);
+    const { frontmatter: taskFm } = parseFrontmatter(taskContent);
     const num = parseInt(file.replace('.md', '')) || 0;
     tasks.push({
       number: num,
-      title: taskFm ? (taskFm.name || file) : file,
-      status: taskFm ? (taskFm.status || 'open') : 'open',
+      title: taskFm.name || file,
+      status: taskFm.status || 'open',
       path: path.join(epicDir, file)
     });
   }
@@ -45,16 +47,16 @@ async function execute(options = {}) {
   return {
     success: true,
     epic: {
-      name,
-      title: fm ? (fm.name || name) : name,
-      status: fm ? (fm.status || 'backlog') : 'backlog',
-      prd: fm ? (fm.prd || '') : '',
-      progress: fm ? (parseInt(fm.progress) || 0) : 0,
-      body,
+      name: slug,
+      title: fm.name || slug,
+      status: fm.status || 'backlog',
+      prd: fm.prd || '',
+      progress: parseInt(fm.progress) || 0,
+      body: body.trim(),
       tasks,
       taskCount: tasks.length,
-      createdAt: fm ? (fm.created || '') : '',
-      updatedAt: fm ? (fm.updated || '') : '',
+      createdAt: fm.created || '',
+      updatedAt: fm.updated || '',
       path: filepath
     }
   };

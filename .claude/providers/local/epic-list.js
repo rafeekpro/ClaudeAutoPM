@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { parseFrontmatter } = require('./prd-list');
+const { parseFrontmatter } = require('../../lib/frontmatter');
 
 function getEpicsDir() {
   return path.join(process.cwd(), '.claude', 'epics');
@@ -14,6 +14,7 @@ async function execute(options = {}) {
   }
 
   const dirs = fs.readdirSync(epicsDir).filter(d => {
+    if (!/^[a-z0-9-]+$/.test(d)) return false;
     const full = path.join(epicsDir, d);
     return fs.statSync(full).isDirectory();
   }).sort();
@@ -25,15 +26,15 @@ async function execute(options = {}) {
     if (!fs.existsSync(epicFile)) continue;
 
     const content = fs.readFileSync(epicFile, 'utf8');
-    const fm = parseFrontmatter(content);
-    if (!fm) continue;
+    const { frontmatter: fm } = parseFrontmatter(content);
+    if (!fm || Object.keys(fm).length === 0) continue;
 
     if (options.status && fm.status !== options.status) continue;
 
-    // Count task files (numbered .md files, not epic.md)
+    // Count task files (numbered .md files only)
     const epicDirPath = path.join(epicsDir, dir);
     const taskFiles = fs.readdirSync(epicDirPath).filter(f =>
-      f.endsWith('.md') && f !== 'epic.md'
+      /^\d+\.md$/.test(f)
     );
 
     epics.push({

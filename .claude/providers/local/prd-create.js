@@ -19,13 +19,25 @@ async function execute(options = {}) {
   const timeline = options.timeline || '';
   const body = options.body || '';
 
+  const slug = slugify(title);
+  if (!slug) {
+    return { success: false, error: 'Could not generate valid slug from title' };
+  }
+  if (!/^[a-z0-9-]+$/.test(slug)) {
+    return { success: false, error: `Invalid slug generated: "${slug}"` };
+  }
+
   const prdsDir = getPrdsDir();
   if (!fs.existsSync(prdsDir)) {
     fs.mkdirSync(prdsDir, { recursive: true });
   }
 
-  const slug = slugify(title);
   const filepath = path.join(prdsDir, `${slug}.md`);
+
+  if (fs.existsSync(filepath)) {
+    return { success: false, error: `PRD "${slug}" already exists` };
+  }
+
   const now = new Date().toISOString();
 
   const content = `---

@@ -19,13 +19,22 @@ async function execute(options = {}) {
   const body = options.body || '';
 
   const slug = slugify(title);
-  const epicDir = path.join(getEpicsDir(), slug);
-
-  if (!fs.existsSync(epicDir)) {
-    fs.mkdirSync(epicDir, { recursive: true });
+  if (!slug) {
+    return { success: false, error: 'Could not generate valid slug from title' };
+  }
+  if (!/^[a-z0-9-]+$/.test(slug)) {
+    return { success: false, error: `Invalid slug generated: "${slug}"` };
   }
 
+  const epicDir = path.join(getEpicsDir(), slug);
   const filepath = path.join(epicDir, 'epic.md');
+
+  if (fs.existsSync(filepath)) {
+    return { success: false, error: `Epic "${slug}" already exists` };
+  }
+
+  fs.mkdirSync(epicDir, { recursive: true });
+
   const now = new Date().toISOString();
 
   const content = `---

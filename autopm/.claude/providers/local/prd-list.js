@@ -1,23 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-
-function parseFrontmatter(content) {
-  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
-  if (!match) return null;
-
-  const fm = {};
-  for (const line of match[1].split('\n')) {
-    const kv = line.match(/^(\w+):\s*(.+)$/);
-    if (kv) {
-      let value = kv[2].trim();
-      if (value.startsWith('"') && value.endsWith('"')) {
-        value = value.slice(1, -1);
-      }
-      fm[kv[1]] = value;
-    }
-  }
-  return fm;
-}
+const { parseFrontmatter } = require('../../lib/frontmatter');
 
 async function execute(options = {}) {
   const prdsDir = path.join(process.cwd(), '.claude', 'prds');
@@ -31,8 +14,8 @@ async function execute(options = {}) {
 
   for (const file of files) {
     const content = fs.readFileSync(path.join(prdsDir, file), 'utf8');
-    const fm = parseFrontmatter(content);
-    if (!fm) continue;
+    const { frontmatter: fm } = parseFrontmatter(content);
+    if (!fm || Object.keys(fm).length === 0) continue;
 
     if (options.status && fm.status !== options.status) continue;
 
@@ -51,4 +34,4 @@ async function execute(options = {}) {
   return { success: true, prds, count: prds.length };
 }
 
-module.exports = { execute, parseFrontmatter };
+module.exports = { execute };

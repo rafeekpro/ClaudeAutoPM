@@ -1,11 +1,15 @@
 const fs = require('fs');
 const path = require('path');
-const { parseFrontmatter } = require('./prd-list');
 
 async function execute(options = {}) {
   const name = options.name;
   if (!name) {
     return { success: false, error: 'Epic name is required' };
+  }
+
+  const slug = path.basename(name);
+  if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
+    return { success: false, error: `Invalid epic name: "${name}"` };
   }
 
   const tasks = options.tasks;
@@ -14,19 +18,19 @@ async function execute(options = {}) {
   }
 
   const epicsDir = path.join(process.cwd(), '.claude', 'epics');
-  const epicDir = path.join(epicsDir, name);
+  const epicDir = path.join(epicsDir, slug);
   const epicFile = path.join(epicDir, 'epic.md');
 
   if (!fs.existsSync(epicFile)) {
-    return { success: false, error: `Epic "${name}" not found` };
+    return { success: false, error: `Epic "${slug}" not found` };
   }
 
   const now = new Date().toISOString();
   const created = [];
 
-  // Find next task number
+  // Find next task number (numbered .md files only)
   const existing = fs.readdirSync(epicDir).filter(f =>
-    f.endsWith('.md') && f !== 'epic.md'
+    /^\d+\.md$/.test(f)
   );
   let nextNum = 1;
   for (const f of existing) {
@@ -57,15 +61,15 @@ ${description || `## Goal\n${title}\n\n## Acceptance Criteria\n- [ ] TODO`}
   // Update epic frontmatter with progress
   const epicContent = fs.readFileSync(epicFile, 'utf8');
   const updatedContent = epicContent
-    .replace(/updated: .+/, `updated: ${now}`)
-    .replace(/progress: \d+/, `progress: 0`);
+    .replace(/^updated:\s*.*/m, `updated: ${now}`)
+    .replace(/^progress:\s*\d+/m, `progress: 0`);
   fs.writeFileSync(epicFile, updatedContent, 'utf8');
 
   return {
     success: true,
     tasks: created,
     count: created.length,
-    actions: [`Decomposed epic "${name}" into ${created.length} tasks`],
+    actions: [`Decomposed epic "${slug}" into ${created.length} tasks`],
     timestamp: now
   };
 }
