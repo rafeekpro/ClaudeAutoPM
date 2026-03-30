@@ -11,6 +11,7 @@
 @include .claude/rules/github-operations.xml
 @include .claude/rules/naming-conventions.xml
 @include .claude/rules/command-pipelines.xml
+@include .claude/rules/issue-structure.xml
 
 ## COMMANDS
 

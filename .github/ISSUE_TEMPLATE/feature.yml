@@ -1,0 +1,97 @@
+name: Feature / Enhancement
+description: New feature, improvement, or refactoring task
+title: "[feat][scope] "
+labels: ["enhancement", "ai-ready"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: "Goal"
+      description: "One clear sentence: WHAT and WHY."
+      placeholder: "Add retry logic to ResearcherAgent to handle transient API failures and improve reliability."
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: "Context"
+      description: "Where in the architecture? Which files/modules? Dependencies?"
+      placeholder: |
+        - Located in `lib/plugins/PluginManager.js`
+        - Depends on `install/install.js` for scenario configs
+        - Uses `packages/plugin-*/plugin.json` for metadata
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: "Acceptance Criteria"
+      description: "Measurable, concrete checklist. AI works best with checkboxes."
+      placeholder: |
+        - [ ] Function handles timeout after 30s
+        - [ ] Tests cover 3 error scenarios
+        - [ ] No breaking changes to public API
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical-constraints
+    attributes:
+      label: "Technical Constraints"
+      description: "Stack, patterns, what NOT to use."
+      placeholder: |
+        - Stack: Node.js 18+, Jest for testing
+        - Pattern: must follow existing plugin architecture
+        - NOT: no new dependencies, no mocking in tests
+    validations:
+      required: false
+
+  - type: textarea
+    id: affected-files
+    attributes:
+      label: "Affected Files / Scope"
+      description: "Exact file paths with brief description of change."
+      placeholder: |
+        - `lib/plugins/PluginManager.js` — add retry logic to loadPlugin()
+        - `test/core/PluginManager.test.js` — new test cases
+    validations:
+      required: true
+
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: "Out of Scope"
+      description: "What should NOT be changed. Prevents AI from over-engineering."
+      placeholder: |
+        - Do not refactor existing test structure
+        - Do not modify install.js
+    validations:
+      required: false
+
+  - type: textarea
+    id: suggested-approach
+    attributes:
+      label: "Suggested Approach"
+      description: "Optional: brief implementation strategy."
+      placeholder: |
+        1. Add `retryWithBackoff()` utility
+        2. Wrap `loadPlugin()` calls
+        3. Add tests for 1x, 2x, 3x retry scenarios
+    validations:
+      required: false
+
+  - type: textarea
+    id: definition-of-done
+    attributes:
+      label: "Definition of Done"
+      description: "Standard quality gates."
+      value: |
+        - [ ] Tests passing (`npm test`)
+        - [ ] No lint errors
+        - [ ] Coverage thresholds met (80/75/80/80)
+        - [ ] PR description contains design decisions
+        - [ ] CLAUDE.md updated if architecture changes
+    validations:
+      required: false
