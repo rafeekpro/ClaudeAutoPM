@@ -37,7 +37,7 @@ async function whatNext() {
   // Otherwise fall back to suggestion-based output
   displayProjectStatus(state);
   console.log('');
-  displaySuggestions(suggestions, state);
+  displaySuggestions(suggestions);
   console.log('');
 }
 

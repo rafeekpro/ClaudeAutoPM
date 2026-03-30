@@ -121,7 +121,8 @@ function formatInProgressOutput(data) {
 
   // Recent Activity section
   try {
-    const { formatRecentActivity } = require('../../../../autopm/.claude/lib/event-logger');
+    const loggerPath = require('path').join(process.cwd(), '.claude', 'lib', 'event-logger');
+    const { formatRecentActivity } = require(loggerPath);
     lines.push('');
     lines.push(formatRecentActivity(7));
   } catch (e) { /* event logger not available */ }

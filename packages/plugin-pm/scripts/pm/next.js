@@ -37,11 +37,11 @@ async function next() {
       addMessage(`### ${task.name}`);
       addMessage(`**What:** ${task.description || 'See task details'}`);
       addMessage(`**Why:** ${task.why || 'See task details'}`);
-      addMessage(`**Effort:** ${task.estimatedHours || 'Unknown'}`);
+      addMessage(`**Effort:** ${formatEffort(task.estimatedHours) || 'Unknown'}`);
       addMessage(`**Priority:** ${task.priority || 'P2'}`);
-      addMessage(`**Epic:** ${task.epicName || '—'}`);
-      addMessage(`**Depends on:** ${task.dependencies || '—'}`);
-      addMessage(`**Files:** ${task.affectedFiles || '—'}`);
+      addMessage(`**Epic:** ${task.epicName || '\u2014'}`);
+      addMessage(`**Depends on:** ${task.dependencies || '\u2014'}`);
+      addMessage(`**Files:** ${task.affectedFiles || '\u2014'}`);
       addMessage('');
       addMessage(`To start: /pm:issue-start ${task.taskNum}`);
     } else {
@@ -160,6 +160,15 @@ async function findAvailableTasks() {
   });
 
   return availableTasks;
+}
+
+function formatEffort(hours) {
+  if (!hours) return null;
+  const h = parseFloat(hours);
+  if (isNaN(h)) return hours;
+  if (h <= 2) return 'S';
+  if (h <= 8) return 'M';
+  return 'L';
 }
 
 function parsePriority(p) {
