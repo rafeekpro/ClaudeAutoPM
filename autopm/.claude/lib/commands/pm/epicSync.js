@@ -111,6 +111,36 @@ function getTimestamp() {
 }
 
 /**
+ * Check that remote origin is not the template repository
+ */
+function checkRepoProtection() {
+  try {
+    const remote = execSync('git remote get-url origin', {
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe']
+    }).trim();
+    if (remote.includes('rlagowski/autopm')) {
+      throw new Error('Cannot sync to template repository (rlagowski/autopm). Fork first.');
+    }
+  } catch (e) {
+    if (e.message.includes('template repository')) throw e;
+    // No remote origin — warn but allow (local-only repos)
+    console.warn('⚠️  Could not verify remote origin. Proceeding without repo protection check.');
+  }
+}
+
+/**
+ * Read mandatory footer template for issue bodies
+ */
+function readMandatoryFooter() {
+  const footerPath = path.join(process.cwd(), '.claude/templates/issue-mandatory-footer.md');
+  if (!fs.existsSync(footerPath)) {
+    throw new Error(`Mandatory footer template not found: ${footerPath}. Run 'autopm install' to restore it.`);
+  }
+  return '\n\n' + fs.readFileSync(footerPath, 'utf8');
+}
+
+/**
  * Get repository info from gh CLI
  */
 function getRepoInfo() {
@@ -129,6 +159,8 @@ function getRepoInfo() {
  * Create epic GitHub issue
  */
 function createEpicIssue(epicPath) {
+  checkRepoProtection();
+
   const epicFile = path.join(process.cwd(), '.claude/epics', epicPath, 'epic.md');
 
   if (!fs.existsSync(epicFile)) {
@@ -153,7 +185,8 @@ function createEpicIssue(epicPath) {
   console.log(`   Tasks: ${taskCount}`);
   console.log(`   Labels: ${labels}`);
 
-  // Create issue body
+  // Create issue body with mandatory footer
+  const footer = readMandatoryFooter();
   const issueBody = `
 ${body}
 
@@ -163,7 +196,7 @@ ${body}
 - Tasks: ${taskCount}
 - Status: Planning
 - Created: ${getTimestamp()}
-`.trim();
+${footer}`.trim();
 
   // Escape for shell
   const escapedTitle = `Epic: ${epicPath}`.replace(/"/g, '\\"');
@@ -192,6 +225,8 @@ ${body}
  * Create task issues for an epic
  */
 function createTaskIssues(epicPath, epicIssueNumber) {
+  checkRepoProtection();
+
   const epicDir = path.join(process.cwd(), '.claude/epics', epicPath);
 
   if (!fs.existsSync(epicDir)) {
@@ -223,7 +258,8 @@ function createTaskIssues(epicPath, epicIssueNumber) {
       const { frontmatter, body } = parseMarkdownFile(taskPath);
       const title = frontmatter.name || 'Untitled Task';
 
-      // Create issue body
+      // Create issue body with mandatory footer
+      const taskFooter = readMandatoryFooter();
       const issueBody = `
 Part of Epic #${epicIssueNumber}
 
@@ -235,7 +271,7 @@ ${body}
 
 **Epic Path:** \`${epicPath}\`
 **Task Number:** ${taskNumber}
-`.trim();
+${taskFooter}`.trim();
 
       // Escape for shell
       const escapedTitle = title.replace(/"/g, '\\"');
@@ -490,6 +526,8 @@ if (require.main === module) {
 module.exports = {
   parseMarkdownFile,
   updateFrontmatter,
+  checkRepoProtection,
+  readMandatoryFooter,
   createEpicIssue,
   createTaskIssues,
   updateEpicFile,

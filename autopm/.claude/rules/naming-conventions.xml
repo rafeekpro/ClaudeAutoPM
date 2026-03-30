@@ -1,0 +1,44 @@
+<rule id="naming-conventions" priority="high" enforcement="auto-reject">
+  <description>
+    Consistent naming and zero technical debt. No exceptions.
+    Always search existing codebase before creating anything new.
+  </description>
+
+  <prohibited-suffixes>
+    _advanced, _fixed, _improved, _new, _old, _v2, _v3,
+    _backup, _copy, _temp, _updated, _modified, _changed
+  </prohibited-suffixes>
+
+  <prohibited-files>
+    CHANGES_*.md, SUMMARY_*.md, WORKFLOW_SETUP_GUIDE.md,
+    one-off documentation files, temporary explanation files
+  </prohibited-files>
+
+  <before-create>
+    <step>Search existing codebase for similar functions/patterns</step>
+    <step>Check for duplicates — never create what already exists</step>
+    <step>Follow established naming patterns exactly</step>
+    <step>Match language conventions (camelCase for JS, snake_case for Python)</step>
+  </before-create>
+
+  <code-quality>
+    <never>partial implementations, TODOs in simplified code, duplicate functions,
+           mixed concerns (UI+DB), resource leaks, dead code, inconsistent formatting</never>
+    <always>SRP, separation of concerns, resource cleanup, consistent error handling,
+            meaningful names, DRY</always>
+  </code-quality>
+
+  <anti-patterns>
+    <over-engineering>No unnecessary abstractions, no factory patterns for simple functions,
+                      no middleware for trivial ops</over-engineering>
+    <under-engineering>No skipped error handling, no ignored edge cases,
+                       no hardcoded configurable values</under-engineering>
+  </anti-patterns>
+
+  <violations enforcement="auto-reject">
+    <violation>Using prohibited suffixes in any name</violation>
+    <violation>Creating one-off documentation files without explicit request</violation>
+    <violation>Duplicating existing functions without searching first</violation>
+    <violation>Leaving dead code (unused functions, imports)</violation>
+  </violations>
+</rule>

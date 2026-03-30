@@ -1,5 +1,8 @@
 name: "UI Feature"
 description: "Frontend feature or component development"
+prompt_templates:
+  - dev/stage2-code-generation.xml
+  - test/stage3-test-creation.xml
 patterns:
   - "ui"
   - "frontend"

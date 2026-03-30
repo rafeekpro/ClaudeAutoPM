@@ -1,5 +1,9 @@
 name: "API Integration"
 description: "External API integration or new API endpoint development"
+prompt_templates:
+  - arch/stage1-architectural-planning.xml
+  - dev/api-endpoint.xml
+  - test/test-suite.xml
 patterns:
   - "api"
   - "endpoint"

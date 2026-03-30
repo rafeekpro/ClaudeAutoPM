@@ -3,6 +3,10 @@
 > **IMPORTANT:** Run each `pm:issue-start` in a FRESH Claude Code session.
 > Long sessions cause rule degradation. When in doubt — start fresh.
 
+> **MANDATORY:** Every issue created by PM commands MUST include the mandatory implementation
+> rules footer from `.claude/templates/issue-mandatory-footer.md`.
+> See `.claude/rules/github-operations.xml` for details.
+
 ## pm:issue-start <issue_number> [--analyze]
 
 Start work on a GitHub issue.

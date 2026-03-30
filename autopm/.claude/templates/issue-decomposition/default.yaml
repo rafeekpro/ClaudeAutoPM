@@ -1,5 +1,9 @@
 name: "Default Template"
 description: "Generic template for issues that don't match specific patterns"
+prompt_templates:
+  - arch/stage1-architectural-planning.xml
+  - dev/stage2-code-generation.xml
+  - test/stage3-test-creation.xml
 patterns: []
 
 streams:

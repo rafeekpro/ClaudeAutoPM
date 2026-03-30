@@ -8,6 +8,9 @@
 @include .claude/rules/coverage-thresholds.xml
 @include .claude/rules/agent-mandatory.xml
 @include .claude/rules/context7.xml
+@include .claude/rules/github-operations.xml
+@include .claude/rules/naming-conventions.xml
+@include .claude/rules/command-pipelines.xml
 
 ## COMMANDS
 
@@ -15,23 +18,22 @@
 
 ## AGENTS
 
-@include .claude/agents/AGENT-REGISTRY.md
+@include .claude/agents/agent-registry.xml
 
-## EXTENDED RULES
+Full agent descriptions: `.claude/agents/AGENT-REGISTRY.md`
 
-See `.claude/rules/` for all operational rules:
+## XML PROMPT TEMPLATES
 
-- `standard-patterns.md` — Output formats, error messages, validation
-- `github-operations.md` — gh CLI patterns, repo protection
-- `frontmatter-operations.md` — YAML frontmatter read/write
-- `command-pipelines.md` — Command sequences and prerequisites
-- `naming-conventions.md` — Naming prohibitions, code quality
-- `datetime.md` — ISO 8601 timestamps from system clock
-- `context-optimization.md` — Agent delegation for context efficiency
-- `development-workflow.md` — Pre/during/post implementation steps
-- `git-strategy.md` — Branch-based development workflow
-- `strip-frontmatter.md` — Remove YAML before GitHub sync
-- `test-execution.md` — Test runner patterns and cleanup
+See `.claude/templates/xml-prompts/TEMPLATE_REGISTRY.md` for staged workflow templates.
+Builder: `lib/xml-prompt-builder.js` — invoke with template path and variables.
+
+## OPERATIONAL GUIDANCE
+
+See `.claude/rules/` for reference:
+
+- `standard-patterns.md` — Output formats, datetime handling, error messages
+- `frontmatter-operations.md` — YAML frontmatter read/write/strip
+- `git-strategy.md` — Branch naming, commit standards, merge workflow
 
 ## PROJECT
 
