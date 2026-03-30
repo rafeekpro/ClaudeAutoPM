@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { parseFrontmatter } = require('../../lib/frontmatter');
 
-async function execute(options = {}) {
+async function execute(options = {}, settings = {}) {
   const name = options.name;
   if (!name) {
     return { success: false, error: 'PRD name is required' };
@@ -13,7 +13,8 @@ async function execute(options = {}) {
     return { success: false, error: `Invalid PRD name: "${name}"` };
   }
 
-  const prdsDir = path.join(process.cwd(), '.claude', 'prds');
+  const basePath = settings.basePath || process.cwd();
+  const prdsDir = path.join(basePath, '.claude', 'prds');
   const filepath = path.join(prdsDir, `${slug}.md`);
 
   if (!fs.existsSync(filepath)) {

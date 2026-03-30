@@ -16,13 +16,14 @@ function findIssueFile(issuesDir, id) {
   return null;
 }
 
-async function execute(options = {}) {
+async function execute(options = {}, settings = {}) {
   const id = options.id;
   if (!id) {
     return { success: false, error: 'Issue ID is required' };
   }
 
-  const issuesDir = path.join(process.cwd(), '.claude', 'issues');
+  const basePath = settings.basePath || process.cwd();
+  const issuesDir = path.join(basePath, '.claude', 'issues');
   const filepath = findIssueFile(issuesDir, id);
 
   if (!filepath) {

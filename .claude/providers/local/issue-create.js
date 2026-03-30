@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-function getIssuesDir() {
-  return path.join(process.cwd(), '.claude', 'issues');
+function getIssuesDir(basePath) {
+  return path.join(basePath || process.cwd(), '.claude', 'issues');
 }
 
 function slugify(title) {
@@ -20,12 +20,13 @@ function getNextNumber(issuesDir) {
   return max + 1;
 }
 
-async function execute(options = {}) {
+async function execute(options = {}, settings = {}) {
   const title = options.title || options.name || 'Untitled Issue';
   const labels = options.labels || [];
   const body = options.body || '';
+  const basePath = settings.basePath || process.cwd();
 
-  const issuesDir = getIssuesDir();
+  const issuesDir = getIssuesDir(basePath);
   if (!fs.existsSync(issuesDir)) {
     fs.mkdirSync(issuesDir, { recursive: true });
   }

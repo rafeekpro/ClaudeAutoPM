@@ -3,35 +3,19 @@ module.exports = {
   testEnvironment: 'node',
 
   // Only stable, fast tests
+  // Explicit test files only — no wildcards to prevent chdir tests from sneaking in
+  // cli-integration.test.js excluded: uses process.chdir(), crashes subsequent suites
   testMatch: [
-    '**/test/teams/*.test.js',
-    '**/test/cli/*.test.js',
-    '**/test/local-mode/*.test.js',
-    '**/test/templates/*.test.js'
+    '**/test/templates/agent-registry-consistency.test.js',
+    '**/test/local-mode/local-issues.test.js',
+    '**/test/local-mode/local-prd-epic.test.js',
+    '**/test/core/PluginManager.test.js',
+    '**/test/installation/generate-agent-xml.test.js',
+    '**/test/installation/e2e-scenarios.test.js'
   ],
 
-  // Ignore everything else
   testPathIgnorePatterns: [
-    '/node_modules/',
-    '/test/jest-tests/',
-    '/test/unit/',
-    '/test/integration/',
-    '/test/installation/',
-    '/test/scripts/',
-    '/test/node-scripts/',
-    '/test/providers/',
-    '/test/cli/basic-commands.test.js',
-    '/test/cli/autopm-commands.test.js',
-    '/test/cli/config-command.test.js',
-    '/test/cli/epic-command.test.js',
-    '/test/cli/mcp-command.test.js',
-    '/test/teams/teams-config.test.js',  // Temporarily exclude - unrelated to Phase 1
-    // Skip all tests using process.chdir() - causes Jest/graceful-fs uv_cwd errors in CI
-    '/test/local-mode/',  // All local-mode tests use process.chdir()
-    '/test/templates/template-engine.test.js',  // Uses temp dirs, tested via cli-integration
-    '/test/templates/agent-registry-consistency.test.js',  // Must run isolated — uv_cwd crash after process.chdir() tests
-    '/test/cli/team-command.test.js',  // Uses process.chdir()
-    '/test/cli/interactive-guide.test.js'  // Uses process.chdir()
+    '/node_modules/'
   ],
 
   // Coverage settings

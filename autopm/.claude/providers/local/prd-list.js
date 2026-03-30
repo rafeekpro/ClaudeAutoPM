@@ -2,8 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const { parseFrontmatter } = require('../../lib/frontmatter');
 
-async function execute(options = {}) {
-  const prdsDir = path.join(process.cwd(), '.claude', 'prds');
+async function execute(options = {}, settings = {}) {
+  const basePath = settings.basePath || process.cwd();
+  const prdsDir = path.join(basePath, '.claude', 'prds');
 
   if (!fs.existsSync(prdsDir)) {
     return { success: true, prds: [], count: 0 };
