@@ -1,25 +1,5 @@
-# Test files
-*.test.js
-*.spec.js
-__tests__/
+node_modules/
 test/
-tests/
-
-# Development files
+*.test.js
+jest.config.*
 .DS_Store
-*.swp
-*.swo
-*~
-
-# IDE
-.vscode/
-.idea/
-*.iml
-
-# Logs
-*.log
-npm-debug.log*
-
-# Temporary files
-tmp/
-temp/

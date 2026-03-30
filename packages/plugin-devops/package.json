@@ -1,6 +1,6 @@
 {
   "name": "@claudeautopm/plugin-devops",
-  "version": "3.0.0",
+  "version": "3.13.0",
   "description": "Complete DevOps plugin with agents, commands, rules, and scripts for CI/CD, Docker, GitHub, observability, and infrastructure automation for ClaudeAutoPM",
   "main": "plugin.json",
   "type": "module",
@@ -65,11 +65,11 @@
     "url": "https://github.com/rafeekpro/ClaudeAutoPM/issues"
   },
   "engines": {
-    "node": ">=16.0.0",
+    "node": ">=18.0.0",
     "npm": ">=8.0.0"
   },
   "peerDependencies": {
-    "@claudeautopm/plugin-core": "^2.0.0"
+    "@claudeautopm/plugin-core": "^3.0.0"
   },
   "publishConfig": {
     "access": "public",
