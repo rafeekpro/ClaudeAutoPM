@@ -40,7 +40,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Publish ${{ matrix.plugin }}
         working-directory: packages/${{ matrix.plugin }}
-        run: npm publish --provenance --access public || echo "Already published or error"
+        run: npm publish --access public || echo "Already published or error"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -58,6 +58,6 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Publish ${{ inputs.plugin }}
         working-directory: packages/${{ inputs.plugin }}
-        run: npm publish --provenance --access public
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
