@@ -1,6 +1,10 @@
 # Agent Registry
 
-This document provides the official registry of all agents for inclusion in the system prompt.
+> **Note**: Only core agents (7) are bundled with autopm. All other agents are available via plugins.
+> Install plugins for your stack: `autopm install --scenario=full` or pick specific plugins.
+> The active `agent-registry.xml` is dynamically generated based on installed plugins.
+
+This document is a full reference of all available agents across all plugins.
 
 ## 🎯 Agent Selection Rules
 

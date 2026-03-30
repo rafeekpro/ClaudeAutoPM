@@ -52,6 +52,30 @@
       "description": "Analyze and summarize large files to reduce context usage",
       "version": "1.0.0",
       "tags": ["core", "analysis", "optimization"]
+    },
+    {
+      "name": "parallel-worker",
+      "file": "agents/core/parallel-worker.md",
+      "category": "core",
+      "description": "Execute parallel work streams in a git branch",
+      "version": "1.0.0",
+      "tags": ["core", "parallel", "workflow"]
+    },
+    {
+      "name": "mcp-manager",
+      "file": "agents/core/mcp-manager.md",
+      "category": "core",
+      "description": "MCP server install, config, process management, health checks",
+      "version": "1.0.0",
+      "tags": ["core", "mcp", "management"]
+    },
+    {
+      "name": "context-optimizer",
+      "file": "agents/core/context-optimizer.md",
+      "category": "core",
+      "description": "Context window efficiency, compaction, summarization, memory optimization",
+      "version": "1.0.0",
+      "tags": ["core", "context", "optimization"]
     }
   ],
   "commands": [

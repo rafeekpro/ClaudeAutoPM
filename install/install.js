@@ -925,9 +925,6 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
               agentsByCategory[category] = [];
             }
 
-            // Build installed path: .claude/agents/{category}/{filename}
-            // agent.file contains the full path like "agents/core/agent-manager.md"
-            // We extract just the filename and use category for the directory
             const filename = path.basename(agent.file);
             const installedPath = `.claude/agents/${category}/${filename}`;
 
@@ -955,7 +952,6 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
       }
     }
 
-    // Add any remaining categories not in the order list
     for (const category of Object.keys(agentsByCategory)) {
       if (!categoryOrder.includes(category)) {
         for (const agent of agentsByCategory[category]) {
@@ -965,6 +961,91 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
     }
 
     return lines.join('\n');
+  }
+
+  /**
+   * Generate XML entries for plugin agents to inject into agent-registry.xml
+   */
+  generatePluginAgentXml(installedPlugins) {
+    const packagesDir = path.join(this.baseDir, 'packages');
+    const agentsByCategory = {};
+    const categoryOrder = ['languages', 'frameworks', 'testing', 'integration', 'devops', 'cloud', 'databases', 'data', 'ai', 'ml'];
+
+    for (const pluginName of installedPlugins) {
+      const pluginJsonPath = path.join(packagesDir, pluginName, 'plugin.json');
+      if (!fs.existsSync(pluginJsonPath)) continue;
+
+      try {
+        const metadata = JSON.parse(fs.readFileSync(pluginJsonPath, 'utf-8'));
+        if (!metadata.agents) continue;
+
+        for (const agent of metadata.agents) {
+          if (agent.category === 'core') continue; // core agents are static in XML
+          const category = agent.category || 'other';
+          if (!agentsByCategory[category]) agentsByCategory[category] = [];
+
+          const filename = path.basename(agent.file);
+          agentsByCategory[category].push({
+            name: agent.name,
+            path: `agents/${category}/${filename}`,
+            description: agent.description || agent.name
+          });
+        }
+      } catch (error) {
+        this.printWarning(`Failed to read plugin agents for ${pluginName}: ${error.message}`);
+      }
+    }
+
+    const lines = [];
+    const allCategories = [...categoryOrder, ...Object.keys(agentsByCategory).filter(c => !categoryOrder.includes(c))];
+
+    for (const category of allCategories) {
+      if (!agentsByCategory[category] || agentsByCategory[category].length === 0) continue;
+      lines.push(`  <agents category="${category}">`);
+      for (const agent of agentsByCategory[category]) {
+        const escaped = agent.description.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        lines.push(`    <agent name="${agent.name}" path="${agent.path}">${escaped}</agent>`);
+      }
+      lines.push(`  </agents>`);
+    }
+
+    return lines.join('\n');
+  }
+
+  /**
+   * Update agent-registry.xml with plugin agent entries
+   */
+  updateAgentRegistry(installedPlugins) {
+    const registryPath = path.join(this.targetDir, '.claude', 'agents', 'agent-registry.xml');
+    if (!fs.existsSync(registryPath)) {
+      this.printWarning('agent-registry.xml not found, skipping plugin agent injection');
+      return;
+    }
+
+    const pluginXml = this.generatePluginAgentXml(installedPlugins);
+    let content = fs.readFileSync(registryPath, 'utf8');
+
+    const startMarker = '<!-- PLUGIN_AGENTS_START -->';
+    const endMarker = '<!-- PLUGIN_AGENTS_END -->';
+
+    const startIdx = content.indexOf(startMarker);
+    const endIdx = content.indexOf(endMarker);
+
+    if (startIdx === -1 || endIdx === -1) {
+      this.printWarning('Plugin agent markers not found in agent-registry.xml');
+      return;
+    }
+
+    const before = content.substring(0, startIdx + startMarker.length);
+    const after = content.substring(endIdx);
+
+    content = pluginXml ? `${before}\n${pluginXml}\n  ${after}` : `${before}\n  ${after}`;
+    fs.writeFileSync(registryPath, content, 'utf8');
+
+    const agentCount = (pluginXml.match(/<agent /g) || []).length;
+    if (agentCount > 0) {
+      this.printSuccess(`Injected ${agentCount} plugin agents into agent-registry.xml`);
+    }
   }
 
   async installPlugins() {
@@ -1204,6 +1285,10 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
         this.printWarning(`Failed to install ${pluginName}: ${error.message}`);
       }
     }
+
+    // Update agent-registry.xml with plugin agents
+    const pluginNames = installedPlugins.map(p => p.name);
+    this.updateAgentRegistry(pluginNames);
 
     // Store installation results in config
     this.currentConfig.installedPlugins = installedPlugins;
