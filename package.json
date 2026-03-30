@@ -165,8 +165,8 @@
     "sinon": "^21.0.0"
   },
   "optionalDependencies": {
-    "@playwright/mcp": "^0.0.43",
-    "@upstash/context7-mcp": "^1.0.0"
+    "@playwright/mcp": "^0.0.68",
+    "@upstash/context7-mcp": "^2.1.6"
   },
   "publishConfig": {
     "access": "public",
