@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * PM In-Progress Script - Node.js Implementation
- *
- * Migrated from in-progress.sh to show active work items
- * Maintains full compatibility with the original bash implementation
+ * PM In-Progress Script
+ * Outputs markdown pipe table for active work items
  */
 
 const fs = require('fs');
@@ -17,9 +15,7 @@ function getInProgressWork() {
     totalActive: 0
   };
 
-  if (!fs.existsSync('.claude/epics')) {
-    return result;
-  }
+  if (!fs.existsSync('.claude/epics')) return result;
 
   try {
     const epicDirs = fs.readdirSync('.claude/epics', { withFileTypes: true })
@@ -39,138 +35,102 @@ function getInProgressWork() {
 
           for (const issueNum of updateDirs) {
             const progressFile = path.join(updatesPath, issueNum, 'progress.md');
+            if (!fs.existsSync(progressFile)) continue;
 
-            if (fs.existsSync(progressFile)) {
-              try {
-                const progressContent = fs.readFileSync(progressFile, 'utf8');
+            try {
+              const progressContent = fs.readFileSync(progressFile, 'utf8');
+              const completionMatch = progressContent.match(/^completion:\s*(.*)$/m);
+              const completion = completionMatch ? completionMatch[1].trim() : '0%';
+              const lastSyncMatch = progressContent.match(/^last_sync:\s*(.*)$/m);
+              const lastSync = lastSyncMatch ? lastSyncMatch[1].trim() : null;
 
-                // Extract completion percentage
-                const completionMatch = progressContent.match(/^completion:\s*(.*)$/m);
-                const completion = completionMatch ? completionMatch[1].trim() : '0%';
-
-                // Extract last sync
-                const lastSyncMatch = progressContent.match(/^last_sync:\s*(.*)$/m);
-                const lastSync = lastSyncMatch ? lastSyncMatch[1].trim() : null;
-
-                // Get task name from task file
-                const taskFile = path.join(epicPath, `${issueNum}.md`);
-                let taskName = 'Unknown task';
-
-                if (fs.existsSync(taskFile)) {
-                  try {
-                    const taskContent = fs.readFileSync(taskFile, 'utf8');
-                    const nameMatch = taskContent.match(/^name:\s*(.*)$/m);
-                    if (nameMatch) {
-                      taskName = nameMatch[1].trim();
-                    }
-                  } catch (error) {
-                    // Keep default task name
-                  }
-                }
-
-                result.activeIssues.push({
-                  issueNum,
-                  epicName,
-                  taskName,
-                  completion,
-                  lastSync
-                });
-
-                result.totalActive++;
-              } catch (error) {
-                // Skip unreadable progress files
-                continue;
+              const taskFile = path.join(epicPath, `${issueNum}.md`);
+              let taskName = 'Unknown task';
+              if (fs.existsSync(taskFile)) {
+                try {
+                  const taskContent = fs.readFileSync(taskFile, 'utf8');
+                  const nameMatch = taskContent.match(/^name:\s*(.*)$/m);
+                  if (nameMatch) taskName = nameMatch[1].trim();
+                } catch (error) { /* keep default */ }
               }
-            }
+
+              result.activeIssues.push({ issueNum, epicName, taskName, completion, lastSync });
+              result.totalActive++;
+            } catch (error) { continue; }
           }
-        } catch (error) {
-          // Skip unreadable updates directories
-          continue;
-        }
+        } catch (error) { continue; }
       }
     }
 
     // Check for active epics
     for (const epicName of epicDirs) {
       const epicFile = path.join('.claude/epics', epicName, 'epic.md');
+      if (!fs.existsSync(epicFile)) continue;
 
-      if (fs.existsSync(epicFile)) {
-        try {
-          const epicContent = fs.readFileSync(epicFile, 'utf8');
+      try {
+        const epicContent = fs.readFileSync(epicFile, 'utf8');
+        const statusMatch = epicContent.match(/^status:\s*(.*)$/m);
+        const status = statusMatch ? statusMatch[1].trim() : '';
 
-          const statusMatch = epicContent.match(/^status:\s*(.*)$/m);
-          const status = statusMatch ? statusMatch[1].trim() : '';
+        if (status === 'in-progress' || status === 'active') {
+          const nameMatch = epicContent.match(/^name:\s*(.*)$/m);
+          const name = nameMatch ? nameMatch[1].trim() : epicName;
+          const progressMatch = epicContent.match(/^progress:\s*(.*)$/m);
+          const progress = progressMatch ? progressMatch[1].trim() : '0%';
+          const updatedMatch = epicContent.match(/^updated:\s*(.*)$/m);
+          const updated = updatedMatch ? updatedMatch[1].trim().split('T')[0] : '\u2014';
 
-          if (status === 'in-progress' || status === 'active') {
-            const nameMatch = epicContent.match(/^name:\s*(.*)$/m);
-            const name = nameMatch ? nameMatch[1].trim() : epicName;
-
-            const progressMatch = epicContent.match(/^progress:\s*(.*)$/m);
-            const progress = progressMatch ? progressMatch[1].trim() : '0%';
-
-            result.activeEpics.push({
-              name,
-              status,
-              progress
-            });
-          }
-        } catch (error) {
-          // Skip unreadable epic files
-          continue;
+          result.activeEpics.push({ name, status, progress, epicName, updated });
         }
-      }
+      } catch (error) { continue; }
     }
-  } catch (error) {
-    // Directory doesn't exist or can't be read
-  }
+  } catch (error) { /* skip */ }
 
   return result;
 }
 
 function formatInProgressOutput(data) {
-  let output = 'Getting status...\n\n\n';
-  output += '🔄 In Progress Work\n';
-  output += '===================\n\n';
+  const lines = [];
 
-  // Active issues
-  if (data.activeIssues.length > 0) {
-    for (const issue of data.activeIssues) {
-      output += `📝 Issue #${issue.issueNum} - ${issue.taskName}\n`;
-      output += `   Epic: ${issue.epicName}\n`;
-      output += `   Progress: ${issue.completion} complete\n`;
+  lines.push('## In Progress');
+  lines.push('');
 
-      if (issue.lastSync) {
-        output += `   Last update: ${issue.lastSync}\n`;
-      }
+  const rows = [];
 
-      output += '\n';
-    }
+  for (const issue of data.activeIssues) {
+    rows.push({ num: issue.issueNum, title: issue.taskName, type: 'task', epic: issue.epicName, started: issue.lastSync ? issue.lastSync.split('T')[0] : '\u2014' });
   }
 
-  // Active epics
-  output += '📚 Active Epics:\n';
-  if (data.activeEpics.length > 0) {
-    for (const epic of data.activeEpics) {
-      output += `   • ${epic.name} - ${epic.progress} complete\n`;
-    }
+  for (const epic of data.activeEpics) {
+    rows.push({ num: '\u2014', title: epic.name, type: 'epic', epic: '\u2014', started: epic.updated });
   }
 
-  output += '\n';
-
-  if (data.totalActive === 0) {
-    output += 'No active work items found.\n\n';
-    output += '💡 Start work with: /pm:next\n';
+  if (rows.length > 0) {
+    lines.push('| # | Title | Type | Epic | Started |');
+    lines.push('|---|-------|------|------|---------|');
+    for (const r of rows) {
+      lines.push(`| ${r.num} | ${r.title} | ${r.type} | ${r.epic} | ${r.started} |`);
+    }
+    lines.push('');
+    lines.push(`Total: ${rows.length} items in progress`);
   } else {
-    output += `📊 Total active items: ${data.totalActive}\n`;
+    lines.push('No active work items found.');
+    lines.push('');
+    lines.push('Next: /pm:next');
   }
 
-  return output;
+  // Recent Activity section
+  try {
+    const { formatRecentActivity } = require('../../../../autopm/.claude/lib/event-logger');
+    lines.push('');
+    lines.push(formatRecentActivity(7));
+  } catch (e) { /* event logger not available */ }
+
+  return lines.join('\n');
 }
 
-// CommonJS export for testing
 module.exports = getInProgressWork;
 
-// CLI execution
 if (require.main === module) {
   const data = getInProgressWork();
   console.log(formatInProgressOutput(data));
