@@ -19,7 +19,7 @@ function findIssueFile(issuesDir, id) {
 async function execute(options = {}, settings = {}) {
   const id = options.id;
   if (!id) {
-    return { success: false, error: 'Issue ID is required' };
+    return { success: false, error: 'Issue ID is required. Usage: /pm:issue-show <number>' };
   }
 
   const basePath = settings.basePath || process.cwd();
@@ -27,7 +27,7 @@ async function execute(options = {}, settings = {}) {
   const filepath = findIssueFile(issuesDir, id);
 
   if (!filepath) {
-    return { success: false, error: `Issue #${id} not found` };
+    return { success: false, error: `Issue #${id} not found. Run /pm:issue-list to see available issues.` };
   }
 
   const content = fs.readFileSync(filepath, 'utf8');

@@ -14,7 +14,7 @@ function getPrdsDir(basePath) {
 async function execute(options = {}, settings = {}) {
   const title = options.title || options.name;
   if (!title) {
-    return { success: false, error: 'Title is required' };
+    return { success: false, error: 'Title is required. Usage: /pm:prd-new "Feature Name"' };
   }
 
   const priority = options.priority || 'P2';
@@ -24,10 +24,10 @@ async function execute(options = {}, settings = {}) {
 
   const slug = slugify(title);
   if (!slug) {
-    return { success: false, error: 'Could not generate valid slug from title' };
+    return { success: false, error: 'Could not generate valid slug from title. Use alphanumeric characters: /pm:prd-new "My Feature"' };
   }
   if (!/^[a-z0-9-]+$/.test(slug)) {
-    return { success: false, error: `Invalid slug generated: "${slug}"` };
+    return { success: false, error: `Invalid slug "${slug}". Use only letters, numbers, hyphens: /pm:prd-new "My Feature"` };
   }
 
   const prdsDir = getPrdsDir(basePath);
@@ -38,7 +38,7 @@ async function execute(options = {}, settings = {}) {
   const filepath = path.join(prdsDir, `${slug}.md`);
 
   if (fs.existsSync(filepath)) {
-    return { success: false, error: `PRD "${slug}" already exists` };
+    return { success: false, error: `PRD "${slug}" already exists at .claude/prds/${slug}.md. Use /pm:prd-edit ${slug} to modify.` };
   }
 
   const now = new Date().toISOString();

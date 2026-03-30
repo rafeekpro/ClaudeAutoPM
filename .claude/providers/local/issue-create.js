@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { readTemplate, generateMarkdown, resolveTemplatePath } = require('../../lib/template-reader');
+const { logEvent } = require('../../lib/event-logger');
 
 function getIssuesDir(basePath) {
   return path.join(basePath || process.cwd(), '.claude', 'issues');
@@ -35,7 +36,7 @@ async function execute(options = {}, settings = {}) {
   const number = getNextNumber(issuesDir);
   const slug = slugify(title);
   if (!slug) {
-    return { success: false, error: 'Could not generate valid slug from title' };
+    return { success: false, error: 'Could not generate valid slug from title. Use alphanumeric characters: /pm:issue-create "Fix login bug"' };
   }
 
   const filename = `${number}-${slug}.md`;
@@ -61,6 +62,7 @@ async function execute(options = {}, settings = {}) {
   }
 
   fs.writeFileSync(filepath, content, 'utf8');
+  logEvent('issue.created', { id: number, title, labels }, basePath);
 
   return {
     success: true,
