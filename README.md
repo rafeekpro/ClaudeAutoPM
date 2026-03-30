@@ -7,7 +7,7 @@
 
 **AI-Powered Project Management Framework for Claude Code**
 
-ClaudeAutoPM transforms your development workflow with intelligent automation, 40 specialized AI agents, and complete GitHub/Azure DevOps integration.
+ClaudeAutoPM transforms your development workflow with intelligent automation, specialized AI agents via a plugin system, and complete GitHub/Azure DevOps integration. Install only what you need — pay only for the tokens you use.
 
 ---
 
@@ -20,10 +20,94 @@ autopm install
 ```
 
 Choose your scenario during installation:
-- **Minimal** - Core features, sequential execution
-- **Docker** - Container development with Docker
-- **Full** - All features, adaptive execution (recommended)
-- **Performance** - Maximum parallelization for power users
+
+| Scenario | Agents | Use case |
+|----------|--------|----------|
+| **Lite** | 7 core | Minimal token footprint |
+| **GitHub** | 12 | Core + languages for GitHub projects |
+| **Azure** | 14 | Core + languages + Azure DevOps |
+| **Docker** | 16 | Core + DevOps + containers |
+| **Full** | 44+ | All plugins, all agents |
+| **Performance** | 44+ | Full + max parallelization |
+
+---
+
+## Architecture
+
+### Plugin-Based Agent System
+
+ClaudeAutoPM uses a **plugin architecture** for token efficiency. Only 7 core agents are loaded by default. Specialized agents are installed on demand via plugins.
+
+```
+autopm/.claude/agents/       ← 7 core agents (always available)
+packages/plugin-*/agents/    ← 37+ specialized agents (per plugin)
+```
+
+**Token savings**: Lite installs use 73% fewer agent tokens vs full.
+
+### XML Rules Engine
+
+7 critical rules auto-loaded via `@include` in XML format:
+
+| Rule | Enforcement |
+|------|-------------|
+| `tdd.enforcement.xml` | Zero-tolerance TDD cycle |
+| `coverage-thresholds.xml` | 80/75/80/80 coverage gates |
+| `agent-mandatory.xml` | Agent delegation + context strategy |
+| `context7.xml` | Context7 MCP before any library code |
+| `github-operations.xml` | Repo protection + mandatory issue footer |
+| `naming-conventions.xml` | Naming prohibitions + code quality |
+| `command-pipelines.xml` | 5 mandatory command sequences |
+
+3 MD operational guides: `standard-patterns.md`, `frontmatter-operations.md`, `git-strategy.md`
+
+### Dynamic Agent Registry
+
+`agent-registry.xml` is generated at install time based on selected plugins:
+
+```xml
+<!-- Core agents (always present) -->
+<agents category="core">
+  <agent name="code-analyzer">...</agent>
+  <agent name="test-runner">...</agent>
+  ...
+</agents>
+
+<!-- Plugin agents (injected by installer) -->
+<!-- PLUGIN_AGENTS_START -->
+<agents category="languages">...</agents>
+<agents category="frameworks">...</agents>
+<!-- PLUGIN_AGENTS_END -->
+```
+
+---
+
+## Core Agents (Always Available)
+
+| Agent | Purpose |
+|-------|---------|
+| `agent-manager` | Agent lifecycle, registry maintenance |
+| `code-analyzer` | Code analysis, bug detection, logic tracing |
+| `test-runner` | Test execution with actionable insights |
+| `file-analyzer` | Summarize large files, reduce context |
+| `parallel-worker` | Multi-agent parallel work streams |
+| `mcp-manager` | MCP server install, config, health |
+| `context-optimizer` | Context window efficiency, compaction |
+
+## Plugin Agents
+
+| Plugin | Agents | Examples |
+|--------|--------|----------|
+| **plugin-languages** | 5 | python-backend-engineer, nodejs-backend-engineer, bash-scripting-expert |
+| **plugin-frameworks** | 6 | react-frontend-engineer, tailwindcss-expert, e2e-test-engineer |
+| **plugin-cloud** | 8 | aws-cloud-architect, kubernetes-orchestrator, terraform-expert |
+| **plugin-devops** | 7 | docker-expert, github-operations-specialist, observability-engineer |
+| **plugin-databases** | 5 | postgresql-expert, mongodb-expert, redis-expert |
+| **plugin-ai** | 8 | openai-python-expert, gemini-api-expert, langchain-expert |
+| **plugin-data** | 3 | airflow-orchestration-expert, kedro-pipeline-expert |
+| **plugin-testing** | 2 | frontend-testing-engineer, e2e specialists |
+| **plugin-ml** | 2 | ML workflow agents |
+| **plugin-pm** | — | 29 PM commands (PRD, epic, issue management) |
 
 ---
 
@@ -36,13 +120,9 @@ All commands run inside Claude Code (not terminal):
 /context:create
 /testing:prime
 
-# Azure DevOps integration
-/azure:init
-/azure:us-new "User authentication"
-/azure:task-list
-
-# GitHub integration
-/github:workflow-create
+# PM workflow
+/pm:issue-start 42
+/pm:issue-finish 42
 
 # Working with agents
 @python-backend-engineer Build FastAPI endpoint
@@ -54,178 +134,42 @@ All commands run inside Claude Code (not terminal):
 
 ## Features
 
-### Plugin System
+### 13 Official Plugins
 
-12 official plugins with 269 commands across all domains:
-
-**Core** (7 commands)
-- Context management (`/context:*`)
-- Testing framework detection (`/testing:*`)
-- Configuration (`/config:*`)
-- MCP server setup (`/mcp:*`)
-
-**PM System** (54 commands)
-- PRD and Epic management
-- Issue tracking and decomposition
-- Git workflow integration
-- Progress tracking
-
-**Azure DevOps** (41 commands)
-- User Story management (`/azure:us-*`)
-- Task management (`/azure:task-*`)
-- Feature/Epic management (`/azure:feature-*`)
-- Sprint planning and status
-
-**GitHub** (18 commands)
-- Workflow creation
-- Issue and PR management
-- Repository automation
-
-**Languages** (3 commands)
-- Python backend expert
-- JavaScript frontend expert
-- Node.js backend expert
-
-**Frameworks** (6 commands)
-- React UI components
-- Tailwind CSS styling
-- UX design analysis
-
-**Testing** (3 commands)
-- E2E test scaffolding
-- Frontend testing
-- Test execution
-
-**DevOps** (8 commands)
-- Docker containerization
-- Kubernetes deployment
-- Infrastructure setup
-- SSH operations
-
-**Cloud** (2 commands)
-- Multi-cloud deployment
-- Infrastructure automation
-
-**Databases** (4 commands)
-- PostgreSQL expert
-- MongoDB expert
-- Redis expert
-- BigQuery expert
-
-**AI/ML** (3 commands)
-- LangGraph workflows
-- OpenAI integration
-- Data pipelines
-
-**Data** (3 commands)
-- Kedro pipelines
-- Airflow orchestration
-
-### Agent Registry
-
-40 specialized AI agents organized by domain:
-
-**Core Agents** (6)
-- `agent-manager` - Create and manage agents
-- `code-analyzer` - Code analysis and bug detection
-- `test-runner` - Test execution and analysis
-- `file-analyzer` - Large file summarization
-- `parallel-worker` - Multi-agent coordination
-- `mcp-manager` - MCP server infrastructure
-
-**Language Agents** (4)
-- `python-backend-engineer` - Python architecture and FastAPI
-- `javascript-frontend-engineer` - Modern JavaScript/TypeScript
-- `nodejs-backend-engineer` - Express, Fastify, NestJS
-- `bash-scripting-expert` - Shell automation and scripting
-
-**Framework Agents** (5)
-- `react-frontend-engineer` - Full React applications
-- `react-ui-expert` - UI components (MUI, Chakra, AntD)
-- `tailwindcss-expert` - Utility-first CSS framework
-- `ux-design-expert` - UX/UI design and accessibility
-- `e2e-test-engineer` - Playwright and Cypress E2E tests
-
-**Testing Agents** (1)
-- `frontend-testing-engineer` - Component and integration tests
-
-**Database Agents** (4)
-- `postgresql-expert` - PostgreSQL design and optimization
-- `mongodb-expert` - MongoDB schema and aggregation
-- `redis-expert` - Caching and pub/sub messaging
-- `bigquery-expert` - Data warehouse and analytics
-
-**DevOps Agents** (6)
-- `docker-containerization-expert` - Docker containers and compose
-- `kubernetes-orchestrator` - K8s deployments and Helm
-- `github-operations-specialist` - GitHub Actions and workflows
-- `observability-engineer` - Prometheus, Grafana, ELK
-- `traefik-proxy-expert` - Reverse proxy configuration
-- `ssh-operations-expert` - Secure SSH operations
-
-**Cloud Agents** (5)
-- `aws-cloud-architect` - AWS infrastructure design
-- `azure-cloud-architect` - Azure cloud architecture
-- `gcp-cloud-architect` - GCP cloud design
-- `terraform-infrastructure-expert` - Infrastructure as Code
-- `gcp-cloud-functions-engineer` - Serverless functions
-
-**Integration Agents** (2)
-- `message-queue-engineer` - Kafka, RabbitMQ, SQS/SNS
-- `nats-messaging-expert` - NATS pub/sub and queues
-
-**Data/ML Agents** (3)
-- `langgraph-workflow-expert` - LangGraph workflows
-- `kedro-pipeline-expert` - Kedro data pipelines
-- `airflow-orchestration-expert` - Airflow DAGs
-
-**AI API Agents** (2)
-- `openai-python-expert` - OpenAI API integration
-- `gemini-api-expert` - Google Gemini API
+- **Core** — Context management, testing, configuration, MCP
+- **PM System** — PRD, epics, issues, decomposition, git workflow
+- **Azure DevOps** — Work items, boards, pipelines, sprints
+- **GitHub** — Workflows, issues, PRs, automation
+- **Languages** — Python, JavaScript, Node.js, Bash
+- **Frameworks** — React, Tailwind, UX, E2E testing, NATS
+- **Testing** — Frontend unit/integration, E2E
+- **DevOps** — Docker, Kubernetes, Traefik, SSH, observability
+- **Cloud** — AWS, Azure, GCP, Terraform, serverless
+- **Databases** — PostgreSQL, MongoDB, BigQuery, CosmosDB, Redis
+- **AI/ML** — OpenAI, Gemini, LangChain, HuggingFace
+- **Data** — Airflow, Kedro, LangGraph
 
 ### Provider Integration
 
-- **GitHub** - Issues, PRs, Actions, Projects, Workflows
-- **Azure DevOps** - Work Items, Boards, Pipelines, Sprints
-- **Local** - Git-based workflow with markdown tracking
+- **GitHub** — Issues, PRs, Actions, Projects
+- **Azure DevOps** — Work Items, Boards, Pipelines
+- **Local** — Git-based workflow with markdown tracking
 
 ### Execution Strategies
 
-- **Sequential** - Safe, predictable, resource-light
-- **Adaptive** - Intelligent mode selection (default)
-- **Hybrid** - Maximum parallelization
+- **Sequential** — Safe, predictable
+- **Adaptive** — Intelligent mode selection (default)
+- **Hybrid** — Maximum parallelization
 
 ---
 
 ## Documentation
 
-### Getting Started
 - [Installation](https://rafeekpro.github.io/ClaudeAutoPM/getting-started/installation)
-- [First Project](https://rafeekpro.github.io/ClaudeAutoPM/getting-started/first-project)
-- [Configuration](https://rafeekpro.github.io/ClaudeAutoPM/getting-started/configuration)
-
-### User Guide
 - [Command Overview](https://rafeekpro.github.io/ClaudeAutoPM/user-guide/commands-overview)
 - [Agent Registry](https://rafeekpro.github.io/ClaudeAutoPM/user-guide/agents-overview)
-- [PM System](https://rafeekpro.github.io/ClaudeAutoPM/user-guide/pm-system)
-- [Azure DevOps Integration](https://rafeekpro.github.io/ClaudeAutoPM/user-guide/azure-devops)
-- [GitHub Integration](https://rafeekpro.github.io/ClaudeAutoPM/user-guide/github-integration)
-- [MCP Servers](https://rafeekpro.github.io/ClaudeAutoPM/user-guide/mcp-servers)
-- [Best Practices](https://rafeekpro.github.io/ClaudeAutoPM/user-guide/best-practices)
-
-### Developer Guide
-- [Architecture](https://rafeekpro.github.io/ClaudeAutoPM/developer-guide/architecture)
 - [Plugin Development](https://rafeekpro.github.io/ClaudeAutoPM/developer-guide/plugin-development)
-- [Agent Development](https://rafeekpro.github.io/ClaudeAutoPM/developer-guide/agent-development)
-- [Command Development](https://rafeekpro.github.io/ClaudeAutoPM/developer-guide/command-development)
-- [Testing](https://rafeekpro.github.io/ClaudeAutoPM/developer-guide/testing)
-- [Contributing](https://rafeekpro.github.io/ClaudeAutoPM/developer-guide/contributing)
-
-### Reference
-- [CLI Reference](https://rafeekpro.github.io/ClaudeAutoPM/commands/)
-- [Agent Registry](https://rafeekpro.github.io/ClaudeAutoPM/agents/)
-- [Configuration Options](https://rafeekpro.github.io/ClaudeAutoPM/reference/configuration)
-- [Troubleshooting](https://rafeekpro.github.io/ClaudeAutoPM/reference/troubleshooting)
+- [Architecture](https://rafeekpro.github.io/ClaudeAutoPM/developer-guide/architecture)
 
 ---
 
@@ -234,9 +178,9 @@ All commands run inside Claude Code (not terminal):
 | Feature | ClaudeAutoPM | Traditional Tools |
 |---------|--------------|-------------------|
 | AI-native | Built for Claude Code | Adapted/retrofitted |
-| Modular | 12 plugins, install what you need | Monolithic |
-| Agents | 40 specialized experts | Generic or none |
-| Workflow | Context to Production | Fragmented |
+| Token-efficient | Plugin system, install what you need | Monolithic |
+| Agents | 44+ specialized, load on demand | Generic or none |
+| Rules | 7 XML auto-enforced (TDD, coverage, Context7) | Manual checklists |
 | Integration | GitHub + Azure DevOps | Limited |
 | Documentation | Context7-verified, always current | Often outdated |
 
@@ -244,11 +188,9 @@ All commands run inside Claude Code (not terminal):
 
 ## Contributing
 
-We welcome contributions! See [Contributing Guide](https://rafeekpro.github.io/ClaudeAutoPM/developer-guide/contributing) for:
-- Development setup
-- Coding standards (TDD mandatory)
-- Testing requirements
-- Pull request process
+We welcome contributions! See [Contributing Guide](https://rafeekpro.github.io/ClaudeAutoPM/developer-guide/contributing).
+
+TDD is mandatory — every PR must follow Red-Green-Refactor.
 
 ---
 
@@ -263,13 +205,4 @@ MIT License - see [LICENSE](LICENSE) for details.
 - **Documentation**: [rafeekpro.github.io/ClaudeAutoPM](https://rafeekpro.github.io/ClaudeAutoPM/)
 - **npm**: [npmjs.com/package/claude-autopm](https://www.npmjs.com/package/claude-autopm)
 - **Issues**: [GitHub Issues](https://github.com/rafeekpro/ClaudeAutoPM/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/rafeekpro/ClaudeAutoPM/discussions)
 - **Changelog**: [CHANGELOG.md](CHANGELOG.md)
-
----
-
-<p align="center">
-  <b>Built for Claude Code community</b>
-  <br>
-  <sub>Star this repo if ClaudeAutoPM helps your workflow!</sub>
-</p>
