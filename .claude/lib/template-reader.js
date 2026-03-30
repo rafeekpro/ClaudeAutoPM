@@ -7,6 +7,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { parseFrontmatter, stringifyFrontmatter } = require('./frontmatter');
 
 /**
  * Parse XML template file into structured object
@@ -59,8 +60,8 @@ function readTemplate(templatePath) {
   const validation = [];
   const ruleRegex = /<rule>([\s\S]*?)<\/rule>/g;
   let ruleMatch;
-  while ((ruleRegex.exec(xml)) !== null) {
-    validation.push(RegExp.$1.trim());
+  while ((ruleMatch = ruleRegex.exec(xml)) !== null) {
+    validation.push(ruleMatch[1].trim());
   }
 
   return { id, version, frontmatter, sections, validation };
@@ -74,9 +75,9 @@ function readTemplate(templatePath) {
  */
 function generateMarkdown(template, data = {}) {
   const now = new Date().toISOString();
-  const lines = ['---'];
 
-  // Generate frontmatter
+  // Build frontmatter object from template fields + data
+  const fm = {};
   for (const field of template.frontmatter) {
     let value;
 
@@ -89,47 +90,32 @@ function generateMarkdown(template, data = {}) {
     } else if (field.default !== undefined && field.default !== null) {
       value = field.default;
     } else if (field.type === 'datetime') {
-      value = '""';
+      value = '';
     } else {
       value = '';
     }
 
-    // Format value based on type
-    if (field.type === 'string' && typeof value === 'string' && (value.includes(':') || value.includes('"'))) {
-      lines.push(`${field.name}: "${value.replace(/"/g, '\\"')}"`);
-    } else if (field.type === 'array') {
-      if (Array.isArray(value)) {
-        lines.push(`${field.name}: [${value.join(', ')}]`);
-      } else {
-        lines.push(`${field.name}: ${value}`);
-      }
-    } else if (field.type === 'string' && value === '') {
-      lines.push(`${field.name}: ""`);
-    } else {
-      lines.push(`${field.name}: ${value}`);
-    }
+    fm[field.name] = value;
   }
 
-  lines.push('---');
-  lines.push('');
-
-  // Generate sections
+  // Build body from sections
+  const bodyLines = [];
   for (const section of template.sections) {
     const content = data[section.name] || '';
-    lines.push(`## ${section.heading}`);
+    bodyLines.push(`## ${section.heading}`);
 
     if (content) {
-      lines.push(content);
+      bodyLines.push(content);
     } else if (section.placeholder) {
-      lines.push(section.placeholder);
+      bodyLines.push(section.placeholder);
     } else if (section.required) {
-      lines.push('TODO');
+      bodyLines.push('TODO');
     }
 
-    lines.push('');
+    bodyLines.push('');
   }
 
-  return lines.join('\n');
+  return stringifyFrontmatter(fm, bodyLines.join('\n'));
 }
 
 /**
@@ -140,12 +126,13 @@ function generateMarkdown(template, data = {}) {
  */
 function validateContent(template, content) {
   const errors = [];
+  const { frontmatter, body } = parseFrontmatter(content);
 
   // Check required frontmatter fields
   for (const field of template.frontmatter) {
     if (field.required) {
-      const regex = new RegExp(`^${field.name}:\\s*.+$`, 'm');
-      if (!regex.test(content)) {
+      const val = frontmatter[field.name];
+      if (val === undefined || val === null || val === '') {
         errors.push(`Missing required field: ${field.name}`);
       }
     }
@@ -155,8 +142,29 @@ function validateContent(template, content) {
   for (const section of template.sections) {
     if (section.required) {
       const headingRegex = new RegExp(`^## ${section.heading}`, 'm');
-      if (!headingRegex.test(content)) {
+      if (!headingRegex.test(body)) {
         errors.push(`Missing required section: ${section.heading}`);
+      }
+    }
+  }
+
+  // Evaluate validation rules
+  if (template.validation) {
+    for (const rule of template.validation) {
+      if (/must be non-empty/i.test(rule)) {
+        const sectionName = rule.split(/\s+must/)[0].trim();
+        const section = template.sections.find(s => s.name === sectionName);
+        if (section) {
+          const headingPattern = new RegExp(`## ${section.heading}[^\\n]*\\n([\\s\\S]*?)(?=\\n## |$)`);
+          const match = body.match(headingPattern);
+          if (!match || !match[1].trim()) {
+            errors.push(`Validation failed: ${rule}`);
+          }
+        }
+      } else if (/checkbox|- \[ \]/i.test(rule)) {
+        if (!content.includes('- [ ]') && !content.includes('- [x]')) {
+          errors.push(`Validation failed: ${rule}`);
+        }
       }
     }
   }

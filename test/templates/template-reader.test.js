@@ -74,7 +74,7 @@ describe('generateMarkdown', () => {
     expect(md).toContain('number: 1');
     expect(md).toContain('name: Fix login bug');
     expect(md).toContain('status: open');
-    expect(md).toContain('labels: [bug]');
+    expect(md).toContain('- bug');
     expect(md).toContain('## Goal');
     expect(md).toContain('Fix the login authentication failure');
     expect(md).toContain('## Acceptance Criteria');
@@ -145,6 +145,63 @@ describe('validateContent', () => {
     const result = validateContent(tpl, content);
     expect(result.valid).toBe(false);
     expect(result.errors.some(e => e.includes('Acceptance Criteria'))).toBe(true);
+  });
+});
+
+describe('validateContent with validation rules', () => {
+  test('fails when goal section is empty', () => {
+    const tpl = readTemplate(path.join(TEMPLATES_DIR, 'issue.xml'));
+    const content = `---\nname: Test\nstatus: open\n---\n\n## Goal\n\n## Acceptance Criteria\n- [ ] Done\n\n## Affected Files\n- src/app.js\n`;
+
+    const result = validateContent(tpl, content);
+    expect(result.valid).toBe(false);
+    expect(result.errors.some(e => e.includes('goal must be non-empty'))).toBe(true);
+  });
+
+  test('fails when no checkbox present', () => {
+    const tpl = readTemplate(path.join(TEMPLATES_DIR, 'issue.xml'));
+    const content = `---\nname: Test\nstatus: open\n---\n\n## Goal\nFix bug\n\n## Acceptance Criteria\nNo checkboxes here\n\n## Affected Files\n- src/app.js\n`;
+
+    const result = validateContent(tpl, content);
+    expect(result.valid).toBe(false);
+    expect(result.errors.some(e => e.includes('checkbox'))).toBe(true);
+  });
+
+  test('passes with valid content and checkboxes', () => {
+    const tpl = readTemplate(path.join(TEMPLATES_DIR, 'issue.xml'));
+    const content = `---\nname: Test\nstatus: open\n---\n\n## Goal\nFix the bug\n\n## Acceptance Criteria\n- [ ] Done\n\n## Affected Files\n- src/app.js\n`;
+
+    const result = validateContent(tpl, content);
+    expect(result.valid).toBe(true);
+  });
+});
+
+describe('template-based issue creation', () => {
+  let tempDir;
+
+  beforeEach(() => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'issue-create-'));
+    const templatesDir = path.join(tempDir, '.claude', 'templates');
+    fs.mkdirSync(templatesDir, { recursive: true });
+    fs.copyFileSync(
+      path.join(TEMPLATES_DIR, 'issue.xml'),
+      path.join(templatesDir, 'issue.xml')
+    );
+  });
+
+  afterEach(() => {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test('issue-create uses template structure', async () => {
+    const { execute } = require('../../autopm/.claude/providers/local/issue-create');
+    const result = await execute({ title: 'Test Issue' }, { basePath: tempDir });
+
+    expect(result.success).toBe(true);
+    const content = fs.readFileSync(result.issue.path, 'utf8');
+    expect(content).toContain('## Goal');
+    expect(content).toContain('## Acceptance Criteria');
+    expect(content).toContain('## Affected Files');
   });
 });
 
