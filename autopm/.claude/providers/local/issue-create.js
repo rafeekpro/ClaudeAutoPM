@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { readTemplate, generateMarkdown, resolveTemplatePath } = require('../../lib/template-reader');
+const { logEvent } = require('../../lib/event-logger');
 
 function getIssuesDir(basePath) {
   return path.join(basePath || process.cwd(), '.claude', 'issues');
@@ -73,7 +74,7 @@ async function execute(options = {}, settings = {}) {
       url: `file://${filepath}`
     },
     actions: [`Created local issue #${number}: ${filename}`],
-    timestamp: new Date().toISOString()
+    timestamp: (() => { logEvent('issue.created', { id: number, title, labels }, basePath); return new Date().toISOString(); })()
   };
 }
 

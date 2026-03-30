@@ -3,6 +3,7 @@ const path = require('path');
 const { execSync } = require('child_process');
 const { findIssueFile } = require('./issue-show');
 const { parseIssueFrontmatter } = require('./issue-list');
+const { logEvent } = require('../../lib/event-logger');
 
 async function execute(options = {}, settings = {}) {
   const id = options.id;
@@ -44,6 +45,8 @@ async function execute(options = {}, settings = {}) {
       actions.push(`Branch creation skipped: ${e.message.split('\n')[0]}`);
     }
   }
+
+  logEvent('issue.started', { id: parseInt(id), title: fm.name }, basePath);
 
   return {
     success: true,

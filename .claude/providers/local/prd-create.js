@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { readTemplate, generateMarkdown, resolveTemplatePath } = require('../../lib/template-reader');
+const { logEvent } = require('../../lib/event-logger');
 
 function slugify(title) {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50);
@@ -59,6 +60,8 @@ async function execute(options = {}, settings = {}) {
   }
 
   fs.writeFileSync(filepath, content, 'utf8');
+
+  logEvent('prd.created', { name: slug, title, priority }, basePath);
 
   return {
     success: true,
