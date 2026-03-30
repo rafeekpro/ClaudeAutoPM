@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { readTemplate, generateMarkdown, resolveTemplatePath } = require('../../lib/template-reader');
+const { logEvent } = require('../../lib/event-logger');
 
 async function execute(options = {}, settings = {}) {
   const name = options.name;
@@ -72,6 +73,8 @@ async function execute(options = {}, settings = {}) {
     .replace(/^updated:\s*.*/m, `updated: ${now}`)
     .replace(/^progress:\s*\d+/m, `progress: 0`);
   fs.writeFileSync(epicFile, updatedContent, 'utf8');
+
+  logEvent('epic.decomposed', { name: slug, taskCount: created.length }, basePath);
 
   return {
     success: true,

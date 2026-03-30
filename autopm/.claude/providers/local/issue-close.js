@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { findIssueFile } = require('./issue-show');
 const { parseIssueFrontmatter } = require('./issue-list');
+const { logEvent } = require('../../lib/event-logger');
 
 async function execute(options = {}, settings = {}) {
   const id = options.id;
@@ -28,6 +29,8 @@ async function execute(options = {}, settings = {}) {
     .replace(/^completed:\s*.*$/m, `completed: ${now}`);
 
   fs.writeFileSync(filepath, updated, 'utf8');
+
+  logEvent('issue.closed', { id: parseInt(id), title: fm.name }, basePath);
 
   return {
     success: true,
