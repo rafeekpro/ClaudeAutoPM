@@ -6,17 +6,17 @@ const { logEvent } = require('../../lib/event-logger');
 async function execute(options = {}, settings = {}) {
   const name = options.name;
   if (!name) {
-    return { success: false, error: 'Epic name is required' };
+    return { success: false, error: 'Epic name is required. Usage: /pm:epic-decompose <name>' };
   }
 
   const slug = path.basename(name);
   if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
-    return { success: false, error: `Invalid epic name: "${name}"` };
+    return { success: false, error: `Invalid epic name "${name}". Use the slug (lowercase, hyphens). Run /pm:epic-list to see available epics.` };
   }
 
   const tasks = options.tasks;
   if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
-    return { success: false, error: 'Tasks array is required' };
+    return { success: false, error: 'Tasks array is required. Provide tasks: [{title: "Task 1", description: "..."}]' };
   }
 
   const basePath = settings.basePath || process.cwd();
@@ -25,7 +25,7 @@ async function execute(options = {}, settings = {}) {
   const epicFile = path.join(epicDir, 'epic.md');
 
   if (!fs.existsSync(epicFile)) {
-    return { success: false, error: `Epic "${slug}" not found` };
+    return { success: false, error: `Epic "${slug}" not found. Run /pm:epic-list to see available epics, or /pm:epic-create to create one.` };
   }
 
   const now = new Date().toISOString();

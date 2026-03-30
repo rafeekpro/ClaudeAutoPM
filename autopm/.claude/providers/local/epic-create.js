@@ -14,7 +14,7 @@ function getEpicsDir(basePath) {
 async function execute(options = {}, settings = {}) {
   const title = options.title || options.name;
   if (!title) {
-    return { success: false, error: 'Title is required' };
+    return { success: false, error: 'Title is required. Usage: /pm:epic-create "Epic Name"' };
   }
 
   const prd = options.prd || '';
@@ -23,17 +23,17 @@ async function execute(options = {}, settings = {}) {
 
   const slug = slugify(title);
   if (!slug) {
-    return { success: false, error: 'Could not generate valid slug from title' };
+    return { success: false, error: 'Could not generate valid slug from title. Use alphanumeric characters.' };
   }
   if (!/^[a-z0-9-]+$/.test(slug)) {
-    return { success: false, error: `Invalid slug generated: "${slug}"` };
+    return { success: false, error: `Invalid slug "${slug}". Use only letters, numbers, hyphens.` };
   }
 
   const epicDir = path.join(getEpicsDir(basePath), slug);
   const filepath = path.join(epicDir, 'epic.md');
 
   if (fs.existsSync(filepath)) {
-    return { success: false, error: `Epic "${slug}" already exists` };
+    return { success: false, error: `Epic "${slug}" already exists at .claude/epics/${slug}/. Use /pm:epic-edit ${slug} to modify.` };
   }
 
   fs.mkdirSync(epicDir, { recursive: true });

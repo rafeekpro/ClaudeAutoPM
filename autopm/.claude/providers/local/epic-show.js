@@ -5,12 +5,12 @@ const { parseFrontmatter } = require('../../lib/frontmatter');
 async function execute(options = {}, settings = {}) {
   const name = options.name;
   if (!name) {
-    return { success: false, error: 'Epic name is required' };
+    return { success: false, error: 'Epic name is required. Usage: /pm:epic-show <name>. Run /pm:epic-list to see available epics.' };
   }
 
   const slug = path.basename(name);
   if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
-    return { success: false, error: `Invalid epic name: "${name}"` };
+    return { success: false, error: `Invalid epic name "${name}". Use the slug (lowercase, hyphens). Run /pm:epic-list to see available epics.` };
   }
 
   const basePath = settings.basePath || process.cwd();
@@ -19,7 +19,7 @@ async function execute(options = {}, settings = {}) {
   const filepath = path.join(epicDir, 'epic.md');
 
   if (!fs.existsSync(filepath)) {
-    return { success: false, error: `Epic "${slug}" not found` };
+    return { success: false, error: `Epic "${slug}" not found. Run /pm:epic-list to see available epics.` };
   }
 
   const content = fs.readFileSync(filepath, 'utf8');

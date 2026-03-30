@@ -5,12 +5,12 @@ const { parseFrontmatter } = require('../../lib/frontmatter');
 async function execute(options = {}, settings = {}) {
   const name = options.name;
   if (!name) {
-    return { success: false, error: 'PRD name is required' };
+    return { success: false, error: 'PRD name is required. Usage: /pm:prd-show <name>. Run /pm:prd-list to see available PRDs.' };
   }
 
   const slug = path.basename(name.replace(/\.md$/, ''));
   if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
-    return { success: false, error: `Invalid PRD name: "${name}"` };
+    return { success: false, error: `Invalid PRD name "${name}". Use the slug (lowercase, hyphens). Run /pm:prd-list to see available PRDs.` };
   }
 
   const basePath = settings.basePath || process.cwd();
@@ -18,7 +18,7 @@ async function execute(options = {}, settings = {}) {
   const filepath = path.join(prdsDir, `${slug}.md`);
 
   if (!fs.existsSync(filepath)) {
-    return { success: false, error: `PRD "${slug}" not found` };
+    return { success: false, error: `PRD "${slug}" not found. Run /pm:prd-list to see available PRDs.` };
   }
 
   const content = fs.readFileSync(filepath, 'utf8');
