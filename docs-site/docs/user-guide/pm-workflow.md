@@ -31,7 +31,7 @@ ClaudeAutoPM supports three issue tracking providers. The active provider is set
 
 | Provider | Scenario | Requires | Storage |
 |----------|----------|----------|---------|
-| **local** | lite | Nothing | `.claude/providers/local/` |
+| **local** | lite | Nothing | `.claude/issues/` |
 | **github** | github, docker, full, performance | `gh` CLI | GitHub Issues |
 | **azure** | azure, full-azure | `az` CLI | Azure DevOps Work Items |
 
@@ -57,7 +57,7 @@ The local provider works without any external service. Issues are stored as file
 # In Claude Code:
 /pm:prd-new user-authentication
 /pm:prd-parse user-authentication
-/pm:epic-sync user-authentication    # Creates local issues
+/pm:epic-decompose user-authentication    # Breaks epic into tasks (local files)
 ```
 
 ### Local Issue Commands
@@ -68,6 +68,8 @@ The local provider works without any external service. Issues are stored as file
 /pm:issue-close 1      # Close completed issue
 /pm:status              # View all issues and progress
 ```
+
+Note: `/pm:epic-sync` and `/pm:issue-*` commands that interact with GitHub require the GitHub plugin (scenarios: github, docker, full, performance). The lite scenario uses local-only commands.
 
 Local issues support the full workflow (create, list, show, start, close) without GitHub or Azure credentials. This is ideal for:
 
@@ -101,7 +103,7 @@ This launches an interactive session to define:
 - Feature overview, user stories, technical requirements
 - Success criteria and dependencies
 
-PRDs are stored in `.claude/prd/` with YAML frontmatter:
+PRDs are stored in `.claude/prds/` with YAML frontmatter:
 
 ```markdown
 ---
@@ -236,6 +238,7 @@ autopm install --scenario=lite
 /pm:init
 /pm:prd-new payment-integration
 /pm:prd-parse payment-integration
+/pm:epic-decompose payment-integration
 /pm:epic-start payment-integration
 /pm:issue-start 1
 # ... develop ...
@@ -280,7 +283,7 @@ autopm install --scenario=azure
 
 ### Local Provider
 - No external service required
-- Issues stored in `.claude/providers/local/`
+- Issues stored in `.claude/issues/`
 - Full workflow support (create, list, show, start, close)
 - No authentication needed
 

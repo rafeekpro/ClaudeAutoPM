@@ -5,7 +5,7 @@ description: Complete installation guide for ClaudeAutoPM v3.14.0 with all scena
 
 # Installation Guide
 
-This guide covers all installation methods and configuration options for ClaudeAutoPM v3.14.0.
+This guide covers npm/npx installation methods and configuration options for ClaudeAutoPM v3.14.0. For the shell-based installer, see `install/install.sh`.
 
 ## System Requirements
 
@@ -13,7 +13,7 @@ This guide covers all installation methods and configuration options for ClaudeA
 
 | Requirement | Minimum Version |
 |-------------|-----------------|
-| Node.js | >= 18.0.0 |
+| Node.js | >= 16.0.0 (>= 18.0.0 recommended; plugins require 18+) |
 | npm | >= 8.0.0 |
 | Git | Latest stable |
 
@@ -25,8 +25,8 @@ This guide covers all installation methods and configuration options for ClaudeA
 
 ### Optional Dependencies
 
-- **Docker**: For Docker-first development scenarios (3, 4, 5)
-- **Kubernetes CLI (kubectl)**: For full and performance scenarios (4, 5)
+- **Docker**: For Docker-first development scenarios (3-6: Docker, Full, Full-Azure, Performance)
+- **Kubernetes CLI (kubectl)**: For full, full-azure, and performance scenarios (4-6)
 - **GitHub CLI (gh)**: For GitHub provider sync
 - **Azure CLI (az)**: For Azure DevOps provider sync
 
@@ -67,7 +67,7 @@ autopm install --scenario=full-azure
 
 ## Installation Scenarios
 
-ClaudeAutoPM offers 7 pre-configured scenarios. Each installs a different set of plugins from the `@claudeautopm` npm scope.
+ClaudeAutoPM offers 7 predefined scenarios + Custom. Each installs a different set of plugins from the `@claudeautopm` npm scope.
 
 ### 0. Lite
 
@@ -185,7 +185,7 @@ The dynamic `agent-registry.xml` uses `PLUGIN_AGENTS_START`/`PLUGIN_AGENTS_END` 
 
 ## Local Provider (Default)
 
-The lite scenario uses a **local provider** for issue tracking without any external service. Local issue files are stored in `.claude/providers/local/` and support:
+The lite scenario uses a **local provider** for issue tracking without any external service. Local issue files are stored in `.claude/issues/` and support:
 
 - `issue-create` - Create issues locally
 - `issue-list` - List all local issues
@@ -206,7 +206,7 @@ After installation, complete these setup steps:
 /pm:init
 ```
 
-This creates the `.pm/` directory structure and configures your selected provider.
+This creates the `.claude/` directory tree (prds/, epics/, issues/, etc.) and configures your selected provider.
 
 ### 2. Configure Environment (Optional)
 

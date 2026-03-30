@@ -32,10 +32,10 @@ ClaudeAutoPM v3.14.0 follows a plugin-based architecture with 13 npm packages, a
 │  ├── GitHubProvider  (lib/providers/)      ← plugin-pm-github   │
 │  └── AzureProvider   (lib/providers/)      ← plugin-pm-azure   │
 ├─────────────────────────────────────────────────────────────────┤
-│  13 Plugin Packages (packages/@claudeautopm/)                   │
+│  13 Plugin Packages (packages/plugin-*)                          │
 │  ├── plugin-core (7 agents)    │ plugin-pm (commands)           │
-│  ├── plugin-languages (6)      │ plugin-frameworks (7)          │
-│  ├── plugin-devops (8)         │ plugin-cloud (9)               │
+│  ├── plugin-languages (5)      │ plugin-frameworks (4)          │
+│  ├── plugin-devops (7)         │ plugin-cloud (8)               │
 │  ├── plugin-databases (6)      │ plugin-testing (1)             │
 │  ├── plugin-ai (8)             │ plugin-ml (10)                 │
 │  ├── plugin-data (3)           │ plugin-pm-github               │
@@ -46,7 +46,8 @@ ClaudeAutoPM v3.14.0 follows a plugin-based architecture with 13 npm packages, a
 │  ├── agent-mandatory.xml       │ context7.xml                   │
 │  ├── github-operations.xml     │ naming-conventions.xml         │
 │  ├── command-pipelines.xml     │ issue-structure.xml            │
-│  └── standard-patterns.md, datetime.md, git-strategy.md        │
+│  └── standard-patterns.md, git-strategy.md,                    │
+│       frontmatter-operations.md                                 │
 ├─────────────────────────────────────────────────────────────────┤
 │  Dynamic Agent Registry (agent-registry.xml)                    │
 │  ├── 7 core agents (always present)                             │
@@ -66,12 +67,12 @@ packages/
 ├── plugin-pm/           # PM commands (prd, epic, issue, workflow)
 ├── plugin-pm-github/    # GitHub provider integration
 ├── plugin-pm-azure/     # Azure DevOps provider integration
-├── plugin-languages/    # 6 language specialist agents
-├── plugin-frameworks/   # 7 framework specialist agents
-├── plugin-devops/       # 8 DevOps agents (Docker, K8s, CI/CD)
-├── plugin-cloud/        # 9 cloud architect agents (AWS, Azure, GCP)
+├── plugin-languages/    # 5 language specialist agents (see plugin.json)
+├── plugin-frameworks/   # 4 framework specialist agents (see plugin.json)
+├── plugin-devops/       # 7 DevOps agents: Docker, CI/CD, observability (see plugin.json)
+├── plugin-cloud/        # 8 cloud/infra agents: AWS, Azure, GCP, K8s, Terraform (see plugin.json)
 ├── plugin-databases/    # 6 database specialist agents
-├── plugin-testing/      # 1 Playwright specialist agent
+├── plugin-testing/      # 1 frontend testing engineer agent (see plugin.json)
 ├── plugin-ai/           # 8 AI/ML integration agents
 ├── plugin-data/         # 3 data pipeline agents
 └── plugin-ml/           # 10 machine learning agents
@@ -112,7 +113,7 @@ Each plugin defines its contents in a `plugin.json` file using Schema v2.0:
 ```javascript
 class PluginManager extends EventEmitter {
   async initialize() {
-    await this.discoverPlugins();   // Scan node_modules/@claudeautopm/
+    await this.discoverPlugins();   // Monorepo: scan packages/; installed projects: scan node_modules/@claudeautopm/
     await this.validatePlugins();   // Check version compatibility
   }
 
@@ -143,7 +144,7 @@ router.js → delegates to appropriate provider
 
 ### Local Provider (Default)
 
-The local provider stores issues as files in `.claude/providers/local/`:
+The local provider stores issue data in `.claude/issues/` and provider scripts in `.claude/providers/local/`:
 
 - `issue-create.js` - Create local issues
 - `issue-list.js` - List issues from local store
@@ -188,8 +189,8 @@ XML format was chosen over markdown for rules because:
 
 Three additional MD rules are available as reference but not auto-loaded:
 - `standard-patterns.md` - Output formats, error messages
-- `datetime.md` - ISO 8601 timestamps
 - `git-strategy.md` - Branch-based workflow
+- `frontmatter-operations.md` - YAML frontmatter read/write
 
 ## Dynamic Agent Registry
 
@@ -228,7 +229,7 @@ install.js → selectScenario() → generateConfig()
     ▼
 PluginManager.initialize()
     │
-    ├── discoverPlugins() → Scan packages/@claudeautopm/
+    ├── discoverPlugins() → Scan packages/ (monorepo) or node_modules/@claudeautopm/
     ├── validatePlugins() → Check compatibility
     │
     ▼

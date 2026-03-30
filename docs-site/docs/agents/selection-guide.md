@@ -30,7 +30,7 @@ ClaudeAutoPM provides 7 core agents (always available) plus 50+ specialized plug
 | Python Backend | `@python-backend-expert` | plugin-languages |
 | Node.js Backend | `@nodejs-backend-engineer` | plugin-languages |
 | Docker | `@docker-containerization-expert` | plugin-devops |
-| Kubernetes | `@kubernetes-orchestrator` | plugin-devops |
+| Kubernetes | `@kubernetes-orchestrator` | plugin-cloud |
 | GitHub Actions | `@github-operations-specialist` | plugin-devops |
 | AWS | `@aws-cloud-architect` | plugin-cloud |
 | Azure | `@azure-cloud-architect` | plugin-cloud |
@@ -38,7 +38,7 @@ ClaudeAutoPM provides 7 core agents (always available) plus 50+ specialized plug
 | PostgreSQL | `@postgresql-expert` | plugin-databases |
 | MongoDB | `@mongodb-expert` | plugin-databases |
 | Terraform | `@terraform-infrastructure-expert` | plugin-cloud |
-| Playwright | `@e2e-test-engineer` | plugin-frameworks |
+| Frontend Testing | `@frontend-testing-engineer` | plugin-testing |
 
 ### By Task Type
 
@@ -95,7 +95,7 @@ Testing?                → Use @test-runner (core)
 @test-runner execute all tests                          # Core
 @docker-containerization-expert dockerize application   # plugin-devops
 @github-operations-specialist setup GitHub Actions      # plugin-devops
-@kubernetes-orchestrator deploy to K8s                  # plugin-devops
+@kubernetes-orchestrator deploy to K8s                  # plugin-cloud
 ```
 
 ### Testing Suite
@@ -103,7 +103,7 @@ Testing?                → Use @test-runner (core)
 ```markdown
 @test-runner create unit tests             # Core
 @code-analyzer verify test coverage        # Core
-@e2e-test-engineer create end-to-end tests # plugin-frameworks
+@frontend-testing-engineer create end-to-end tests # plugin-testing
 ```
 
 ## Checking Available Agents
@@ -113,8 +113,8 @@ Your available agents depend on your installation scenario:
 | Scenario | Core Agents | Plugin Agents |
 |----------|-------------|---------------|
 | lite | 7 | 0 |
-| github | 7 | 6 (languages) |
-| azure | 7 | 6 (languages) |
+| github | 7 | 5 (languages) |
+| azure | 7 | 5 (languages) |
 | docker | 7 | ~22 |
 | full | 7 | ~45 |
 | performance | 7 | ~50 |

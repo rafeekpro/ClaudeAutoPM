@@ -288,13 +288,6 @@ Plugins are published under the `@claudeautopm` scope via CI-only workflow (GitH
 3. CI runs tests and validates `plugin.json`
 4. After merge, the GitHub Actions workflow publishes to npm
 
-### Manual Publishing (Development Only)
-
-```bash
-cd packages/plugin-example
-npm publish --access public
-```
-
 ## Testing Your Plugin
 
 ### Validate plugin.json

@@ -71,10 +71,10 @@ Plugin agents are only available after installing the corresponding plugin. They
 
 | Plugin | Agents | Category |
 |--------|--------|----------|
-| `plugin-languages` | 6 | Node.js, Python, Bash, JavaScript |
-| `plugin-frameworks` | 7 | React, FastAPI, Flask, Tailwind, E2E testing |
-| `plugin-devops` | 8 | Docker, Kubernetes, GitHub Actions, Azure DevOps, SSH, Traefik |
-| `plugin-cloud` | 9 | AWS, Azure, GCP, Terraform, OpenAI, Gemini |
+| `plugin-languages` | 5 | Python, Node.js, JavaScript, Bash (see plugin.json) |
+| `plugin-frameworks` | 4 | React, Tailwind, UX Design (see plugin.json) |
+| `plugin-devops` | 7 | Docker, GitHub Actions, Azure DevOps, Observability, SSH, Traefik (see plugin.json) |
+| `plugin-cloud` | 8 | AWS, Azure, GCP, Kubernetes, Terraform, OpenAI, Gemini (see plugin.json) |
 | `plugin-databases` | 6 | PostgreSQL, MongoDB, Redis, CosmosDB, BigQuery |
 | `plugin-testing` | 1 | Playwright specialist |
 | `plugin-ai` | 8 | AI/ML integration agents |
@@ -93,7 +93,7 @@ Plugin agents are installed automatically based on your chosen scenario:
 # Lite: 7 core agents only
 autopm install --scenario=lite
 
-# GitHub: 7 core + 6 language agents
+# GitHub: 7 core + 5 language agents
 autopm install --scenario=github
 
 # Full: 7 core + 45+ plugin agents
@@ -109,12 +109,12 @@ autopm install --scenario=full
 
 **From plugin-devops:**
 - `@docker-containerization-expert` - Docker, Compose, multi-stage builds
-- `@kubernetes-orchestrator` - K8s deployments, Helm charts
 - `@github-operations-specialist` - GitHub Actions, CI/CD pipelines
 
 **From plugin-cloud:**
 - `@aws-cloud-architect` - AWS infrastructure design
 - `@azure-cloud-architect` - Azure resources, ARM templates
+- `@kubernetes-orchestrator` - K8s deployments, Helm charts
 - `@terraform-infrastructure-expert` - Infrastructure as Code
 
 **From plugin-databases:**
@@ -143,7 +143,7 @@ Deprecated agent names were removed in the v1.1.0 consolidation. Use the consoli
 | `@react-expert` | `@react-ui-expert` (plugin-frameworks) |
 | `@docker-expert` | `@docker-containerization-expert` (plugin-devops) |
 | `@python-expert` | `@python-backend-expert` (plugin-languages) |
-| `@kubernetes-expert` | `@kubernetes-orchestrator` (plugin-devops) |
+| `@kubernetes-expert` | `@kubernetes-orchestrator` (plugin-cloud) |
 
 ## Related Pages
 
