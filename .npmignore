@@ -51,6 +51,7 @@ Desktop.ini
 
 # Node modules (should not be in source anyway)
 node_modules/
+**/node_modules/
 
 # Lock files (let users choose their package manager)
 package-lock.json
