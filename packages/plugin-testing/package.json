@@ -1,6 +1,6 @@
 {
   "name": "@claudeautopm/plugin-testing",
-  "version": "3.0.0",
+  "version": "3.13.0",
   "description": "Testing frameworks, E2E testing, and quality assurance specialists",
   "keywords": [
     "claudeautopm",
@@ -22,7 +22,7 @@
     "url": "https://github.com/rafeekpro/ClaudeAutoPM/issues"
   },
   "engines": {
-    "node": ">=16.0.0",
+    "node": ">=18.0.0",
     "npm": ">=8.0.0"
   },
   "publishConfig": {

@@ -1,0 +1,63 @@
+name: Publish Plugins
+
+on:
+  workflow_dispatch:
+    inputs:
+      plugin:
+        description: 'Plugin to publish (e.g. plugin-core, or "all")'
+        required: true
+        default: 'all'
+
+jobs:
+  publish-all:
+    if: inputs.plugin == 'all'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      max-parallel: 1
+      matrix:
+        plugin:
+          - plugin-core
+          - plugin-ai
+          - plugin-cloud
+          - plugin-data
+          - plugin-databases
+          - plugin-devops
+          - plugin-frameworks
+          - plugin-languages
+          - plugin-ml
+          - plugin-pm
+          - plugin-pm-azure
+          - plugin-pm-github
+          - plugin-testing
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Publish ${{ matrix.plugin }}
+        working-directory: packages/${{ matrix.plugin }}
+        run: npm publish --provenance --access public || echo "Already published or error"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-single:
+    if: inputs.plugin != 'all'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Publish ${{ inputs.plugin }}
+        working-directory: packages/${{ inputs.plugin }}
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

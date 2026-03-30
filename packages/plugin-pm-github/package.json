@@ -1,0 +1,33 @@
+{
+  "name": "@claudeautopm/plugin-pm-github",
+  "version": "3.13.0",
+  "description": "GitHub provider for ClaudeAutoPM PM system",
+  "main": "plugin.json",
+  "files": [
+    "commands/",
+    "plugin.json",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "peerDependencies": {
+    "@claudeautopm/plugin-core": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rafeekpro/ClaudeAutoPM.git",
+    "directory": "packages/plugin-pm-github"
+  },
+  "keywords": [
+    "claudeautopm",
+    "plugin",
+    "github",
+    "pm"
+  ]
+}
