@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.20.3] - 2026-04-01
+
+### Fixed
+- `autopm install --force` now actually works — flag was consumed by yargs CLI and never passed to installer
+- bin/autopm.js now calls install.js directly with --force and --scenario flags
+
 ## [3.20.2] - 2026-04-01
 
 ### Fixed
@@ -5161,6 +5167,12 @@ autopm --help            # Show usage guide
 - `prettier` - Code formatting
 
 ## [Unreleased]
+
+## [3.20.3] - 2026-04-01
+
+### Fixed
+- `autopm install --force` now actually works — flag was consumed by yargs CLI and never passed to installer
+- bin/autopm.js now calls install.js directly with --force and --scenario flags
 
 ### Planned Features
 
