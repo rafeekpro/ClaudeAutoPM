@@ -32,19 +32,18 @@ function countAgents() {
 }
 
 function getVersion() {
-  // Try project root package.json first, then autopm package
-  for (const rel of ['package.json', 'node_modules/autopm/package.json']) {
+  // Prioritize .claude/config.json (autopm version), then fallback to package.json
+  try {
+    const cfg = JSON.parse(fs.readFileSync(path.join(basePath, '.claude', 'config.json'), 'utf8'));
+    if (cfg.version) return cfg.version;
+  } catch { /* continue */ }
+  for (const rel of ['node_modules/autopm/package.json', 'package.json']) {
     const p = path.join(basePath, rel);
     try {
       const pkg = JSON.parse(fs.readFileSync(p, 'utf8'));
       if (pkg.version) return pkg.version;
     } catch { /* continue */ }
   }
-  // Try config.json version
-  try {
-    const cfg = JSON.parse(fs.readFileSync(path.join(basePath, '.claude', 'config.json'), 'utf8'));
-    if (cfg.version) return cfg.version;
-  } catch { /* continue */ }
   return 'unknown';
 }
 

@@ -26,17 +26,19 @@ try {
   } else {
     lines.push('| Server | Command | Status |');
     lines.push('|--------|---------|--------|');
-    let hasContext7 = false;
+    let hasContext7 = null;
     for (const [name, cfg] of entries) {
       const cmd = cfg.command
         ? `${cfg.command}${cfg.args ? ' ' + (Array.isArray(cfg.args) ? cfg.args.join(' ') : cfg.args) : ''}`
         : 'n/a';
       const status = cfg.disabled ? 'disabled' : 'configured';
       lines.push(`| ${name} | ${cmd} | ${status} |`);
-      if (name.toLowerCase().includes('context7')) hasContext7 = true;
+      if (name.toLowerCase().includes('context7')) {
+        hasContext7 = cfg.disabled ? 'disabled' : 'configured';
+      }
     }
     lines.push('');
-    lines.push(`Context7: ${hasContext7 ? 'configured' : 'not configured'}`);
+    lines.push(`Context7: ${hasContext7 || 'not configured'}`);
     lines.push(`Total: ${entries.length} servers configured`);
   }
 

@@ -35,10 +35,19 @@ function parseYamlTemplate(content) {
   const nameMatch = content.match(/^name:\s*"?([^"\n]+)"?/m);
   const name = nameMatch ? nameMatch[1].trim() : 'unknown';
 
+  // Collect streams only from within streams: block
   const streams = [];
-  const streamRe = /^\s{2}(\w+):\s*$/gm;
-  let m;
-  while ((m = streamRe.exec(content)) !== null) streams.push(m[1]);
+  const contentLines = content.split(/\r?\n/);
+  let inStreams = false;
+  for (const line of contentLines) {
+    if (!inStreams) {
+      if (/^streams:\s*$/.test(line)) inStreams = true;
+      continue;
+    }
+    if (/^[^\s]/.test(line)) break; // left streams block
+    const m = /^ {2}(\w+):\s*$/.exec(line);
+    if (m) streams.push(m[1]);
+  }
 
   const agents = new Set();
   const agentRe = /agent:\s*"?([^"\n]+)"?/g;

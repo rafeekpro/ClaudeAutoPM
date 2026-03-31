@@ -24,7 +24,10 @@ try {
   if (config.version) lines.push(`| Version | ${config.version} |`);
   if (config.installed) lines.push(`| Installed | ${config.installed} |`);
   if (config.execution_strategy) lines.push(`| Execution Strategy | ${config.execution_strategy.mode || 'default'} |`);
-  if (config.docker) lines.push(`| Docker | ${config.features?.docker_first_development ? 'enabled' : 'disabled'} |`);
+  if (config.docker) {
+    const dockerEnabled = config.docker?.enabled ?? !!config.features?.docker_first_development;
+    lines.push(`| Docker | ${dockerEnabled ? 'enabled' : 'disabled'} |`);
+  }
   if (config.kubernetes) lines.push(`| Kubernetes | ${config.kubernetes?.enabled ? 'enabled' : 'disabled'} |`);
   if (config.provider) lines.push(`| Provider | ${config.provider} |`);
   lines.push('');
@@ -48,10 +51,13 @@ try {
     lines.push(`### Installed Plugins (${plugins.length})`);
     lines.push('| Plugin | Status |');
     lines.push('|--------|--------|');
+    // Note: for plugin version info, run /pm:session
     for (const p of plugins) {
       const status = typeof config.plugins === 'object' && !Array.isArray(config.plugins) ? config.plugins[p] : 'installed';
       lines.push(`| ${typeof p === 'string' ? p : p.name || p} | ${status} |`);
     }
+    lines.push('');
+    lines.push('_Plugin version info: run `/pm:session`_');
     lines.push('');
   } else if (fs.existsSync(pluginsDir)) {
     const pkgs = fs.readdirSync(pluginsDir).filter(d => {
