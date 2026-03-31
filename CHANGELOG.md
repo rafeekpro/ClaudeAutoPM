@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.19.0] - 2026-03-31
+
+### Added
+- **Interactive config dashboard** — `/pm:dashboard --serve` starts HTTP server with config forms
+  - Config editor (execution strategy, provider, docker/k8s toggles)
+  - Plugin enable/disable toggles with descriptions and tooltips
+  - MCP server management with presets (Context7, Playwright)
+  - API keys editor with masked inputs and suggested keys
+  - Bearer token auth, localhost only, auto-shutdown 5min idle
+  - Connection lost banner with retry
+- Security: XSS prevention (DOM APIs), merge-not-overwrite for MCP/env, JSON validation
+
 ## [3.18.0] - 2026-03-31
 
 ### Added
