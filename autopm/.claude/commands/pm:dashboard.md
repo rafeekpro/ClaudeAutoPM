@@ -8,21 +8,19 @@ Project dashboard with two modes: static HTML report or interactive config serve
 
 ## Usage
 
-### Static (read-only report)
+```bash
+node .claude/scripts/pm/dashboard-serve.js
+```
+
+Starts interactive dashboard with tabs: Overview, Config, MCP & Keys, Diagrams, Tests.
+
+### Static mode (legacy, read-only)
 
 ```bash
 node .claude/scripts/pm/dashboard.js
 ```
 
-Generates `.claude/pm/dashboard.html` with PRD/Epic/Issue counts, epic progress bars, recent activity. Opens in browser.
-
-### Interactive (config editor) — `--serve`
-
-```bash
-node .claude/scripts/pm/dashboard-serve.js
-```
-
-Pass `--serve` when invoking via the PM command to launch the interactive server instead of the static report.
+Generates static `.claude/pm/dashboard.html` without tabs or config forms.
 
 Starts a localhost-only HTTP server with bearer token auth. The server writes its PID, port, and token to `.claude/pm/dashboard.pid`. The browser is opened automatically with the token in the query string (`?token=<token>`).
 
