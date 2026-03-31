@@ -1137,7 +1137,7 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
             const sourcePath = path.join(pluginPath, agent.file);
             const targetPath = path.join(targetDir, path.basename(agent.file));
 
-            if (fs.existsSync(sourcePath) && !fs.existsSync(targetPath)) {
+            if (fs.existsSync(sourcePath) && (!fs.existsSync(targetPath) || this.options.force)) {
               fs.copyFileSync(sourcePath, targetPath);
               agentsInstalled++;
             }
@@ -1164,7 +1164,7 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
                     const sourcePath = path.join(commandsSourceDir, file);
                     const targetPath = path.join(targetDir, file);
 
-                    if (fs.existsSync(sourcePath) && !fs.existsSync(targetPath)) {
+                    if (fs.existsSync(sourcePath) && (!fs.existsSync(targetPath) || this.options.force)) {
                       fs.copyFileSync(sourcePath, targetPath);
                       commandsInstalled++;
                     }
@@ -1176,7 +1176,7 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
               const sourcePath = path.join(pluginPath, command.file);
               const targetPath = path.join(targetDir, path.basename(command.file));
 
-              if (fs.existsSync(sourcePath) && !fs.existsSync(targetPath)) {
+              if (fs.existsSync(sourcePath) && (!fs.existsSync(targetPath) || this.options.force)) {
                 fs.copyFileSync(sourcePath, targetPath);
                 commandsInstalled++;
               }
@@ -1197,7 +1197,7 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
               const sourcePath = path.join(pluginPath, file);
               const targetPath = path.join(targetDir, path.basename(file));
 
-              if (fs.existsSync(sourcePath) && !fs.existsSync(targetPath)) {
+              if (fs.existsSync(sourcePath) && (!fs.existsSync(targetPath) || this.options.force)) {
                 fs.copyFileSync(sourcePath, targetPath);
                 // Make executable if shell script
                 if (file.endsWith('.sh')) {
@@ -1229,7 +1229,7 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
                 const sourcePath = path.join(pluginPath, script.subdirectory, file);
                 const targetPath = path.join(subdirTarget, file);
 
-                if (fs.existsSync(sourcePath) && !fs.existsSync(targetPath)) {
+                if (fs.existsSync(sourcePath) && (!fs.existsSync(targetPath) || this.options.force)) {
                   fs.copyFileSync(sourcePath, targetPath);
                   if (file.endsWith('.sh')) {
                     fs.chmodSync(targetPath, 0o755);
@@ -1249,7 +1249,7 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
                 fs.mkdirSync(scriptTargetDir, { recursive: true });
               }
 
-              if (fs.existsSync(sourcePath) && !fs.existsSync(targetPath)) {
+              if (fs.existsSync(sourcePath) && (!fs.existsSync(targetPath) || this.options.force)) {
                 fs.copyFileSync(sourcePath, targetPath);
                 if (script.file.endsWith('.sh')) {
                   fs.chmodSync(targetPath, 0o755);
@@ -1270,7 +1270,7 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
             const sourcePath = path.join(pluginPath, rule.file);
             const targetPath = path.join(targetDir, path.basename(rule.file));
 
-            if (fs.existsSync(sourcePath) && !fs.existsSync(targetPath)) {
+            if (fs.existsSync(sourcePath) && (!fs.existsSync(targetPath) || this.options.force)) {
               fs.copyFileSync(sourcePath, targetPath);
               rulesInstalled++;
             }
