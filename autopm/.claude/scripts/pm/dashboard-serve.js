@@ -20,6 +20,10 @@ const pidFile = path.join(pmDir, 'dashboard.pid');
 const configPath = path.join(basePath, '.claude', 'config.json');
 const mcpPath = path.join(basePath, '.claude', 'mcp-servers.json');
 const envPath = path.join(basePath, '.env');
+const epicsDir = path.join(basePath, '.claude', 'epics');
+const prdsDir = path.join(basePath, '.claude', 'prds');
+const agentRegistryPath = path.join(basePath, '.claude', 'agents', 'agent-registry.xml');
+const claudeDir = path.join(basePath, '.claude');
 
 const IDLE_TIMEOUT_MS = 5 * 60 * 1000;
 const token = crypto.randomBytes(16).toString('hex');
@@ -94,6 +98,154 @@ function json(res, status, data) {
   res.end(JSON.stringify(data));
 }
 
+// --- Diagram Generators ---
+function generateArchitectureDiagram() {
+  const lines = ['graph LR'];
+  lines.push('  CLAUDE[CLAUDE.md] --> Rules[Rules]');
+  lines.push('  CLAUDE --> Registry[Agent Registry]');
+  lines.push('  CLAUDE --> Commands[PM Commands]');
+  // Count rules
+  const rulesDir = path.join(claudeDir, 'rules');
+  let ruleCount = 0;
+  try { ruleCount = fs.readdirSync(rulesDir).filter(f => f.endsWith('.xml') || f.endsWith('.md')).length; } catch {}
+  if (ruleCount > 0) lines[1] = `  CLAUDE[CLAUDE.md] --> Rules[${ruleCount} Rules]`;
+  lines.push('  Commands --> Local[Local Provider]');
+  lines.push('  Commands --> GitHub[GitHub Provider]');
+  lines.push('  Commands --> Azure[Azure Provider]');
+  lines.push('  Local --> Issues[.claude/issues/]');
+  lines.push('  Local --> PRDs[.claude/prds/]');
+  lines.push('  Local --> Epics[.claude/epics/]');
+  return lines.join('\n');
+}
+
+function generateEpicFlowDiagram() {
+  const lines = ['graph TD'];
+  // Read PRDs
+  const prds = [];
+  try {
+    if (fs.existsSync(prdsDir)) {
+      for (const f of fs.readdirSync(prdsDir)) {
+        if (f.endsWith('.md')) prds.push(f.replace('.md', ''));
+      }
+    }
+  } catch {}
+  // Read epics
+  const epics = [];
+  try {
+    if (fs.existsSync(epicsDir)) {
+      for (const entry of fs.readdirSync(epicsDir)) {
+        const ep = path.join(epicsDir, entry);
+        if (fs.statSync(ep).isDirectory()) {
+          const tasks = [];
+          for (const tf of fs.readdirSync(ep)) {
+            if (!tf.endsWith('.md')) continue;
+            const content = fs.readFileSync(path.join(ep, tf), 'utf8');
+            const sm = content.match(/status:\s*(\S+)/);
+            const status = sm ? sm[1] : 'open';
+            const icon = status === 'closed' || status === 'completed' || status === 'done' || status === 'complete' ? '\\u2705' : status === 'in-progress' || status === 'in_progress' ? '\\ud83d\\udd04' : '\\u2b1c';
+            tasks.push({ name: tf.replace('.md', ''), icon });
+          }
+          epics.push({ name: entry, tasks });
+        }
+      }
+    }
+  } catch {}
+  if (epics.length === 0 && prds.length === 0) {
+    lines.push('  N[No epics or PRDs found]');
+    return lines.join('\n');
+  }
+  let nodeId = 0;
+  for (const prd of prds) {
+    const pid = `P${nodeId++}`;
+    lines.push(`  ${pid}[PRD: ${prd}]`);
+    const matchingEpic = epics.find(e => e.name === prd);
+    if (matchingEpic) {
+      const eid = `E${nodeId++}`;
+      lines.push(`  ${pid} --> ${eid}[Epic: ${matchingEpic.name}]`);
+      for (const t of matchingEpic.tasks) {
+        const tid = `T${nodeId++}`;
+        lines.push(`  ${eid} --> ${tid}["${t.name} ${t.icon}"]`);
+      }
+    }
+  }
+  // Epics without matching PRDs
+  for (const epic of epics) {
+    if (prds.includes(epic.name)) continue;
+    const eid = `E${nodeId++}`;
+    lines.push(`  ${eid}[Epic: ${epic.name}]`);
+    for (const t of epic.tasks) {
+      const tid = `T${nodeId++}`;
+      lines.push(`  ${eid} --> ${tid}["${t.name} ${t.icon}"]`);
+    }
+  }
+  return lines.join('\n');
+}
+
+function generatePluginGraph() {
+  const plugins = scanPlugins();
+  const lines = ['graph TD'];
+  if (plugins.length === 0) {
+    lines.push('  N[No plugins found]');
+    return lines.join('\n');
+  }
+  const hasCore = plugins.includes('plugin-core');
+  if (hasCore) {
+    lines.push('  Core[plugin-core]');
+    for (const p of plugins) {
+      if (p === 'plugin-core') continue;
+      const id = p.replace(/-/g, '_');
+      const label = p;
+      lines.push(`  Core --> ${id}[${label}]`);
+    }
+  } else {
+    for (const p of plugins) {
+      const id = p.replace(/-/g, '_');
+      lines.push(`  ${id}[${p}]`);
+    }
+  }
+  return lines.join('\n');
+}
+
+function generateAgentTree() {
+  const lines = ['graph TD'];
+  lines.push('  A[Select Agent] --> B{Task Type}');
+  // Try to read agent registry
+  let agents = [];
+  try {
+    if (fs.existsSync(agentRegistryPath)) {
+      const content = fs.readFileSync(agentRegistryPath, 'utf8');
+      const matches = content.match(/<agent[^>]*name="([^"]+)"/g);
+      if (matches) {
+        agents = matches.map(m => { const n = m.match(/name="([^"]+)"/); return n ? n[1] : null; }).filter(Boolean);
+      }
+    }
+  } catch {}
+  if (agents.length === 0) {
+    // Fallback defaults
+    agents = ['code-analyzer', 'test-runner', 'file-analyzer', 'parallel-worker'];
+  }
+  let nodeId = 0;
+  for (const agent of agents.slice(0, 12)) {
+    const id = `AG${nodeId++}`;
+    lines.push(`  B --> ${id}[${agent}]`);
+  }
+  if (agents.length > 12) {
+    lines.push(`  B --> MORE[... +${agents.length - 12} more]`);
+  }
+  return lines.join('\n');
+}
+
+// --- Test Plan Data ---
+function readTestPlan() {
+  const testPlanPath = path.join(pmDir, 'test-plan.md');
+  try { return fs.readFileSync(testPlanPath, 'utf8'); } catch { return null; }
+}
+
+function readTestResults() {
+  const resultsPath = path.join(pmDir, 'test-results.json');
+  try { return JSON.parse(fs.readFileSync(resultsPath, 'utf8')); } catch { return null; }
+}
+
 function getStatusData() {
   const config = readJSON(configPath) || {};
   const mcp = readJSON(mcpPath) || {};
@@ -105,7 +257,15 @@ function getStatusData() {
     const lines = fs.readFileSync(eventsPath, 'utf8').trim().split('\n').filter(Boolean);
     events = lines.slice(-20).map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean).reverse();
   }
-  return { config, mcp, plugins, env: Object.keys(env), events };
+  const diagrams = {
+    architecture: generateArchitectureDiagram(),
+    epicFlow: generateEpicFlowDiagram(),
+    pluginGraph: generatePluginGraph(),
+    agentTree: generateAgentTree()
+  };
+  const testPlan = readTestPlan();
+  const testResults = readTestResults();
+  return { config, mcp, plugins, env: Object.keys(env), events, diagrams, testPlan, testResults };
 }
 
 // --- HTML ---
@@ -116,6 +276,7 @@ function renderHTML() {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AutoPM Config Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"><\/script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d1117; color: #c9d1d9; padding: 24px; }
@@ -124,6 +285,7 @@ function renderHTML() {
   .subtitle { color: #8b949e; margin-bottom: 24px; font-size: 13px; }
   .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
   .card h2 { color: #58a6ff; font-size: 14px; text-transform: uppercase; margin-bottom: 14px; }
+  .card h3 { color: #c9d1d9; font-size: 13px; margin-bottom: 10px; }
   label { display: block; color: #8b949e; font-size: 12px; margin-bottom: 4px; margin-top: 10px; }
   select, input[type="text"], input[type="password"] {
     background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; border-radius: 6px;
@@ -167,6 +329,21 @@ function renderHTML() {
   .event { padding: 5px 0; border-bottom: 1px solid #21262d; font-size: 12px; }
   .event-type { color: #58a6ff; }
   .event-time { color: #484f58; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid #30363d; }
+  .tab { background: none; border: none; color: #8b949e; padding: 8px 16px; cursor: pointer; border-bottom: 2px solid transparent; font-size: 13px; }
+  .tab.active { color: #58a6ff; border-bottom-color: #58a6ff; }
+  .tab:hover { color: #c9d1d9; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .grid { display: grid; gap: 16px; }
+  .test-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .test-table th { text-align: left; color: #8b949e; padding: 6px 8px; border-bottom: 1px solid #30363d; }
+  .test-table td { padding: 6px 8px; border-bottom: 1px solid #21262d; }
+  .test-table tr:hover { background: #1c2128; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+  .badge-pending { background: #30363d; color: #8b949e; }
+  .badge-passed { background: #1b3a2d; color: #3fb950; }
+  .badge-failed { background: #3d1116; color: #f85149; }
   .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 8px; font-size: 13px; color: #fff; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; }
   .toast.show { opacity: 1; }
   .toast.ok { background: #238636; }
@@ -184,89 +361,146 @@ function renderHTML() {
     <button onclick="location.reload()" style="background:#da3633;color:#fff;border:none;border-radius:4px;padding:4px 12px;cursor:pointer;margin-left:8px;">Retry</button> or restart with /pm:dashboard --serve
   </div>
 
-  <!-- Config Section -->
-  <div class="card" id="config-section">
-    <h2>Configuration</h2>
-    <p class="desc">Project execution settings. Changes saved to .claude/config.json</p>
-    <div class="row">
-      <div>
-        <label>Execution Strategy</label>
-        <p class="hint">How Claude Code runs tasks: sequential (safe), adaptive (smart auto-choice), hybrid (max parallel)</p>
-        <select id="cfg-strategy">
-          <option value="sequential">sequential</option>
-          <option value="parallel">parallel</option>
-          <option value="adaptive">adaptive</option>
-        </select>
-      </div>
-      <div>
-        <label>Provider</label>
-        <p class="hint">Where issues/epics are tracked: local (files only), github (requires gh CLI), azure (requires PAT)</p>
-        <select id="cfg-provider">
-          <option value="github">github</option>
-          <option value="azure">azure</option>
-          <option value="local">local</option>
-        </select>
-      </div>
-    </div>
-    <div class="toggle-row">
-      <label class="toggle"><input type="checkbox" id="cfg-docker"><span class="slider"></span></label>
-      <div>
-        <span class="toggle-label">Docker</span>
-        <p class="hint">Enable Docker-first development. Tests and commands run inside containers.</p>
-      </div>
-    </div>
-    <div class="toggle-row">
-      <label class="toggle"><input type="checkbox" id="cfg-k8s"><span class="slider"></span></label>
-      <div>
-        <span class="toggle-label">Kubernetes</span>
-        <p class="hint">Enable Kubernetes orchestration for deployment and scaling.</p>
-      </div>
-    </div>
-    <button class="btn" onclick="saveConfig()">Save Config</button>
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('overview', this)">Overview</button>
+    <button class="tab" onclick="showTab('config', this)">Config</button>
+    <button class="tab" onclick="showTab('mcp', this)">MCP & Keys</button>
+    <button class="tab" onclick="showTab('diagrams', this)">Diagrams</button>
+    <button class="tab" onclick="showTab('tests', this)">Tests</button>
   </div>
 
-  <!-- Plugins Section -->
-  <div class="card" id="plugins-section">
-    <h2>Plugins</h2>
-    <p class="desc">Check plugins to include their agents. Click Save Plugins to apply. Requires re-running <code>autopm install</code>.</p>
-    <div class="plugin-grid" id="plugin-list"></div>
-    <p id="no-plugins" style="color:#8b949e;font-size:13px;display:none">No plugins found in packages/</p>
-    <button class="btn" onclick="saveConfig()">Save Plugins</button>
-  </div>
-
-  <!-- MCP Servers Section -->
-  <div class="card" id="mcp-section">
-    <h2>MCP Servers</h2>
-    <p class="desc">Model Context Protocol servers provide real-time documentation and tools to Claude Code.</p>
-    <div class="mcp-presets">
-      <span style="color:#8b949e;font-size:12px;margin-right:8px;">Quick add:</span>
-      <button onclick="addMcpPreset('context7')">+ Context7 (docs)</button>
-      <button onclick="addMcpPreset('playwright')">+ Playwright (browser)</button>
+  <!-- Overview Tab -->
+  <div id="tab-overview" class="tab-content active">
+    <div class="card">
+      <h2>Configuration Overview</h2>
+      <p class="desc">Quick view of current settings. Use Config tab to edit.</p>
+      <div class="row">
+        <div><label>Strategy</label><span id="ov-strategy">-</span></div>
+        <div><label>Provider</label><span id="ov-provider">-</span></div>
+        <div><label>Plugins</label><span id="ov-plugins">-</span></div>
+      </div>
     </div>
-    <div id="mcp-list"></div>
-    <button class="btn" style="margin-right:8px" onclick="addMcpEntry()">+ Add Server</button>
-    <button class="btn" onclick="saveMcp()">Save MCP Config</button>
-  </div>
-
-  <!-- API Keys Section -->
-  <div class="card" id="env-section">
-    <h2>API Keys / Environment</h2>
-    <p class="desc">Environment variables stored in .env. Secrets are masked.</p>
-    <div class="env-suggestions">
-      <p class="hint">Suggested keys for common providers:</p>
-      <button onclick="addEnvSuggestion('GITHUB_TOKEN','')">+ GITHUB_TOKEN</button>
-      <button onclick="addEnvSuggestion('AZURE_DEVOPS_PAT','')">+ AZURE_DEVOPS_PAT</button>
-      <button onclick="addEnvSuggestion('OPENAI_API_KEY','')">+ OPENAI_API_KEY</button>
+    <div class="card">
+      <h2>Recent Events</h2>
+      <div class="events" id="events-list"></div>
     </div>
-    <div id="env-list"></div>
-    <button class="btn" style="margin-right:8px" onclick="addEnvRow()">+ Add Variable</button>
-    <button class="btn" onclick="saveEnv()">Save .env</button>
   </div>
 
-  <!-- Recent Events -->
-  <div class="card">
-    <h2>Recent Events</h2>
-    <div class="events" id="events-list"></div>
+  <!-- Config Tab -->
+  <div id="tab-config" class="tab-content">
+    <div class="card" id="config-section">
+      <h2>Configuration</h2>
+      <p class="desc">Project execution settings. Changes saved to .claude/config.json</p>
+      <div class="row">
+        <div>
+          <label>Execution Strategy</label>
+          <p class="hint">How Claude Code runs tasks: sequential (safe), adaptive (smart auto-choice), hybrid (max parallel)</p>
+          <select id="cfg-strategy">
+            <option value="sequential">sequential</option>
+            <option value="parallel">parallel</option>
+            <option value="adaptive">adaptive</option>
+          </select>
+        </div>
+        <div>
+          <label>Provider</label>
+          <p class="hint">Where issues/epics are tracked: local (files only), github (requires gh CLI), azure (requires PAT)</p>
+          <select id="cfg-provider">
+            <option value="github">github</option>
+            <option value="azure">azure</option>
+            <option value="local">local</option>
+          </select>
+        </div>
+      </div>
+      <div class="toggle-row">
+        <label class="toggle"><input type="checkbox" id="cfg-docker"><span class="slider"></span></label>
+        <div>
+          <span class="toggle-label">Docker</span>
+          <p class="hint">Enable Docker-first development. Tests and commands run inside containers.</p>
+        </div>
+      </div>
+      <div class="toggle-row">
+        <label class="toggle"><input type="checkbox" id="cfg-k8s"><span class="slider"></span></label>
+        <div>
+          <span class="toggle-label">Kubernetes</span>
+          <p class="hint">Enable Kubernetes orchestration for deployment and scaling.</p>
+        </div>
+      </div>
+      <button class="btn" onclick="saveConfig()">Save Config</button>
+    </div>
+
+    <div class="card" id="plugins-section">
+      <h2>Plugins</h2>
+      <p class="desc">Check plugins to include their agents. Click Save Plugins to apply. Requires re-running <code>autopm install</code>.</p>
+      <div class="plugin-grid" id="plugin-list"></div>
+      <p id="no-plugins" style="color:#8b949e;font-size:13px;display:none">No plugins found in packages/</p>
+      <button class="btn" onclick="saveConfig()">Save Plugins</button>
+    </div>
+  </div>
+
+  <!-- MCP & Keys Tab -->
+  <div id="tab-mcp" class="tab-content">
+    <div class="card" id="mcp-section">
+      <h2>MCP Servers</h2>
+      <p class="desc">Model Context Protocol servers provide real-time documentation and tools to Claude Code.</p>
+      <div class="mcp-presets">
+        <span style="color:#8b949e;font-size:12px;margin-right:8px;">Quick add:</span>
+        <button onclick="addMcpPreset('context7')">+ Context7 (docs)</button>
+        <button onclick="addMcpPreset('playwright')">+ Playwright (browser)</button>
+      </div>
+      <div id="mcp-list"></div>
+      <button class="btn" style="margin-right:8px" onclick="addMcpEntry()">+ Add Server</button>
+      <button class="btn" onclick="saveMcp()">Save MCP Config</button>
+    </div>
+
+    <div class="card" id="env-section">
+      <h2>API Keys / Environment</h2>
+      <p class="desc">Environment variables stored in .env. Secrets are masked.</p>
+      <div class="env-suggestions">
+        <p class="hint">Suggested keys for common providers:</p>
+        <button onclick="addEnvSuggestion('GITHUB_TOKEN','')">+ GITHUB_TOKEN</button>
+        <button onclick="addEnvSuggestion('AZURE_DEVOPS_PAT','')">+ AZURE_DEVOPS_PAT</button>
+        <button onclick="addEnvSuggestion('OPENAI_API_KEY','')">+ OPENAI_API_KEY</button>
+      </div>
+      <div id="env-list"></div>
+      <button class="btn" style="margin-right:8px" onclick="addEnvRow()">+ Add Variable</button>
+      <button class="btn" onclick="saveEnv()">Save .env</button>
+    </div>
+  </div>
+
+  <!-- Diagrams Tab -->
+  <div id="tab-diagrams" class="tab-content">
+    <div class="grid" style="grid-template-columns: 1fr 1fr;">
+      <div class="card">
+        <h3>Architecture</h3>
+        <pre class="mermaid" id="diagram-arch"></pre>
+      </div>
+      <div class="card">
+        <h3>Epic Flow</h3>
+        <pre class="mermaid" id="diagram-epic"></pre>
+      </div>
+      <div class="card">
+        <h3>Installed Plugins</h3>
+        <pre class="mermaid" id="diagram-plugins"></pre>
+      </div>
+      <div class="card">
+        <h3>Agent Selection</h3>
+        <pre class="mermaid" id="diagram-agents"></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tests Tab -->
+  <div id="tab-tests" class="tab-content">
+    <div class="card">
+      <h2>TEST PLAN</h2>
+      <p class="desc">Generated from epic acceptance criteria. Run /pm:test-plan to regenerate.</p>
+      <div id="test-plan-content">Loading...</div>
+    </div>
+    <div class="card">
+      <h2>LAST TEST RESULTS</h2>
+      <p class="desc">From .claude/pm/test-results.json (run npm test with --json reporter)</p>
+      <div id="test-results-content">No test results found.</div>
+    </div>
   </div>
 
   <footer>AutoPM Config Dashboard &mdash; localhost only &mdash; auto-shutdown after 5 min idle</footer>
@@ -275,11 +509,94 @@ function renderHTML() {
 <div class="toast" id="toast"></div>
 
 <script>
+mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+
 const TOKEN = '${token}';
 const headers = { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' };
 
 // Fix 3: client-side XSS escaping
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'diagrams') renderMermaid();
+}
+
+let diagramsRendered = false;
+function renderMermaid() {
+  if (diagramsRendered) return;
+  fetch('/api/status', { headers: { 'Authorization': 'Bearer ' + TOKEN } })
+    .then(r => r.json())
+    .then(data => {
+      if (data.diagrams) {
+        document.getElementById('diagram-arch').textContent = data.diagrams.architecture;
+        document.getElementById('diagram-epic').textContent = data.diagrams.epicFlow;
+        document.getElementById('diagram-plugins').textContent = data.diagrams.pluginGraph;
+        document.getElementById('diagram-agents').textContent = data.diagrams.agentTree;
+        mermaid.run();
+        diagramsRendered = true;
+      }
+    });
+}
+
+function renderTestPlan(md) {
+  if (!md) { document.getElementById('test-plan-content').textContent = 'No test plan found. Run /pm:test-plan to generate.'; return; }
+  const lines = md.split('\\n');
+  let html = '';
+  for (const line of lines) {
+    if (line.startsWith('# ')) html += '<h2 style="color:#58a6ff;margin:8px 0">' + esc(line.slice(2)) + '</h2>';
+    else if (line.startsWith('## ')) html += '<h3 style="color:#c9d1d9;margin:8px 0">' + esc(line.slice(3)) + '</h3>';
+    else if (line.startsWith('| #')) {
+      html += '<table class="test-table"><thead><tr>';
+      const cols = line.split('|').filter(Boolean).map(c => c.trim());
+      for (const c of cols) html += '<th>' + esc(c) + '</th>';
+      html += '</tr></thead><tbody>';
+    } else if (line.startsWith('|---')) { /* skip separator */ }
+    else if (line.startsWith('|') && line.includes('|')) {
+      html += '<tr>';
+      const cols = line.split('|').filter(Boolean).map(c => c.trim());
+      for (let i = 0; i < cols.length; i++) {
+        let val = esc(cols[i]);
+        if (i === cols.length - 1) {
+          const cls = val === 'passed' ? 'badge-passed' : val === 'failed' ? 'badge-failed' : 'badge-pending';
+          val = '<span class="badge ' + cls + '">' + val + '</span>';
+        }
+        html += '<td>' + val + '</td>';
+      }
+      html += '</tr>';
+    } else if (line.startsWith('Total:') || line.startsWith('Summary:')) {
+      html += '</tbody></table><p style="color:#8b949e;margin-top:8px;font-size:12px">' + esc(line) + '</p>';
+    }
+  }
+  document.getElementById('test-plan-content').innerHTML = html;
+}
+
+function renderTestResults(results) {
+  if (!results) { document.getElementById('test-results-content').textContent = 'No test results found.'; return; }
+  let html = '';
+  const passed = results.numPassedTests || 0;
+  const failed = results.numFailedTests || 0;
+  const total = results.numTotalTests || (passed + failed);
+  html += '<div style="display:flex;gap:16px;margin-bottom:12px">';
+  html += '<span class="badge badge-passed">' + passed + ' passed</span>';
+  if (failed > 0) html += '<span class="badge badge-failed">' + failed + ' failed</span>';
+  html += '<span style="color:#8b949e;font-size:12px">' + total + ' total</span>';
+  html += '</div>';
+  if (results.testResults && Array.isArray(results.testResults)) {
+    html += '<table class="test-table"><thead><tr><th>Suite</th><th>Status</th><th>Time</th></tr></thead><tbody>';
+    for (const suite of results.testResults) {
+      const name = (suite.testFilePath || suite.name || '').split('/').pop();
+      const status = suite.status === 'passed' ? '<span class="badge badge-passed">passed</span>' : '<span class="badge badge-failed">failed</span>';
+      const time = suite.perfStats ? ((suite.perfStats.end - suite.perfStats.start) / 1000).toFixed(1) + 's' : '-';
+      html += '<tr><td>' + esc(name) + '</td><td>' + status + '</td><td>' + time + '</td></tr>';
+    }
+    html += '</tbody></table>';
+  }
+  document.getElementById('test-results-content').innerHTML = html;
+}
 
 const PLUGIN_DESCRIPTIONS = {
   'plugin-core': 'Core agents (always installed). agent-manager, code-analyzer, test-runner, file-analyzer, parallel-worker, mcp-manager, context-optimizer.',
@@ -318,6 +635,11 @@ function loadStatus(data) {
   const strategy = cfg.execution_strategy?.mode || cfg.execution_strategy || 'sequential';
   document.getElementById('cfg-strategy').value = strategy;
   document.getElementById('cfg-provider').value = cfg.provider || 'github';
+
+  // Overview tab
+  document.getElementById('ov-strategy').textContent = strategy;
+  document.getElementById('ov-provider').textContent = cfg.provider || 'github';
+  document.getElementById('ov-plugins').textContent = data.plugins.length + ' installed';
   document.getElementById('cfg-docker').checked = !!(cfg.docker?.enabled ?? cfg.features?.docker_first_development);
   document.getElementById('cfg-k8s').checked = !!(cfg.kubernetes?.enabled);
 
@@ -377,6 +699,10 @@ function loadStatus(data) {
     d.appendChild(typeSpan); d.appendChild(text); d.appendChild(timeSpan);
     ev.appendChild(d);
   });
+
+  // Test plan and results
+  renderTestPlan(data.testPlan);
+  renderTestResults(data.testResults);
 }
 
 // Fix 12: addMcpEntry — use DOM APIs not innerHTML
