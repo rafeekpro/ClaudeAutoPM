@@ -142,7 +142,7 @@ function generateEpicFlowDiagram() {
             const content = fs.readFileSync(path.join(ep, tf), 'utf8');
             const sm = content.match(/status:\s*(\S+)/);
             const status = sm ? sm[1] : 'open';
-            const icon = status === 'closed' || status === 'completed' || status === 'done' || status === 'complete' ? '\\u2705' : status === 'in-progress' || status === 'in_progress' ? '\\ud83d\\udd04' : '\\u2b1c';
+            const icon = status === 'closed' || status === 'completed' || status === 'done' || status === 'complete' ? '✅' : status === 'in-progress' || status === 'in_progress' ? '🔄' : '⬜';
             tasks.push({ name: tf.replace('.md', ''), icon });
           }
           epics.push({ name: entry, tasks });
@@ -257,15 +257,23 @@ function getStatusData() {
     const lines = fs.readFileSync(eventsPath, 'utf8').trim().split('\n').filter(Boolean);
     events = lines.slice(-20).map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean).reverse();
   }
-  const diagrams = {
+  return { config, mcp, plugins, env: Object.keys(env), events };
+}
+
+function getDiagramsData() {
+  return {
     architecture: generateArchitectureDiagram(),
     epicFlow: generateEpicFlowDiagram(),
     pluginGraph: generatePluginGraph(),
     agentTree: generateAgentTree()
   };
-  const testPlan = readTestPlan();
-  const testResults = readTestResults();
-  return { config, mcp, plugins, env: Object.keys(env), events, diagrams, testPlan, testResults };
+}
+
+function getTestsData() {
+  return {
+    testPlan: readTestPlan(),
+    testResults: readTestResults()
+  };
 }
 
 // --- HTML ---
@@ -509,7 +517,9 @@ function renderHTML() {
 <div class="toast" id="toast"></div>
 
 <script>
-mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+if (typeof mermaid !== 'undefined' && mermaid.initialize) {
+  mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+}
 
 const TOKEN = '${token}';
 const headers = { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' };
@@ -528,17 +538,22 @@ function showTab(name, btn) {
 let diagramsRendered = false;
 function renderMermaid() {
   if (diagramsRendered) return;
-  fetch('/api/status', { headers: { 'Authorization': 'Bearer ' + TOKEN } })
+  fetch('/api/diagrams', { headers: { 'Authorization': 'Bearer ' + TOKEN } })
     .then(r => r.json())
     .then(data => {
-      if (data.diagrams) {
-        document.getElementById('diagram-arch').textContent = data.diagrams.architecture;
-        document.getElementById('diagram-epic').textContent = data.diagrams.epicFlow;
-        document.getElementById('diagram-plugins').textContent = data.diagrams.pluginGraph;
-        document.getElementById('diagram-agents').textContent = data.diagrams.agentTree;
+      document.getElementById('diagram-arch').textContent = data.architecture;
+      document.getElementById('diagram-epic').textContent = data.epicFlow;
+      document.getElementById('diagram-plugins').textContent = data.pluginGraph;
+      document.getElementById('diagram-agents').textContent = data.agentTree;
+      if (typeof mermaid !== 'undefined' && mermaid.run) {
         mermaid.run();
-        diagramsRendered = true;
+      } else {
+        ['diagram-arch','diagram-epic','diagram-plugins','diagram-agents'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = 'Mermaid library unavailable. Check network connection.';
+        });
       }
+      diagramsRendered = true;
     });
 }
 
@@ -546,20 +561,23 @@ function renderTestPlan(md) {
   if (!md) { document.getElementById('test-plan-content').textContent = 'No test plan found. Run /pm:test-plan to generate.'; return; }
   const lines = md.split('\\n');
   let html = '';
+  let inTable = false;
   for (const line of lines) {
     if (line.startsWith('# ')) html += '<h2 style="color:#58a6ff;margin:8px 0">' + esc(line.slice(2)) + '</h2>';
     else if (line.startsWith('## ')) html += '<h3 style="color:#c9d1d9;margin:8px 0">' + esc(line.slice(3)) + '</h3>';
     else if (line.startsWith('| #')) {
       html += '<table class="test-table"><thead><tr>';
+      inTable = true;
       const cols = line.split('|').filter(Boolean).map(c => c.trim());
       for (const c of cols) html += '<th>' + esc(c) + '</th>';
       html += '</tr></thead><tbody>';
     } else if (line.startsWith('|---')) { /* skip separator */ }
     else if (line.startsWith('|') && line.includes('|')) {
       html += '<tr>';
-      const cols = line.split('|').filter(Boolean).map(c => c.trim());
+      const text = line.replace(/\\|/g, '&#124;');
+      const cols = text.split('|').filter(Boolean).map(c => c.trim());
       for (let i = 0; i < cols.length; i++) {
-        let val = esc(cols[i]);
+        let val = esc(cols[i]).replace(/&#124;/g, '|');
         if (i === cols.length - 1) {
           const cls = val === 'passed' ? 'badge-passed' : val === 'failed' ? 'badge-failed' : 'badge-pending';
           val = '<span class="badge ' + cls + '">' + val + '</span>';
@@ -568,9 +586,13 @@ function renderTestPlan(md) {
       }
       html += '</tr>';
     } else if (line.startsWith('Total:') || line.startsWith('Summary:')) {
-      html += '</tbody></table><p style="color:#8b949e;margin-top:8px;font-size:12px">' + esc(line) + '</p>';
+      if (inTable) { html += '</tbody></table>'; inTable = false; }
+      html += '<p style="color:#8b949e;margin-top:8px;font-size:12px">' + esc(line) + '</p>';
+    } else if (line.trim()) {
+      html += '<p style="color:#c9d1d9;font-size:13px">' + esc(line) + '</p>';
     }
   }
+  if (inTable) html += '</tbody></table>';
   document.getElementById('test-plan-content').innerHTML = html;
 }
 
@@ -700,9 +722,18 @@ function loadStatus(data) {
     ev.appendChild(d);
   });
 
-  // Test plan and results
-  renderTestPlan(data.testPlan);
-  renderTestResults(data.testResults);
+  // Test plan and results fetched on demand
+  fetchTests();
+}
+
+function fetchTests() {
+  fetch('/api/tests', { headers: { 'Authorization': 'Bearer ' + TOKEN } })
+    .then(r => r.json())
+    .then(data => {
+      renderTestPlan(data.testPlan);
+      renderTestResults(data.testResults);
+    })
+    .catch(() => {});
 }
 
 // Fix 12: addMcpEntry — use DOM APIs not innerHTML
@@ -869,6 +900,14 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'GET' && parsedUrl.pathname === '/api/status') {
       return json(res, 200, getStatusData());
+    }
+
+    if (req.method === 'GET' && parsedUrl.pathname === '/api/diagrams') {
+      return json(res, 200, getDiagramsData());
+    }
+
+    if (req.method === 'GET' && parsedUrl.pathname === '/api/tests') {
+      return json(res, 200, getTestsData());
     }
 
     if (req.method === 'POST' && parsedUrl.pathname === '/api/config') {

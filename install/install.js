@@ -273,10 +273,22 @@ ${this.colors.BOLD}Examples:${this.colors.NC}
       if (entry.isDirectory()) {
         this.copyDirectory(sourcePath, targetPath);
       } else {
+        // Handle directory collision: target is a directory but source is a file
+        if (fs.existsSync(targetPath) && fs.statSync(targetPath).isDirectory()) {
+          this.printWarning(`Skipping ${entry.name}: target is a directory`);
+          continue;
+        }
+
         // Skip if file exists and not forcing
         if (fs.existsSync(targetPath) && !this.options.force) {
           this.printWarning(`Skipping existing file: ${entry.name}`);
           continue;
+        }
+
+        // Backup existing file before force overwrite
+        if (fs.existsSync(targetPath) && this.options.force) {
+          const backupPath = targetPath + '.backup';
+          try { fs.copyFileSync(targetPath, backupPath); } catch {}
         }
 
         fs.copyFileSync(sourcePath, targetPath);
@@ -307,9 +319,15 @@ ${this.colors.BOLD}Examples:${this.colors.NC}
           fs.mkdirSync(targetDir, { recursive: true });
         }
 
-        if (fs.existsSync(targetPath) && !this.options.force) {
+        if (fs.existsSync(targetPath) && fs.statSync(targetPath).isDirectory()) {
+          this.printWarning(`Skipping ${item}: target is a directory`);
+        } else if (fs.existsSync(targetPath) && !this.options.force) {
           this.printWarning(`File exists, skipping: ${item}`);
         } else {
+          if (fs.existsSync(targetPath) && this.options.force) {
+            const backupPath = targetPath + '.backup';
+            try { fs.copyFileSync(targetPath, backupPath); } catch {}
+          }
           fs.copyFileSync(sourcePath, targetPath);
         }
       }
