@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.20.0] - 2026-03-31
+
+### Added
+- **Dashboard v2** — tab-based layout: Overview, Config, MCP & Keys, Diagrams, Tests
+- **Mermaid diagrams** — architecture, epic flow, plugin graph, agent selection tree (CDN, dark theme)
+- **Test plan** — `/pm:test-plan` generates test cases from epic acceptance criteria
+- **Tests tab** — dashboard shows test plan + last test results + coverage
+
 ## [3.19.0] - 2026-03-31
 
 ### Added
