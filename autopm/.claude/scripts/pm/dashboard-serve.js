@@ -25,6 +25,11 @@ const IDLE_TIMEOUT_MS = 5 * 60 * 1000;
 const token = crypto.randomBytes(16).toString('hex');
 let idleTimer = null;
 
+// Fix 3: XSS — escape HTML in user-controlled data
+function escapeHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
 function resetIdle() {
   if (idleTimer) clearTimeout(idleTimer);
   idleTimer = setTimeout(() => {
@@ -180,8 +185,7 @@ function renderHTML() {
         <label>Provider</label>
         <select id="cfg-provider">
           <option value="github">github</option>
-          <option value="azure-devops">azure-devops</option>
-          <option value="gitlab">gitlab</option>
+          <option value="azure">azure</option>
           <option value="local">local</option>
         </select>
       </div>
@@ -235,6 +239,9 @@ function renderHTML() {
 const TOKEN = '${token}';
 const headers = { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' };
 
+// Fix 3: client-side XSS escaping
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
 function toast(msg, ok) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -266,10 +273,20 @@ function loadStatus(data) {
   if (data.plugins.length === 0) { np.style.display = 'block'; }
   else {
     np.style.display = 'none';
-    const enabled = Array.isArray(cfg.plugins) ? cfg.plugins : (cfg.plugins ? Object.keys(cfg.plugins) : []);
+    // Fix 9: check actual enabled status, not just key presence
+    const enabledSet = new Set();
+    if (Array.isArray(cfg.plugins)) {
+      cfg.plugins.forEach(p => enabledSet.add(p));
+    } else if (cfg.plugins && typeof cfg.plugins === 'object') {
+      for (const [k, v] of Object.entries(cfg.plugins)) {
+        if (v === true || v === 'enabled') enabledSet.add(k);
+      }
+    }
     data.plugins.forEach(p => {
       const d = document.createElement('div'); d.className = 'plugin-item';
-      d.innerHTML = '<input type="checkbox" data-plugin="' + p + '"' + (enabled.includes(p) ? ' checked' : '') + '><span>' + p + '</span>';
+      const cb = document.createElement('input'); cb.type = 'checkbox'; cb.dataset.plugin = p; cb.checked = enabledSet.has(p);
+      const sp = document.createElement('span'); sp.textContent = p;
+      d.appendChild(cb); d.appendChild(sp);
       pl.appendChild(d);
     });
   }
@@ -290,30 +307,56 @@ function loadStatus(data) {
   // Events
   const ev = document.getElementById('events-list');
   ev.innerHTML = '';
+  // Fix 3: XSS — use escaped content in events
   (data.events || []).forEach(e => {
     const d = document.createElement('div'); d.className = 'event';
-    d.innerHTML = '<span class="event-type">' + (e.type||'') + '</span> ' + (e.title||e.name||'') + ' <span class="event-time">' + (e.timestamp ? e.timestamp.split('T')[0] : '') + '</span>';
+    const typeSpan = document.createElement('span'); typeSpan.className = 'event-type'; typeSpan.textContent = e.type || '';
+    const text = document.createTextNode(' ' + (e.title || e.name || '') + ' ');
+    const timeSpan = document.createElement('span'); timeSpan.className = 'event-time'; timeSpan.textContent = e.timestamp ? e.timestamp.split('T')[0] : '';
+    d.appendChild(typeSpan); d.appendChild(text); d.appendChild(timeSpan);
     ev.appendChild(d);
   });
 }
 
+// Fix 12: addMcpEntry — use DOM APIs not innerHTML
 function addMcpEntry(name, cmd, args) {
   const ml = document.getElementById('mcp-list');
   const d = document.createElement('div'); d.className = 'mcp-entry';
-  d.innerHTML = '<div class="row"><div><label>Name</label><input type="text" class="mcp-name" value="' + (name||'') + '"></div>' +
-    '<div><label>Command</label><input type="text" class="mcp-cmd" value="' + (cmd||'') + '"></div></div>' +
-    '<div class="row"><div><label>Args (space-separated)</label><input type="text" class="mcp-args" value="' + (args||'') + '"></div>' +
-    '<div style="display:flex;align-items:end"><button class="btn btn-danger btn-sm" onclick="this.closest(\\'.mcp-entry\\').remove()">Remove</button></div></div>';
+
+  function makeField(labelText, className, val) {
+    const wrap = document.createElement('div');
+    const lbl = document.createElement('label'); lbl.textContent = labelText;
+    const inp = document.createElement('input'); inp.type = 'text'; inp.className = className; inp.value = val || '';
+    wrap.appendChild(lbl); wrap.appendChild(inp);
+    return wrap;
+  }
+
+  const row1 = document.createElement('div'); row1.className = 'row';
+  row1.appendChild(makeField('Name', 'mcp-name', name));
+  row1.appendChild(makeField('Command', 'mcp-cmd', cmd));
+
+  const row2 = document.createElement('div'); row2.className = 'row';
+  row2.appendChild(makeField('Args (space-separated)', 'mcp-args', args));
+  const btnWrap = document.createElement('div'); btnWrap.style.display = 'flex'; btnWrap.style.alignItems = 'end';
+  const rmBtn = document.createElement('button'); rmBtn.className = 'btn btn-danger btn-sm'; rmBtn.textContent = 'Remove';
+  rmBtn.addEventListener('click', function() { this.closest('.mcp-entry').remove(); });
+  btnWrap.appendChild(rmBtn);
+  row2.appendChild(btnWrap);
+
+  d.appendChild(row1); d.appendChild(row2);
   ml.appendChild(d);
 }
 
 function addEnvRow(key, val) {
   const el = document.getElementById('env-list');
   const d = document.createElement('div'); d.className = 'env-row';
-  d.innerHTML = '<input type="text" class="env-key" placeholder="KEY" value="' + (key||'') + '">' +
-    '<input type="password" class="env-val" placeholder="value" value="' + (val||'') + '">' +
-    '<span class="eye" onclick="toggleVis(this)">&#128065;</span>' +
-    '<button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">X</button>';
+  const keyInp = document.createElement('input'); keyInp.type = 'text'; keyInp.className = 'env-key'; keyInp.placeholder = 'KEY'; keyInp.value = key || '';
+  const valInp = document.createElement('input'); valInp.type = 'password'; valInp.className = 'env-val'; valInp.placeholder = 'value'; valInp.value = val || '';
+  const eye = document.createElement('span'); eye.className = 'eye'; eye.innerHTML = '&#128065;';
+  eye.addEventListener('click', function() { toggleVis(this); });
+  const rmBtn = document.createElement('button'); rmBtn.className = 'btn btn-danger btn-sm'; rmBtn.textContent = 'X';
+  rmBtn.addEventListener('click', function() { this.parentElement.remove(); });
+  d.appendChild(keyInp); d.appendChild(valInp); d.appendChild(eye); d.appendChild(rmBtn);
   el.appendChild(d);
 }
 
@@ -322,12 +365,13 @@ function toggleVis(el) {
   inp.type = inp.type === 'password' ? 'text' : 'password';
 }
 
+// Fix 7: saveConfig — merge nested objects, don't replace
 async function saveConfig() {
   const cfg = (await api('GET', '/api/status')).config || {};
-  cfg.execution_strategy = { mode: document.getElementById('cfg-strategy').value };
+  cfg.execution_strategy = Object.assign({}, cfg.execution_strategy || {}, { mode: document.getElementById('cfg-strategy').value });
   cfg.provider = document.getElementById('cfg-provider').value;
-  cfg.docker = { enabled: document.getElementById('cfg-docker').checked };
-  cfg.kubernetes = { enabled: document.getElementById('cfg-k8s').checked };
+  cfg.docker = Object.assign({}, cfg.docker || {}, { enabled: document.getElementById('cfg-docker').checked });
+  cfg.kubernetes = Object.assign({}, cfg.kubernetes || {}, { enabled: document.getElementById('cfg-k8s').checked });
   const checks = document.querySelectorAll('#plugin-list input[data-plugin]');
   const plugins = {};
   checks.forEach(c => { plugins[c.dataset.plugin] = c.checked ? 'enabled' : 'disabled'; });
@@ -349,13 +393,14 @@ async function saveMcp() {
   toast('MCP config saved', true);
 }
 
+// Fix 11: saveEnv — send all values (server-side merge handles placeholders)
 async function saveEnv() {
   const rows = document.querySelectorAll('.env-row');
   const vars = {};
   rows.forEach(r => {
     const k = r.querySelector('.env-key').value.trim();
     const v = r.querySelector('.env-val').value;
-    if (k && v !== '********') vars[k] = v;
+    if (k) vars[k] = v;
   });
   await api('POST', '/api/env', vars);
   toast('.env saved', true);
@@ -375,51 +420,89 @@ setInterval(refresh, 10000);
 </html>`;
 }
 
+// --- Helpers for safe JSON body parsing ---
+async function parseJSONBody(req, res) {
+  let raw;
+  try { raw = await readBody(req); } catch (e) { return { err: json(res, 400, { error: e.message }) }; }
+  let body;
+  try { body = JSON.parse(raw); } catch { return { err: json(res, 400, { error: 'Invalid JSON syntax' }) }; }
+  if (typeof body !== 'object' || body === null) return { err: json(res, 400, { error: 'Invalid JSON object' }) };
+  return { body };
+}
+
 // --- Server ---
 const server = http.createServer(async (req, res) => {
-  resetIdle();
+  const parsedUrl = new URL(req.url || '/', `http://${req.headers.host}`);
 
-  // Auth check
-  if (req.url !== '/favicon.ico') {
+  // Fix 13 + Fix 4: Auth check BEFORE resetIdle
+  if (parsedUrl.pathname !== '/favicon.ico') {
     const authHeader = req.headers['authorization'] || '';
-    const isHTML = req.url === '/' || req.url === '';
+    const isHTML = parsedUrl.pathname === '/' || parsedUrl.pathname === '';
 
-    if (!isHTML) {
+    if (isHTML) {
+      // HTML route: accept token as query param
+      const qToken = parsedUrl.searchParams.get('token');
+      if (qToken !== token) {
+        return json(res, 401, { error: 'Unauthorized — append ?token=<token> to URL' });
+      }
+    } else {
       if (authHeader !== `Bearer ${token}`) {
         return json(res, 401, { error: 'Unauthorized' });
       }
     }
   }
 
+  // Fix 4: resetIdle only AFTER auth succeeds
+  resetIdle();
+
   try {
     // Routes
-    if (req.method === 'GET' && (req.url === '/' || req.url === '')) {
+    if (req.method === 'GET' && (parsedUrl.pathname === '/' || parsedUrl.pathname === '')) {
       res.writeHead(200, { 'Content-Type': 'text/html' });
       return res.end(renderHTML());
     }
 
-    if (req.method === 'GET' && req.url === '/api/status') {
+    if (req.method === 'GET' && parsedUrl.pathname === '/api/status') {
       return json(res, 200, getStatusData());
     }
 
-    if (req.method === 'POST' && req.url === '/api/config') {
-      const body = JSON.parse(await readBody(req));
-      if (typeof body !== 'object' || body === null) return json(res, 400, { error: 'Invalid JSON object' });
+    if (req.method === 'POST' && parsedUrl.pathname === '/api/config') {
+      const { body, err } = await parseJSONBody(req, res);
+      if (err) return;
       writeJSON(configPath, body);
       return json(res, 200, { ok: true });
     }
 
-    if (req.method === 'POST' && req.url === '/api/mcp') {
-      const body = JSON.parse(await readBody(req));
-      if (typeof body !== 'object' || body === null) return json(res, 400, { error: 'Invalid JSON object' });
-      writeJSON(mcpPath, body);
+    // Fix 1: /api/mcp — merge with existing, don't overwrite
+    if (req.method === 'POST' && parsedUrl.pathname === '/api/mcp') {
+      const { body, err } = await parseJSONBody(req, res);
+      if (err) return;
+      let current = {};
+      try { current = JSON.parse(fs.readFileSync(mcpPath, 'utf8')); } catch {}
+      const merged = { ...current, ...body };
+      writeJSON(mcpPath, merged);
       return json(res, 200, { ok: true });
     }
 
-    if (req.method === 'POST' && req.url === '/api/env') {
-      const body = JSON.parse(await readBody(req));
-      if (typeof body !== 'object' || body === null) return json(res, 400, { error: 'Invalid JSON object' });
-      writeEnv(body);
+    // Fix 2: /api/env — merge with existing, skip placeholders
+    if (req.method === 'POST' && parsedUrl.pathname === '/api/env') {
+      const { body, err } = await parseJSONBody(req, res);
+      if (err) return;
+      let existing = {};
+      try {
+        const lines = fs.readFileSync(envPath, 'utf8').split('\n');
+        for (const line of lines) {
+          const m = line.match(/^([^#=]+)=(.*)$/);
+          if (m) existing[m[1].trim()] = m[2].trim();
+        }
+      } catch {}
+      for (const [k, v] of Object.entries(body)) {
+        if (v !== '********') existing[k] = v;
+      }
+      const envContent = Object.entries(existing).map(([k, v]) => `${k}=${v}`).join('\n') + '\n';
+      const backup = envPath + '.backup';
+      if (fs.existsSync(envPath)) fs.copyFileSync(envPath, backup);
+      fs.writeFileSync(envPath, envContent, 'utf8');
       return json(res, 200, { ok: true });
     }
 
@@ -438,9 +521,10 @@ server.listen(0, '127.0.0.1', () => {
 
   resetIdle();
 
-  const url = `http://127.0.0.1:${port}`;
+  const baseUrl = `http://127.0.0.1:${port}`;
+  const authUrl = `${baseUrl}/?token=${token}`;
   console.log(`## Config Dashboard Server\n`);
-  console.log(`URL:   ${url}`);
+  console.log(`URL:   ${authUrl}`);
   console.log(`Token: ${token}`);
   console.log(`PID:   ${process.pid}`);
   console.log(`State: ${pidFile}`);
@@ -449,11 +533,12 @@ server.listen(0, '127.0.0.1', () => {
 
   try {
     const { execSync } = require('child_process');
-    if (process.platform === 'darwin') execSync(`open "${url}"`);
-    else if (process.platform === 'win32') execSync(`start "${url}"`);
-    else execSync(`xdg-open "${url}"`);
+    // Fix 6: Windows browser open + Fix 13: token in URL
+    if (process.platform === 'darwin') execSync(`open "${authUrl}"`);
+    else if (process.platform === 'win32') execSync(`cmd /c start "" "${authUrl}"`);
+    else execSync(`xdg-open "${authUrl}"`);
   } catch {
-    console.log(`Could not open browser. Open manually: ${url}`);
+    console.log(`Could not open browser. Open manually: ${authUrl}`);
   }
 });
 
