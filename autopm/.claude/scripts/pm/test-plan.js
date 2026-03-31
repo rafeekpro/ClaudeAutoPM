@@ -109,7 +109,9 @@ function generate() {
         totalCases++;
         const type = inferTestType(ac.text);
         const status = ac.done ? 'passed' : 'pending';
-        lines.push(`| ${caseNum} | ${ac.text} | ${task.name} AC | ${type} | ${status} |`);
+        const safeText = ac.text.replace(/\|/g, '\\|');
+        const safeName = task.name.replace(/\|/g, '\\|');
+        lines.push(`| ${caseNum} | ${safeText} | ${safeName} AC | ${type} | ${status} |`);
       }
     }
     lines.push('', `Total: ${caseNum} test cases from ${epic.tasks.length} tasks`, '');

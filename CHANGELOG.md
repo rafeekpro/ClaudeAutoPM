@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.20.2] - 2026-04-01
+
+### Fixed
+- `autopm install --force` now actually overwrites existing files (was silently skipping all)
+
 ## [3.20.1] - 2026-04-01
 
 ### Fixed
