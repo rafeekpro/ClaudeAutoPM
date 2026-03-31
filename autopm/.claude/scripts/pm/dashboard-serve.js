@@ -150,9 +150,19 @@ function renderHTML() {
   .env-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
   .env-row input { flex: 1; }
   .env-row .eye { cursor: pointer; color: #8b949e; font-size: 16px; user-select: none; width: 30px; text-align: center; }
-  .plugin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; }
-  .plugin-item { display: flex; align-items: center; gap: 8px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 8px 12px; font-size: 13px; }
+  .plugin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
+  .plugin-item { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 8px 12px; font-size: 13px; }
+  .plugin-item label { display: flex; align-items: center; gap: 8px; color: #c9d1d9; font-size: 13px; margin: 0; }
   .plugin-item input { width: 16px; height: 16px; accent-color: #238636; }
+  .plugin-item .hint { margin-left: 24px; }
+  .hint { color: #8b949e; font-size: 12px; margin: 2px 0 8px 0; }
+  .desc { color: #8b949e; font-size: 13px; margin-bottom: 16px; }
+  .mcp-presets button, .env-suggestions button {
+    background: #21262d; color: #58a6ff; border: 1px solid #30363d;
+    padding: 4px 12px; border-radius: 4px; cursor: pointer; margin: 4px;
+  }
+  .mcp-presets button:hover, .env-suggestions button:hover { background: #30363d; }
+  .mcp-presets, .env-suggestions { margin-bottom: 12px; }
   .events { max-height: 200px; overflow-y: auto; }
   .event { padding: 5px 0; border-bottom: 1px solid #21262d; font-size: 12px; }
   .event-type { color: #58a6ff; }
@@ -169,12 +179,19 @@ function renderHTML() {
   <h1>AutoPM Config Dashboard</h1>
   <p class="subtitle">Interactive configuration editor &mdash; changes save to disk</p>
 
+  <div id="connection-banner" style="display:none;background:#3d1116;color:#f85149;padding:12px;border-radius:8px;margin-bottom:16px;text-align:center;">
+    Connection lost. Server may have auto-shutdown (5min idle).
+    <button onclick="location.reload()" style="background:#da3633;color:#fff;border:none;border-radius:4px;padding:4px 12px;cursor:pointer;margin-left:8px;">Retry</button> or restart with /pm:dashboard --serve
+  </div>
+
   <!-- Config Section -->
   <div class="card" id="config-section">
     <h2>Configuration</h2>
+    <p class="desc">Project execution settings. Changes saved to .claude/config.json</p>
     <div class="row">
       <div>
         <label>Execution Strategy</label>
+        <p class="hint">How Claude Code runs tasks: sequential (safe), adaptive (smart auto-choice), hybrid (max parallel)</p>
         <select id="cfg-strategy">
           <option value="sequential">sequential</option>
           <option value="parallel">parallel</option>
@@ -183,6 +200,7 @@ function renderHTML() {
       </div>
       <div>
         <label>Provider</label>
+        <p class="hint">Where issues/epics are tracked: local (files only), github (requires gh CLI), azure (requires PAT)</p>
         <select id="cfg-provider">
           <option value="github">github</option>
           <option value="azure">azure</option>
@@ -192,11 +210,17 @@ function renderHTML() {
     </div>
     <div class="toggle-row">
       <label class="toggle"><input type="checkbox" id="cfg-docker"><span class="slider"></span></label>
-      <span class="toggle-label">Docker</span>
+      <div>
+        <span class="toggle-label">Docker</span>
+        <p class="hint">Enable Docker-first development. Tests and commands run inside containers.</p>
+      </div>
     </div>
     <div class="toggle-row">
       <label class="toggle"><input type="checkbox" id="cfg-k8s"><span class="slider"></span></label>
-      <span class="toggle-label">Kubernetes</span>
+      <div>
+        <span class="toggle-label">Kubernetes</span>
+        <p class="hint">Enable Kubernetes orchestration for deployment and scaling.</p>
+      </div>
     </div>
     <button class="btn" onclick="saveConfig()">Save Config</button>
   </div>
@@ -204,13 +228,21 @@ function renderHTML() {
   <!-- Plugins Section -->
   <div class="card" id="plugins-section">
     <h2>Plugins</h2>
+    <p class="desc">Check plugins to include their agents. Click Save Plugins to apply. Requires re-running <code>autopm install</code>.</p>
     <div class="plugin-grid" id="plugin-list"></div>
     <p id="no-plugins" style="color:#8b949e;font-size:13px;display:none">No plugins found in packages/</p>
+    <button class="btn" onclick="saveConfig()">Save Plugins</button>
   </div>
 
   <!-- MCP Servers Section -->
   <div class="card" id="mcp-section">
     <h2>MCP Servers</h2>
+    <p class="desc">Model Context Protocol servers provide real-time documentation and tools to Claude Code.</p>
+    <div class="mcp-presets">
+      <span style="color:#8b949e;font-size:12px;margin-right:8px;">Quick add:</span>
+      <button onclick="addMcpPreset('context7')">+ Context7 (docs)</button>
+      <button onclick="addMcpPreset('playwright')">+ Playwright (browser)</button>
+    </div>
     <div id="mcp-list"></div>
     <button class="btn" style="margin-right:8px" onclick="addMcpEntry()">+ Add Server</button>
     <button class="btn" onclick="saveMcp()">Save MCP Config</button>
@@ -219,6 +251,13 @@ function renderHTML() {
   <!-- API Keys Section -->
   <div class="card" id="env-section">
     <h2>API Keys / Environment</h2>
+    <p class="desc">Environment variables stored in .env. Secrets are masked.</p>
+    <div class="env-suggestions">
+      <p class="hint">Suggested keys for common providers:</p>
+      <button onclick="addEnvSuggestion('GITHUB_TOKEN','')">+ GITHUB_TOKEN</button>
+      <button onclick="addEnvSuggestion('AZURE_DEVOPS_PAT','')">+ AZURE_DEVOPS_PAT</button>
+      <button onclick="addEnvSuggestion('OPENAI_API_KEY','')">+ OPENAI_API_KEY</button>
+    </div>
     <div id="env-list"></div>
     <button class="btn" style="margin-right:8px" onclick="addEnvRow()">+ Add Variable</button>
     <button class="btn" onclick="saveEnv()">Save .env</button>
@@ -241,6 +280,22 @@ const headers = { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'applicati
 
 // Fix 3: client-side XSS escaping
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+const PLUGIN_DESCRIPTIONS = {
+  'plugin-core': 'Core agents (always installed). agent-manager, code-analyzer, test-runner, file-analyzer, parallel-worker, mcp-manager, context-optimizer.',
+  'plugin-languages': 'Python, JavaScript, Node.js, Bash agents. For backend/frontend development.',
+  'plugin-frameworks': 'React, Tailwind, UX, E2E testing, NATS. For frontend/UI development.',
+  'plugin-cloud': 'AWS, Azure, GCP, Kubernetes, Terraform. For cloud infrastructure.',
+  'plugin-devops': 'Docker, GitHub Actions, SSH, observability. For CI/CD and deployment.',
+  'plugin-databases': 'PostgreSQL, MongoDB, Redis, BigQuery, CosmosDB. For database work.',
+  'plugin-ai': 'OpenAI, Gemini, LangChain, HuggingFace. For AI/ML integrations.',
+  'plugin-data': 'Airflow, Kedro, LangGraph. For data pipelines.',
+  'plugin-ml': 'ML workflow agents. For machine learning projects.',
+  'plugin-testing': 'Frontend testing specialists. For UI test automation.',
+  'plugin-pm': 'PM commands (always installed). PRD, epic, issue management.',
+  'plugin-pm-github': 'GitHub integration. Issues, PRs, Actions sync.',
+  'plugin-pm-azure': 'Azure DevOps integration. Work items, sprints.'
+};
 
 function toast(msg, ok) {
   const t = document.getElementById('toast');
@@ -284,9 +339,15 @@ function loadStatus(data) {
     }
     data.plugins.forEach(p => {
       const d = document.createElement('div'); d.className = 'plugin-item';
+      const lbl = document.createElement('label');
       const cb = document.createElement('input'); cb.type = 'checkbox'; cb.dataset.plugin = p; cb.checked = enabledSet.has(p);
-      const sp = document.createElement('span'); sp.textContent = p;
-      d.appendChild(cb); d.appendChild(sp);
+      const sp = document.createElement('span'); sp.textContent = ' ' + p;
+      lbl.appendChild(cb); lbl.appendChild(sp);
+      d.appendChild(lbl);
+      if (PLUGIN_DESCRIPTIONS[p]) {
+        const hint = document.createElement('p'); hint.className = 'hint'; hint.textContent = PLUGIN_DESCRIPTIONS[p];
+        d.appendChild(hint);
+      }
       pl.appendChild(d);
     });
   }
@@ -406,11 +467,29 @@ async function saveEnv() {
   toast('.env saved', true);
 }
 
+function addMcpPreset(name) {
+  const presets = {
+    context7: { name: 'context7', cmd: 'npx', args: '@upstash/context7-mcp', desc: 'Real-time library documentation. Queries up-to-date API docs before writing code.' },
+    playwright: { name: 'playwright-mcp', cmd: 'npx', args: '@playwright/mcp', desc: 'Browser automation. Controls browser for E2E testing and screenshots.' }
+  };
+  const p = presets[name];
+  if (p) addMcpEntry(p.name, p.cmd, p.args);
+}
+
+function addEnvSuggestion(key, val) {
+  const existing = document.querySelectorAll('.env-key');
+  for (const inp of existing) { if (inp.value === key) { toast(key + ' already exists', false); return; } }
+  addEnvRow(key, val);
+}
+
 async function refresh() {
   try {
     const data = await api('GET', '/api/status');
     loadStatus(data);
-  } catch {}
+    document.getElementById('connection-banner').style.display = 'none';
+  } catch {
+    document.getElementById('connection-banner').style.display = 'block';
+  }
 }
 
 refresh();
