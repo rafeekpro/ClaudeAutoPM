@@ -55,8 +55,8 @@ function main() {
 
   entries.forEach((entry, idx) => {
     const date = entry.timestamp ? entry.timestamp.split('T')[0] : '-';
-    const tags = (entry.tags || []).join(', ');
-    const text = entry.learning.replace(/\|/g, '\\|');
+    const tags = (entry.tags || []).length > 0 ? entry.tags.join(', ') : '\u2014';
+    const text = String(entry.learning || '').replace(/\|/g, '\\|');
     console.log(`| ${idx + 1} | ${text} | ${tags} | ${date} |`);
   });
 

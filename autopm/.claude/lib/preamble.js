@@ -26,7 +26,9 @@ function loadPreamble(basePath) {
     if (fs.existsSync(configPath)) {
       const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
       result.version = config.version || null;
-      if (config.providers) {
+      if (config.provider) {
+        result.provider = config.provider;
+      } else if (config.providers) {
         const providers = Object.keys(config.providers);
         result.provider = providers.length > 0 ? providers[0] : 'local';
       }
@@ -112,8 +114,10 @@ function formatPreamble(preamble) {
 
 function formatTimeAgo(isoTimestamp) {
   if (!isoTimestamp) return 'unknown';
-  const diff = Date.now() - new Date(isoTimestamp).getTime();
+  const diff = Math.max(0, Date.now() - new Date(isoTimestamp).getTime());
+  if (diff === 0) return 'just now';
   const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return 'just now';
   if (minutes < 60) return `${minutes}m ago`;
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return `${hours}h ago`;

@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { parseFrontmatter } = require('../../lib/frontmatter');
 
 /**
  * PM System Validation Script
@@ -24,35 +25,39 @@ async function validate() {
     }
   }
 
-  // Helper: read frontmatter from a file (simple parser)
+  // Helper: read frontmatter from a file using shared lib
   function readFrontmatter(filePath) {
     const content = fs.readFileSync(filePath, 'utf8');
-    const match = content.match(/^---\r?\n([\s\S]*?)^---\r?\n?([\s\S]*)$/m);
-    if (!match) return { fm: {}, body: content, raw: content, hasFrontmatter: false };
-
-    const lines = match[1].split('\n');
-    const fm = {};
-    for (const line of lines) {
-      const kv = line.match(/^(\w[\w_-]*):\s*(.*)$/);
-      if (kv) fm[kv[1]] = kv[2].trim();
-    }
-    return { fm, body: match[2] || '', raw: content, hasFrontmatter: true };
+    const { frontmatter, body } = parseFrontmatter(content);
+    const hasFrontmatter = content.trimStart().startsWith('---');
+    return { fm: frontmatter, body, raw: content, hasFrontmatter };
   }
 
-  // Helper: write back frontmatter fix
+  // Helper: write back frontmatter fix (scoped to frontmatter block only)
   function writeFrontmatterFix(filePath, fieldName, newValue) {
     const content = fs.readFileSync(filePath, 'utf8');
-    const fieldRegex = new RegExp(`^(${fieldName}:\\s*)(.*)$`, 'm');
-    const match = content.match(fieldRegex);
+    const fmMatch = content.match(/^(---\r?\n)([\s\S]*?)(^---\r?\n?)/m);
 
-    if (match) {
-      const updated = content.replace(fieldRegex, `$1${newValue}`);
+    if (!fmMatch) {
+      // No frontmatter block — insert one
+      const updated = `---\n${fieldName}: ${newValue}\n---\n${content}`;
       fs.writeFileSync(filePath, updated, 'utf8');
-    } else {
-      // Insert field after opening ---
-      const updated = content.replace(/^---\r?\n/, `---\n${fieldName}: ${newValue}\n`);
-      fs.writeFileSync(filePath, updated, 'utf8');
+      return;
     }
+
+    const before = fmMatch[1];
+    let fmBlock = fmMatch[2];
+    const after = fmMatch[3];
+    const rest = content.slice(fmMatch[0].length);
+
+    const fieldRegex = new RegExp(`^(${fieldName}:\\s*)(.*)$`, 'm');
+    if (fieldRegex.test(fmBlock)) {
+      fmBlock = fmBlock.replace(fieldRegex, `$1${newValue}`);
+    } else {
+      fmBlock += `${fieldName}: ${newValue}\n`;
+    }
+
+    fs.writeFileSync(filePath, before + fmBlock + after + rest, 'utf8');
   }
 
   const now = new Date().toISOString();
@@ -115,7 +120,7 @@ async function validate() {
       }
 
       // AUTO-FIX: wrong case in status field
-      const validStatuses = ['backlog', 'in-progress', 'in_progress', 'complete', 'completed', 'done', 'open', 'closed', 'active', 'blocked'];
+      const validStatuses = ['backlog', 'in-progress', 'in_progress', 'complete', 'completed', 'done', 'open', 'closed', 'active', 'blocked', 'draft', 'review', 'approved', 'rejected'];
       if (fm.status) {
         const lower = fm.status.toLowerCase();
         if (fm.status !== lower && validStatuses.includes(lower)) {
@@ -128,11 +133,12 @@ async function validate() {
       try {
         const templateReader = require(path.join(process.cwd(), '.claude', 'lib', 'template-reader'));
 
-        // Determine template type based on path
+        // Determine template type based on path (normalize separators for Windows)
+        const normalizedPath = filePath.split(path.sep).join('/');
         let templateName = null;
-        if (filePath.includes('/prds/')) templateName = 'prd.xml';
-        else if (filePath.endsWith('epic.md')) templateName = 'epic.xml';
-        else if (/\/\d+.*\.md$/.test(filePath)) templateName = 'issue.xml';
+        if (normalizedPath.includes('/prds/')) templateName = 'prd.xml';
+        else if (normalizedPath.endsWith('epic.md')) templateName = 'epic.xml';
+        else if (/\/\d+.*\.md$/.test(normalizedPath)) templateName = 'issue.xml';
 
         if (templateName) {
           const templatePath = templateReader.resolveTemplatePath(templateName, process.cwd());

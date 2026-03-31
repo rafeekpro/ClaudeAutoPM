@@ -44,7 +44,7 @@ function main() {
   const entry = {
     timestamp: new Date().toISOString(),
     learning,
-    tags: tags.length > 0 ? tags : ['general'],
+    tags: tags,
     source: 'manual'
   };
 

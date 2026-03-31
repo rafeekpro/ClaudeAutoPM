@@ -138,7 +138,7 @@ function listCheckpoints() {
       const date = data.timestamp ? data.timestamp.split('T')[0] : '-';
       const branch = data.git ? data.git.branch : '-';
       const issues = data.counts ? `${data.counts.issues} tasks` : '-';
-      console.log(`| ${idx + 1} | ${data.description} | ${date} | ${branch} | ${issues} |`);
+      console.log(`| ${idx + 1} | ${(data.description || '').replace(/\|/g, '\\|')} | ${date} | ${branch} | ${issues} |`);
     } catch { /* skip corrupt file */ }
   });
 }
@@ -158,7 +158,13 @@ function showCheckpoint(id) {
     process.exit(1);
   }
 
-  const data = JSON.parse(fs.readFileSync(path.join(checkpointsDir, match), 'utf8'));
+  let data;
+  try {
+    data = JSON.parse(fs.readFileSync(path.join(checkpointsDir, match), 'utf8'));
+  } catch (err) {
+    console.log(`❌ Corrupt checkpoint file: ${match}. Delete and recreate.`);
+    process.exit(1);
+  }
 
   console.log(`## Checkpoint: ${data.description}`);
   console.log('');
