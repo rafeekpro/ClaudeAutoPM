@@ -7,6 +7,85 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.18.0] - 2026-03-31
+
+### Added
+- **Introspection commands** — `/pm:agents`, `/pm:templates`, `/pm:config`, `/pm:mcp`, `/pm:session`
+- **Session learnings** — `/pm:learn`, `/pm:recall` (JSONL persistence)
+- **Project checkpoints** — `/pm:checkpoint` (create/list/show snapshots)
+- **HTML Dashboard** — `/pm:dashboard` generates self-contained HTML overview
+- **JSONL Event Logger** — all PM actions logged to `.claude/pm/events.jsonl`
+- **Command preamble** — auto-context in `/pm:status`, `/pm:standup`, `/pm:next`
+- **39 PM scripts** added to framework install (were only in plugin packages)
+- **16 issue/epic commands** from plugin-pm-github added to framework
+
+### Changed
+- **Markdown tables** in `/pm:status`, `/pm:standup`, `/pm:epic-status`, `/pm:in-progress`, `/pm:blocked`
+- **Structured TODO** format in `/pm:next`, `/pm:what-next` (What/Why/Effort/Priority)
+- **Enhanced validate** — AUTO-FIXED / NEEDS INPUT format with template validation
+- **Actionable error messages** — 25 errors updated with next-step guidance
+- **issue-start.cjs** path fixed (`packages/` → `.claude/scripts/pm/`)
+
+## [3.17.0] - 2026-03-31
+
+### Added
+- Markdown pipe tables in PM status commands (gstack pattern)
+- Structured TODO format in pm:next, pm:what-next
+- JSONL event logger for PM actions
+- HTML Dashboard (/pm:dashboard)
+- Actionable error messages (25 updated)
+
+## [3.16.1] - 2026-03-30
+
+### Fixed
+- PM slash commands (29 pm:*.md) included in framework install
+- npm-publish.yml removed --provenance flag
+
+## [3.16.0] - 2026-03-30
+
+### Added
+- XML template system (issue.xml, prd.xml, epic.xml, task.xml)
+- template-reader.js (readTemplate, generateMarkdown, validateContent)
+- Local PRD/epic tracking provider (7 commands, 27 tests)
+- Eliminated process.chdir from tests (158 in CI)
+
+## [3.15.0] - 2026-03-30
+
+### Changed
+- Docs site updated for v3.14.0 architecture (7 pages)
+- E2E install scenario tests (23 tests)
+- npm-publish.yml fixed
+
+## [3.14.0] - 2026-03-30
+
+### Added
+- Local issue tracking provider (create, list, show, start, close)
+- Issue structure template + enforcement rule (issue-structure.xml)
+- PluginManager tests (31) + installer tests (22) + e2e scenario tests (23)
+- 13 plugins published to npm @claudeautopm scope
+- PR-only workflow + CI-only publishing enforcement
+
+### Changed
+- Azure DevOps decoupled from docker/full/performance scenarios
+- Quick-ref files regenerated for current XML rules
+
+## [3.13.0] - 2026-03-30
+
+### Changed
+- Agent consolidation: core-only in autopm, 36 non-core moved to plugins
+- Dynamic agent-registry.xml generation from installed plugins
+- plugin-core completed (7/7 agents)
+- Token savings: 73% for lite, 59% for github scenario
+
+## [3.12.0] - 2026-03-30
+
+### Changed
+- XML rules unification: 7 XML auto-loaded (was 4), 3 MD reference (was 12)
+- 44 agent definition files generated
+- Compact agent-registry.xml (65 lines vs 323)
+- epicSync.js: mandatory footer + repo protection
+- Installer: .claude/templates added to installItems
+
 ## [3.11.0] - 2026-03-27
 
 ### Changed
