@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.20.1] - 2026-04-01
+
+### Fixed
+- `/pm:dashboard` now defaults to interactive server (dashboard-serve.js) instead of static HTML
+
 ## [3.20.0] - 2026-03-31
 
 ### Added
