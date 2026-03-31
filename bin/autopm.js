@@ -26,14 +26,26 @@ function main() {
           .positional('preset', {
             describe: 'Installation preset (1-5)',
             type: 'number'
+          })
+          .option('force', {
+            describe: 'Force overwrite existing files',
+            type: 'boolean',
+            default: false
+          })
+          .option('scenario', {
+            describe: 'Installation scenario (lite, github, azure, docker, full, performance)',
+            type: 'string'
           });
       },
       (argv) => {
-        // Delegate to the install script
+        // Delegate to install.js directly (not install.sh) to pass flags
         const { execSync } = require('child_process');
-        const installPath = path.join(__dirname, '..', 'install', 'install.sh');
+        const installJsPath = path.join(__dirname, '..', 'install', 'install.js');
+        const args = [];
+        if (argv.force) args.push('--force');
+        if (argv.scenario) args.push(`--scenario=${argv.scenario}`);
         try {
-          execSync(`bash ${installPath}`, {
+          execSync(`node "${installJsPath}" ${args.join(' ')}`, {
             stdio: 'inherit',
             env: { ...process.env, AUTOPM_PRESET: argv.preset || '' }
           });
