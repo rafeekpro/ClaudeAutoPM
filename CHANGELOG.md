@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.21.0] - 2026-04-01
+
+### Changed
+- **MCP & Keys tab UX** — persistent server cards with descriptions, presets (Context7, Playwright), env vars per server, save preview with confirm
+- **API Keys** — masked by default, eye icon toggle to reveal, plain text from server
+- **Diagrams tab** — dynamic loading from `.claude/pm/diagrams/*.mmd`, removed hardcoded AutoPM diagrams
+- **Config tab** — moved Installed Plugins diagram here (was in Diagrams)
+- **Overview tab** — moved Agent Selection tree here (quick reference)
+
 ## [3.20.3] - 2026-04-01
 
 ### Fixed
