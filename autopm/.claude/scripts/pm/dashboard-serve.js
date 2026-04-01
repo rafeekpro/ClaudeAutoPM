@@ -132,8 +132,7 @@ function generateEpicFlowDiagram() {
     }
   } catch {}
   if (epics.length === 0 && prds.length === 0) {
-    lines.push('  N[No epics or PRDs found]');
-    return lines.join('\n');
+    return { mermaid: '', hasData: false };
   }
   let nodeId = 0;
   for (const prd of prds) {
@@ -159,7 +158,7 @@ function generateEpicFlowDiagram() {
       lines.push(`  ${eid} --> ${tid}["${t.name} ${t.icon}"]`);
     }
   }
-  return lines.join('\n');
+  return { mermaid: lines.join('\n'), hasData: true };
 }
 
 function generatePluginGraph() {
@@ -263,8 +262,10 @@ function getProjectDiagrams() {
 }
 
 function getDiagramsData() {
+  const epic = generateEpicFlowDiagram();
   return {
-    epicFlow: generateEpicFlowDiagram(),
+    epicFlow: epic.mermaid,
+    epicFlowHasData: epic.hasData,
     projectDiagrams: getProjectDiagrams(),
     pluginGraph: generatePluginGraph(),
     agentTree: generateAgentTree()
@@ -364,6 +365,42 @@ function renderHTML() {
   .toast.ok { background: #238636; }
   .toast.err { background: #da3633; }
   footer { margin-top: 24px; text-align: center; color: #484f58; font-size: 12px; }
+  /* Diagram cards */
+  .diagram-card { position: relative; }
+  .diagram-card .diagram-toolbar { display: flex; gap: 6px; position: absolute; top: 12px; right: 12px; z-index: 2; }
+  .diagram-card .diagram-toolbar button {
+    background: #21262d; color: #8b949e; border: 1px solid #30363d;
+    padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;
+  }
+  .diagram-card .diagram-toolbar button:hover { background: #30363d; color: #c9d1d9; }
+  .diagram-card .mermaid-wrap { overflow: auto; max-height: 400px; cursor: pointer; }
+  .diagram-card .mermaid-wrap:hover { outline: 1px solid #30363d; border-radius: 4px; }
+  /* Fullscreen modal */
+  .diagram-modal {
+    display: none; position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0,0,0,0.85); justify-content: center; align-items: center;
+  }
+  .diagram-modal.open { display: flex; }
+  .diagram-modal .modal-inner {
+    background: #161b22; border: 1px solid #30363d; border-radius: 12px;
+    width: 95vw; height: 92vh; display: flex; flex-direction: column; position: relative;
+  }
+  .diagram-modal .modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 20px; border-bottom: 1px solid #30363d;
+  }
+  .diagram-modal .modal-header h3 { color: #c9d1d9; font-size: 14px; }
+  .diagram-modal .modal-header .modal-actions { display: flex; gap: 8px; }
+  .diagram-modal .modal-header button {
+    background: #21262d; color: #8b949e; border: 1px solid #30363d;
+    padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px;
+  }
+  .diagram-modal .modal-header button:hover { background: #30363d; color: #c9d1d9; }
+  .diagram-modal .modal-body {
+    flex: 1; overflow: auto; padding: 20px; display: flex;
+    justify-content: center; align-items: flex-start;
+  }
+  .diagram-modal .modal-body svg { max-width: 100%; height: auto; }
 </style>
 </head>
 <body>
@@ -494,13 +531,31 @@ function renderHTML() {
 
   <!-- Diagrams Tab -->
   <div id="tab-diagrams" class="tab-content">
-    <div class="grid" style="grid-template-columns: 1fr 1fr;">
-      <div class="card">
-        <h3>Epic Flow</h3>
+    <div id="diagram-epic-card" class="card diagram-card" style="display:none;">
+      <h3>Epic Flow <span style="color:#8b949e;font-size:11px;font-weight:normal;margin-left:8px;">PRD → Epic → Tasks workflow</span></h3>
+      <div class="diagram-toolbar">
+        <button onclick="downloadMermaid('diagram-epic')">↓ .mmd</button>
+        <button onclick="openDiagramModal('diagram-epic','Epic Flow')">⤢ Fullscreen</button>
+      </div>
+      <div class="mermaid-wrap" onclick="openDiagramModal('diagram-epic','Epic Flow')">
         <pre class="mermaid" id="diagram-epic"></pre>
       </div>
     </div>
     <div id="project-diagrams"></div>
+  </div>
+
+  <!-- Diagram fullscreen modal -->
+  <div class="diagram-modal" id="diagram-modal" role="dialog" aria-modal="true" aria-labelledby="modal-diagram-title" onclick="if(event.target===this)closeDiagramModal()">
+    <div class="modal-inner">
+      <div class="modal-header">
+        <h3 id="modal-diagram-title"></h3>
+        <div class="modal-actions">
+          <button onclick="downloadMermaid(currentModalDiagram)">↓ Download .mmd</button>
+          <button onclick="closeDiagramModal()">✕ Close</button>
+        </div>
+      </div>
+      <div class="modal-body" id="modal-diagram-body"></div>
+    </div>
   </div>
 
   <!-- Tests Tab -->
@@ -542,26 +597,68 @@ function showTab(name, btn) {
 }
 
 let diagramsRendered = false;
+const diagramSources = {};
+const diagramNames = {};
+let currentModalDiagram = null;
+
 function renderMermaid() {
   if (diagramsRendered) return;
   fetch('/api/diagrams', { headers: { 'Authorization': 'Bearer ' + TOKEN } })
     .then(r => r.json())
     .then(data => {
-      document.getElementById('diagram-epic').textContent = data.epicFlow;
+      // Epic Flow — only show if there are actual epics/PRDs
+      const epicCard = document.getElementById('diagram-epic-card');
+      const epicEl = document.getElementById('diagram-epic');
+      if (data.epicFlowHasData) {
+        epicCard.style.display = '';
+        epicEl.className = 'mermaid';
+        epicEl.textContent = data.epicFlow;
+        diagramSources['diagram-epic'] = data.epicFlow;
+        diagramNames['diagram-epic'] = 'epic-flow';
+      } else {
+        epicCard.style.display = 'none';
+        epicEl.className = '';
+        epicEl.textContent = '';
+      }
       document.getElementById('diagram-plugins').textContent = data.pluginGraph;
       document.getElementById('diagram-agents').textContent = data.agentTree;
+      diagramSources['diagram-plugins'] = data.pluginGraph;
+      diagramSources['diagram-agents'] = data.agentTree;
+      diagramNames['diagram-plugins'] = 'plugins';
+      diagramNames['diagram-agents'] = 'agents';
       // Render project diagrams dynamically
       const container = document.getElementById('project-diagrams');
       container.innerHTML = '';
       if (data.projectDiagrams && data.projectDiagrams.length > 0) {
-        data.projectDiagrams.forEach(d => {
+        data.projectDiagrams.forEach((d, i) => {
+          const id = 'proj-diagram-' + i;
+          diagramSources[id] = d.content;
+          diagramNames[id] = d.name;
           const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = '<h3>' + esc(d.name) + '</h3>';
+          card.className = 'card diagram-card';
+          const h3 = document.createElement('h3');
+          h3.textContent = d.name;
+          card.appendChild(h3);
+          const toolbar = document.createElement('div');
+          toolbar.className = 'diagram-toolbar';
+          const dlBtn = document.createElement('button');
+          dlBtn.textContent = '↓ .mmd';
+          dlBtn.onclick = function(e) { e.stopPropagation(); downloadMermaid(id); };
+          const fsBtn = document.createElement('button');
+          fsBtn.textContent = '⤢ Fullscreen';
+          fsBtn.onclick = function(e) { e.stopPropagation(); openDiagramModal(id, d.name); };
+          toolbar.appendChild(dlBtn);
+          toolbar.appendChild(fsBtn);
+          card.appendChild(toolbar);
+          const wrap = document.createElement('div');
+          wrap.className = 'mermaid-wrap';
+          wrap.onclick = function() { openDiagramModal(id, d.name); };
           const pre = document.createElement('pre');
           pre.className = 'mermaid';
+          pre.id = id;
           pre.textContent = d.content;
-          card.appendChild(pre);
+          wrap.appendChild(pre);
+          card.appendChild(wrap);
           container.appendChild(card);
         });
       } else {
@@ -584,6 +681,59 @@ function renderMermaid() {
       }
       diagramsRendered = true;
     });
+}
+
+function openDiagramModal(diagramId, title) {
+  currentModalDiagram = diagramId;
+  document.getElementById('modal-diagram-title').textContent = title || diagramId;
+  const body = document.getElementById('modal-diagram-body');
+  body.textContent = '';
+  const source = diagramSources[diagramId];
+  if (source) {
+    const pre = document.createElement('pre');
+    pre.className = 'mermaid';
+    pre.textContent = source;
+    body.appendChild(pre);
+    if (typeof mermaid !== 'undefined' && mermaid.run) {
+      mermaid.run({ nodes: body.querySelectorAll('.mermaid') });
+    }
+  } else {
+    body.textContent = 'Diagram not available.';
+  }
+  const modal = document.getElementById('diagram-modal');
+  modal.classList.add('open');
+  modalPrevFocus = document.activeElement;
+  const closeBtn = modal.querySelector('.modal-actions button:last-child');
+  if (closeBtn) closeBtn.focus();
+  document.addEventListener('keydown', modalEscHandler);
+}
+
+let modalPrevFocus = null;
+function closeDiagramModal() {
+  document.getElementById('diagram-modal').classList.remove('open');
+  document.removeEventListener('keydown', modalEscHandler);
+  currentModalDiagram = null;
+  if (modalPrevFocus) { modalPrevFocus.focus(); modalPrevFocus = null; }
+}
+
+function modalEscHandler(e) { if (e.key === 'Escape') closeDiagramModal(); }
+
+function downloadMermaid(diagramId) {
+  const src = diagramSources[diagramId];
+  if (!src) return;
+  const label = diagramNames[diagramId] || diagramId.replace('proj-diagram-', 'diagram-').replace('diagram-', '');
+  const safeName = label.replace(/[^a-zA-Z0-9_-]/g, '_') + '.mmd';
+  const blob = new Blob([src], { type: 'text/plain' });
+  const a = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  a.href = url;
+  a.download = safeName;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  try { a.click(); } finally {
+    document.body.removeChild(a);
+    setTimeout(function() { URL.revokeObjectURL(url); }, 100);
+  }
 }
 
 function renderTestPlan(md) {
@@ -963,7 +1113,22 @@ function addEnvSuggestion(key, val, hint) {
   addEnvRow(key, val);
 }
 
+// Pause auto-refresh while user is editing MCP or env forms
+let editingLock = false;
+document.addEventListener('focusin', function(e) {
+  if (e.target.closest('#mcp-list, #env-list, .mcp-entry, .env-row')) editingLock = true;
+});
+document.addEventListener('focusout', function(e) {
+  if (e.target.closest('#mcp-list, #env-list, .mcp-entry, .env-row')) {
+    setTimeout(function() {
+      const active = document.activeElement;
+      if (!active || !active.closest('#mcp-list, #env-list, .mcp-entry, .env-row')) editingLock = false;
+    }, 200);
+  }
+});
+
 async function refresh() {
+  if (editingLock) return;
   try {
     const data = await api('GET', '/api/status');
     loadStatus(data);
