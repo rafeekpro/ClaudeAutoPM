@@ -7,6 +7,8 @@
     <field name="assignee" type="string" default=""/>
     <field name="created" type="datetime" auto="true"/>
     <field name="updated" type="datetime" auto="true"/>
+    <field name="priority" type="enum" values="critical,high,medium,low" default="medium"/>
+    <field name="effort" type="enum" values="S,M,L,XL" default="M"/>
     <field name="started" type="datetime"/>
     <field name="completed" type="datetime"/>
   </frontmatter>
