@@ -324,7 +324,6 @@ function renderHTML() {
   .mcp-card .env-var-row input { flex: 1; }
   .env-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
   .env-row input { flex: 1; }
-  .env-row .eye { cursor: pointer; color: #8b949e; font-size: 16px; user-select: none; width: 30px; text-align: center; }
   .btn-icon { background: none; border: none; cursor: pointer; font-size: 16px; padding: 4px; }
   .plugin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
   .plugin-item { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 8px 12px; font-size: 13px; }
@@ -469,10 +468,10 @@ function renderHTML() {
 
     <div class="card" id="env-section">
       <h2>API Keys / Environment</h2>
-      <p class="desc">Environment variables stored in .env. Values are masked by default &mdash; click the eye icon to reveal.</p>
+      <p class="desc">Environment variables stored in .claude/.env. Values are masked by default &mdash; click the eye icon to reveal.</p>
       <div id="env-list"></div>
       <button class="btn" style="margin-right:8px" onclick="addEnvRow()">+ Add Variable</button>
-      <button class="btn" onclick="saveEnv()">Save .env</button>
+      <button class="btn" onclick="saveEnv()">Save .claude/.env</button>
       <div class="env-suggestions" style="margin-top:12px;">
         <p class="hint">Quick add:</p>
         <button onclick="addEnvSuggestion('GITHUB_TOKEN','','GitHub personal access token')">+ GITHUB_TOKEN</button>
@@ -840,7 +839,7 @@ function addEnvRow(key, val) {
   const d = document.createElement('div'); d.className = 'env-row';
   const keyInp = document.createElement('input'); keyInp.type = 'text'; keyInp.className = 'env-key'; keyInp.placeholder = 'KEY'; keyInp.value = key || '';
   const valInp = document.createElement('input'); valInp.type = 'password'; valInp.className = 'env-val'; valInp.placeholder = 'value'; valInp.value = val || '';
-  const eyeBtn = document.createElement('button'); eyeBtn.className = 'btn-icon'; eyeBtn.textContent = '\u{1F441}'; eyeBtn.title = 'Show/Hide';
+  const eyeBtn = document.createElement('button'); eyeBtn.className = 'btn-icon'; eyeBtn.textContent = '\u{1F441}'; eyeBtn.title = 'Show/Hide'; eyeBtn.type = 'button'; eyeBtn.setAttribute('aria-label', 'Toggle password visibility');
   eyeBtn.addEventListener('click', function() { toggleEnvVisibility(this); });
   const rmBtn = document.createElement('button'); rmBtn.className = 'btn btn-danger btn-sm'; rmBtn.textContent = 'X';
   rmBtn.addEventListener('click', function() { this.parentElement.remove(); });
@@ -902,7 +901,8 @@ function collectMcpData() {
 async function saveMcp() {
   const data = collectMcpData();
   const preview = JSON.stringify(data, null, 2);
-  if (!confirm('Save MCP Config?\\n\\n' + preview.substring(0, 500))) return;
+  const display = preview.length > 1000 ? preview.substring(0, 1000) + '\\n\\n... (truncated)' : preview;
+  if (!confirm('Save MCP Config?\\n\\n' + display)) return;
   await api('POST', '/api/mcp', data);
   toast('MCP config saved', true);
 }
@@ -920,8 +920,8 @@ function collectEnvData() {
 
 async function saveEnv() {
   const data = collectEnvData();
-  const preview = Object.entries(data).map(([k,v]) => k + '=' + v.substring(0,3) + '***').join('\\n');
-  if (!confirm('Save .env?\\n\\n' + preview)) return;
+  const preview = Object.entries(data).map(([k,v]) => k + '=' + v).join('\\n');
+  if (!confirm('Save .claude/.env?\\n\\n' + preview)) return;
   await api('POST', '/api/env', data);
   toast('.env saved', true);
 }
