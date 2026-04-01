@@ -122,7 +122,7 @@ describe('generateMarkdown', () => {
 describe('validateContent', () => {
   test('valid issue content passes', () => {
     const tpl = readTemplate(path.join(TEMPLATES_DIR, 'issue.xml'));
-    const content = `---\nname: Test\nstatus: open\n---\n\n## Goal\nFix bug\n\n## Acceptance Criteria\n- [ ] Done\n\n## Affected Files\n- src/app.js\n`;
+    const content = `---\nname: Test\nstatus: open\n---\n\n## Goal\nFix bug\n\n## Context\nBug reported by user, API returns 500\n\n## Acceptance Criteria\n- [ ] Done\n\n## Affected Files\n- src/app.js\n\n## Related Issues\nNone\n\n## Verification Steps\ncurl /api/health → 200\n\n## Definition of Done\n- [ ] Tests pass\n`;
 
     const result = validateContent(tpl, content);
     expect(result.valid).toBe(true);
@@ -169,7 +169,7 @@ describe('validateContent with validation rules', () => {
 
   test('passes with valid content and checkboxes', () => {
     const tpl = readTemplate(path.join(TEMPLATES_DIR, 'issue.xml'));
-    const content = `---\nname: Test\nstatus: open\n---\n\n## Goal\nFix the bug\n\n## Acceptance Criteria\n- [ ] Done\n\n## Affected Files\n- src/app.js\n`;
+    const content = `---\nname: Test\nstatus: open\n---\n\n## Goal\nFix the bug\n\n## Context\nAPI crashes on null input\n\n## Acceptance Criteria\n- [ ] Done\n\n## Affected Files\n- src/app.js\n\n## Related Issues\nNone\n\n## Verification Steps\nnpm test → pass\n\n## Definition of Done\n- [ ] Tests pass\n`;
 
     const result = validateContent(tpl, content);
     expect(result.valid).toBe(true);
