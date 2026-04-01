@@ -263,8 +263,11 @@ function getProjectDiagrams() {
 }
 
 function getDiagramsData() {
+  const epicFlow = generateEpicFlowDiagram();
+  const hasEpicData = !epicFlow.includes('No epics or PRDs found');
   return {
-    epicFlow: generateEpicFlowDiagram(),
+    epicFlow,
+    epicFlowHasData: hasEpicData,
     projectDiagrams: getProjectDiagrams(),
     pluginGraph: generatePluginGraph(),
     agentTree: generateAgentTree()
@@ -597,6 +600,7 @@ function showTab(name, btn) {
 
 let diagramsRendered = false;
 const diagramSources = {};
+const diagramNames = {};
 let currentModalDiagram = null;
 
 function renderMermaid() {
@@ -606,11 +610,11 @@ function renderMermaid() {
     .then(data => {
       // Epic Flow — only show if there are actual epics/PRDs
       const epicCard = document.getElementById('diagram-epic-card');
-      const hasEpicData = data.epicFlow && !data.epicFlow.includes('No epics or PRDs found');
-      if (hasEpicData) {
+      if (data.epicFlowHasData) {
         epicCard.style.display = '';
         document.getElementById('diagram-epic').textContent = data.epicFlow;
         diagramSources['diagram-epic'] = data.epicFlow;
+        diagramNames['diagram-epic'] = 'epic-flow';
       } else {
         epicCard.style.display = 'none';
       }
@@ -618,6 +622,8 @@ function renderMermaid() {
       document.getElementById('diagram-agents').textContent = data.agentTree;
       diagramSources['diagram-plugins'] = data.pluginGraph;
       diagramSources['diagram-agents'] = data.agentTree;
+      diagramNames['diagram-plugins'] = 'plugins';
+      diagramNames['diagram-agents'] = 'agents';
       // Render project diagrams dynamically
       const container = document.getElementById('project-diagrams');
       container.innerHTML = '';
@@ -625,6 +631,7 @@ function renderMermaid() {
         data.projectDiagrams.forEach((d, i) => {
           const id = 'proj-diagram-' + i;
           diagramSources[id] = d.content;
+          diagramNames[id] = d.name;
           const card = document.createElement('div');
           card.className = 'card diagram-card';
           const h3 = document.createElement('h3');
@@ -678,15 +685,21 @@ function openDiagramModal(diagramId, title) {
   currentModalDiagram = diagramId;
   document.getElementById('modal-diagram-title').textContent = title || diagramId;
   const body = document.getElementById('modal-diagram-body');
+  body.textContent = '';
   const sourceEl = document.getElementById(diagramId);
   if (sourceEl) {
     const svg = sourceEl.querySelector('svg');
     if (svg) {
-      body.innerHTML = svg.outerHTML;
+      body.appendChild(svg.cloneNode(true));
     } else {
-      body.innerHTML = '<pre class="mermaid">' + esc(diagramSources[diagramId] || '') + '</pre>';
+      const pre = document.createElement('pre');
+      pre.className = 'mermaid';
+      pre.textContent = diagramSources[diagramId] || '';
+      body.appendChild(pre);
       if (typeof mermaid !== 'undefined' && mermaid.run) mermaid.run({ nodes: body.querySelectorAll('.mermaid') });
     }
+  } else {
+    body.textContent = 'Diagram not available.';
   }
   document.getElementById('diagram-modal').classList.add('open');
   document.addEventListener('keydown', modalEscHandler);
@@ -703,13 +716,15 @@ function modalEscHandler(e) { if (e.key === 'Escape') closeDiagramModal(); }
 function downloadMermaid(diagramId) {
   const src = diagramSources[diagramId];
   if (!src) return;
-  const name = (diagramId.replace('proj-diagram-', 'diagram-').replace('diagram-', '')) + '.mmd';
+  const label = diagramNames[diagramId] || diagramId.replace('proj-diagram-', 'diagram-').replace('diagram-', '');
+  const safeName = label.replace(/[^a-zA-Z0-9_-]/g, '_') + '.mmd';
   const blob = new Blob([src], { type: 'text/plain' });
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = name;
+  const url = URL.createObjectURL(blob);
+  a.href = url;
+  a.download = safeName;
   a.click();
-  URL.revokeObjectURL(a.href);
+  setTimeout(function() { URL.revokeObjectURL(url); }, 100);
 }
 
 function renderTestPlan(md) {
