@@ -257,7 +257,7 @@ function getStatusData() {
     const lines = fs.readFileSync(eventsPath, 'utf8').trim().split('\n').filter(Boolean);
     events = lines.slice(-20).map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean).reverse();
   }
-  return { config, mcp, plugins, env: Object.keys(env), events };
+  return { config, mcp, plugins, env, events };
 }
 
 function getDiagramsData() {
@@ -317,9 +317,14 @@ function renderHTML() {
   .btn-sm { padding: 4px 12px; font-size: 12px; margin-top: 0; }
   .mcp-entry { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 12px; margin-top: 8px; }
   .mcp-entry .row { margin-top: 6px; }
+  .mcp-card { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+  .mcp-card h4 { color: #58a6ff; margin-bottom: 4px; }
+  .mcp-card .mcp-desc { color: #8b949e; font-size: 12px; margin-bottom: 12px; }
+  .mcp-card .env-var-row { display: flex; gap: 8px; margin-top: 4px; align-items: center; }
+  .mcp-card .env-var-row input { flex: 1; }
   .env-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
   .env-row input { flex: 1; }
-  .env-row .eye { cursor: pointer; color: #8b949e; font-size: 16px; user-select: none; width: 30px; text-align: center; }
+  .btn-icon { background: none; border: none; cursor: pointer; font-size: 16px; padding: 4px; }
   .plugin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
   .plugin-item { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 8px 12px; font-size: 13px; }
   .plugin-item label { display: flex; align-items: center; gap: 8px; color: #c9d1d9; font-size: 13px; margin: 0; }
@@ -456,22 +461,24 @@ function renderHTML() {
         <button onclick="addMcpPreset('playwright')">+ Playwright (browser)</button>
       </div>
       <div id="mcp-list"></div>
-      <button class="btn" style="margin-right:8px" onclick="addMcpEntry()">+ Add Server</button>
+      <button class="btn" style="margin-right:8px" onclick="addMcpCard()">+ Add Server</button>
       <button class="btn" onclick="saveMcp()">Save MCP Config</button>
+      <p style="margin-top:12px"><a href="https://github.com/modelcontextprotocol/servers" target="_blank" style="color:#58a6ff;font-size:12px;">Browse more MCP servers</a></p>
     </div>
 
     <div class="card" id="env-section">
       <h2>API Keys / Environment</h2>
-      <p class="desc">Environment variables stored in .env. Secrets are masked.</p>
-      <div class="env-suggestions">
-        <p class="hint">Suggested keys for common providers:</p>
-        <button onclick="addEnvSuggestion('GITHUB_TOKEN','')">+ GITHUB_TOKEN</button>
-        <button onclick="addEnvSuggestion('AZURE_DEVOPS_PAT','')">+ AZURE_DEVOPS_PAT</button>
-        <button onclick="addEnvSuggestion('OPENAI_API_KEY','')">+ OPENAI_API_KEY</button>
-      </div>
+      <p class="desc">Environment variables stored in .claude/.env. Values are masked by default &mdash; click the eye icon to reveal.</p>
       <div id="env-list"></div>
       <button class="btn" style="margin-right:8px" onclick="addEnvRow()">+ Add Variable</button>
-      <button class="btn" onclick="saveEnv()">Save .env</button>
+      <button class="btn" onclick="saveEnv()">Save .claude/.env</button>
+      <div class="env-suggestions" style="margin-top:12px;">
+        <p class="hint">Quick add:</p>
+        <button onclick="addEnvSuggestion('GITHUB_TOKEN','','GitHub personal access token')">+ GITHUB_TOKEN</button>
+        <button onclick="addEnvSuggestion('OPENAI_API_KEY','','OpenAI API key for AI agents')">+ OPENAI_API_KEY</button>
+        <button onclick="addEnvSuggestion('AZURE_DEVOPS_PAT','','Azure DevOps personal access token')">+ AZURE_DEVOPS_PAT</button>
+        <button onclick="addEnvSuggestion('HF_TOKEN','','HuggingFace API token')">+ HF_TOKEN</button>
+      </div>
     </div>
   </div>
 
@@ -701,13 +708,16 @@ function loadStatus(data) {
   ml.innerHTML = '';
   const servers = data.mcp?.mcpServers || {};
   for (const [name, srv] of Object.entries(servers)) {
-    addMcpEntry(name, srv.command || '', (srv.args || []).join(' '));
+    addMcpCard(name, srv.command || '', (srv.args || []).join(' '), '', srv.env || {});
   }
 
   // Env
   const el = document.getElementById('env-list');
   el.innerHTML = '';
-  (data.env || []).forEach(k => addEnvRow(k, '********'));
+  const envData = data.env || {};
+  for (const [k, v] of Object.entries(envData)) {
+    addEnvRow(k, v);
+  }
 
   // Events
   const ev = document.getElementById('events-list');
@@ -736,33 +746,92 @@ function fetchTests() {
     .catch(() => {});
 }
 
-// Fix 12: addMcpEntry — use DOM APIs not innerHTML
-function addMcpEntry(name, cmd, args) {
-  const ml = document.getElementById('mcp-list');
-  const d = document.createElement('div'); d.className = 'mcp-entry';
+const MCP_PRESETS = {
+  context7: {
+    name: 'context7',
+    command: 'npx',
+    args: '@upstash/context7-mcp',
+    description: 'Real-time library documentation. Queries up-to-date API docs before writing code. No API key needed.',
+    envVars: []
+  },
+  playwright: {
+    name: 'playwright-mcp',
+    command: 'npx',
+    args: '@playwright/mcp',
+    description: 'Browser automation for E2E testing and screenshots. No API key needed.',
+    envVars: [{ key: 'PLAYWRIGHT_HEADLESS', value: 'true', hint: 'Run browser headless (true/false)' }]
+  }
+};
 
-  function makeField(labelText, className, val) {
-    const wrap = document.createElement('div');
+function addMcpCard(name, cmd, args, description, envVars) {
+  const ml = document.getElementById('mcp-list');
+  const card = document.createElement('div'); card.className = 'mcp-card';
+
+  const header = document.createElement('div'); header.style.display = 'flex'; header.style.justifyContent = 'space-between'; header.style.alignItems = 'start';
+  const h4 = document.createElement('h4'); h4.textContent = name || 'New Server';
+  const rmBtn = document.createElement('button'); rmBtn.className = 'btn btn-danger btn-sm'; rmBtn.textContent = 'Remove';
+  rmBtn.addEventListener('click', function() { card.remove(); });
+  header.appendChild(h4); header.appendChild(rmBtn);
+  card.appendChild(header);
+
+  if (description) {
+    const desc = document.createElement('p'); desc.className = 'mcp-desc'; desc.textContent = description;
+    card.appendChild(desc);
+  }
+
+  function makeField(labelText, className, val, placeholder) {
+    const wrap = document.createElement('div'); wrap.style.flex = '1';
     const lbl = document.createElement('label'); lbl.textContent = labelText;
-    const inp = document.createElement('input'); inp.type = 'text'; inp.className = className; inp.value = val || '';
+    const inp = document.createElement('input'); inp.type = 'text'; inp.className = className; inp.value = val || ''; inp.placeholder = placeholder || '';
     wrap.appendChild(lbl); wrap.appendChild(inp);
     return wrap;
   }
 
   const row1 = document.createElement('div'); row1.className = 'row';
-  row1.appendChild(makeField('Name', 'mcp-name', name));
-  row1.appendChild(makeField('Command', 'mcp-cmd', cmd));
+  row1.appendChild(makeField('Name', 'mcp-name', name, 'server-name'));
+  row1.appendChild(makeField('Command', 'mcp-cmd', cmd, 'npx'));
+  card.appendChild(row1);
 
-  const row2 = document.createElement('div'); row2.className = 'row';
-  row2.appendChild(makeField('Args (space-separated)', 'mcp-args', args));
-  const btnWrap = document.createElement('div'); btnWrap.style.display = 'flex'; btnWrap.style.alignItems = 'end';
-  const rmBtn = document.createElement('button'); rmBtn.className = 'btn btn-danger btn-sm'; rmBtn.textContent = 'Remove';
-  rmBtn.addEventListener('click', function() { this.closest('.mcp-entry').remove(); });
-  btnWrap.appendChild(rmBtn);
-  row2.appendChild(btnWrap);
+  const row2 = document.createElement('div'); row2.className = 'row'; row2.style.marginTop = '6px';
+  row2.appendChild(makeField('Args (space-separated)', 'mcp-args', args, '@scope/package'));
+  card.appendChild(row2);
 
-  d.appendChild(row1); d.appendChild(row2);
-  ml.appendChild(d);
+  // Env vars section
+  const envSection = document.createElement('div'); envSection.style.marginTop = '10px';
+  const envLabel = document.createElement('label'); envLabel.textContent = 'Environment Variables';
+  envSection.appendChild(envLabel);
+
+  const envList = document.createElement('div'); envList.className = 'mcp-env-list';
+  envSection.appendChild(envList);
+
+  // Populate env vars
+  if (envVars && typeof envVars === 'object') {
+    const entries = Array.isArray(envVars) ? envVars : Object.entries(envVars).map(([k, v]) => ({ key: k, value: v }));
+    for (const ev of entries) {
+      addMcpEnvVar(envList, ev.key || '', ev.value || '', ev.hint || '');
+    }
+  }
+
+  const addVarBtn = document.createElement('button'); addVarBtn.className = 'btn btn-sm'; addVarBtn.textContent = '+ Add Var'; addVarBtn.style.marginTop = '6px';
+  addVarBtn.addEventListener('click', function() { addMcpEnvVar(envList, '', '', ''); });
+  envSection.appendChild(addVarBtn);
+
+  card.appendChild(envSection);
+  ml.appendChild(card);
+
+  // Update card title on name change
+  const nameInp = card.querySelector('.mcp-name');
+  nameInp.addEventListener('input', function() { h4.textContent = this.value || 'New Server'; });
+}
+
+function addMcpEnvVar(container, key, value, hint) {
+  const row = document.createElement('div'); row.className = 'env-var-row';
+  const kInp = document.createElement('input'); kInp.type = 'text'; kInp.placeholder = 'VAR_NAME'; kInp.value = key; kInp.style.flex = '1';
+  const vInp = document.createElement('input'); vInp.type = 'text'; vInp.placeholder = hint || 'value'; vInp.value = value; vInp.style.flex = '1';
+  const rmBtn = document.createElement('button'); rmBtn.className = 'btn btn-danger btn-sm'; rmBtn.textContent = 'X';
+  rmBtn.addEventListener('click', function() { row.remove(); });
+  row.appendChild(kInp); row.appendChild(vInp); row.appendChild(rmBtn);
+  container.appendChild(row);
 }
 
 function addEnvRow(key, val) {
@@ -770,17 +839,25 @@ function addEnvRow(key, val) {
   const d = document.createElement('div'); d.className = 'env-row';
   const keyInp = document.createElement('input'); keyInp.type = 'text'; keyInp.className = 'env-key'; keyInp.placeholder = 'KEY'; keyInp.value = key || '';
   const valInp = document.createElement('input'); valInp.type = 'password'; valInp.className = 'env-val'; valInp.placeholder = 'value'; valInp.value = val || '';
-  const eye = document.createElement('span'); eye.className = 'eye'; eye.innerHTML = '&#128065;';
-  eye.addEventListener('click', function() { toggleVis(this); });
+  const eyeBtn = document.createElement('button'); eyeBtn.className = 'btn-icon'; eyeBtn.textContent = '\u{1F441}'; eyeBtn.title = 'Show/Hide'; eyeBtn.type = 'button'; eyeBtn.setAttribute('aria-label', 'Toggle password visibility');
+  eyeBtn.addEventListener('click', function() { toggleEnvVisibility(this); });
   const rmBtn = document.createElement('button'); rmBtn.className = 'btn btn-danger btn-sm'; rmBtn.textContent = 'X';
   rmBtn.addEventListener('click', function() { this.parentElement.remove(); });
-  d.appendChild(keyInp); d.appendChild(valInp); d.appendChild(eye); d.appendChild(rmBtn);
+  d.appendChild(keyInp); d.appendChild(valInp); d.appendChild(eyeBtn); d.appendChild(rmBtn);
   el.appendChild(d);
 }
 
-function toggleVis(el) {
-  const inp = el.previousElementSibling;
-  inp.type = inp.type === 'password' ? 'text' : 'password';
+function toggleEnvVisibility(btn) {
+  const input = btn.parentElement.querySelector('.env-val');
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '\u{1F512}';
+    btn.title = 'Hide';
+  } else {
+    input.type = 'password';
+    btn.textContent = '\u{1F441}';
+    btn.title = 'Show';
+  }
 }
 
 // Fix 7: saveConfig — merge nested objects, don't replace
@@ -798,21 +875,39 @@ async function saveConfig() {
   toast('Config saved', true);
 }
 
-async function saveMcp() {
-  const entries = document.querySelectorAll('.mcp-entry');
+function collectMcpData() {
+  const cards = document.querySelectorAll('.mcp-card');
   const servers = {};
-  entries.forEach(e => {
-    const name = e.querySelector('.mcp-name').value.trim();
-    const cmd = e.querySelector('.mcp-cmd').value.trim();
-    const args = e.querySelector('.mcp-args').value.trim().split(/\\s+/).filter(Boolean);
-    if (name && cmd) servers[name] = { command: cmd, args };
+  cards.forEach(c => {
+    const name = c.querySelector('.mcp-name').value.trim();
+    const cmd = c.querySelector('.mcp-cmd').value.trim();
+    const args = c.querySelector('.mcp-args').value.trim().split(/\\s+/).filter(Boolean);
+    if (!name || !cmd) return;
+    const envRows = c.querySelectorAll('.env-var-row');
+    const env = {};
+    envRows.forEach(r => {
+      const inputs = r.querySelectorAll('input');
+      const k = inputs[0].value.trim();
+      const v = inputs[1].value.trim();
+      if (k) env[k] = v;
+    });
+    const entry = { command: cmd, args };
+    if (Object.keys(env).length > 0) entry.env = env;
+    servers[name] = entry;
   });
-  await api('POST', '/api/mcp', { mcpServers: servers });
+  return { mcpServers: servers };
+}
+
+async function saveMcp() {
+  const data = collectMcpData();
+  const preview = JSON.stringify(data, null, 2);
+  const display = preview.length > 1000 ? preview.substring(0, 1000) + '\\n\\n... (truncated)' : preview;
+  if (!confirm('Save MCP Config?\\n\\n' + display)) return;
+  await api('POST', '/api/mcp', data);
   toast('MCP config saved', true);
 }
 
-// Fix 11: saveEnv — send all values (server-side merge handles placeholders)
-async function saveEnv() {
+function collectEnvData() {
   const rows = document.querySelectorAll('.env-row');
   const vars = {};
   rows.forEach(r => {
@@ -820,20 +915,27 @@ async function saveEnv() {
     const v = r.querySelector('.env-val').value;
     if (k) vars[k] = v;
   });
-  await api('POST', '/api/env', vars);
+  return vars;
+}
+
+async function saveEnv() {
+  const data = collectEnvData();
+  const preview = Object.entries(data).map(([k,v]) => k + '=' + v).join('\\n');
+  if (!confirm('Save .claude/.env?\\n\\n' + preview)) return;
+  await api('POST', '/api/env', data);
   toast('.env saved', true);
 }
 
 function addMcpPreset(name) {
-  const presets = {
-    context7: { name: 'context7', cmd: 'npx', args: '@upstash/context7-mcp', desc: 'Real-time library documentation. Queries up-to-date API docs before writing code.' },
-    playwright: { name: 'playwright-mcp', cmd: 'npx', args: '@playwright/mcp', desc: 'Browser automation. Controls browser for E2E testing and screenshots.' }
-  };
-  const p = presets[name];
-  if (p) addMcpEntry(p.name, p.cmd, p.args);
+  const p = MCP_PRESETS[name];
+  if (!p) return;
+  // Check if already exists
+  const existing = document.querySelectorAll('.mcp-card .mcp-name');
+  for (const inp of existing) { if (inp.value === p.name) { toast(p.name + ' already added', false); return; } }
+  addMcpCard(p.name, p.command, p.args, p.description, p.envVars);
 }
 
-function addEnvSuggestion(key, val) {
+function addEnvSuggestion(key, val, hint) {
   const existing = document.querySelectorAll('.env-key');
   for (const inp of existing) { if (inp.value === key) { toast(key + ' already exists', false); return; } }
   addEnvRow(key, val);
@@ -928,7 +1030,7 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, { ok: true });
     }
 
-    // Fix 2: /api/env — merge with existing, skip placeholders
+    // /api/env — save env vars (UI sends real values, not masked)
     if (req.method === 'POST' && parsedUrl.pathname === '/api/env') {
       const { body, err } = await parseJSONBody(req, res);
       if (err) return;
@@ -941,7 +1043,7 @@ const server = http.createServer(async (req, res) => {
         }
       } catch {}
       for (const [k, v] of Object.entries(body)) {
-        if (v !== '********') existing[k] = v;
+        existing[k] = v;
       }
       const envContent = Object.entries(existing).map(([k, v]) => `${k}=${v}`).join('\n') + '\n';
       const backup = envPath + '.backup';
