@@ -442,7 +442,7 @@ function renderHTML() {
   .diagram-grid-item .card-actions .btn-remove:hover { background: #3d1116; border-color: #f85149; }
   /* Fullscreen editor */
   .diagram-editor.fullscreen {
-    position: fixed; inset: 0; z-index: 1000; background: #0d1117;
+    position: fixed; inset: 0; z-index: 998; background: #0d1117;
     padding: 12px; display: flex; flex-direction: column;
   }
   .diagram-editor.fullscreen .diagram-split { min-height: 0; flex: 1; }
@@ -715,7 +715,6 @@ function renderDiagramGrid() {
   allDiagrams.forEach(d => {
     const item = document.createElement('div');
     item.className = 'diagram-grid-item';
-    item.setAttribute('role', 'button');
     item.setAttribute('tabindex', '0');
     const h4 = document.createElement('h4');
     h4.textContent = d.name;
@@ -750,7 +749,10 @@ function renderDiagramGrid() {
     item.appendChild(actions);
     // Click card body (not actions) opens editor
     item.onclick = function(e) { if (!e.target.closest('.card-actions')) openDiagramEditor(d.name); };
-    item.onkeydown = function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDiagramEditor(d.name); } };
+    item.onkeydown = function(e) {
+      if (e.target && e.target.closest('.card-actions')) return;
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDiagramEditor(d.name); }
+    };
     grid.appendChild(item);
   });
   if (typeof mermaid !== 'undefined' && mermaid.run) {
@@ -777,7 +779,7 @@ async function createNewDiagram() {
     diagramsLoaded = false;
     renderDiagramsTab();
     toast('Diagram "' + name + '" created', true);
-  } catch (e) { toast('Failed: ' + e.message, false); }
+  } catch (e) { /* api() already shows toast */ }
 }
 
 async function removeDiagram(name) {
@@ -787,7 +789,7 @@ async function removeDiagram(name) {
     allDiagrams = allDiagrams.filter(d => d.name !== name);
     renderDiagramGrid();
     toast('Diagram removed', true);
-  } catch (e) { toast('Failed: ' + e.message, false); }
+  } catch (e) { /* api() already shows toast */ }
 }
 
 function downloadDiagram(name, content) {
@@ -886,7 +888,7 @@ async function saveDiagram() {
     diagramsLoaded = false;
     toast('Diagram saved', true);
   } catch (e) {
-    toast('Save failed: ' + e.message, false);
+    /* api() already shows toast */
   }
 }
 
@@ -1372,8 +1374,8 @@ const server = http.createServer(async (req, res) => {
       let meta = {};
       try { meta = JSON.parse(fs.readFileSync(metaPath, 'utf8')); } catch {}
       meta.name = meta.name || name;
-      if (body.type) meta.type = body.type;
-      if (body.description) meta.description = body.description;
+      if (typeof body.type === 'string') meta.type = body.type.slice(0, 50);
+      if (typeof body.description === 'string') meta.description = body.description.slice(0, 500);
       meta.updated = new Date().toISOString().replace(/\\.\\d{3}Z$/, 'Z');
       if (!meta.created) meta.created = meta.updated;
       fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2), 'utf8');
