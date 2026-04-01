@@ -635,6 +635,8 @@ function showTab(name, btn) {
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
   if (name === 'diagrams') renderDiagramsTab();
+  // Pause auto-refresh on tabs with editable forms
+  editingLock = (name === 'mcp' || name === 'diagrams');
 }
 
 // --- Diagram editor state ---
@@ -713,8 +715,6 @@ function openDiagramEditor(name) {
   codeEl.readOnly = d.type === 'system';
   document.getElementById('diagram-list-view').style.display = 'none';
   document.getElementById('diagram-editor-view').classList.add('active');
-  // Lock auto-refresh while editing
-  editingLock = true;
   renderPreview(d.content);
 }
 
@@ -723,7 +723,6 @@ function closeDiagramEditor() {
   document.getElementById('diagram-editor-view').classList.remove('active');
   document.getElementById('diagram-list-view').style.display = '';
   currentDiagramName = null;
-  editingLock = false;
 }
 
 function renderPreview(source) {
@@ -1178,19 +1177,8 @@ function addEnvSuggestion(key, val, hint) {
   addEnvRow(key, val);
 }
 
-// Pause auto-refresh while user is editing MCP or env forms
+// Pause auto-refresh while MCP & Keys tab is active (editing forms)
 let editingLock = false;
-document.addEventListener('focusin', function(e) {
-  if (e.target.closest('#mcp-list, #env-list, .mcp-entry, .env-row')) editingLock = true;
-});
-document.addEventListener('focusout', function(e) {
-  if (e.target.closest('#mcp-list, #env-list, .mcp-entry, .env-row')) {
-    setTimeout(function() {
-      const active = document.activeElement;
-      if (!active || !active.closest('#mcp-list, #env-list, .mcp-entry, .env-row')) editingLock = false;
-    }, 200);
-  }
-});
 
 async function refresh() {
   if (editingLock) return;
