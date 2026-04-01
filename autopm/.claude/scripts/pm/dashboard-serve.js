@@ -630,6 +630,8 @@ const headers = { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'applicati
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function showTab(name, btn) {
+  // Close diagram editor if leaving diagrams tab
+  if (currentDiagramName && name !== 'diagrams') closeDiagramEditor();
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
@@ -679,7 +681,10 @@ function renderDiagramGrid() {
   allDiagrams.forEach(d => {
     const item = document.createElement('div');
     item.className = 'diagram-grid-item';
+    item.setAttribute('role', 'button');
+    item.setAttribute('tabindex', '0');
     item.onclick = function() { openDiagramEditor(d.name); };
+    item.onkeydown = function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDiagramEditor(d.name); } };
     const h4 = document.createElement('h4');
     h4.textContent = d.name;
     const meta = document.createElement('div');
@@ -719,6 +724,7 @@ function openDiagramEditor(name) {
 }
 
 function closeDiagramEditor() {
+  clearTimeout(previewDebounce); previewDebounce = null;
   if (panzoomInstance) { panzoomInstance.dispose(); panzoomInstance = null; }
   document.getElementById('diagram-editor-view').classList.remove('active');
   document.getElementById('diagram-list-view').style.display = '';
@@ -777,6 +783,8 @@ async function saveDiagram() {
     currentDiagramSaved = content;
     if (d) d.content = content;
     document.getElementById('editor-unsaved').style.display = 'none';
+    // Re-render grid so mini previews reflect saved content
+    diagramsLoaded = false;
     toast('Diagram saved', true);
   } catch (e) {
     toast('Save failed: ' + e.message, false);
@@ -1255,9 +1263,11 @@ const server = http.createServer(async (req, res) => {
       if (!/^[a-zA-Z0-9_-]+$/.test(name)) return json(res, 400, { error: 'Invalid diagram name' });
       const { body, err } = await parseJSONBody(req, res);
       if (err) return;
+      if (typeof body.content !== 'string') return json(res, 400, { error: 'content must be a string' });
+      if (body.content.length > 500000) return json(res, 400, { error: 'content too large (max 500KB)' });
       const diagramsDir = path.join(basePath, '.claude', 'pm', 'diagrams');
       if (!fs.existsSync(diagramsDir)) fs.mkdirSync(diagramsDir, { recursive: true });
-      fs.writeFileSync(path.join(diagramsDir, name + '.mmd'), body.content || '', 'utf8');
+      fs.writeFileSync(path.join(diagramsDir, name + '.mmd'), body.content, 'utf8');
       // Update metadata timestamp if exists, or create
       const metaPath = path.join(diagramsDir, name + '.meta.json');
       let meta = {};
