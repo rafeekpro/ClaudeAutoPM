@@ -132,8 +132,7 @@ function generateEpicFlowDiagram() {
     }
   } catch {}
   if (epics.length === 0 && prds.length === 0) {
-    lines.push('  N[No epics or PRDs found]');
-    return lines.join('\n');
+    return { mermaid: '', hasData: false };
   }
   let nodeId = 0;
   for (const prd of prds) {
@@ -159,7 +158,7 @@ function generateEpicFlowDiagram() {
       lines.push(`  ${eid} --> ${tid}["${t.name} ${t.icon}"]`);
     }
   }
-  return lines.join('\n');
+  return { mermaid: lines.join('\n'), hasData: true };
 }
 
 function generatePluginGraph() {
@@ -263,11 +262,10 @@ function getProjectDiagrams() {
 }
 
 function getDiagramsData() {
-  const epicFlow = generateEpicFlowDiagram();
-  const hasEpicData = !epicFlow.includes('No epics or PRDs found');
+  const epic = generateEpicFlowDiagram();
   return {
-    epicFlow,
-    epicFlowHasData: hasEpicData,
+    epicFlow: epic.mermaid,
+    epicFlowHasData: epic.hasData,
     projectDiagrams: getProjectDiagrams(),
     pluginGraph: generatePluginGraph(),
     agentTree: generateAgentTree()
@@ -686,17 +684,14 @@ function openDiagramModal(diagramId, title) {
   document.getElementById('modal-diagram-title').textContent = title || diagramId;
   const body = document.getElementById('modal-diagram-body');
   body.textContent = '';
-  const sourceEl = document.getElementById(diagramId);
-  if (sourceEl) {
-    const svg = sourceEl.querySelector('svg');
-    if (svg) {
-      body.appendChild(svg.cloneNode(true));
-    } else {
-      const pre = document.createElement('pre');
-      pre.className = 'mermaid';
-      pre.textContent = diagramSources[diagramId] || '';
-      body.appendChild(pre);
-      if (typeof mermaid !== 'undefined' && mermaid.run) mermaid.run({ nodes: body.querySelectorAll('.mermaid') });
+  const source = diagramSources[diagramId];
+  if (source) {
+    const pre = document.createElement('pre');
+    pre.className = 'mermaid';
+    pre.textContent = source;
+    body.appendChild(pre);
+    if (typeof mermaid !== 'undefined' && mermaid.run) {
+      mermaid.run({ nodes: body.querySelectorAll('.mermaid') });
     }
   } else {
     body.textContent = 'Diagram not available.';
