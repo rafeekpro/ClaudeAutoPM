@@ -252,10 +252,12 @@ function getProjectDiagrams() {
   for (const f of entries) {
     if (!f.endsWith('.mmd')) continue;
     try {
-      diagrams.push({
-        name: f.replace(/\.mmd$/, ''),
-        content: fs.readFileSync(path.join(diagramsDir, f), 'utf8')
-      });
+      const name = f.replace(/\.mmd$/, '');
+      const d = { name, content: fs.readFileSync(path.join(diagramsDir, f), 'utf8') };
+      // Load metadata if available
+      const metaPath = path.join(diagramsDir, name + '.meta.json');
+      try { const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8')); d.type = meta.type || 'custom'; } catch { d.type = 'custom'; }
+      diagrams.push(d);
     } catch { /* skip unreadable */ }
   }
   return diagrams;
@@ -288,6 +290,7 @@ function renderHTML() {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AutoPM Config Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"><\/script>
+<script src="https://cdn.jsdelivr.net/npm/panzoom@9.4.3/dist/panzoom.min.js"><\/script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d1117; color: #c9d1d9; padding: 24px; }
@@ -365,42 +368,67 @@ function renderHTML() {
   .toast.ok { background: #238636; }
   .toast.err { background: #da3633; }
   footer { margin-top: 24px; text-align: center; color: #484f58; font-size: 12px; }
-  /* Diagram cards */
-  .diagram-card { position: relative; }
-  .diagram-card .diagram-toolbar { display: flex; gap: 6px; position: absolute; top: 12px; right: 12px; z-index: 2; }
-  .diagram-card .diagram-toolbar button {
-    background: #21262d; color: #8b949e; border: 1px solid #30363d;
-    padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;
+  /* Diagram list */
+  .diagram-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .diagram-grid-item {
+    background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 16px; cursor: pointer; transition: border-color 0.15s;
   }
-  .diagram-card .diagram-toolbar button:hover { background: #30363d; color: #c9d1d9; }
-  .diagram-card .mermaid-wrap { overflow: auto; max-height: 400px; cursor: pointer; }
-  .diagram-card .mermaid-wrap:hover { outline: 1px solid #30363d; border-radius: 4px; }
-  /* Fullscreen modal */
-  .diagram-modal {
-    display: none; position: fixed; inset: 0; z-index: 1000;
-    background: rgba(0,0,0,0.85); justify-content: center; align-items: center;
-  }
-  .diagram-modal.open { display: flex; }
-  .diagram-modal .modal-inner {
-    background: #161b22; border: 1px solid #30363d; border-radius: 12px;
-    width: 95vw; height: 92vh; display: flex; flex-direction: column; position: relative;
-  }
-  .diagram-modal .modal-header {
+  .diagram-grid-item:hover { border-color: #58a6ff; }
+  .diagram-grid-item h4 { color: #58a6ff; margin-bottom: 4px; }
+  .diagram-grid-item .diagram-meta { color: #8b949e; font-size: 11px; }
+  .diagram-grid-item .diagram-preview { height: 100px; overflow: hidden; opacity: 0.6; margin-top: 8px; }
+  .diagram-grid-item .diagram-preview svg { max-height: 100px; width: 100%; }
+  /* Diagram split editor */
+  .diagram-editor { display: none; }
+  .diagram-editor.active { display: flex; flex-direction: column; }
+  .diagram-editor-toolbar {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 12px 20px; border-bottom: 1px solid #30363d;
+    padding: 8px 0; margin-bottom: 8px;
   }
-  .diagram-modal .modal-header h3 { color: #c9d1d9; font-size: 14px; }
-  .diagram-modal .modal-header .modal-actions { display: flex; gap: 8px; }
-  .diagram-modal .modal-header button {
+  .diagram-editor-toolbar .left { display: flex; align-items: center; gap: 12px; }
+  .diagram-editor-toolbar .right { display: flex; gap: 6px; }
+  .diagram-editor-toolbar button {
     background: #21262d; color: #8b949e; border: 1px solid #30363d;
-    padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px;
+    padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;
   }
-  .diagram-modal .modal-header button:hover { background: #30363d; color: #c9d1d9; }
-  .diagram-modal .modal-body {
-    flex: 1; overflow: auto; padding: 20px; display: flex;
-    justify-content: center; align-items: flex-start;
+  .diagram-editor-toolbar button:hover { background: #30363d; color: #c9d1d9; }
+  .diagram-editor-toolbar .btn-save { background: #238636; color: #fff; border-color: #238636; }
+  .diagram-editor-toolbar .btn-save:hover { background: #2ea043; }
+  .diagram-editor-toolbar .btn-back { color: #58a6ff; }
+  .diagram-split {
+    display: flex; gap: 0; flex: 1; min-height: 500px;
+    border: 1px solid #30363d; border-radius: 8px; overflow: hidden;
   }
-  .diagram-modal .modal-body svg { max-width: 100%; height: auto; }
+  .diagram-split .code-pane {
+    flex: 1; display: flex; flex-direction: column; border-right: 1px solid #30363d; min-width: 0;
+  }
+  .diagram-split .code-pane .pane-header {
+    background: #161b22; padding: 6px 12px; font-size: 11px; color: #8b949e;
+    border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center;
+  }
+  .diagram-split .code-pane textarea {
+    flex: 1; background: #0d1117; color: #c9d1d9; border: none; padding: 12px;
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace; font-size: 13px;
+    line-height: 1.5; resize: none; outline: none; tab-size: 2;
+  }
+  .diagram-split .preview-pane {
+    flex: 1; display: flex; flex-direction: column; background: #161b22; min-width: 0;
+  }
+  .diagram-split .preview-pane .pane-header {
+    background: #161b22; padding: 6px 12px; font-size: 11px; color: #8b949e;
+    border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center;
+  }
+  .diagram-split .preview-pane .pane-header button {
+    background: none; border: none; color: #8b949e; cursor: pointer; font-size: 11px; padding: 2px 6px;
+  }
+  .diagram-split .preview-pane .pane-header button:hover { color: #c9d1d9; }
+  .diagram-split .preview-container {
+    flex: 1; overflow: hidden; position: relative; background: #0d1117;
+  }
+  .diagram-split .preview-container svg { width: 100%; height: 100%; }
+  .panzoom-hint {
+    position: absolute; bottom: 8px; right: 12px; color: #484f58; font-size: 10px; pointer-events: none; z-index: 1;
+  }
 </style>
 </head>
 <body>
@@ -531,30 +559,43 @@ function renderHTML() {
 
   <!-- Diagrams Tab -->
   <div id="tab-diagrams" class="tab-content">
-    <div id="diagram-epic-card" class="card diagram-card" style="display:none;">
-      <h3>Epic Flow <span style="color:#8b949e;font-size:11px;font-weight:normal;margin-left:8px;">PRD → Epic → Tasks workflow</span></h3>
-      <div class="diagram-toolbar">
-        <button onclick="downloadMermaid('diagram-epic')">↓ .mmd</button>
-        <button onclick="openDiagramModal('diagram-epic','Epic Flow')">⤢ Fullscreen</button>
+    <!-- Diagram list view -->
+    <div id="diagram-list-view">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <p class="desc" style="margin:0;">Click a diagram to view and edit. Create new: <code>/pm:diagram-new &lt;name&gt;</code></p>
       </div>
-      <div class="mermaid-wrap" onclick="openDiagramModal('diagram-epic','Epic Flow')">
-        <pre class="mermaid" id="diagram-epic"></pre>
-      </div>
+      <div id="diagram-grid" class="diagram-grid"></div>
     </div>
-    <div id="project-diagrams"></div>
-  </div>
-
-  <!-- Diagram fullscreen modal -->
-  <div class="diagram-modal" id="diagram-modal" role="dialog" aria-modal="true" aria-labelledby="modal-diagram-title" onclick="if(event.target===this)closeDiagramModal()">
-    <div class="modal-inner">
-      <div class="modal-header">
-        <h3 id="modal-diagram-title"></h3>
-        <div class="modal-actions">
-          <button onclick="downloadMermaid(currentModalDiagram)">↓ Download .mmd</button>
-          <button onclick="closeDiagramModal()">✕ Close</button>
+    <!-- Diagram editor view (split: code | preview) -->
+    <div id="diagram-editor-view" class="diagram-editor">
+      <div class="diagram-editor-toolbar">
+        <div class="left">
+          <button class="btn-back" onclick="closeDiagramEditor()">← Back</button>
+          <strong id="editor-diagram-name" style="color:#c9d1d9;font-size:14px;"></strong>
+          <span id="editor-diagram-meta" style="color:#8b949e;font-size:11px;"></span>
+          <span id="editor-unsaved" style="color:#d29922;font-size:11px;display:none;">● unsaved</span>
+        </div>
+        <div class="right">
+          <button onclick="downloadCurrentDiagram()">↓ .mmd</button>
+          <button class="btn-save" onclick="saveDiagram()">Save</button>
         </div>
       </div>
-      <div class="modal-body" id="modal-diagram-body"></div>
+      <div class="diagram-split">
+        <div class="code-pane">
+          <div class="pane-header"><span>Mermaid Source</span></div>
+          <textarea id="diagram-code" spellcheck="false"></textarea>
+        </div>
+        <div class="preview-pane">
+          <div class="pane-header">
+            <span>Preview</span>
+            <button onclick="resetPanZoom()">Reset zoom</button>
+          </div>
+          <div class="preview-container" id="diagram-preview-container">
+            <div id="diagram-preview-render"></div>
+            <div class="panzoom-hint">Scroll to zoom · Drag to pan</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -593,136 +634,160 @@ function showTab(name, btn) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
-  if (name === 'diagrams') renderMermaid();
+  if (name === 'diagrams') renderDiagramsTab();
 }
 
-let diagramsRendered = false;
-const diagramSources = {};
-const diagramNames = {};
-let currentModalDiagram = null;
+// --- Diagram editor state ---
+let diagramsLoaded = false;
+let allDiagrams = [];
+let currentDiagramName = null;
+let currentDiagramSaved = '';
+let panzoomInstance = null;
+let previewDebounce = null;
 
-function renderMermaid() {
-  if (diagramsRendered) return;
+function renderDiagramsTab() {
+  if (diagramsLoaded) return;
   fetch('/api/diagrams', { headers: { 'Authorization': 'Bearer ' + TOKEN } })
     .then(r => r.json())
     .then(data => {
-      // Epic Flow — only show if there are actual epics/PRDs
-      const epicCard = document.getElementById('diagram-epic-card');
-      const epicEl = document.getElementById('diagram-epic');
+      // Merge system-generated + project diagrams into one list
+      allDiagrams = [];
       if (data.epicFlowHasData) {
-        epicCard.style.display = '';
-        epicEl.className = 'mermaid';
-        epicEl.textContent = data.epicFlow;
-        diagramSources['diagram-epic'] = data.epicFlow;
-        diagramNames['diagram-epic'] = 'epic-flow';
-      } else {
-        epicCard.style.display = 'none';
-        epicEl.className = '';
-        epicEl.textContent = '';
+        allDiagrams.push({ name: 'epic-flow', content: data.epicFlow, type: 'system', meta: 'PRD → Epic → Tasks' });
       }
-      document.getElementById('diagram-plugins').textContent = data.pluginGraph;
-      document.getElementById('diagram-agents').textContent = data.agentTree;
-      diagramSources['diagram-plugins'] = data.pluginGraph;
-      diagramSources['diagram-agents'] = data.agentTree;
-      diagramNames['diagram-plugins'] = 'plugins';
-      diagramNames['diagram-agents'] = 'agents';
-      // Render project diagrams dynamically
-      const container = document.getElementById('project-diagrams');
-      container.innerHTML = '';
-      if (data.projectDiagrams && data.projectDiagrams.length > 0) {
-        data.projectDiagrams.forEach((d, i) => {
-          const id = 'proj-diagram-' + i;
-          diagramSources[id] = d.content;
-          diagramNames[id] = d.name;
-          const card = document.createElement('div');
-          card.className = 'card diagram-card';
-          const h3 = document.createElement('h3');
-          h3.textContent = d.name;
-          card.appendChild(h3);
-          const toolbar = document.createElement('div');
-          toolbar.className = 'diagram-toolbar';
-          const dlBtn = document.createElement('button');
-          dlBtn.textContent = '↓ .mmd';
-          dlBtn.onclick = function(e) { e.stopPropagation(); downloadMermaid(id); };
-          const fsBtn = document.createElement('button');
-          fsBtn.textContent = '⤢ Fullscreen';
-          fsBtn.onclick = function(e) { e.stopPropagation(); openDiagramModal(id, d.name); };
-          toolbar.appendChild(dlBtn);
-          toolbar.appendChild(fsBtn);
-          card.appendChild(toolbar);
-          const wrap = document.createElement('div');
-          wrap.className = 'mermaid-wrap';
-          wrap.onclick = function() { openDiagramModal(id, d.name); };
-          const pre = document.createElement('pre');
-          pre.className = 'mermaid';
-          pre.id = id;
-          pre.textContent = d.content;
-          wrap.appendChild(pre);
-          card.appendChild(wrap);
-          container.appendChild(card);
-        });
-      } else {
-        const msg = document.createElement('div');
-        msg.className = 'card';
-        msg.innerHTML = '<p class="desc">No project diagrams yet. Run <code>/pm:diagram-new</code> to create your first diagram.</p>';
-        container.appendChild(msg);
-      }
-      if (typeof mermaid !== 'undefined' && mermaid.run) {
-        mermaid.run();
-      } else {
-        const errorMsg = 'Mermaid library unavailable. Check network connection.';
-        ['diagram-epic','diagram-plugins','diagram-agents'].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.textContent = errorMsg;
-        });
-        document.querySelectorAll('#project-diagrams .mermaid').forEach(el => {
-          el.textContent = errorMsg;
+      allDiagrams.push({ name: 'plugins', content: data.pluginGraph, type: 'system', meta: 'Plugin dependencies' });
+      allDiagrams.push({ name: 'agents', content: data.agentTree, type: 'system', meta: 'Agent selection tree' });
+      if (data.projectDiagrams) {
+        data.projectDiagrams.forEach(d => {
+          allDiagrams.push({ name: d.name, content: d.content, type: 'project', meta: d.type || 'custom' });
         });
       }
-      diagramsRendered = true;
+      renderDiagramGrid();
+      diagramsLoaded = true;
     });
 }
 
-function openDiagramModal(diagramId, title) {
-  currentModalDiagram = diagramId;
-  document.getElementById('modal-diagram-title').textContent = title || diagramId;
-  const body = document.getElementById('modal-diagram-body');
-  body.textContent = '';
-  const source = diagramSources[diagramId];
-  if (source) {
+function renderDiagramGrid() {
+  const grid = document.getElementById('diagram-grid');
+  grid.textContent = '';
+  if (allDiagrams.length === 0) {
+    grid.innerHTML = '<p class="desc">No diagrams yet. Run <code>/pm:diagram-new &lt;name&gt;</code> to create one.</p>';
+    return;
+  }
+  allDiagrams.forEach(d => {
+    const item = document.createElement('div');
+    item.className = 'diagram-grid-item';
+    item.onclick = function() { openDiagramEditor(d.name); };
+    const h4 = document.createElement('h4');
+    h4.textContent = d.name;
+    const meta = document.createElement('div');
+    meta.className = 'diagram-meta';
+    meta.textContent = d.type === 'system' ? '⚙ ' + d.meta : '📄 ' + d.meta;
+    const preview = document.createElement('div');
+    preview.className = 'diagram-preview';
     const pre = document.createElement('pre');
     pre.className = 'mermaid';
-    pre.textContent = source;
-    body.appendChild(pre);
-    if (typeof mermaid !== 'undefined' && mermaid.run) {
-      mermaid.run({ nodes: body.querySelectorAll('.mermaid') });
-    }
-  } else {
-    body.textContent = 'Diagram not available.';
+    pre.textContent = d.content;
+    preview.appendChild(pre);
+    item.appendChild(h4);
+    item.appendChild(meta);
+    item.appendChild(preview);
+    grid.appendChild(item);
+  });
+  // Render mini previews
+  if (typeof mermaid !== 'undefined' && mermaid.run) {
+    mermaid.run({ nodes: grid.querySelectorAll('.mermaid') });
   }
-  const modal = document.getElementById('diagram-modal');
-  modal.classList.add('open');
-  modalPrevFocus = document.activeElement;
-  const closeBtn = modal.querySelector('.modal-actions button:last-child');
-  if (closeBtn) closeBtn.focus();
-  document.addEventListener('keydown', modalEscHandler);
 }
 
-let modalPrevFocus = null;
-function closeDiagramModal() {
-  document.getElementById('diagram-modal').classList.remove('open');
-  document.removeEventListener('keydown', modalEscHandler);
-  currentModalDiagram = null;
-  if (modalPrevFocus) { modalPrevFocus.focus(); modalPrevFocus = null; }
+function openDiagramEditor(name) {
+  const d = allDiagrams.find(x => x.name === name);
+  if (!d) return;
+  currentDiagramName = name;
+  currentDiagramSaved = d.content;
+  document.getElementById('editor-diagram-name').textContent = name;
+  document.getElementById('editor-diagram-meta').textContent = d.type === 'system' ? '(system — read-only)' : '';
+  document.getElementById('editor-unsaved').style.display = 'none';
+  const codeEl = document.getElementById('diagram-code');
+  codeEl.value = d.content;
+  codeEl.readOnly = d.type === 'system';
+  document.getElementById('diagram-list-view').style.display = 'none';
+  document.getElementById('diagram-editor-view').classList.add('active');
+  // Lock auto-refresh while editing
+  editingLock = true;
+  renderPreview(d.content);
 }
 
-function modalEscHandler(e) { if (e.key === 'Escape') closeDiagramModal(); }
+function closeDiagramEditor() {
+  if (panzoomInstance) { panzoomInstance.dispose(); panzoomInstance = null; }
+  document.getElementById('diagram-editor-view').classList.remove('active');
+  document.getElementById('diagram-list-view').style.display = '';
+  currentDiagramName = null;
+  editingLock = false;
+}
 
-function downloadMermaid(diagramId) {
-  const src = diagramSources[diagramId];
-  if (!src) return;
-  const label = diagramNames[diagramId] || diagramId.replace('proj-diagram-', 'diagram-').replace('diagram-', '');
-  const safeName = label.replace(/[^a-zA-Z0-9_-]/g, '_') + '.mmd';
+function renderPreview(source) {
+  const container = document.getElementById('diagram-preview-render');
+  container.textContent = '';
+  if (panzoomInstance) { panzoomInstance.dispose(); panzoomInstance = null; }
+  if (!source || !source.trim()) { container.textContent = 'Empty diagram'; return; }
+  const pre = document.createElement('pre');
+  pre.className = 'mermaid';
+  pre.textContent = source;
+  container.appendChild(pre);
+  if (typeof mermaid !== 'undefined' && mermaid.run) {
+    mermaid.run({ nodes: [pre] }).then(function() {
+      const svg = container.querySelector('svg');
+      if (svg && typeof panzoom !== 'undefined') {
+        svg.style.width = '100%';
+        svg.style.height = '100%';
+        panzoomInstance = panzoom(svg, { maxZoom: 10, minZoom: 0.1, smoothScroll: false });
+      }
+    }).catch(function() {
+      container.textContent = 'Mermaid syntax error — check your code';
+    });
+  }
+}
+
+function resetPanZoom() {
+  if (panzoomInstance) {
+    panzoomInstance.moveTo(0, 0);
+    panzoomInstance.zoomAbs(0, 0, 1);
+  }
+}
+
+// Live preview on code change
+document.addEventListener('DOMContentLoaded', function() {
+  const codeEl = document.getElementById('diagram-code');
+  if (codeEl) {
+    codeEl.addEventListener('input', function() {
+      document.getElementById('editor-unsaved').style.display = codeEl.value !== currentDiagramSaved ? '' : 'none';
+      clearTimeout(previewDebounce);
+      previewDebounce = setTimeout(function() { renderPreview(codeEl.value); }, 600);
+    });
+  }
+});
+
+async function saveDiagram() {
+  if (!currentDiagramName) return;
+  const d = allDiagrams.find(x => x.name === currentDiagramName);
+  if (d && d.type === 'system') { toast('System diagrams are read-only', false); return; }
+  const content = document.getElementById('diagram-code').value;
+  try {
+    await api('POST', '/api/diagrams/' + encodeURIComponent(currentDiagramName), { content: content });
+    currentDiagramSaved = content;
+    if (d) d.content = content;
+    document.getElementById('editor-unsaved').style.display = 'none';
+    toast('Diagram saved', true);
+  } catch (e) {
+    toast('Save failed: ' + e.message, false);
+  }
+}
+
+function downloadCurrentDiagram() {
+  const src = document.getElementById('diagram-code').value;
+  if (!src || !currentDiagramName) return;
+  const safeName = currentDiagramName.replace(/[^a-zA-Z0-9_-]/g, '_') + '.mmd';
   const blob = new Blob([src], { type: 'text/plain' });
   const a = document.createElement('a');
   const url = URL.createObjectURL(blob);
@@ -1193,6 +1258,39 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'GET' && parsedUrl.pathname === '/api/diagrams') {
       return json(res, 200, getDiagramsData());
+    }
+
+    // Save diagram content
+    const diagramMatch = parsedUrl.pathname.match(/^\/api\/diagrams\/([a-zA-Z0-9_-]+)$/);
+    if (req.method === 'POST' && diagramMatch) {
+      const name = decodeURIComponent(diagramMatch[1]);
+      if (!/^[a-zA-Z0-9_-]+$/.test(name)) return json(res, 400, { error: 'Invalid diagram name' });
+      const { body, err } = await parseJSONBody(req, res);
+      if (err) return;
+      const diagramsDir = path.join(basePath, '.claude', 'pm', 'diagrams');
+      if (!fs.existsSync(diagramsDir)) fs.mkdirSync(diagramsDir, { recursive: true });
+      fs.writeFileSync(path.join(diagramsDir, name + '.mmd'), body.content || '', 'utf8');
+      // Update metadata timestamp if exists, or create
+      const metaPath = path.join(diagramsDir, name + '.meta.json');
+      let meta = {};
+      try { meta = JSON.parse(fs.readFileSync(metaPath, 'utf8')); } catch {}
+      meta.name = meta.name || name;
+      meta.updated = new Date().toISOString().replace(/\\.\\d{3}Z$/, 'Z');
+      if (!meta.created) meta.created = meta.updated;
+      fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2), 'utf8');
+      return json(res, 200, { ok: true });
+    }
+
+    const diagramDeleteMatch = parsedUrl.pathname.match(/^\/api\/diagrams\/([a-zA-Z0-9_-]+)$/);
+    if (req.method === 'DELETE' && diagramDeleteMatch) {
+      const name = decodeURIComponent(diagramDeleteMatch[1]);
+      if (!/^[a-zA-Z0-9_-]+$/.test(name)) return json(res, 400, { error: 'Invalid diagram name' });
+      const diagramsDir = path.join(basePath, '.claude', 'pm', 'diagrams');
+      const mmdPath = path.join(diagramsDir, name + '.mmd');
+      const metaPath = path.join(diagramsDir, name + '.meta.json');
+      try { fs.unlinkSync(mmdPath); } catch {}
+      try { fs.unlinkSync(metaPath); } catch {}
+      return json(res, 200, { ok: true });
     }
 
     if (req.method === 'GET' && parsedUrl.pathname === '/api/tests') {
