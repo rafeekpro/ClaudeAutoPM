@@ -99,25 +99,6 @@ function json(res, status, data) {
 }
 
 // --- Diagram Generators ---
-function generateArchitectureDiagram() {
-  const lines = ['graph LR'];
-  lines.push('  CLAUDE[CLAUDE.md] --> Rules[Rules]');
-  lines.push('  CLAUDE --> Registry[Agent Registry]');
-  lines.push('  CLAUDE --> Commands[PM Commands]');
-  // Count rules
-  const rulesDir = path.join(claudeDir, 'rules');
-  let ruleCount = 0;
-  try { ruleCount = fs.readdirSync(rulesDir).filter(f => f.endsWith('.xml') || f.endsWith('.md')).length; } catch {}
-  if (ruleCount > 0) lines[1] = `  CLAUDE[CLAUDE.md] --> Rules[${ruleCount} Rules]`;
-  lines.push('  Commands --> Local[Local Provider]');
-  lines.push('  Commands --> GitHub[GitHub Provider]');
-  lines.push('  Commands --> Azure[Azure Provider]');
-  lines.push('  Local --> Issues[.claude/issues/]');
-  lines.push('  Local --> PRDs[.claude/prds/]');
-  lines.push('  Local --> Epics[.claude/epics/]');
-  return lines.join('\n');
-}
-
 function generateEpicFlowDiagram() {
   const lines = ['graph TD'];
   // Read PRDs
@@ -260,10 +241,21 @@ function getStatusData() {
   return { config, mcp, plugins, env, events };
 }
 
+function getProjectDiagrams() {
+  const diagramsDir = path.join(basePath, '.claude', 'pm', 'diagrams');
+  if (!fs.existsSync(diagramsDir)) return [];
+  return fs.readdirSync(diagramsDir)
+    .filter(f => f.endsWith('.mmd'))
+    .map(f => ({
+      name: f.replace('.mmd', ''),
+      content: fs.readFileSync(path.join(diagramsDir, f), 'utf8')
+    }));
+}
+
 function getDiagramsData() {
   return {
-    architecture: generateArchitectureDiagram(),
     epicFlow: generateEpicFlowDiagram(),
+    projectDiagrams: getProjectDiagrams(),
     pluginGraph: generatePluginGraph(),
     agentTree: generateAgentTree()
   };
@@ -397,6 +389,10 @@ function renderHTML() {
       <h2>Recent Events</h2>
       <div class="events" id="events-list"></div>
     </div>
+    <div class="card">
+      <h3>Agent Selection</h3>
+      <pre class="mermaid" id="diagram-agents"></pre>
+    </div>
   </div>
 
   <!-- Config Tab -->
@@ -448,6 +444,10 @@ function renderHTML() {
       <p id="no-plugins" style="color:#8b949e;font-size:13px;display:none">No plugins found in packages/</p>
       <button class="btn" onclick="saveConfig()">Save Plugins</button>
     </div>
+    <div class="card">
+      <h3>Installed Plugins</h3>
+      <pre class="mermaid" id="diagram-plugins"></pre>
+    </div>
   </div>
 
   <!-- MCP & Keys Tab -->
@@ -486,22 +486,11 @@ function renderHTML() {
   <div id="tab-diagrams" class="tab-content">
     <div class="grid" style="grid-template-columns: 1fr 1fr;">
       <div class="card">
-        <h3>Architecture</h3>
-        <pre class="mermaid" id="diagram-arch"></pre>
-      </div>
-      <div class="card">
         <h3>Epic Flow</h3>
         <pre class="mermaid" id="diagram-epic"></pre>
       </div>
-      <div class="card">
-        <h3>Installed Plugins</h3>
-        <pre class="mermaid" id="diagram-plugins"></pre>
-      </div>
-      <div class="card">
-        <h3>Agent Selection</h3>
-        <pre class="mermaid" id="diagram-agents"></pre>
-      </div>
     </div>
+    <div id="project-diagrams"></div>
   </div>
 
   <!-- Tests Tab -->
@@ -539,7 +528,7 @@ function showTab(name, btn) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
-  if (name === 'diagrams') renderMermaid();
+  if (name === 'diagrams' || name === 'config' || name === 'overview') renderMermaid();
 }
 
 let diagramsRendered = false;
@@ -548,14 +537,33 @@ function renderMermaid() {
   fetch('/api/diagrams', { headers: { 'Authorization': 'Bearer ' + TOKEN } })
     .then(r => r.json())
     .then(data => {
-      document.getElementById('diagram-arch').textContent = data.architecture;
       document.getElementById('diagram-epic').textContent = data.epicFlow;
       document.getElementById('diagram-plugins').textContent = data.pluginGraph;
       document.getElementById('diagram-agents').textContent = data.agentTree;
+      // Render project diagrams dynamically
+      const container = document.getElementById('project-diagrams');
+      container.innerHTML = '';
+      if (data.projectDiagrams && data.projectDiagrams.length > 0) {
+        data.projectDiagrams.forEach(d => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = '<h3>' + esc(d.name) + '</h3>';
+          const pre = document.createElement('pre');
+          pre.className = 'mermaid';
+          pre.textContent = d.content;
+          card.appendChild(pre);
+          container.appendChild(card);
+        });
+      } else {
+        const msg = document.createElement('div');
+        msg.className = 'card';
+        msg.innerHTML = '<p class="desc">No project diagrams yet. Run <code>/pm:diagram-new architecture</code> to create your first diagram.</p>';
+        container.appendChild(msg);
+      }
       if (typeof mermaid !== 'undefined' && mermaid.run) {
         mermaid.run();
       } else {
-        ['diagram-arch','diagram-epic','diagram-plugins','diagram-agents'].forEach(id => {
+        ['diagram-epic','diagram-plugins','diagram-agents'].forEach(id => {
           const el = document.getElementById(id);
           if (el) el.textContent = 'Mermaid library unavailable. Check network connection.';
         });
@@ -951,7 +959,7 @@ async function refresh() {
   }
 }
 
-refresh();
+refresh().then(() => renderMermaid());
 setInterval(refresh, 10000);
 </script>
 </body>
