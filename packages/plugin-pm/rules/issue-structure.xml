@@ -15,7 +15,7 @@
     <section name="related-issues" required="true">depends on / blocks / related to #NNN, or "None"</section>
     <section name="verification" required="true">Concrete commands to verify (curl, kubectl, npm test, etc.)</section>
     <section name="definition-of-done" required="true">Quality gate checkboxes — tests, deploy, PR merged</section>
-    <section name="technical-constraints" required="false">Stack, patterns, prohibitions</section>
+    <section name="constraints" required="false">Stack, patterns, prohibitions</section>
     <section name="out-of-scope" required="false">What NOT to touch</section>
     <section name="suggested-approach" required="false">Brief implementation strategy</section>
   </template>

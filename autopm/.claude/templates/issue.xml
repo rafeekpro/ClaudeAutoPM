@@ -50,10 +50,11 @@
 
   <validation>
     <rule>goal must be non-empty</rule>
-    <rule>context must describe WHY this issue exists and current state</rule>
+    <rule>context must be non-empty</rule>
+    <rule>acceptance-criteria must be non-empty</rule>
+    <rule>related-issues must be non-empty</rule>
+    <rule>verification must be non-empty</rule>
+    <rule>definition-of-done must be non-empty</rule>
     <rule>at least 1 acceptance criterion checkbox (- [ ])</rule>
-    <rule>verification must have at least 1 concrete command or check</rule>
-    <rule>definition-of-done must have at least 1 checkbox (- [ ])</rule>
-    <rule>related-issues must list issues or explicitly state "None"</rule>
   </validation>
 </template>

@@ -846,9 +846,11 @@
   },
   "rules": [
     {
+      "name": "issue-structure",
       "file": "rules/issue-structure.xml",
       "description": "Enforces standard issue structure with required sections",
-      "priority": "high"
+      "priority": "high",
+      "appliesTo": ["issue-create", "epic-decompose"]
     }
   ],
   "dependencies": [],
