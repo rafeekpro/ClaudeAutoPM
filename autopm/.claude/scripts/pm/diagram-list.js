@@ -53,7 +53,9 @@ function listDiagrams() {
   console.log('| Name | Type | Created | Updated |');
   console.log('|------|------|---------|---------|');
   for (const r of rows) {
-    console.log(`| ${r.name} | ${r.type} | ${r.created} | ${r.updated} |`);
+    const escapedName = r.name.replace(/\|/g, '\\|');
+    const escapedType = (r.type || '').replace(/\|/g, '\\|');
+    console.log(`| ${escapedName} | ${escapedType} | ${r.created} | ${r.updated} |`);
   }
   console.log(`\nTotal: ${rows.length} diagram${rows.length === 1 ? '' : 's'}`);
   console.log('View in dashboard: /pm:dashboard → Diagrams tab');
@@ -80,7 +82,13 @@ const args = process.argv.slice(2);
 const showIdx = args.indexOf('--show');
 
 if (showIdx !== -1 && args[showIdx + 1]) {
-  showDiagram(args[showIdx + 1]);
+  const name = args[showIdx + 1];
+  const safeName = path.basename(name || '');
+  if (!safeName || !/^[a-z0-9_-]+$/i.test(safeName)) {
+    console.log('Invalid diagram name. Use alphanumeric, hyphens, underscores only.');
+    process.exit(1);
+  }
+  showDiagram(safeName);
 } else {
   listDiagrams();
 }

@@ -24,12 +24,21 @@ Create a project architecture diagram by analyzing the codebase.
    - Check for API routes (Express, FastAPI, etc.)
    - Check for database models/schemas
    - Check for .env for external service connections
+     **NEVER include actual .env values (tokens, passwords, secrets) in diagram or metadata.**
+     Only infer service names/types from variable names, not values.
 
 3. Generate Mermaid diagram based on analysis:
    - Use `graph TD` for hierarchical, `graph LR` for flow
    - Group related modules in `subgraph` blocks
    - Use icons: databases [(DB)], services [Service], external{{External}}
-   - Color-code: green for active, gray for config, blue for API
+   - Color-code using Mermaid classDef:
+     ```
+     classDef active fill:#d4f8db,stroke:#2f855a
+     classDef config fill:#e2e8f0,stroke:#4a5568
+     classDef api fill:#ebf4ff,stroke:#2b6cb0
+     class FastAPI api
+     class PostgreSQL active
+     ```
 
 4. Save diagram:
    ```bash
