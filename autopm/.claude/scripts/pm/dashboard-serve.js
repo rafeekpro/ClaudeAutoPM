@@ -400,7 +400,7 @@ function renderHTML() {
     border: 1px solid #30363d; border-radius: 8px; overflow: hidden;
   }
   .diagram-split .code-pane {
-    flex: 1; display: flex; flex-direction: column; border-right: 1px solid #30363d; min-width: 0;
+    width: 30%; display: flex; flex-direction: column; min-width: 150px; flex-shrink: 0;
   }
   .diagram-split .code-pane .pane-header {
     background: #161b22; padding: 6px 12px; font-size: 11px; color: #8b949e;
@@ -411,8 +411,13 @@ function renderHTML() {
     font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace; font-size: 13px;
     line-height: 1.5; resize: none; outline: none; tab-size: 2;
   }
+  .diagram-split .split-handle {
+    width: 5px; cursor: col-resize; background: #30363d; flex-shrink: 0;
+    transition: background 0.15s;
+  }
+  .diagram-split .split-handle:hover, .diagram-split .split-handle.dragging { background: #58a6ff; }
   .diagram-split .preview-pane {
-    flex: 1; display: flex; flex-direction: column; background: #161b22; min-width: 0;
+    flex: 1; display: flex; flex-direction: column; background: #161b22; min-width: 200px;
   }
   .diagram-split .preview-pane .pane-header {
     background: #161b22; padding: 6px 12px; font-size: 11px; color: #8b949e;
@@ -618,10 +623,11 @@ function renderHTML() {
         </div>
       </div>
       <div class="diagram-split" id="diagram-split">
-        <div class="code-pane">
+        <div class="code-pane" id="code-pane">
           <div class="pane-header"><span>Mermaid Source</span></div>
           <textarea id="diagram-code" spellcheck="false"></textarea>
         </div>
+        <div class="split-handle" id="split-handle"></div>
         <div class="preview-pane">
           <div class="pane-header">
             <span>Preview</span>
@@ -862,6 +868,35 @@ function resetPanZoom() {
     panzoomInstance.zoomAbs(0, 0, 1);
   }
 }
+
+// Resizable split handle
+(function() {
+  const handle = document.getElementById('split-handle');
+  const codePane = document.getElementById('code-pane');
+  const split = document.getElementById('diagram-split');
+  if (!handle || !codePane || !split) return;
+  let dragging = false;
+  handle.addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    dragging = true;
+    handle.classList.add('dragging');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  });
+  document.addEventListener('mousemove', function(e) {
+    if (!dragging) return;
+    const rect = split.getBoundingClientRect();
+    const pct = Math.min(70, Math.max(10, ((e.clientX - rect.left) / rect.width) * 100));
+    codePane.style.width = pct + '%';
+  });
+  document.addEventListener('mouseup', function() {
+    if (!dragging) return;
+    dragging = false;
+    handle.classList.remove('dragging');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  });
+})();
 
 // Live preview on code change
 document.addEventListener('DOMContentLoaded', function() {
