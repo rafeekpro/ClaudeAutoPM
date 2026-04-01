@@ -545,7 +545,7 @@ function renderHTML() {
   </div>
 
   <!-- Diagram fullscreen modal -->
-  <div class="diagram-modal" id="diagram-modal" onclick="if(event.target===this)closeDiagramModal()">
+  <div class="diagram-modal" id="diagram-modal" role="dialog" aria-modal="true" aria-labelledby="modal-diagram-title" onclick="if(event.target===this)closeDiagramModal()">
     <div class="modal-inner">
       <div class="modal-header">
         <h3 id="modal-diagram-title"></h3>
@@ -608,13 +608,17 @@ function renderMermaid() {
     .then(data => {
       // Epic Flow — only show if there are actual epics/PRDs
       const epicCard = document.getElementById('diagram-epic-card');
+      const epicEl = document.getElementById('diagram-epic');
       if (data.epicFlowHasData) {
         epicCard.style.display = '';
-        document.getElementById('diagram-epic').textContent = data.epicFlow;
+        epicEl.className = 'mermaid';
+        epicEl.textContent = data.epicFlow;
         diagramSources['diagram-epic'] = data.epicFlow;
         diagramNames['diagram-epic'] = 'epic-flow';
       } else {
         epicCard.style.display = 'none';
+        epicEl.className = '';
+        epicEl.textContent = '';
       }
       document.getElementById('diagram-plugins').textContent = data.pluginGraph;
       document.getElementById('diagram-agents').textContent = data.agentTree;
@@ -696,14 +700,20 @@ function openDiagramModal(diagramId, title) {
   } else {
     body.textContent = 'Diagram not available.';
   }
-  document.getElementById('diagram-modal').classList.add('open');
+  const modal = document.getElementById('diagram-modal');
+  modal.classList.add('open');
+  modalPrevFocus = document.activeElement;
+  const closeBtn = modal.querySelector('.modal-actions button:last-child');
+  if (closeBtn) closeBtn.focus();
   document.addEventListener('keydown', modalEscHandler);
 }
 
+let modalPrevFocus = null;
 function closeDiagramModal() {
   document.getElementById('diagram-modal').classList.remove('open');
   document.removeEventListener('keydown', modalEscHandler);
   currentModalDiagram = null;
+  if (modalPrevFocus) { modalPrevFocus.focus(); modalPrevFocus = null; }
 }
 
 function modalEscHandler(e) { if (e.key === 'Escape') closeDiagramModal(); }
@@ -718,8 +728,12 @@ function downloadMermaid(diagramId) {
   const url = URL.createObjectURL(blob);
   a.href = url;
   a.download = safeName;
-  a.click();
-  setTimeout(function() { URL.revokeObjectURL(url); }, 100);
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  try { a.click(); } finally {
+    document.body.removeChild(a);
+    setTimeout(function() { URL.revokeObjectURL(url); }, 100);
+  }
 }
 
 function renderTestPlan(md) {
