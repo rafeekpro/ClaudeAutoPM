@@ -156,13 +156,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
       case 'autopm_learn': {
         try {
-          const loggerPath = path.join(basePath, '.claude', 'lib', 'event-logger');
-          const { logEvent } = require(loggerPath);
           const learningsPath = path.join(basePath, '.claude', 'pm', 'learnings.jsonl');
           const dir = path.dirname(learningsPath);
           if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
           const entry = { timestamp: new Date().toISOString(), type: 'learning', learning: args.learning, tags: args.tags || [] };
           fs.appendFileSync(learningsPath, JSON.stringify(entry) + '\n');
+          try {
+            const loggerPath = path.join(basePath, '.claude', 'lib', 'event-logger');
+            const { logEvent } = require(loggerPath);
+            logEvent('learning.saved', { learning: args.learning, tags: args.tags || [] }, basePath);
+          } catch { /* best effort */ }
           return text(JSON.stringify({ success: true, learning: args.learning }));
         } catch (e) { return text(JSON.stringify({ error: e.message })); }
       }
@@ -173,7 +176,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           .map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
         if (args && args.tag) entries = entries.filter(e => (e.tags || []).includes(args.tag));
         const limit = (args && args.limit) || 20;
-        return text(JSON.stringify({ learnings: entries.slice(-limit) }));
+        return text(JSON.stringify({ learnings: entries.slice(-limit).reverse() }));
       }
       case 'autopm_checkpoint': {
         try {
@@ -187,7 +190,22 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             gitInfo.hash = execSync('git rev-parse --short HEAD', { encoding: 'utf8', cwd: basePath }).trim();
             gitInfo.clean = !execSync('git status --porcelain', { encoding: 'utf8', cwd: basePath }).trim();
           } catch { /* not a git repo */ }
-          const checkpoint = { timestamp: now, description: args.description, git: gitInfo };
+          // Count PM artifacts to match CLI checkpoint format
+          const counts = {};
+          for (const [key, dir] of [['issues', 'issues'], ['epics', 'epics'], ['prds', 'prds']]) {
+            const d = path.join(basePath, '.claude', dir);
+            try { counts[key] = fs.readdirSync(d).filter(f => f.endsWith('.md')).length; } catch { counts[key] = 0; }
+          }
+          // Load recent learnings
+          let learnings = [];
+          try {
+            const lPath = path.join(basePath, '.claude', 'pm', 'learnings.jsonl');
+            if (fs.existsSync(lPath)) {
+              learnings = fs.readFileSync(lPath, 'utf8').trim().split('\n')
+                .map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean).slice(-5);
+            }
+          } catch { /* ignore */ }
+          const checkpoint = { timestamp: now, description: args.description, git: gitInfo, counts, learnings, config_snapshot: null };
           fs.writeFileSync(path.join(cpDir, now.replace(/[:.]/g, '-') + '.json'), JSON.stringify(checkpoint, null, 2));
           return text(JSON.stringify({ success: true, checkpoint }));
         } catch (e) { return text(JSON.stringify({ error: e.message })); }
@@ -273,14 +291,14 @@ server.setRequestHandler(GetPromptRequestSchema, async (request) => {
     return {
       messages: [{
         role: 'user',
-        content: { type: 'text', text: `Use this template to create a new ${templateFile.replace('.xml', '')}:\n\n${markdown}` }
+        content: [{ type: 'text', text: `Use this template to create a new ${templateFile.replace('.xml', '')}:\n\n${markdown}` }]
       }]
     };
   } catch (e) {
     return {
       messages: [{
         role: 'user',
-        content: { type: 'text', text: `Template not available: ${e.message}. Run autopm install first.` }
+        content: [{ type: 'text', text: `Template not available: ${e.message}. Run autopm install first.` }]
       }]
     };
   }
