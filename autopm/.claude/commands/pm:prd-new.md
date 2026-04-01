@@ -356,18 +356,50 @@ Parse the arguments to detect the mode:
    - [Internal systems or components]
    - [Third-party libraries or tools]
 
+   ## Architecture Design
+   ### Component Tree
+   [Map out the key new files/modules/components that will be created:]
+   ```
+   src/
+   ├── feature/
+   │   ├── Component.tsx
+   │   ├── hooks/useFeature.ts
+   │   └── utils/helpers.ts
+   ```
+
+   ### Data Flow
+   [How data moves through the system for this feature:]
+   - User action → API endpoint → Service → Database → Response
+
+   ### State Management
+   [New state needed — stores, context, caching strategy]
+
    ## Implementation Plan
-   ### Phase 1: Foundation
-   - [ ] [Initial tasks]
+   ### Phase 1: Analyze (before writing code)
+   - [ ] Read existing codebase patterns
+   - [ ] Identify integration points
+   - [ ] Confirm architecture with stakeholder
 
-   ### Phase 2: Core Features
-   - [ ] [Main development]
+   ### Phase 2: Foundation
+   - [ ] Database migrations / models
+   - [ ] Core API endpoints (backend)
+   - [ ] Base component scaffolding (frontend)
 
-   ### Phase 3: Enhancement
-   - [ ] [Additional features]
+   ### Phase 3: Core Features
+   - [ ] [Main feature implementation]
+   - [ ] [Integration with existing systems]
 
-   ### Phase 4: Release
-   - [ ] [Final testing and deployment]
+   ### Phase 4: Polish & Release
+   - [ ] [Testing — unit, integration, e2e]
+   - [ ] [Documentation]
+   - [ ] [Deployment]
+
+   ### Quick Win Path
+   [Minimum viable subset that works end-to-end in 1-3 days:]
+   - Day 1: [smallest vertical slice]
+   - Day 2: [connect to real data]
+   - Day 3: [basic UI showing results]
+   [This path gives a working demo before full implementation]
 
    ## Risks and Mitigation
    ### Technical Risks
