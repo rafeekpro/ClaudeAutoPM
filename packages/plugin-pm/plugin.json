@@ -844,6 +844,13 @@
       "description": "Provider-agnostic PM workflows"
     }
   },
+  "rules": [
+    {
+      "file": "rules/issue-structure.xml",
+      "description": "Enforces standard issue structure with required sections",
+      "priority": "high"
+    }
+  ],
   "dependencies": [],
   "peerPlugins": [
     "@claudeautopm/plugin-core"
