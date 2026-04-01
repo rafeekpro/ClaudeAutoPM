@@ -1089,7 +1089,22 @@ function addEnvSuggestion(key, val, hint) {
   addEnvRow(key, val);
 }
 
+// Pause auto-refresh while user is editing MCP or env forms
+let editingLock = false;
+document.addEventListener('focusin', function(e) {
+  if (e.target.closest('#mcp-list, #env-list, .mcp-entry, .env-row')) editingLock = true;
+});
+document.addEventListener('focusout', function(e) {
+  if (e.target.closest('#mcp-list, #env-list, .mcp-entry, .env-row')) {
+    setTimeout(function() {
+      const active = document.activeElement;
+      if (!active || !active.closest('#mcp-list, #env-list, .mcp-entry, .env-row')) editingLock = false;
+    }, 200);
+  }
+});
+
 async function refresh() {
+  if (editingLock) return;
   try {
     const data = await api('GET', '/api/status');
     loadStatus(data);
