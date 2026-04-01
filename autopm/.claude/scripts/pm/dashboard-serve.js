@@ -429,6 +429,23 @@ function renderHTML() {
   .panzoom-hint {
     position: absolute; bottom: 8px; right: 12px; color: #484f58; font-size: 10px; pointer-events: none; z-index: 1;
   }
+  /* Diagram card actions */
+  .diagram-grid-item .card-actions {
+    display: flex; gap: 6px; margin-top: 8px; border-top: 1px solid #21262d; padding-top: 8px;
+  }
+  .diagram-grid-item .card-actions button {
+    background: #21262d; color: #8b949e; border: 1px solid #30363d;
+    padding: 3px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;
+  }
+  .diagram-grid-item .card-actions button:hover { background: #30363d; color: #c9d1d9; }
+  .diagram-grid-item .card-actions .btn-remove { color: #f85149; }
+  .diagram-grid-item .card-actions .btn-remove:hover { background: #3d1116; border-color: #f85149; }
+  /* Fullscreen editor */
+  .diagram-editor.fullscreen {
+    position: fixed; inset: 0; z-index: 1000; background: #0d1117;
+    padding: 12px; display: flex; flex-direction: column;
+  }
+  .diagram-editor.fullscreen .diagram-split { min-height: 0; flex: 1; }
 </style>
 </head>
 <body>
@@ -562,7 +579,27 @@ function renderHTML() {
     <!-- Diagram list view -->
     <div id="diagram-list-view">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <p class="desc" style="margin:0;">Click a diagram to view and edit. Create new: <code>/pm:diagram-new &lt;name&gt;</code></p>
+        <p class="desc" style="margin:0;">Project diagrams stored in <code>.claude/pm/diagrams/</code></p>
+        <button class="btn" onclick="showNewDiagramForm()">+ New Diagram</button>
+      </div>
+      <!-- New diagram form (hidden by default) -->
+      <div id="new-diagram-form" class="card" style="display:none;margin-bottom:16px;">
+        <div class="row">
+          <div><label>Name (slug)</label><input type="text" id="new-diagram-name" placeholder="e.g. frontend, backend, database"></div>
+          <div><label>Type</label><select id="new-diagram-type">
+            <option value="architecture">architecture</option>
+            <option value="modules">modules</option>
+            <option value="data-flow">data-flow</option>
+            <option value="dependencies">dependencies</option>
+            <option value="custom">custom</option>
+          </select></div>
+        </div>
+        <label>Description</label>
+        <input type="text" id="new-diagram-desc" placeholder="e.g. Frontend React component tree">
+        <div style="margin-top:12px;">
+          <button class="btn" onclick="createNewDiagram()">Create</button>
+          <button class="btn" style="background:#21262d;margin-left:6px;" onclick="hideNewDiagramForm()">Cancel</button>
+        </div>
       </div>
       <div id="diagram-grid" class="diagram-grid"></div>
     </div>
@@ -572,15 +609,15 @@ function renderHTML() {
         <div class="left">
           <button class="btn-back" onclick="closeDiagramEditor()">← Back</button>
           <strong id="editor-diagram-name" style="color:#c9d1d9;font-size:14px;"></strong>
-          <span id="editor-diagram-meta" style="color:#8b949e;font-size:11px;"></span>
           <span id="editor-unsaved" style="color:#d29922;font-size:11px;display:none;">● unsaved</span>
         </div>
         <div class="right">
           <button onclick="downloadCurrentDiagram()">↓ .mmd</button>
+          <button onclick="toggleEditorFullscreen()">⤢ Fullscreen</button>
           <button class="btn-save" onclick="saveDiagram()">Save</button>
         </div>
       </div>
-      <div class="diagram-split">
+      <div class="diagram-split" id="diagram-split">
         <div class="code-pane">
           <div class="pane-header"><span>Mermaid Source</span></div>
           <textarea id="diagram-code" spellcheck="false"></textarea>
@@ -654,16 +691,10 @@ function renderDiagramsTab() {
   fetch('/api/diagrams', { headers: { 'Authorization': 'Bearer ' + TOKEN } })
     .then(r => r.json())
     .then(data => {
-      // Merge system-generated + project diagrams into one list
       allDiagrams = [];
-      if (data.epicFlowHasData) {
-        allDiagrams.push({ name: 'epic-flow', content: data.epicFlow, type: 'system', meta: 'PRD → Epic → Tasks' });
-      }
-      allDiagrams.push({ name: 'plugins', content: data.pluginGraph, type: 'system', meta: 'Plugin dependencies' });
-      allDiagrams.push({ name: 'agents', content: data.agentTree, type: 'system', meta: 'Agent selection tree' });
       if (data.projectDiagrams) {
         data.projectDiagrams.forEach(d => {
-          allDiagrams.push({ name: d.name, content: d.content, type: 'project', meta: d.type || 'custom' });
+          allDiagrams.push({ name: d.name, content: d.content, type: d.type || 'custom' });
         });
       }
       renderDiagramGrid();
@@ -675,7 +706,10 @@ function renderDiagramGrid() {
   const grid = document.getElementById('diagram-grid');
   grid.textContent = '';
   if (allDiagrams.length === 0) {
-    grid.innerHTML = '<p class="desc">No diagrams yet. Run <code>/pm:diagram-new &lt;name&gt;</code> to create one.</p>';
+    const msg = document.createElement('p');
+    msg.className = 'desc';
+    msg.textContent = 'No diagrams yet. Click "+ New Diagram" or run /pm:diagram-new <name>.';
+    grid.appendChild(msg);
     return;
   }
   allDiagrams.forEach(d => {
@@ -683,28 +717,87 @@ function renderDiagramGrid() {
     item.className = 'diagram-grid-item';
     item.setAttribute('role', 'button');
     item.setAttribute('tabindex', '0');
-    item.onclick = function() { openDiagramEditor(d.name); };
-    item.onkeydown = function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDiagramEditor(d.name); } };
     const h4 = document.createElement('h4');
     h4.textContent = d.name;
     const meta = document.createElement('div');
     meta.className = 'diagram-meta';
-    meta.textContent = d.type === 'system' ? '⚙ ' + d.meta : '📄 ' + d.meta;
+    meta.textContent = d.type;
     const preview = document.createElement('div');
     preview.className = 'diagram-preview';
     const pre = document.createElement('pre');
     pre.className = 'mermaid';
     pre.textContent = d.content;
     preview.appendChild(pre);
+    // Action buttons
+    const actions = document.createElement('div');
+    actions.className = 'card-actions';
+    const editBtn = document.createElement('button');
+    editBtn.textContent = 'Edit';
+    editBtn.onclick = function(e) { e.stopPropagation(); openDiagramEditor(d.name); };
+    const dlBtn = document.createElement('button');
+    dlBtn.textContent = '↓ .mmd';
+    dlBtn.onclick = function(e) { e.stopPropagation(); downloadDiagram(d.name, d.content); };
+    const rmBtn = document.createElement('button');
+    rmBtn.textContent = 'Remove';
+    rmBtn.className = 'btn-remove';
+    rmBtn.onclick = function(e) { e.stopPropagation(); removeDiagram(d.name); };
+    actions.appendChild(editBtn);
+    actions.appendChild(dlBtn);
+    actions.appendChild(rmBtn);
     item.appendChild(h4);
     item.appendChild(meta);
     item.appendChild(preview);
+    item.appendChild(actions);
+    // Click card body (not actions) opens editor
+    item.onclick = function(e) { if (!e.target.closest('.card-actions')) openDiagramEditor(d.name); };
+    item.onkeydown = function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDiagramEditor(d.name); } };
     grid.appendChild(item);
   });
-  // Render mini previews
   if (typeof mermaid !== 'undefined' && mermaid.run) {
     mermaid.run({ nodes: grid.querySelectorAll('.mermaid') });
   }
+}
+
+// New diagram form
+function showNewDiagramForm() { document.getElementById('new-diagram-form').style.display = ''; }
+function hideNewDiagramForm() { document.getElementById('new-diagram-form').style.display = 'none'; }
+
+async function createNewDiagram() {
+  const name = document.getElementById('new-diagram-name').value.trim().replace(/[^a-zA-Z0-9_-]/g, '-');
+  if (!name) { toast('Name is required', false); return; }
+  if (allDiagrams.find(d => d.name === name)) { toast('Diagram "' + name + '" already exists', false); return; }
+  const type = document.getElementById('new-diagram-type').value;
+  const desc = document.getElementById('new-diagram-desc').value.trim();
+  const template = 'graph TD\\n  A[' + esc(desc || name) + ']';
+  try {
+    await api('POST', '/api/diagrams/' + encodeURIComponent(name), { content: template, type: type, description: desc });
+    hideNewDiagramForm();
+    document.getElementById('new-diagram-name').value = '';
+    document.getElementById('new-diagram-desc').value = '';
+    diagramsLoaded = false;
+    renderDiagramsTab();
+    toast('Diagram "' + name + '" created', true);
+  } catch (e) { toast('Failed: ' + e.message, false); }
+}
+
+async function removeDiagram(name) {
+  if (!confirm('Remove diagram "' + name + '"?')) return;
+  try {
+    await api('DELETE', '/api/diagrams/' + encodeURIComponent(name));
+    allDiagrams = allDiagrams.filter(d => d.name !== name);
+    renderDiagramGrid();
+    toast('Diagram removed', true);
+  } catch (e) { toast('Failed: ' + e.message, false); }
+}
+
+function downloadDiagram(name, content) {
+  const safeName = name.replace(/[^a-zA-Z0-9_-]/g, '_') + '.mmd';
+  const blob = new Blob([content], { type: 'text/plain' });
+  const a = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  a.href = url; a.download = safeName; a.style.display = 'none';
+  document.body.appendChild(a);
+  try { a.click(); } finally { document.body.removeChild(a); setTimeout(function() { URL.revokeObjectURL(url); }, 100); }
 }
 
 function openDiagramEditor(name) {
@@ -713,11 +806,10 @@ function openDiagramEditor(name) {
   currentDiagramName = name;
   currentDiagramSaved = d.content;
   document.getElementById('editor-diagram-name').textContent = name;
-  document.getElementById('editor-diagram-meta').textContent = d.type === 'system' ? '(system — read-only)' : '';
   document.getElementById('editor-unsaved').style.display = 'none';
   const codeEl = document.getElementById('diagram-code');
   codeEl.value = d.content;
-  codeEl.readOnly = d.type === 'system';
+  codeEl.readOnly = false;
   document.getElementById('diagram-list-view').style.display = 'none';
   document.getElementById('diagram-editor-view').classList.add('active');
   renderPreview(d.content);
@@ -726,9 +818,17 @@ function openDiagramEditor(name) {
 function closeDiagramEditor() {
   clearTimeout(previewDebounce); previewDebounce = null;
   if (panzoomInstance) { panzoomInstance.dispose(); panzoomInstance = null; }
-  document.getElementById('diagram-editor-view').classList.remove('active');
+  const editor = document.getElementById('diagram-editor-view');
+  editor.classList.remove('active', 'fullscreen');
   document.getElementById('diagram-list-view').style.display = '';
   currentDiagramName = null;
+}
+
+function toggleEditorFullscreen() {
+  document.getElementById('diagram-editor-view').classList.toggle('fullscreen');
+  // Re-render preview to fit new size
+  if (panzoomInstance) { panzoomInstance.dispose(); panzoomInstance = null; }
+  setTimeout(function() { renderPreview(document.getElementById('diagram-code').value); }, 100);
 }
 
 function renderPreview(source) {
@@ -776,7 +876,6 @@ document.addEventListener('DOMContentLoaded', function() {
 async function saveDiagram() {
   if (!currentDiagramName) return;
   const d = allDiagrams.find(x => x.name === currentDiagramName);
-  if (d && d.type === 'system') { toast('System diagrams are read-only', false); return; }
   const content = document.getElementById('diagram-code').value;
   try {
     await api('POST', '/api/diagrams/' + encodeURIComponent(currentDiagramName), { content: content });
@@ -1273,6 +1372,8 @@ const server = http.createServer(async (req, res) => {
       let meta = {};
       try { meta = JSON.parse(fs.readFileSync(metaPath, 'utf8')); } catch {}
       meta.name = meta.name || name;
+      if (body.type) meta.type = body.type;
+      if (body.description) meta.description = body.description;
       meta.updated = new Date().toISOString().replace(/\\.\\d{3}Z$/, 'Z');
       if (!meta.created) meta.created = meta.updated;
       fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2), 'utf8');
