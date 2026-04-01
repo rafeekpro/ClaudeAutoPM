@@ -243,13 +243,23 @@ function getStatusData() {
 
 function getProjectDiagrams() {
   const diagramsDir = path.join(basePath, '.claude', 'pm', 'diagrams');
-  if (!fs.existsSync(diagramsDir)) return [];
-  return fs.readdirSync(diagramsDir)
-    .filter(f => f.endsWith('.mmd'))
-    .map(f => ({
-      name: f.replace('.mmd', ''),
-      content: fs.readFileSync(path.join(diagramsDir, f), 'utf8')
-    }));
+  let entries;
+  try {
+    if (!fs.existsSync(diagramsDir)) return [];
+    entries = fs.readdirSync(diagramsDir);
+  } catch { return []; }
+
+  const diagrams = [];
+  for (const f of entries) {
+    if (!f.endsWith('.mmd')) continue;
+    try {
+      diagrams.push({
+        name: f.replace(/\.mmd$/, ''),
+        content: fs.readFileSync(path.join(diagramsDir, f), 'utf8')
+      });
+    } catch { /* skip unreadable */ }
+  }
+  return diagrams;
 }
 
 function getDiagramsData() {
@@ -528,7 +538,7 @@ function showTab(name, btn) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
-  if (name === 'diagrams' || name === 'config' || name === 'overview') renderMermaid();
+  if (name === 'diagrams') renderMermaid();
 }
 
 let diagramsRendered = false;
@@ -557,15 +567,19 @@ function renderMermaid() {
       } else {
         const msg = document.createElement('div');
         msg.className = 'card';
-        msg.innerHTML = '<p class="desc">No project diagrams yet. Run <code>/pm:diagram-new architecture</code> to create your first diagram.</p>';
+        msg.innerHTML = '<p class="desc">No project diagrams yet. Run <code>/pm:diagram-new</code> to create your first diagram.</p>';
         container.appendChild(msg);
       }
       if (typeof mermaid !== 'undefined' && mermaid.run) {
         mermaid.run();
       } else {
+        const errorMsg = 'Mermaid library unavailable. Check network connection.';
         ['diagram-epic','diagram-plugins','diagram-agents'].forEach(id => {
           const el = document.getElementById(id);
-          if (el) el.textContent = 'Mermaid library unavailable. Check network connection.';
+          if (el) el.textContent = errorMsg;
+        });
+        document.querySelectorAll('#project-diagrams .mermaid').forEach(el => {
+          el.textContent = errorMsg;
         });
       }
       diagramsRendered = true;
@@ -959,7 +973,7 @@ async function refresh() {
   }
 }
 
-refresh().then(() => renderMermaid());
+refresh();
 setInterval(refresh, 10000);
 </script>
 </body>
