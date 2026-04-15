@@ -135,7 +135,7 @@
     "fast-glob": "^3.3.2",
     "fs-extra": "^11.3.2",
     "glob": "^11.0.3",
-    "inquirer": "^12.9.6",
+    "inquirer": "^13.3.2",
     "js-yaml": "^4.1.0",
     "markdown-it": "^14.1.0",
     "marked": "^17.0.6",
