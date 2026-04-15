@@ -152,7 +152,8 @@ class Installer {
       console.log('   3. For continuous sync:');
       console.log(`      ${this.colors.BOLD}autopm obsidian sync --watch${this.colors.NC}`);
       console.log('');
-      console.log(`   ${this.colors.DIM}Troubleshooting: autopm obsidian doctor${this.colors.NC}`);
+      console.log(`   ${this.colors.DIM}Verify setup:     autopm validate${this.colors.NC}`);
+      console.log(`   ${this.colors.DIM}Troubleshooting:  autopm obsidian doctor${this.colors.NC}`);
       console.log('');
     } else {
       console.log('   1. Open your project in Claude Code:');
