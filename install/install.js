@@ -127,6 +127,44 @@ class Installer {
     console.log(`${this.colors.RED}✗${this.colors.NC} ${msg}`);
   }
 
+  /**
+   * Print scenario-specific next steps after installation
+   */
+  printScenarioNextSteps() {
+    const scenario = this.currentScenario;
+    if (!scenario) return;
+
+    console.log(`${this.colors.CYAN}📋 Next Steps for "${scenario}" scenario:${this.colors.NC}`);
+    console.log('');
+
+    if (scenario === 'obsidian') {
+      console.log('   1. Configure your Obsidian vault:');
+      console.log(`      ${this.colors.BOLD}autopm obsidian setup --vault-path "<your-vault-path>"${this.colors.NC}`);
+      console.log('');
+      console.log(`      ${this.colors.DIM}Use quotes around the path. Examples per platform:${this.colors.NC}`);
+      console.log(`      ${this.colors.DIM}  WSL:   --vault-path "/mnt/c/Users/You/Documents/My Vault"${this.colors.NC}`);
+      console.log(`      ${this.colors.DIM}  macOS: --vault-path "/Users/you/Documents/My Vault"${this.colors.NC}`);
+      console.log(`      ${this.colors.DIM}  Linux: --vault-path "/home/you/Obsidian/My Vault"${this.colors.NC}`);
+      console.log('');
+      console.log('   2. Open the vault folder in Obsidian and install recommended plugins');
+      console.log(`      ${this.colors.DIM}(Dataview, Templater, Excalidraw, Mermaid Tools)${this.colors.NC}`);
+      console.log('');
+      console.log('   3. For continuous sync:');
+      console.log(`      ${this.colors.BOLD}autopm obsidian sync --watch${this.colors.NC}`);
+      console.log('');
+      console.log(`   ${this.colors.DIM}Verify setup:     autopm validate${this.colors.NC}`);
+      console.log(`   ${this.colors.DIM}Troubleshooting:  autopm obsidian doctor${this.colors.NC}`);
+      console.log('');
+    } else {
+      console.log('   1. Open your project in Claude Code:');
+      console.log(`      ${this.colors.BOLD}cd your-project && claude${this.colors.NC}`);
+      console.log('');
+      console.log('   2. Start working! Slash commands are available inside Claude Code.');
+      console.log(`      ${this.colors.DIM}Example: /pm:status, /pm:next, /pm:help${this.colors.NC}`);
+      console.log('');
+    }
+  }
+
   async confirm(prompt) {
     // In test mode or auto-accept mode, auto-answer yes
     if (process.env.AUTOPM_TEST_MODE === '1' || process.env.AUTOPM_AUTO_ACCEPT === '1') {
@@ -561,6 +599,7 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
    • Core + PM + Obsidian vault sync
    • Unidirectional project → vault mirroring
    • Best for: Knowledge management, documentation-heavy projects
+   • After install, run: ${this.colors.BOLD}autopm obsidian setup --vault-path "<path>"${this.colors.NC}
    ${this.colors.DIM}• Plugins: core, pm, obsidian (3 plugins)${this.colors.NC}
 `);
 
@@ -1524,6 +1563,9 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
     this.printMsg('GREEN', '║     Installation complete! 🎉            ║');
     this.printMsg('GREEN', '╚══════════════════════════════════════════╝');
     console.log('');
+
+    // Scenario-specific next steps
+    this.printScenarioNextSteps();
 
     // Run post-installation configuration check
     await this.runPostInstallCheck();
