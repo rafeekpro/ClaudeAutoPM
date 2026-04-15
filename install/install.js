@@ -139,7 +139,12 @@ class Installer {
 
     if (scenario === 'obsidian') {
       console.log('   1. Configure your Obsidian vault:');
-      console.log(`      ${this.colors.BOLD}autopm obsidian setup --vault-path /path/to/your/vault${this.colors.NC}`);
+      console.log(`      ${this.colors.BOLD}autopm obsidian setup --vault-path "<your-vault-path>"${this.colors.NC}`);
+      console.log('');
+      console.log(`      ${this.colors.DIM}Use quotes around the path. Examples per platform:${this.colors.NC}`);
+      console.log(`      ${this.colors.DIM}  WSL:   --vault-path "/mnt/c/Users/You/Documents/My Vault"${this.colors.NC}`);
+      console.log(`      ${this.colors.DIM}  macOS: --vault-path "/Users/you/Documents/My Vault"${this.colors.NC}`);
+      console.log(`      ${this.colors.DIM}  Linux: --vault-path "/home/you/Obsidian/My Vault"${this.colors.NC}`);
       console.log('');
       console.log('   2. Open the vault folder in Obsidian and install recommended plugins');
       console.log(`      ${this.colors.DIM}(Dataview, Templater, Excalidraw, Mermaid Tools)${this.colors.NC}`);
@@ -593,7 +598,7 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
    • Core + PM + Obsidian vault sync
    • Unidirectional project → vault mirroring
    • Best for: Knowledge management, documentation-heavy projects
-   • After install, run: ${this.colors.BOLD}autopm obsidian setup --vault-path /path${this.colors.NC}
+   • After install, run: ${this.colors.BOLD}autopm obsidian setup --vault-path "<path>"${this.colors.NC}
    ${this.colors.DIM}• Plugins: core, pm, obsidian (3 plugins)${this.colors.NC}
 `);
 

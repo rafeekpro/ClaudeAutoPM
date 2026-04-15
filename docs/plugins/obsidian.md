@@ -26,7 +26,20 @@ Or add to an existing installation by selecting scenario 7 during `autopm instal
 After installation, configure your vault:
 
 ```bash
-autopm obsidian setup --vault-path /path/to/vault --prefix my-project
+autopm obsidian setup --vault-path "/path/to/your vault" --prefix my-project
+```
+
+Use quotes around paths that contain spaces. Platform examples:
+
+```bash
+# WSL
+autopm obsidian setup --vault-path "/mnt/c/Users/You/Documents/My Vault"
+
+# macOS
+autopm obsidian setup --vault-path "/Users/you/Documents/My Vault"
+
+# Linux
+autopm obsidian setup --vault-path "/home/you/Obsidian/My Vault"
 ```
 
 Arguments:

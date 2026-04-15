@@ -343,7 +343,7 @@ class PostInstallChecker {
   checkObsidianVault() {
     const configPath = path.join(this.projectRoot, '.claude', 'config.json');
     let configured = false;
-    let message = 'Not configured — run: autopm obsidian setup --vault-path /path/to/vault';
+    let message = 'Not configured — run: autopm obsidian setup --vault-path "<path>"';
 
     if (fs.existsSync(configPath)) {
       try {

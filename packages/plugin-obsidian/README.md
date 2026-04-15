@@ -57,7 +57,11 @@ Available from your terminal via `autopm obsidian <command>` and as `/obsidian:<
 Configure your Obsidian vault. Run once after install:
 
 ```bash
-autopm obsidian setup --vault-path /path/to/vault --prefix my-project
+autopm obsidian setup --vault-path "/path/to/your vault" --prefix my-project
+
+# WSL:   --vault-path "/mnt/c/Users/You/Documents/My Vault"
+# macOS: --vault-path "/Users/you/Documents/My Vault"
+# Linux: --vault-path "/home/you/Obsidian/My Vault"
 ```
 
 ### `autopm obsidian sync`
