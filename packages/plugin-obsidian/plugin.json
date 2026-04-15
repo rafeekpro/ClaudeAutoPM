@@ -21,6 +21,24 @@
   },
   "scripts": [
     {
+      "name": "setup",
+      "file": "scripts/obsidian/setup.js",
+      "description": "Interactive vault configuration wizard",
+      "type": "workflow",
+      "executable": true,
+      "category": "setup",
+      "tags": ["setup", "wizard", "vault"]
+    },
+    {
+      "name": "doctor",
+      "file": "scripts/obsidian/doctor.js",
+      "description": "Diagnostic checks for common integration issues",
+      "type": "utility",
+      "executable": true,
+      "category": "diagnostics",
+      "tags": ["doctor", "diagnostics", "vault"]
+    },
+    {
       "name": "sync-to-obsidian",
       "file": "scripts/obsidian/sync-to-obsidian.sh",
       "description": "Cross-platform rsync-based project-to-vault sync",
