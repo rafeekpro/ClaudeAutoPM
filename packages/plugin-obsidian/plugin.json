@@ -19,7 +19,26 @@
     "required": false,
     "tags": ["obsidian", "vault", "sync", "dataview", "integration"]
   },
-  "scripts": [],
+  "scripts": [
+    {
+      "name": "sync-to-obsidian",
+      "file": "scripts/obsidian/sync-to-obsidian.sh",
+      "description": "Cross-platform rsync-based project-to-vault sync",
+      "type": "utility",
+      "executable": true,
+      "category": "sync",
+      "tags": ["sync", "rsync", "vault"]
+    },
+    {
+      "name": "sync-to-obsidian-node",
+      "file": "scripts/obsidian/sync-to-obsidian.js",
+      "description": "Node.js fallback for sync engine",
+      "type": "utility",
+      "executable": true,
+      "category": "sync",
+      "tags": ["sync", "node", "vault"]
+    }
+  ],
   "commands": [
     {
       "subdirectory": "commands/",
