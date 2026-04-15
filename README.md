@@ -27,6 +27,7 @@ Choose your scenario during installation:
 | **GitHub** | 12 | Core + languages for GitHub projects |
 | **Azure** | 14 | Core + languages + Azure DevOps |
 | **Docker** | 16 | Core + DevOps + containers |
+| **Obsidian** | 12 | PM + Obsidian vault integration |
 | **Full** | 44+ | All plugins, all agents |
 | **Performance** | 44+ | Full + max parallelization |
 
@@ -134,10 +135,11 @@ All commands run inside Claude Code (not terminal):
 
 ## Features
 
-### 13 Official Plugins
+### 14 Official Plugins
 
 - **Core** — Context management, testing, configuration, MCP
 - **PM System** — PRD, epics, issues, decomposition, git workflow
+- **Obsidian** — Read-only vault sync, Dataview frontmatter, diagnostics
 - **Azure DevOps** — Work items, boards, pipelines, sprints
 - **GitHub** — Workflows, issues, PRs, automation
 - **Languages** — Python, JavaScript, Node.js, Bash

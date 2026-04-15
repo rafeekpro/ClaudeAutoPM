@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **plugin-obsidian**: New Obsidian vault integration plugin (#537)
+  - `obsidian:setup` — Interactive vault configuration wizard
+  - `obsidian:sync` — Unidirectional project-to-vault sync (rsync-based, cross-platform)
+  - `obsidian:doctor` — Five-check diagnostic for common integration issues
+  - Templates: MOC, Dashboard, Dataview queries, Mermaid diagrams, Excalidraw canvas
+  - Canonical frontmatter schema for Dataview + Breadcrumbs
+  - New install scenario: `autopm install --scenario=obsidian`
+  - Supports WSL2, macOS, and Linux-native environments
+
 ## [3.21.0] - 2026-04-01
 
 ### Changed

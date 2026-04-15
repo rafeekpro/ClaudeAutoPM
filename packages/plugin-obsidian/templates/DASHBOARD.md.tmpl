@@ -1,0 +1,63 @@
+---
+type: dashboard
+title: "{{PROJECT_NAME}} Dashboard"
+created: "{{CREATED_DATE}}"
+updated: "{{CREATED_DATE}}"
+tags: [dashboard, overview]
+---
+
+# {{PROJECT_NAME}} Dashboard
+
+## Status Overview
+
+### Open Issues
+```dataview
+LIST
+FROM "{{PREFIX}}/issues"
+WHERE status = "open" OR status = "in-progress"
+SORT status ASC
+```
+
+### In Progress
+```dataview
+TABLE status, tags
+FROM "{{PREFIX}}"
+WHERE status = "in-progress"
+SORT file.mtime DESC
+```
+
+### Recently Completed
+```dataview
+TABLE status, updated
+FROM "{{PREFIX}}"
+WHERE status = "closed" OR status = "completed"
+SORT updated DESC
+LIMIT 10
+```
+
+## Task Breakdown
+
+### By Status
+```dataview
+TABLE WITHOUT ID
+  status as "Status",
+  length(rows) as "Count"
+FROM "{{PREFIX}}/issues"
+GROUP BY status
+```
+
+### By Type
+```dataview
+TABLE WITHOUT ID
+  type as "Type",
+  length(rows) as "Count"
+FROM "{{PREFIX}}"
+WHERE type
+GROUP BY type
+```
+
+## Quick Links
+
+- [[{{PREFIX}}/MOC|Map of Content]]
+- [[{{PREFIX}}/agents|Agents]]
+- [[{{PREFIX}}/rules|Rules]]

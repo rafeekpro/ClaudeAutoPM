@@ -111,7 +111,7 @@ This will prompt you for:
 
 ```bash
 # Create file in appropriate category
-vim autopm/.claude/templates/xml-prompts/dev/my-template.xml
+vim .claude/templates/xml-prompts/dev/my-template.xml
 ```
 
 ### Step 3: Define Template Content
@@ -558,7 +558,7 @@ cat test.xml | grep -q "<thinking>" && echo "✅ Has thinking" || echo "❌ Miss
 Track template changes:
 
 ```bash
-git add autopm/.claude/templates/xml-prompts/dev/my-template.xml
+git add .claude/templates/xml-prompts/dev/my-template.xml
 git commit -m "Update microservice template with health check requirements"
 ```
 
