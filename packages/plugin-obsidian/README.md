@@ -50,11 +50,16 @@ autopm install
 
 ## Commands
 
+> **These are Claude Code slash commands.** Run them inside a Claude Code session (`claude`), not in your terminal directly.
+
 ### `obsidian:setup`
 
-Interactive vault configuration wizard. Run once after install.
+Interactive vault configuration wizard. Run once after install:
 
-```bash
+1. Open your project in Claude Code: `cd your-project && claude`
+2. Type the slash command:
+
+```
 /obsidian:setup --vault-path /path/to/vault --prefix my-project
 ```
 

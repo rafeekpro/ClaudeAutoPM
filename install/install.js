@@ -127,6 +127,42 @@ class Installer {
     console.log(`${this.colors.RED}✗${this.colors.NC} ${msg}`);
   }
 
+  /**
+   * Print scenario-specific next steps after installation
+   */
+  printScenarioNextSteps() {
+    const scenario = this.currentScenario;
+    if (!scenario) return;
+
+    console.log(`${this.colors.CYAN}📋 Next Steps for "${scenario}" scenario:${this.colors.NC}`);
+    console.log('');
+
+    if (scenario === 'obsidian') {
+      console.log('   1. Open your project in Claude Code:');
+      console.log(`      ${this.colors.BOLD}cd your-project && claude${this.colors.NC}`);
+      console.log('');
+      console.log('   2. Inside Claude Code, run the setup wizard (slash command):');
+      console.log(`      ${this.colors.BOLD}/obsidian:setup --vault-path /path/to/your/vault${this.colors.NC}`);
+      console.log('');
+      console.log(`      ${this.colors.DIM}This is a Claude Code slash command, not a terminal command.${this.colors.NC}`);
+      console.log(`      ${this.colors.DIM}It configures your Obsidian vault path, generates templates,${this.colors.NC}`);
+      console.log(`      ${this.colors.DIM}and runs the first sync.${this.colors.NC}`);
+      console.log('');
+      console.log('   3. Open the vault folder in Obsidian and install recommended plugins');
+      console.log('');
+      console.log('   4. For continuous sync, run inside Claude Code:');
+      console.log(`      ${this.colors.BOLD}/obsidian:sync --watch${this.colors.NC}`);
+      console.log('');
+    } else {
+      console.log('   1. Open your project in Claude Code:');
+      console.log(`      ${this.colors.BOLD}cd your-project && claude${this.colors.NC}`);
+      console.log('');
+      console.log('   2. Start working! Slash commands are available inside Claude Code.');
+      console.log(`      ${this.colors.DIM}Example: /pm:status, /pm:next, /pm:help${this.colors.NC}`);
+      console.log('');
+    }
+  }
+
   async confirm(prompt) {
     // In test mode or auto-accept mode, auto-answer yes
     if (process.env.AUTOPM_TEST_MODE === '1' || process.env.AUTOPM_AUTO_ACCEPT === '1') {
@@ -561,6 +597,7 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
    • Core + PM + Obsidian vault sync
    • Unidirectional project → vault mirroring
    • Best for: Knowledge management, documentation-heavy projects
+   • After install, run ${this.colors.BOLD}/obsidian:setup${this.colors.NC} inside Claude Code
    ${this.colors.DIM}• Plugins: core, pm, obsidian (3 plugins)${this.colors.NC}
 `);
 
@@ -1524,6 +1561,9 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
     this.printMsg('GREEN', '║     Installation complete! 🎉            ║');
     this.printMsg('GREEN', '╚══════════════════════════════════════════╝');
     console.log('');
+
+    // Scenario-specific next steps
+    this.printScenarioNextSteps();
 
     // Run post-installation configuration check
     await this.runPostInstallCheck();

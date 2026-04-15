@@ -343,7 +343,7 @@ class PostInstallChecker {
   checkObsidianVault() {
     const configPath = path.join(this.projectRoot, '.claude', 'config.json');
     let configured = false;
-    let message = 'Not configured — run: obsidian:setup';
+    let message = 'Not configured — in Claude Code run: /obsidian:setup --vault-path /path/to/vault';
 
     if (fs.existsSync(configPath)) {
       try {

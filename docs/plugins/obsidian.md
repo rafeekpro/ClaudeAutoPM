@@ -23,11 +23,18 @@ Or add to an existing installation by selecting scenario 7 during `autopm instal
 
 ## Setup
 
-After installation, configure your vault:
+After installation, configure your vault. The setup command is a **Claude Code slash command** — run it inside a Claude Code session, not in your terminal.
 
 ```bash
+# Step 1: Open your project in Claude Code
+cd your-project
+claude
+
+# Step 2: Inside Claude Code, type the slash command:
 /obsidian:setup --vault-path /path/to/vault --prefix my-project
 ```
+
+> **Note:** `/obsidian:setup` is NOT a terminal command like `autopm install`. It's a slash command that runs inside Claude Code's interactive session. Type it at the Claude Code prompt.
 
 Arguments:
 - `--vault-path` (required): Path to your Obsidian vault folder
@@ -43,6 +50,8 @@ The setup wizard will:
 6. Run the first sync
 
 ## Commands
+
+> All commands below are **Claude Code slash commands**. Open your project with `claude` first, then type the command at the Claude Code prompt.
 
 ### `/obsidian:sync`
 
