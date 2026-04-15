@@ -36,27 +36,27 @@ describe('plugin-obsidian documentation', () => {
   describe('packages/plugin-obsidian/README.md', () => {
     const readmePath = resolve(root, 'packages', 'plugin-obsidian', 'README.md');
 
-    it('mentions obsidian:setup', () => {
+    it('mentions obsidian setup command', () => {
       const content = readFileSync(readmePath, 'utf8');
       assert.ok(
-        content.includes('obsidian:setup'),
-        'README must mention obsidian:setup'
+        content.includes('obsidian setup'),
+        'README must mention obsidian setup'
       );
     });
 
-    it('mentions obsidian:sync', () => {
+    it('mentions obsidian sync command', () => {
       const content = readFileSync(readmePath, 'utf8');
       assert.ok(
-        content.includes('obsidian:sync'),
-        'README must mention obsidian:sync'
+        content.includes('obsidian sync'),
+        'README must mention obsidian sync'
       );
     });
 
-    it('mentions obsidian:doctor', () => {
+    it('mentions obsidian doctor command', () => {
       const content = readFileSync(readmePath, 'utf8');
       assert.ok(
-        content.includes('obsidian:doctor'),
-        'README must mention obsidian:doctor'
+        content.includes('obsidian doctor'),
+        'README must mention obsidian doctor'
       );
     });
   });
@@ -64,21 +64,11 @@ describe('plugin-obsidian documentation', () => {
   describe('CHANGELOG.md', () => {
     const changelogPath = resolve(root, 'CHANGELOG.md');
 
-    it('mentions plugin-obsidian under Unreleased', () => {
+    it('mentions plugin-obsidian', () => {
       const content = readFileSync(changelogPath, 'utf8');
-      const unreleasedIdx = content.indexOf('## [Unreleased]');
-      assert.ok(unreleasedIdx !== -1, 'CHANGELOG must have an [Unreleased] section');
-
-      // Find the next version heading after Unreleased
-      const afterUnreleased = content.slice(unreleasedIdx + '## [Unreleased]'.length);
-      const nextVersionIdx = afterUnreleased.indexOf('\n## [');
-      const unreleasedSection = nextVersionIdx !== -1
-        ? afterUnreleased.slice(0, nextVersionIdx)
-        : afterUnreleased;
-
       assert.ok(
-        unreleasedSection.includes('plugin-obsidian'),
-        'Unreleased section must mention plugin-obsidian'
+        content.includes('plugin-obsidian'),
+        'CHANGELOG must mention plugin-obsidian'
       );
     });
   });

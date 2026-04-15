@@ -50,26 +50,32 @@ autopm install
 
 ## Commands
 
-### `obsidian:setup`
+Available from your terminal via `autopm obsidian <command>` and as `/obsidian:<command>` slash commands inside Claude Code.
 
-Interactive vault configuration wizard. Run once after install.
+### `autopm obsidian setup`
+
+Configure your Obsidian vault. Run once after install:
 
 ```bash
-/obsidian:setup --vault-path /path/to/vault --prefix my-project
+autopm obsidian setup --vault-path "/path/to/your vault" --prefix my-project
+
+# WSL:   --vault-path "/mnt/c/Users/You/Documents/My Vault"
+# macOS: --vault-path "/Users/you/Documents/My Vault"
+# Linux: --vault-path "/home/you/Obsidian/My Vault"
 ```
 
-### `obsidian:sync`
+### `autopm obsidian sync`
 
 Sync project files to the Obsidian vault.
 
 ```bash
-/obsidian:sync              # One-shot sync
-/obsidian:sync --watch      # Continuous sync on file changes
-/obsidian:sync --check      # Dry-run (show what would sync)
-/obsidian:sync --safe-mode  # Don't delete vault files
+autopm obsidian sync              # One-shot sync
+autopm obsidian sync --watch      # Continuous sync on file changes
+autopm obsidian sync --check      # Dry-run (show what would sync)
+autopm obsidian sync --safe-mode  # Don't delete vault files
 ```
 
-### `obsidian:doctor`
+### `autopm obsidian doctor`
 
 Diagnose common integration problems:
 
