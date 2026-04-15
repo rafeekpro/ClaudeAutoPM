@@ -556,6 +556,14 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
    • Advanced users only
 `);
 
+    // Option 7: Obsidian (always available)
+    console.log(`${this.colors.CYAN}7. Obsidian${this.colors.NC} - PM + Obsidian vault integration (rsync, Dataview, templates)
+   • Core + PM + Obsidian vault sync
+   • Unidirectional project → vault mirroring
+   • Best for: Knowledge management, documentation-heavy projects
+   ${this.colors.DIM}• Plugins: core, pm, obsidian (3 plugins)${this.colors.NC}
+`);
+
     if (process.env.AUTOPM_TEST_MODE === '1') {
       this.printMsg('CYAN', 'Auto-selecting option 0 (lite) for test mode');
       return 'lite';
@@ -571,7 +579,7 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
 
     return new Promise((resolve) => {
       const askQuestion = () => {
-        rl.question(`${this.colors.CYAN}Enter your choice (0-6) [${defaultChoice}]: ${this.colors.NC}`, (answer) => {
+        rl.question(`${this.colors.CYAN}Enter your choice (0-7) [${defaultChoice}]: ${this.colors.NC}`, (answer) => {
           const choice = answer.trim() || defaultChoice;
           const scenarios = {
             '0': 'lite',
@@ -580,7 +588,8 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
             '3': 'docker',
             '4': 'full',
             '5': 'performance',
-            '6': 'custom'
+            '6': 'custom',
+            '7': 'obsidian'
           };
 
           const selectedScenario = scenarios[choice];
@@ -608,7 +617,7 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
           }
 
           if (!selectedScenario) {
-            console.log(`${this.colors.RED}✗ Invalid choice. Please select 0-6.${this.colors.NC}`);
+            console.log(`${this.colors.RED}✗ Invalid choice. Please select 0-7.${this.colors.NC}`);
             askQuestion();
             return;
           }
@@ -703,6 +712,16 @@ ${this.colors.BOLD}Select installation scenario:${this.colors.NC}
           kubernetes: { enabled: true }
         },
         plugins: ['plugin-core', 'plugin-languages', 'plugin-frameworks', 'plugin-testing', 'plugin-devops', 'plugin-cloud', 'plugin-databases', 'plugin-data', 'plugin-pm', 'plugin-pm-github', 'plugin-ai', 'plugin-ml']
+      },
+      obsidian: {
+        version: version,
+        installed: new Date().toISOString(),
+        execution_strategy: 'sequential',
+        tools: {
+          docker: { enabled: false },
+          kubernetes: { enabled: false }
+        },
+        plugins: ['plugin-core', 'plugin-pm', 'plugin-obsidian']
       }
     };
 
