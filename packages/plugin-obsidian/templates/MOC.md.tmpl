@@ -1,0 +1,61 @@
+---
+type: moc
+title: "{{PROJECT_NAME}} — Map of Content"
+created: "{{CREATED_DATE}}"
+updated: "{{CREATED_DATE}}"
+tags: [moc, navigation]
+---
+
+# {{PROJECT_NAME}} — Map of Content
+
+## Epics
+
+```dataview
+TABLE status, created, updated
+FROM "{{PREFIX}}/epics"
+WHERE type = "epic"
+SORT status ASC, updated DESC
+```
+
+## Issues
+
+```dataview
+TABLE status, type, tags
+FROM "{{PREFIX}}/issues"
+WHERE type = "issue" OR type = "task"
+SORT status ASC, updated DESC
+```
+
+## PRDs
+
+```dataview
+TABLE status, created
+FROM "{{PREFIX}}/prds"
+WHERE type = "prd"
+SORT created DESC
+```
+
+## Agents
+
+```dataview
+LIST
+FROM "{{PREFIX}}/agents"
+SORT file.name ASC
+```
+
+## Rules
+
+```dataview
+LIST
+FROM "{{PREFIX}}/rules"
+SORT file.name ASC
+```
+
+## Recent Changes
+
+```dataview
+TABLE file.mtime as "Modified"
+FROM "{{PREFIX}}"
+SORT file.mtime DESC
+LIMIT 20
+```

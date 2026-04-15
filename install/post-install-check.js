@@ -37,6 +37,7 @@ class PostInstallChecker {
     this.checkMCPConfiguration();
     this.checkGitHooks();
     this.checkNodeVersion();
+    this.checkObsidianVault();
 
     // Display results
     this.displayResults();
@@ -334,6 +335,34 @@ class PostInstallChecker {
     if (!isSupported) {
       this.results.nextSteps.push('Upgrade Node.js to v18 or higher');
     }
+  }
+
+  /**
+   * Check Obsidian vault configuration
+   */
+  checkObsidianVault() {
+    const configPath = path.join(this.projectRoot, '.claude', 'config.json');
+    let configured = false;
+    let message = 'Not configured — run: obsidian:setup';
+
+    if (fs.existsSync(configPath)) {
+      try {
+        const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        const vaultPath = config.obsidian?.vault_path;
+        if (vaultPath) {
+          configured = true;
+          message = `Vault: ${vaultPath}`;
+        }
+      } catch (error) {
+        // config unreadable, leave as not configured
+      }
+    }
+
+    this.results.optional.push({
+      name: 'Obsidian vault',
+      status: configured,
+      message: message
+    });
   }
 
   /**

@@ -462,7 +462,7 @@ done
 /xml:template create microservice --category dev --stage 2
 
 # Edit to add project-specific constraints
-vim autopm/.claude/templates/xml-prompts/dev/microservice.xml
+vim .claude/templates/xml-prompts/dev/microservice.xml
 
 # Add your patterns:
 # - Service structure requirements

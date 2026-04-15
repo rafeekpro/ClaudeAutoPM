@@ -1,0 +1,51 @@
+{
+  "name": "@claudeautopm/plugin-obsidian",
+  "version": "1.0.0",
+  "description": "Obsidian vault integration plugin for ClaudeAutoPM — sync, Dataview, Mermaid, and Excalidraw support",
+  "main": "plugin.json",
+  "type": "module",
+  "files": [
+    "commands/",
+    "scripts/",
+    "templates/",
+    "claude-md/",
+    "plugin.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "validate": "node -e \"require('./plugin.json')\" && echo 'plugin.json is valid'"
+  },
+  "keywords": [
+    "claudeautopm",
+    "plugin",
+    "obsidian",
+    "vault",
+    "sync",
+    "dataview",
+    "mermaid",
+    "excalidraw"
+  ],
+  "author": "ClaudeAutoPM Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rafeekpro/ClaudeAutoPM.git",
+    "directory": "packages/plugin-obsidian"
+  },
+  "bugs": {
+    "url": "https://github.com/rafeekpro/ClaudeAutoPM/issues"
+  },
+  "homepage": "https://github.com/rafeekpro/ClaudeAutoPM/tree/main/packages/plugin-obsidian#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "peerDependencies": {
+    "@claudeautopm/plugin-core": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}
