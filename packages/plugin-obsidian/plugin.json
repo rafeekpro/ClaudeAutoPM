@@ -1,0 +1,54 @@
+{
+  "name": "@claudeautopm/plugin-obsidian",
+  "version": "1.0.0",
+  "schemaVersion": "2.0",
+  "displayName": "Obsidian Vault Integration",
+  "description": "Obsidian vault mirror integration with Dataview, Mermaid, Excalidraw and canonical frontmatter support",
+  "category": "integration",
+  "metadata": {
+    "category": "Integration",
+    "author": "ClaudeAutoPM Team",
+    "license": "MIT",
+    "homepage": "https://github.com/rafeekpro/ClaudeAutoPM",
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/rafeekpro/ClaudeAutoPM.git",
+      "directory": "packages/plugin-obsidian"
+    },
+    "size": "~10 KB (gzipped)",
+    "required": false,
+    "tags": ["obsidian", "vault", "sync", "dataview", "integration"]
+  },
+  "scripts": [],
+  "commands": [
+    {
+      "subdirectory": "commands/",
+      "description": "Obsidian vault management commands",
+      "type": "collection",
+      "categories": {
+        "obsidian": "Obsidian vault integration commands"
+      },
+      "discovery": "auto",
+      "tags": ["obsidian", "vault", "sync"]
+    }
+  ],
+  "features": {
+    "vault_sync": {
+      "enabled": true,
+      "description": "Unidirectional project-to-vault sync"
+    },
+    "setup_wizard": {
+      "enabled": true,
+      "description": "Interactive vault configuration wizard"
+    },
+    "diagnostics": {
+      "enabled": true,
+      "description": "Doctor command for troubleshooting"
+    }
+  },
+  "rules": [],
+  "dependencies": [],
+  "peerPlugins": ["@claudeautopm/plugin-core"],
+  "keywords": ["claudeautopm", "obsidian", "vault", "sync", "dataview", "mermaid", "excalidraw"],
+  "compatibleWith": ">=3.0.0"
+}

@@ -435,7 +435,7 @@ Create templates tailored to your project:
   --stage 2
 
 # Edit template
-vim autopm/.claude/templates/xml-prompts/dev/microservice.xml
+vim .claude/templates/xml-prompts/dev/microservice.xml
 
 # Use custom template
 /prompt:xml microservice \
@@ -522,5 +522,5 @@ Solution: Provide missing flag
   - `.claude/commands/xml/prompt-xml.md`
   - `.claude/commands/xml/template.md`
 - **Utilities:**
-  - `autopm/.claude/lib/xml-prompt-builder.js`
-  - `autopm/.claude/lib/xml-validator.js`
+  - `.claude/lib/xml-prompt-builder.js`
+  - `.claude/lib/xml-validator.js`
