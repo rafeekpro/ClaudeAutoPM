@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.23.2] - 2026-04-15
+
+### Changed
+- Bumped dependencies via Dependabot:
+  - `@playwright/mcp` 0.0.68 → 0.0.70 (#536)
+  - `inquirer` 12.11.1 → 13.3.2 (#535)
+  - `marked` 16.4.2 → 17.0.6 (#533)
+  - `c8` 10.x → 11.0.0 (#532)
+  - `actions/setup-node` 4 → 6 (#531)
+  - `actions/deploy-pages` 4 → 5 (#530)
+  - `actions/configure-pages` 4 → 6 (#529)
+
 ## [3.21.0] - 2026-04-01
 
 ### Changed
