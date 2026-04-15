@@ -36,27 +36,27 @@ describe('plugin-obsidian documentation', () => {
   describe('packages/plugin-obsidian/README.md', () => {
     const readmePath = resolve(root, 'packages', 'plugin-obsidian', 'README.md');
 
-    it('mentions obsidian:setup', () => {
+    it('mentions obsidian setup command', () => {
       const content = readFileSync(readmePath, 'utf8');
       assert.ok(
-        content.includes('obsidian:setup'),
-        'README must mention obsidian:setup'
+        content.includes('obsidian setup'),
+        'README must mention obsidian setup'
       );
     });
 
-    it('mentions obsidian:sync', () => {
+    it('mentions obsidian sync command', () => {
       const content = readFileSync(readmePath, 'utf8');
       assert.ok(
-        content.includes('obsidian:sync'),
-        'README must mention obsidian:sync'
+        content.includes('obsidian sync'),
+        'README must mention obsidian sync'
       );
     });
 
-    it('mentions obsidian:doctor', () => {
+    it('mentions obsidian doctor command', () => {
       const content = readFileSync(readmePath, 'utf8');
       assert.ok(
-        content.includes('obsidian:doctor'),
-        'README must mention obsidian:doctor'
+        content.includes('obsidian doctor'),
+        'README must mention obsidian doctor'
       );
     });
   });

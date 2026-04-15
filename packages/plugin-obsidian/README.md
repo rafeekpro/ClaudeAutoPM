@@ -50,31 +50,28 @@ autopm install
 
 ## Commands
 
-> **These are Claude Code slash commands.** Run them inside a Claude Code session (`claude`), not in your terminal directly.
+Available from your terminal via `autopm obsidian <command>` and as `/obsidian:<command>` slash commands inside Claude Code.
 
-### `obsidian:setup`
+### `autopm obsidian setup`
 
-Interactive vault configuration wizard. Run once after install:
+Configure your Obsidian vault. Run once after install:
 
-1. Open your project in Claude Code: `cd your-project && claude`
-2. Type the slash command:
-
-```
-/obsidian:setup --vault-path /path/to/vault --prefix my-project
+```bash
+autopm obsidian setup --vault-path /path/to/vault --prefix my-project
 ```
 
-### `obsidian:sync`
+### `autopm obsidian sync`
 
 Sync project files to the Obsidian vault.
 
 ```bash
-/obsidian:sync              # One-shot sync
-/obsidian:sync --watch      # Continuous sync on file changes
-/obsidian:sync --check      # Dry-run (show what would sync)
-/obsidian:sync --safe-mode  # Don't delete vault files
+autopm obsidian sync              # One-shot sync
+autopm obsidian sync --watch      # Continuous sync on file changes
+autopm obsidian sync --check      # Dry-run (show what would sync)
+autopm obsidian sync --safe-mode  # Don't delete vault files
 ```
 
-### `obsidian:doctor`
+### `autopm obsidian doctor`
 
 Diagnose common integration problems:
 

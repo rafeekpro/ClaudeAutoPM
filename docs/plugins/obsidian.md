@@ -23,18 +23,11 @@ Or add to an existing installation by selecting scenario 7 during `autopm instal
 
 ## Setup
 
-After installation, configure your vault. The setup command is a **Claude Code slash command** — run it inside a Claude Code session, not in your terminal.
+After installation, configure your vault:
 
 ```bash
-# Step 1: Open your project in Claude Code
-cd your-project
-claude
-
-# Step 2: Inside Claude Code, type the slash command:
-/obsidian:setup --vault-path /path/to/vault --prefix my-project
+autopm obsidian setup --vault-path /path/to/vault --prefix my-project
 ```
-
-> **Note:** `/obsidian:setup` is NOT a terminal command like `autopm install`. It's a slash command that runs inside Claude Code's interactive session. Type it at the Claude Code prompt.
 
 Arguments:
 - `--vault-path` (required): Path to your Obsidian vault folder
@@ -51,22 +44,22 @@ The setup wizard will:
 
 ## Commands
 
-> All commands below are **Claude Code slash commands**. Open your project with `claude` first, then type the command at the Claude Code prompt.
+> Commands are available both as `autopm obsidian <command>` in your terminal and as `/obsidian:<command>` slash commands inside Claude Code.
 
-### `/obsidian:sync`
+### `autopm obsidian sync`
 
 Sync project files to the Obsidian vault.
 
 ```bash
-/obsidian:sync              # One-shot sync
-/obsidian:sync --watch      # Continuous sync on file changes
-/obsidian:sync --check      # Dry-run (show what would sync)
-/obsidian:sync --safe-mode  # Don't delete vault files
+autopm obsidian sync              # One-shot sync
+autopm obsidian sync --watch      # Continuous sync on file changes
+autopm obsidian sync --check      # Dry-run (show what would sync)
+autopm obsidian sync --safe-mode  # Don't delete vault files
 ```
 
-Flags can be combined: `/obsidian:sync --watch --safe-mode`
+Flags can be combined: `autopm obsidian sync --watch --safe-mode`
 
-### `/obsidian:doctor`
+### `autopm obsidian doctor`
 
 Diagnose common integration problems:
 
@@ -76,9 +69,9 @@ Diagnose common integration problems:
 4. Wrong Dataview FROM prefix
 5. Broken symlink between `.claude/issues` and `issues/`
 
-### `/obsidian:setup`
+### `autopm obsidian setup`
 
-Interactive vault configuration (run once after install).
+Vault configuration wizard (run once after install).
 
 ## Sync Mapping
 
@@ -127,11 +120,11 @@ See `packages/plugin-obsidian/templates/FRONTMATTER_SCHEMA.md` for full schema.
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| Dataview shows no results | Wrong prefix or dotfolder issue | Run `/obsidian:doctor` |
+| Dataview shows no results | Wrong prefix or dotfolder issue | Run `autopm obsidian doctor` |
 | Sync fails with "rsync not found" | rsync not installed | `sudo apt install rsync` (Linux) or `brew install rsync` (macOS) |
 | Watch mode doesn't detect changes | Missing inotify-tools/fswatch | `sudo apt install inotify-tools` (Linux) or `brew install fswatch` (macOS) |
-| Files appear in vault but Dataview can't see them | Files in dotfolder | Run `/obsidian:setup` to migrate `.claude/issues/` to `issues/` |
-| Symlink broken after git pull | Target deleted | Run `/obsidian:doctor` check 5 |
+| Files appear in vault but Dataview can't see them | Files in dotfolder | Run `autopm obsidian setup` to migrate `.claude/issues/` to `issues/` |
+| Symlink broken after git pull | Target deleted | Run `autopm obsidian doctor` check 5 |
 | WSL vault path unreachable | Using `\\wsl.localhost\...` path | Use a Windows path (e.g., `/mnt/c/Users/.../vault`) or a local Linux path |
 
 ## Configuration
