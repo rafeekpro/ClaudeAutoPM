@@ -7,8 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.24.0] - 2026-04-15
+
 ### Added
-- **plugin-obsidian**: `autopm obsidian` CLI subcommands (setup, sync, doctor) — no longer requires Claude Code session
+- **plugin-obsidian**: `autopm obsidian` CLI subcommands (setup, sync, doctor) — no longer requires Claude Code session (#549)
 - **plugin-obsidian**: Quoted path examples per platform (WSL, macOS, Linux) in post-install next steps
 - **plugin-obsidian**: `autopm validate` shows Obsidian vault configuration status
 
