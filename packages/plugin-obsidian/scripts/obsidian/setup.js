@@ -158,7 +158,12 @@ function substituteTemplate(content, vars) {
 // ─── Template generation ────────────────────────────────────────────
 
 function generateTemplates(vaultDest, prefix, projectRoot) {
-  const templatesDir = join(__dirname, '..', '..', 'templates');
+  // Find templates: check relative to script first, then source repo from project root
+  const candidates = [
+    join(__dirname, '..', '..', 'templates'),
+    join(projectRoot, 'packages', 'plugin-obsidian', 'templates'),
+  ];
+  const templatesDir = candidates.find(d => existsSync(join(d, 'MOC.md.tmpl'))) || candidates[0];
   const createdDate = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
   const projectName = prefix;
 
