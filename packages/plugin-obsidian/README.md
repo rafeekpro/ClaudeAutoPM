@@ -75,6 +75,15 @@ autopm obsidian sync --check      # Dry-run (show what would sync)
 autopm obsidian sync --safe-mode  # Don't delete vault files
 ```
 
+### `/obsidian:init` (Claude Code)
+
+Generate project-aware vault files by reading your actual project structure. Unlike generic templates, this reads your real issues, epics, agents, and code to create tailored MOC, Dashboard, diagrams, and templates.
+
+```
+/obsidian:init          # Generate vault files
+/obsidian:init --force  # Overwrite existing files
+```
+
 ### `autopm obsidian doctor`
 
 Diagnose common integration problems:
