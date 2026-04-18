@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.25.0] - 2026-04-18
+
+### Added
+- **plugin-obsidian**: `/obsidian:init` command — reads project structure and generates project-aware MOC, Dashboard, templates, and architecture diagrams for Obsidian vault (#555)
+
 ## [3.24.2] - 2026-04-18
 
 ### Fixed
