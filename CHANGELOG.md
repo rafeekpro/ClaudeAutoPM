@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.24.1] - 2026-04-18
+
+### Fixed
+- **plugin-obsidian**: Register `setup.js` and `doctor.js` in plugin manifest — were missing from install (#551)
+- **plugin-obsidian**: CLI resolves scripts from `.claude/scripts/obsidian/` (installed) instead of hardcoded `packages/` path
+- **plugin-obsidian**: Template finder checks for `MOC.md.tmpl` marker instead of matching wrong `.claude/templates/` directory
+
 ## [3.24.0] - 2026-04-15
 
 ### Added
