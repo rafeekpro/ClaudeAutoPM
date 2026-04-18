@@ -115,6 +115,11 @@ function findProjectRoot(startDir) {
 function validateVaultPath(vaultPath) {
   if (!existsSync(vaultPath)) {
     err(`Vault path does not exist: ${vaultPath}`);
+    if (/^[A-Za-z]:[\\\/]/.test(vaultPath)) {
+      err('Detected Windows path format. On WSL, use /mnt/c/... format:');
+      const drive = vaultPath[0].toLowerCase();
+      err(`  ${'/mnt/' + drive + vaultPath.slice(2).replace(/\\/g, '/')}`);
+    }
     process.exit(1);
   }
   try {
@@ -373,8 +378,16 @@ function main() {
     process.exit(1);
   }
 
+  // Convert Windows paths to WSL paths if needed (e.g., C:\Users\... → /mnt/c/Users/...)
+  let rawVaultPath = args.vaultPath;
+  if (detectEnvironment() === 'wsl' && /^[A-Za-z]:[\\\/]/.test(rawVaultPath)) {
+    const drive = rawVaultPath[0].toLowerCase();
+    rawVaultPath = '/mnt/' + drive + rawVaultPath.slice(2).replace(/\\/g, '/');
+    log(`Converted Windows path to WSL: ${rawVaultPath}`);
+  }
+
   // Resolve paths
-  const vaultPath = resolve(args.vaultPath);
+  const vaultPath = resolve(rawVaultPath);
   const projectRoot = args.projectRoot ? resolve(args.projectRoot) : findProjectRoot(process.cwd());
   const prefix = args.prefix || basename(projectRoot);
   const configPath = join(projectRoot, '.claude', 'config.json');
