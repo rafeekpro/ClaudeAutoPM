@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.24.2] - 2026-04-18
+
+### Fixed
+- **plugin-obsidian**: Auto-convert Windows paths to WSL format (`C:\Users\...` → `/mnt/c/Users/...`) (#553)
+- **plugin-obsidian**: Show helpful hint when vault path uses Windows format on WSL
+
 ## [3.24.1] - 2026-04-18
 
 ### Fixed
