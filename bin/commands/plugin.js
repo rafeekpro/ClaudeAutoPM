@@ -266,8 +266,10 @@ async function handleInstall(manager, pluginName, argv) {
     console.log(chalk.gray(`npm package already installed: @claudeautopm/${fullPluginName}`));
   }
 
-  // Install plugin agents
-  console.log(chalk.gray('Installing plugin agents...'));
+  // Discover and install plugin resources
+  console.log(chalk.gray('Discovering plugins...'));
+  await manager.initialize();
+  console.log(chalk.gray('Installing plugin resources...'));
   const result = await manager.installPlugin(fullPluginName);
 
   console.log(chalk.green(`\n✓ Plugin installed successfully!`));
