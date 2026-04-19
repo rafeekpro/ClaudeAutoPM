@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.25.3] - 2026-04-19
+
+### Fixed
+- **PluginManager**: Install scripts to `.claude/scripts/` instead of project root `scripts/` (#563)
+
 ## [3.25.2] - 2026-04-19
 
 ### Fixed
