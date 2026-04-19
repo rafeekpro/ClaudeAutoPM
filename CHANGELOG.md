@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.25.4] - 2026-04-19
+
+### Fixed
+- **PluginManager**: Read autopm framework version for compatibility checks, not user's project version (#565)
+
 ## [3.25.3] - 2026-04-19
 
 ### Fixed
