@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.25.2] - 2026-04-19
+
+### Fixed
+- **PluginManager**: Discover plugins from global npm path — `autopm plugin install` now works for globally installed plugins (#561)
+- **PluginManager**: Normalize plugin names (accept both `plugin-obsidian` and `@claudeautopm/plugin-obsidian`)
+- **PluginManager**: Handle schema v2.0 auto-discovery for commands subdirectory
+- **PluginManager**: Guard against missing `agents` array in plugin manifest
+
 ## [3.25.1] - 2026-04-19
 
 ### Fixed
