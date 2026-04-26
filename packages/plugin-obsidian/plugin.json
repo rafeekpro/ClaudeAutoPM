@@ -55,6 +55,15 @@
       "executable": true,
       "category": "sync",
       "tags": ["sync", "node", "vault"]
+    },
+    {
+      "name": "link-vault",
+      "file": "scripts/obsidian/link-vault.js",
+      "description": "Inject wikilinks into project files for Obsidian Graph View",
+      "type": "utility",
+      "executable": true,
+      "category": "linking",
+      "tags": ["wikilinks", "graph", "vault"]
     }
   ],
   "commands": [
