@@ -352,9 +352,31 @@ Open this file in Excalidraw to start drawing.
 %%
 ```
 
-### 8. Run Sync
+### 8. Inject Wikilinks
 
-After generating all files, run a sync to push everything to the vault:
+After generating vault files, scan ALL project markdown files (issues, epics, PRDs) and inject `[[wikilinks]]` to connect related content. This powers Obsidian's Graph View.
+
+For each file in `issues/`, `.claude/issues/`, `.claude/epics/`, `.claude/prds/`, `prds/`:
+- Scan for `#NNN` references → convert to `[[issues/NNN|#NNN]]`
+- Scan frontmatter `depends_on` → link to referenced tasks
+- Scan frontmatter `github` → link to issue number
+- Link tasks to their parent epic: `[[epics/{name}/epic|{name}]]`
+- Link PRDs to matching epics if they exist
+- Add or update a `## Related` section at the end of each file with all discovered links
+- **Never overwrite existing content** — only add/update the Related section
+
+```bash
+# Run link script
+if [ -f ".claude/scripts/obsidian/link-vault.js" ]; then
+  node .claude/scripts/obsidian/link-vault.js
+elif [ -f "packages/plugin-obsidian/scripts/obsidian/link-vault.js" ]; then
+  node packages/plugin-obsidian/scripts/obsidian/link-vault.js
+fi
+```
+
+### 9. Run Sync
+
+After generating files and injecting links, sync everything to the vault:
 
 ```bash
 # Find and run sync script
@@ -365,7 +387,7 @@ elif [ -f "packages/plugin-obsidian/scripts/obsidian/sync-to-obsidian.sh" ]; the
 fi
 ```
 
-### 9. Output Summary
+### 10. Output Summary
 
 ```
 Obsidian vault initialized for {project_name}
