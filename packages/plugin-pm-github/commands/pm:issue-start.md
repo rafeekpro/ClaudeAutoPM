@@ -22,7 +22,16 @@ Begin work on a GitHub issue with parallel agents based on work stream analysis.
 2. **Find local task file:**
    - First check if `.claude/epics/*/$ARGUMENTS.md` exists (new naming)
    - If not found, search for file containing `github:.*issues/$ARGUMENTS` in frontmatter (old naming)
-   - If not found: "❌ No local task for issue #$ARGUMENTS. This issue may have been created outside the PM system."
+   - If not found, the issue exists on GitHub but isn't tracked locally yet. Tell the user:
+     ```
+     ❌ No local task for issue #$ARGUMENTS.
+
+     This issue exists on GitHub but isn't tracked locally yet.
+     Import it first, then run /pm:issue-start $ARGUMENTS again:
+
+       /pm:import $ARGUMENTS    # Import this single issue
+       /pm:import               # Import all untracked issues
+     ```
 
 3. **Check for analysis (when NOT using --analyze flag):**
    - If user didn't use `--analyze` flag, check if analysis file exists
