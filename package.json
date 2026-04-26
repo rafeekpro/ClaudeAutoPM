@@ -159,7 +159,7 @@
     "jest-html-reporter": "^4.3.0",
     "jest-junit": "^16.0.0",
     "jest-watch-typeahead": "^3.0.1",
-    "markdownlint-cli": "^0.37.0",
+    "markdownlint-cli": "^0.48.0",
     "mocha": "^11.7.2",
     "nock": "^14.0.10",
     "prettier": "^3.0.0",
