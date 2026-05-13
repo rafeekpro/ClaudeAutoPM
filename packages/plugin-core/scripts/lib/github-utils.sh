@@ -93,7 +93,7 @@ create_github_issue() {
     check_gh_auth
 
     # Create issue with split label flags
-    local label_flags
+    local -a label_flags
     mapfile -t label_flags < <(build_label_flags "$labels")
     local issue_number
     if ! issue_output=$(gh issue create \
@@ -123,7 +123,7 @@ create_github_subissue() {
     log_info "Creating GitHub sub-issue under #$parent_issue: $title"
 
     # Build split label flags
-    local label_flags
+    local -a label_flags
     mapfile -t label_flags < <(build_label_flags "$labels")
 
     # Check if gh-sub-issue extension is available

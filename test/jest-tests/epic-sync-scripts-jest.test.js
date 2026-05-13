@@ -246,7 +246,7 @@ Just content, no horizontal rules.
       // Must NOT contain comma-separated labels in a single --label flag
       expect(script).not.toMatch(/--label\s+"[^"]*,[^"]*"/);
       // Must NOT pass $labels as a single --label (which contained comma-separated values)
-      expect(script).not.toMatch(/--label\s+"\$labels"/);
+      expect(script).not.toMatch(/--label\s+"\$\{?labels\}?"/);
     });
 
     test('github-utils.sh create_github_issue should use build_label_flags', () => {
@@ -258,7 +258,7 @@ Just content, no horizontal rules.
       // Should have a build_label_flags function
       expect(script).toContain('build_label_flags()');
       // create_github_issue should NOT use --label "$labels" directly
-      expect(script).not.toMatch(/gh issue create[\s\S]*?--label "\$labels"/);
+      expect(script).not.toMatch(/gh issue create[\s\S]*?--label "\$\{?labels\}?"/);
       // Should use "${label_flags[@]}" instead
       expect(script).toContain('"${label_flags[@]}"');
     });
@@ -271,7 +271,7 @@ Just content, no horizontal rules.
 
       // The sub-issue create block should NOT use --label "$labels"
       const subissueBlock = script.split('create_github_subissue')[1] || '';
-      expect(subissueBlock).not.toMatch(/--label "\$labels"/);
+      expect(subissueBlock).not.toMatch(/--label "\$\{?labels\}?"/);
       // Should use label_flags
       expect(subissueBlock).toContain('label_flags');
     });
