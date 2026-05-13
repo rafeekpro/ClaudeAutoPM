@@ -223,6 +223,71 @@ Just content, no horizontal rules.
     });
   });
 
+  describe('Bug #6: comma-separated labels in --label flag', () => {
+    test('create-task-issues.sh should use separate --label flags', () => {
+      const script = fs.readFileSync(
+        path.join(SCRIPTS_DIR, 'create-task-issues.sh'),
+        'utf8'
+      );
+
+      // Must NOT contain comma-separated labels in a single --label flag
+      expect(script).not.toMatch(/--label\s+"[^"]*,[^"]*"/);
+      // Must have separate --label "task" and --label "epic:
+      expect(script).toMatch(/--label\s+"task"/);
+      expect(script).toMatch(/--label\s+"epic:/);
+    });
+
+    test('create-epic-issue.sh should use separate --label flags', () => {
+      const script = fs.readFileSync(
+        path.join(SCRIPTS_DIR, 'create-epic-issue.sh'),
+        'utf8'
+      );
+
+      // Must NOT contain comma-separated labels in a single --label flag
+      expect(script).not.toMatch(/--label\s+"[^"]*,[^"]*"/);
+      // Must NOT pass $labels as a single --label (which contained comma-separated values)
+      expect(script).not.toMatch(/--label\s+"\$labels"/);
+    });
+
+    test('github-utils.sh create_github_issue should use build_label_flags', () => {
+      const script = fs.readFileSync(
+        path.join(__dirname, '..', '..', '.claude', 'scripts', 'lib', 'github-utils.sh'),
+        'utf8'
+      );
+
+      // Should have a build_label_flags function
+      expect(script).toContain('build_label_flags()');
+      // create_github_issue should NOT use --label "$labels" directly
+      expect(script).not.toMatch(/gh issue create[\s\S]*?--label "\$labels"/);
+      // Should use "${label_flags[@]}" instead
+      expect(script).toContain('"${label_flags[@]}"');
+    });
+
+    test('github-utils.sh create_github_subissue should use build_label_flags', () => {
+      const script = fs.readFileSync(
+        path.join(__dirname, '..', '..', '.claude', 'scripts', 'lib', 'github-utils.sh'),
+        'utf8'
+      );
+
+      // The sub-issue create block should NOT use --label "$labels"
+      const subissueBlock = script.split('create_github_subissue')[1] || '';
+      expect(subissueBlock).not.toMatch(/--label "\$labels"/);
+      // Should use label_flags
+      expect(subissueBlock).toContain('label_flags');
+    });
+
+    test('no comma-separated labels in any epic-sync script', () => {
+      const scriptFiles = fs.readdirSync(SCRIPTS_DIR)
+        .filter(f => f.endsWith('.sh'));
+
+      for (const file of scriptFiles) {
+        const content = fs.readFileSync(path.join(SCRIPTS_DIR, file), 'utf8');
+        const commaLabelMatches = content.match(/--label\s+"[^"]*,[^"]*"/g);
+        expect(commaLabelMatches).toBeNull();
+      }
+    });
+  });
+
   describe('Bug #5: title fallback', () => {
     test('create-task-issues.sh should have separate fallback for empty title', () => {
       const script = fs.readFileSync(

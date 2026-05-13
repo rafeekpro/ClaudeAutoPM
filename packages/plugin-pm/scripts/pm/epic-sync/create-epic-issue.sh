@@ -45,15 +45,15 @@ task_count=$(find ".claude/epics/$EPIC_NAME" -name "[0-9]*.md" -type f 2>/dev/nu
 
 # Detect epic type (bug vs feature)
 if echo "$epic_content" | grep -qi "bug\|fix\|error\|issue"; then
-    labels="epic,bug"
+    epic_type="bug"
 else
-    labels="epic,feature"
+    epic_type="feature"
 fi
 
 # Create issue
 echo "📝 Creating epic issue for: $EPIC_NAME" >&2
 echo "   Tasks: $task_count" >&2
-echo "   Labels: $labels" >&2
+echo "   Labels: epic, $epic_type" >&2
 
 # Write body to temp file for --body-file
 body_tmpfile=$(mktemp /tmp/epic-body-XXXXXX.md)
@@ -71,7 +71,8 @@ EOF
 issue_url=$(gh issue create \
     --title "Epic: $EPIC_NAME" \
     --body-file "$body_tmpfile" \
-    --label "$labels")
+    --label "epic" \
+    --label "$epic_type")
 rm -f "$body_tmpfile"
 
 epic_number=$(echo "$issue_url" | grep -o '[0-9]\+$')
