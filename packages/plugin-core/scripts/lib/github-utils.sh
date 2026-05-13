@@ -60,6 +60,16 @@ check_repo_protection() {
     return 0
 }
 
+# Build separate --label flags from a comma-separated label string
+build_label_flags() {
+    local labels="$1"
+    local IFS=','
+    for label in $labels; do
+        echo "--label"
+        echo "$label"
+    done
+}
+
 # Create GitHub issue with proper error handling
 create_github_issue() {
     local title="$1"
@@ -82,12 +92,14 @@ create_github_issue() {
     # Check authentication
     check_gh_auth
 
-    # Create issue
+    # Create issue with split label flags
+    local -a label_flags
+    mapfile -t label_flags < <(build_label_flags "$labels")
     local issue_number
     if ! issue_output=$(gh issue create \
         --title "$title" \
         --body-file "$body_file" \
-        --label "$labels" \
+        "${label_flags[@]}" \
         --json number 2>/dev/null); then
         log_error "Failed to create GitHub issue"
         return 1
@@ -110,6 +122,10 @@ create_github_subissue() {
 
     log_info "Creating GitHub sub-issue under #$parent_issue: $title"
 
+    # Build split label flags
+    local -a label_flags
+    mapfile -t label_flags < <(build_label_flags "$labels")
+
     # Check if gh-sub-issue extension is available
     if gh extension list | grep -q "yahsan2/gh-sub-issue"; then
         local issue_number
@@ -117,7 +133,7 @@ create_github_subissue() {
             --parent "$parent_issue" \
             --title "$title" \
             --body-file "$body_file" \
-            --label "$labels" \
+            "${label_flags[@]}" \
             --json number -q .number 2>/dev/null); then
             log_error "Failed to create GitHub sub-issue"
             return 1
