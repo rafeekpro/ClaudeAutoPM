@@ -73,7 +73,8 @@ EOF
     issue_url=$(gh issue create \
         --title "$task_title" \
         --body-file "$body_tmpfile" \
-        --label "task,epic:$EPIC_NAME")
+        --label "task" \
+        --label "epic:$EPIC_NAME")
     rm -f "$body_tmpfile"
 
     issue_number=$(echo "$issue_url" | grep -o '[0-9]\+$')
