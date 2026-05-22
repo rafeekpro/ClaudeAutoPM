@@ -1,6 +1,6 @@
 {
   "name": "@claudeautopm/plugin-pm",
-  "version": "3.13.0",
+  "version": "3.13.1",
   "description": "Complete project management plugin with PM workflows, epic management, issue tracking, and release automation for ClaudeAutoPM",
   "main": "plugin.json",
   "type": "module",

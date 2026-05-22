@@ -4,30 +4,56 @@ allowed-tools: Bash, Read, Write, LS, Task
 
 # Issue Start
 
-Begin work on a GitHub issue with parallel agents based on work stream analysis.
+Begin work on an issue. Auto-detects local (Lite) or GitHub mode from git remote.
 
 ## Usage
 ```
-/pm:issue-start <issue_number> [--analyze]
+/pm:issue-start <issue_id> [--analyze]
 ```
 
-## Argument Parsing
+`issue_id` can be a local file ID (`demo-001`, `001`) or a GitHub issue number.
 
-**CRITICAL**: `$ARGUMENTS` may contain both the issue number and flags (e.g. `123 --analyze`).
-Always extract the issue number and flags separately before proceeding:
+## Step 0 — Detect provider
 
 ```bash
-# Extract issue number (first numeric argument) and flags from $ARGUMENTS
-ISSUE_NUMBER=$(echo "$ARGUMENTS" | grep -oE '^[0-9]+')
+ISSUE_ID=$(echo "$ARGUMENTS" | awk '{print $1}')
 HAS_ANALYZE=$(echo "$ARGUMENTS" | grep -q '\-\-analyze' && echo "true" || echo "false")
+
+PROVIDER="local"
+if git remote get-url origin 2>/dev/null | grep -q "github.com"; then
+  PROVIDER="github"
+elif [ -n "$AZURE_DEVOPS_ORG" ] || [ -f ".azure" ]; then
+  PROVIDER="azure"
+fi
+echo "Provider: $PROVIDER"
 ```
 
-All subsequent steps MUST use `$ISSUE_NUMBER` (not raw `$ARGUMENTS`) wherever an issue number is expected.
+**PROVIDER=`local`** → LOCAL FLOW · **PROVIDER=`github`** → GITHUB FLOW
 
-## Quick Check
+---
+
+## LOCAL FLOW (Lite — no GitHub remote)
+
+```bash
+ISSUE_FILE=$(find .claude/issues -name "${ISSUE_ID}.md" 2>/dev/null | head -1)
+[ -z "$ISSUE_FILE" ] && echo "❌ Not found: .claude/issues/${ISSUE_ID}.md — ls .claude/issues/" && exit 1
+```
+
+1. Update `status: open` → `status: in-progress` in frontmatter
+2. Update `updated:` with `date -u +"%Y-%m-%dT%H:%M:%SZ"`
+3. Add entry to `.claude/active-work.json`
+4. Show issue content and begin working on it
+5. Output: `🚀 Local issue $ISSUE_ID started — close with: /pm:issue-close $ISSUE_ID`
+
+---
+
+## GITHUB FLOW
+
+### Quick Check
 
 1. **Get issue details:**
    ```bash
+   ISSUE_NUMBER=$ISSUE_ID
    gh issue view $ISSUE_NUMBER --json state,title,labels,body
    ```
    If it fails: "❌ Cannot access issue #$ISSUE_NUMBER. Check number or run: gh auth login"
