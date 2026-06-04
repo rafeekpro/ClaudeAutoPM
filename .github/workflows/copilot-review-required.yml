@@ -1,0 +1,144 @@
+name: AI Review Gate (Claude Sonnet via claude-bridge) — ClaudeAutoPM
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+concurrency:
+  group: ai-review-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ai-review:
+    name: ai-review
+    runs-on: [self-hosted, claude-bridge]
+    timeout-minutes: 20
+    # Fork-PR guard: NEVER run untrusted fork code on the self-hosted runner
+    # (pwn-request — the runner holds the Claude subscription session).
+    if: >-
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute PR diff
+        id: diff
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git diff "$BASE_SHA" "$HEAD_SHA" > "$RUNNER_TEMP/pr.diff" 2>/dev/null || true
+          echo "bytes=$(wc -c < "$RUNNER_TEMP/pr.diff" 2>/dev/null || echo 0)" >> "$GITHUB_OUTPUT"
+
+      - name: Single-call review via claude-bridge
+        uses: actions/github-script@v7
+        env:
+          PR_DIFF_PATH: ${{ runner.temp }}/pr.diff
+        with:
+          script: |
+            const fs = require('fs');
+            const os = require('os');
+            const path = require('path');
+            const { execFileSync } = require('child_process');
+
+            const sha = context.payload.pull_request.head.sha;
+            const CHECK = 'copilot-review';
+
+            // ---- per-repo PROJECT_CONTEXT_BRIEF (lives in .github/review-context.md) ----
+            let BRIEF = '';
+            try { BRIEF = fs.readFileSync('.github/review-context.md', 'utf8'); } catch (e) {}
+
+            const redactSecrets = (s) => String(s || '')
+              .replace(/("(?:access_token|id_token|refresh_token|api_key|apikey|secret|client_secret|private_key|aws_secret_access_key|OPENAI_API_KEY|account_id|password|passwd|token)"\s*:\s*")[^"]+/gi, '$1[REDACTED]')
+              .replace(/eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}/g, '[REDACTED-JWT]')
+              .replace(/sk-ant-[A-Za-z0-9_-]{20,}/g, 'sk-ant-[REDACTED]')
+              .replace(/sk-[A-Za-z0-9_-]{20,}/g, 'sk-[REDACTED]')
+              .replace(/ghp_[A-Za-z0-9]{36}/g, 'ghp_[REDACTED]')
+              .replace(/github_pat_[A-Za-z0-9_]{50,}/g, 'github_pat_[REDACTED]')
+              .replace(/AKIA[0-9A-Z]{16}/g, 'AKIA[REDACTED]')
+              .replace(/AIza[0-9A-Za-z_-]{35}/g, 'AIza[REDACTED]');
+
+            let diff = '';
+            try { diff = fs.readFileSync(process.env.PR_DIFF_PATH, 'utf8'); } catch (e) {}
+            if (diff.length > 200000) diff = diff.slice(0, 200000) + '\n…[diff truncated]';
+
+            const prompt = [
+              BRIEF,
+              '',
+              'You are a senior code reviewer. Review ONLY the diff below for HIGH/MEDIUM/LOW issues',
+              '(security, correctness, data-loss, broken contracts). Ignore style nits and pre-existing',
+              'tech debt outside the diff. If unsure, do not invent findings.',
+              '',
+              'Respond with ONLY a JSON object, no prose:',
+              '{"verdict":"approve|request_changes","summary":"<=600 chars","findings":[{"severity":"HIGH|MEDIUM|LOW","file":"path","line":<int|null>,"message":"<=300 chars"}]}',
+              '',
+              '--- DIFF ---',
+              diff || '(empty diff)'
+            ].join('\n');
+
+            // ---- claude-bridge Mode B (subscription, no --print); env-strip is critical ----
+            const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'air-'));
+            const env = { ...process.env };
+            for (const k of ['CLAUDECODE','CLAUDE_CODE_ENTRYPOINT','CLAUDE_CODE_SESSION','CLAUDE_CODE_PARENT_SESSION',
+                             'ANTHROPIC_API_KEY','ANTHROPIC_AUTH_TOKEN','ANTHROPIC_BASE_URL']) delete env[k];
+
+            let raw = '';
+            try {
+              raw = execFileSync('claude',
+                ['--model','claude-sonnet-4-6','--allowedTools','','--max-turns','1','--dangerously-skip-permissions'],
+                { cwd: scratch, env, input: prompt, timeout: 180000, maxBuffer: 16*1024*1024, encoding: 'utf8' });
+            } catch (e) {
+              raw = (e.stdout || '') + '';
+            }
+
+            // ---- parse: strip ANSI, JSON.parse, else balanced-brace extract ----
+            const clean = raw.replace(/\x1b\[[0-9;]*[A-Za-z]/g, '');
+            let obj = null;
+            try { obj = JSON.parse(clean); } catch (e) {
+              const i = clean.indexOf('{');
+              if (i >= 0) { let d=0; for (let j=i;j<clean.length;j++){ const c=clean[j]; if(c==='{')d++; else if(c==='}'){d--; if(d===0){ try{obj=JSON.parse(clean.slice(i,j+1));}catch(_){} break; }}}}
+            }
+
+            let conclusion, title, body;
+            if (!obj || !obj.verdict) {
+              conclusion = 'neutral';
+              title = 'AI review — call failed / malformed (human review required)';
+              body = `<!-- gemini-ai-review:${sha} -->\n<!-- gemini-verdict:malformed -->\n\n🤖 **Claude Sonnet** (claude-sonnet-4-6) automated review via claude-bridge:\n\n**Verdict:** (unparseable — gate degraded to neutral, not blocking)`;
+            } else {
+              const approve = obj.verdict === 'approve';
+              conclusion = approve ? 'success' : 'failure';
+              const findings = Array.isArray(obj.findings) ? obj.findings : [];
+              const fblock = findings.length
+                ? '\n\n### Findings\n\n' + findings.map(f => `- **[${redactSecrets(f.severity)}]** \`${redactSecrets(f.file)}${f.line?':'+f.line:''}\` — ${redactSecrets(f.message)}`).join('\n')
+                : '';
+              title = `AI review: ${approve ? 'APPROVE' : 'REQUEST_CHANGES'}`;
+              body = [
+                `<!-- gemini-ai-review:${sha} -->`,
+                `<!-- gemini-verdict:${approve ? 'approve' : 'reject'} -->`,
+                '',
+                '🤖 **Claude Sonnet** (claude-sonnet-4-6) automated review via claude-bridge:',
+                '',
+                `**Verdict:** ${approve ? 'APPROVE' : 'REQUEST_CHANGES'}`,
+                '',
+                `**Summary:** ${redactSecrets(obj.summary || '')}`,
+                fblock
+              ].join('\n');
+            }
+
+            await github.rest.checks.create({
+              owner: context.repo.owner, repo: context.repo.repo,
+              name: CHECK, head_sha: sha, status: 'completed', conclusion,
+              output: { title, summary: redactSecrets((body||'').slice(0, 60000)) }
+            });
+            await github.rest.pulls.createReview({
+              owner: context.repo.owner, repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              event: 'COMMENT', body
+            });
