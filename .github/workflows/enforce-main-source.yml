@@ -1,0 +1,16 @@
+name: Enforce main source
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  verify:
+    name: Verify PR source is develop
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check head is develop
+        run: |
+          if [ "${{ github.head_ref }}" != "develop" ]; then
+            echo "::error::PRs into main must come from develop (head: ${{ github.head_ref }}). Promotion-only."
+            exit 1
+          fi
+          echo "OK — promotion from develop."
