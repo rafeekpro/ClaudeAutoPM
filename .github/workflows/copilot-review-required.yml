@@ -40,7 +40,7 @@ jobs:
         env:
           PR_DIFF_PATH: ${{ runner.temp }}/pr.diff
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          REVIEW_MODEL: anthropic/claude-3.5-sonnet
+          REVIEW_MODEL: anthropic/claude-sonnet-4.6
         with:
           script: |
             const fs = require('fs');
