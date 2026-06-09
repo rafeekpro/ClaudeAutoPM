@@ -1,6 +1,6 @@
 {
   "name": "@claudeautopm/plugin-pm-github",
-  "version": "3.13.1",
+  "version": "3.13.2",
   "description": "GitHub provider for ClaudeAutoPM PM system",
   "main": "plugin.json",
   "files": [

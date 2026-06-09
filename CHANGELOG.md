@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.25.5] - 2026-06-09
+
+### Fixed
+- **strip-frontmatter** (`pm:epic-sync`, `pm:issue-sync`): the documented `sed '1,/^---$/d; 1,/^---$/d'` idiom counted every `---` line, silently destroying GitHub issue bodies when the markdown body had no `---` (entire body deleted) or contained a `---` horizontal rule (body truncated). Replaced with a delimiter-counter `awk` that freezes after the second `---`. `strip_frontmatter()` in `frontmatter-utils.sh` now also passes files without a leading `---` through unchanged so plain-markdown inputs don't produce empty issue bodies. Affects `@claudeautopm/plugin-core` and `@claudeautopm/plugin-pm-github`. (#599, #600)
+- **CI** (`enforce-main-source.yml`): workflow now fires on all PRs (not just PRs into `main`) so the required `Verify PR source is develop` status check reports a result on PRs into `develop` too, instead of sitting "expected" and blocking merge. Enforcement still only runs when `base_ref == 'main'`. (#600)
+
+### Dependencies
+- Bump `yaml` from 2.8.3 to 2.9.0 (#598)
+- Bump `markdown-it` from 14.1.1 to 14.2.0 (#597)
+- Bump `@playwright/mcp` from 0.0.70 to 0.0.75 (#596)
+- Bump `fs-extra` from 11.3.4 to 11.3.5 (#595)
+- Bump `mocha` from 11.7.5 to 11.7.6 (dev, #594)
+- Bump `actions/github-script` from 7 to 9 (#593)
+- Bump `axios` from 1.16.0 to 1.17.0 (#590)
+- Bump `jest-extended` from 6.0.0 to 7.0.0 (dev, #589)
+- Bump `js-yaml` from 4.1.1 to 4.2.0 (#588)
+- Bump `@anthropic-ai/sdk` to 0.100.1 (#586)
+- Bump `glob` to 13.0.6 (#585)
+
 ## [3.25.4] - 2026-04-19
 
 ### Fixed
