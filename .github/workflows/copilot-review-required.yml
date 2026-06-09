@@ -1,0 +1,128 @@
+name: AI Review Gate (Sonnet via OpenRouter) — ClaudeAutoPM
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+concurrency:
+  group: ai-review-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ai-review:
+    name: ai-review
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: >-
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute PR diff
+        id: diff
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git diff "$BASE_SHA" "$HEAD_SHA" > "$RUNNER_TEMP/pr.diff" 2>/dev/null || true
+          echo "bytes=$(wc -c < "$RUNNER_TEMP/pr.diff" 2>/dev/null || echo 0)" >> "$GITHUB_OUTPUT"
+
+      - name: Single-call review via OpenRouter
+        uses: actions/github-script@v9
+        env:
+          PR_DIFF_PATH: ${{ runner.temp }}/pr.diff
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          REVIEW_MODEL: anthropic/claude-sonnet-4.6
+        with:
+          script: |
+            const fs = require('fs');
+            const sha = context.payload.pull_request.head.sha;
+            const CHECK = 'copilot-review';
+
+            const redactSecrets = (s) => String(s || '')
+              .replace(/("(?:access_token|id_token|refresh_token|api_key|apikey|secret|client_secret|private_key|aws_secret_access_key|OPENROUTER_API_KEY|OPENAI_API_KEY|account_id|password|passwd|token)"\s*:\s*")[^"]+/gi, '$1[REDACTED]')
+              .replace(/eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}/g, '[REDACTED-JWT]')
+              .replace(/sk-or-[A-Za-z0-9_-]{20,}/g, 'sk-or-[REDACTED]')
+              .replace(/sk-ant-[A-Za-z0-9_-]{20,}/g, 'sk-ant-[REDACTED]')
+              .replace(/sk-[A-Za-z0-9_-]{20,}/g, 'sk-[REDACTED]')
+              .replace(/ghp_[A-Za-z0-9]{36}/g, 'ghp_[REDACTED]')
+              .replace(/github_pat_[A-Za-z0-9_]{50,}/g, 'github_pat_[REDACTED]');
+
+            let BRIEF = '';
+            try { BRIEF = fs.readFileSync('.github/review-context.md', 'utf8'); } catch (e) {}
+            let diff = '';
+            try { diff = fs.readFileSync(process.env.PR_DIFF_PATH, 'utf8'); } catch (e) {}
+            if (diff.length > 200000) diff = diff.slice(0, 200000) + '\n…[diff truncated]';
+
+            const prompt = [
+              BRIEF, '',
+              'You are a senior code reviewer. Review ONLY the diff below for HIGH/MEDIUM/LOW issues',
+              '(security, correctness, data-loss, broken contracts). Ignore style nits and pre-existing',
+              'tech debt outside the diff. If unsure, do not invent findings.', '',
+              'Respond with ONLY a JSON object, no prose:',
+              '{"verdict":"approve|request_changes","summary":"<=600 chars","findings":[{"severity":"HIGH|MEDIUM|LOW","file":"path","line":<int|null>,"message":"<=300 chars"}]}',
+              '', '--- DIFF ---', diff || '(empty diff)'
+            ].join('\n');
+
+            let raw = '';
+            try {
+              const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  model: process.env.REVIEW_MODEL,
+                  messages: [{ role: 'user', content: prompt }],
+                  temperature: 0.1,
+                  max_tokens: 1500
+                })
+              });
+              const data = await resp.json();
+              raw = data?.choices?.[0]?.message?.content || '';
+            } catch (e) { raw = ''; }
+
+            let obj = null;
+            try { obj = JSON.parse(raw); } catch (e) {
+              const i = raw.indexOf('{');
+              if (i >= 0) { let d=0; for (let j=i;j<raw.length;j++){ const c=raw[j]; if(c==='{')d++; else if(c==='}'){d--; if(d===0){ try{obj=JSON.parse(raw.slice(i,j+1));}catch(_){} break; }}}}
+            }
+
+            let conclusion, title, body;
+            if (!obj || !obj.verdict) {
+              conclusion = 'neutral';
+              title = 'AI review — call failed / malformed (human review required)';
+              body = `<!-- gemini-ai-review:${sha} -->\n<!-- gemini-verdict:malformed -->\n\n🤖 **${process.env.REVIEW_MODEL}** automated review via OpenRouter:\n\n**Verdict:** (unparseable — neutral, not blocking)`;
+            } else {
+              const approve = obj.verdict === 'approve';
+              conclusion = approve ? 'success' : 'failure';
+              const findings = Array.isArray(obj.findings) ? obj.findings : [];
+              const fblock = findings.length
+                ? '\n\n### Findings\n\n' + findings.map(f => `- **[${redactSecrets(f.severity)}]** \`${redactSecrets(f.file)}${f.line?':'+f.line:''}\` — ${redactSecrets(f.message)}`).join('\n')
+                : '';
+              title = `AI review: ${approve ? 'APPROVE' : 'REQUEST_CHANGES'}`;
+              body = [
+                `<!-- gemini-ai-review:${sha} -->`,
+                `<!-- gemini-verdict:${approve ? 'approve' : 'reject'} -->`, '',
+                `🤖 **${process.env.REVIEW_MODEL}** automated review via OpenRouter:`, '',
+                `**Verdict:** ${approve ? 'APPROVE' : 'REQUEST_CHANGES'}`, '',
+                `**Summary:** ${redactSecrets(obj.summary || '')}`, fblock
+              ].join('\n');
+            }
+
+            await github.rest.checks.create({
+              owner: context.repo.owner, repo: context.repo.repo,
+              name: CHECK, head_sha: sha, status: 'completed', conclusion,
+              output: { title, summary: redactSecrets((body||'').slice(0, 60000)) }
+            });
+            await github.rest.pulls.createReview({
+              owner: context.repo.owner, repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              event: 'COMMENT', body
+            });

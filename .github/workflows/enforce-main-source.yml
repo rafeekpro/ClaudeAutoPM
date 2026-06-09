@@ -1,0 +1,24 @@
+name: Enforce main source
+# Fires on ALL PRs so the required-status-check `Verify PR source is develop`
+# reports a result on every PR (including PRs into `develop`). The enforcement
+# itself only runs when the base is `main` — promotion-only into main, free
+# branch names everywhere else.
+on:
+  pull_request:
+jobs:
+  verify:
+    name: Verify PR source is develop
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip when not targeting main
+        if: github.base_ref != 'main'
+        run: |
+          echo "Base is '${{ github.base_ref }}', not 'main' — promotion gate not applicable."
+      - name: Check head is develop
+        if: github.base_ref == 'main'
+        run: |
+          if [ "${{ github.head_ref }}" != "develop" ]; then
+            echo "::error::PRs into main must come from develop (head: ${{ github.head_ref }}). Promotion-only."
+            exit 1
+          fi
+          echo "OK — promotion from develop."
