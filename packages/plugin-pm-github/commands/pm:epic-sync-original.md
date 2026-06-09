@@ -75,7 +75,7 @@ fi
 Strip frontmatter and prepare GitHub issue body:
 ```bash
 # Extract content without frontmatter
-awk 'BEGIN{p=0; done=0} /^---$/ && !done {p++; if(p==2) done=1; next} p>=2{print}' .claude/epics/$ARGUMENTS/epic.md > /tmp/epic-body-raw.md
+awk 'BEGIN{p=0; done=0} /^---$/ && !done {p++; if(p==2) done=1; next} p>=2{print}' ".claude/epics/$ARGUMENTS/epic.md" > /tmp/epic-body-raw.md
 
 # Remove "## Tasks Created" section and replace with Stats
 awk '

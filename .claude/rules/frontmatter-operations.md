@@ -61,7 +61,10 @@ updated: {current_datetime}
 YAML frontmatter MUST be removed before sending content to GitHub (issues, comments, external systems):
 
 ```bash
-# Strip frontmatter, keep full body (including any body '---' horizontal rules)
+# Strip frontmatter, keep full body (including any body '---' horizontal rules).
+# ⚠️ Produces EMPTY output when the input has no leading '---'. If the input
+#    may be a plain markdown file, use the `strip_frontmatter` helper in
+#    `frontmatter-utils.sh` instead — it passes such files through unchanged.
 awk 'BEGIN{p=0; done=0} /^---$/ && !done {p++; if(p==2) done=1; next} p>=2{print}' input.md > output.md
 ```
 

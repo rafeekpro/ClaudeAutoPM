@@ -16,7 +16,11 @@ Use `awk` to strip ONLY the leading frontmatter block, preserving the full body
 (including any in-body `---` horizontal rules):
 
 ```bash
-# Strip frontmatter, keep all body content (even body '---' horizontal rules)
+# Strip frontmatter, keep all body content (even body '---' horizontal rules).
+# ⚠️ Produces EMPTY output when the input has no leading '---' (no frontmatter).
+#    If the input may be a plain markdown file, use the `strip_frontmatter`
+#    helper in `frontmatter-utils.sh` instead — it passes such files through
+#    unchanged.
 awk 'BEGIN{p=0; done=0} /^---$/ && !done {p++; if(p==2) done=1; next} p>=2{print}' input.md > output.md
 ```
 
