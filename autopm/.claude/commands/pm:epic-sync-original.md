@@ -75,7 +75,7 @@ fi
 Strip frontmatter and prepare GitHub issue body:
 ```bash
 # Extract content without frontmatter
-sed '1,/^---$/d; 1,/^---$/d' .claude/epics/$ARGUMENTS/epic.md > /tmp/epic-body-raw.md
+awk 'BEGIN{p=0; done=0} /^---$/ && !done {p++; if(p==2) done=1; next} p>=2{print}' .claude/epics/$ARGUMENTS/epic.md > /tmp/epic-body-raw.md
 
 # Remove "## Tasks Created" section and replace with Stats
 awk '
@@ -162,7 +162,7 @@ if [ "$task_count" -lt 5 ]; then
     task_name=$(grep '^name:' "$task_file" | sed 's/^name: *//')
 
     # Strip frontmatter from task content
-    sed '1,/^---$/d; 1,/^---$/d' "$task_file" > /tmp/task-body.md
+    awk 'BEGIN{p=0; done=0} /^---$/ && !done {p++; if(p==2) done=1; next} p>=2{print}' "$task_file" > /tmp/task-body.md
 
     # Create sub-issue with labels
     if [ "$use_subissues" = true ]; then
@@ -222,7 +222,7 @@ Task:
 
     For each task file:
     1. Extract task name from frontmatter
-    2. Strip frontmatter using: sed '1,/^---$/d; 1,/^---$/d'
+    2. Strip frontmatter using: awk 'BEGIN{p=0; done=0} /^---$/ && !done {p++; if(p==2) done=1; next} p>=2{print}'
     3. Create sub-issue using:
        - If gh-sub-issue available:
          gh sub-issue create --parent $epic_number --title "$task_name" \

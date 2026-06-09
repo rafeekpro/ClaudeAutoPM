@@ -61,9 +61,13 @@ updated: {current_datetime}
 YAML frontmatter MUST be removed before sending content to GitHub (issues, comments, external systems):
 
 ```bash
-# Strip frontmatter (everything between first two --- lines)
-sed '1,/^---$/d; 1,/^---$/d' input.md > output.md
+# Strip frontmatter, keep full body (including any body '---' horizontal rules)
+awk 'BEGIN{p=0; done=0} /^---$/ && !done {p++; if(p==2) done=1; next} p>=2{print}' input.md > output.md
 ```
+
+Do NOT use the naive `sed '1,/^---$/d; 1,/^---$/d'` idiom — it counts every
+`---` line, so it destroys the body when there is no body or when the body
+contains a horizontal rule (see issue #599 and `strip-frontmatter.md`).
 
 Always strip when:
 - Creating GitHub issues from markdown files (`gh issue create --body-file`)
@@ -72,7 +76,7 @@ Always strip when:
 
 ```bash
 # Example: create issue from file
-sed '1,/^---$/d; 1,/^---$/d' task.md > /tmp/clean.md
+awk 'BEGIN{p=0; done=0} /^---$/ && !done {p++; if(p==2) done=1; next} p>=2{print}' task.md > /tmp/clean.md
 gh issue create --body-file /tmp/clean.md
 ```
 

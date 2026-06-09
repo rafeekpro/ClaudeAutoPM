@@ -117,8 +117,12 @@ strip_frontmatter() {
         return 1
     fi
 
-    # Remove frontmatter (everything between first two --- lines)
-    sed '1,/^---$/d; 1,/^---$/d' "$input_file" > "$output_file"
+    # Remove frontmatter (everything between first two --- lines).
+    # Naive `sed '1,/^---$/d; 1,/^---$/d'` is BROKEN: it counts every '---' line,
+    # so it destroys the body when there is no body or when the body contains a
+    # horizontal rule. The `done` flag below freezes the counter after the
+    # second delimiter is consumed. See issue #599.
+    awk 'BEGIN{p=0; done=0} /^---$/ && !done {p++; if(p==2) done=1; next} p>=2{print}' "$input_file" > "$output_file"
 
     log_debug "Stripped frontmatter from $input_file to $output_file"
     log_function_exit "strip_frontmatter"
