@@ -273,5 +273,19 @@ status: open
 
             expect(fs.readFileSync(output, 'utf8')).toBe('body\n');
         });
+
+        test('passthrough when file has no frontmatter at all', () => {
+            // Without a passthrough guard, the delimiter-counter awk produces
+            // empty output for a file with no leading `---`, silently giving
+            // an empty GitHub issue body. PR #600 review finding.
+            const input = path.join(testDir, 'no-fm.md');
+            const output = path.join(testDir, 'no-fm.out');
+            const content = '# Plain Markdown\n\nNo frontmatter here.\n\n---\n\nWith a horizontal rule too.\n';
+            fs.writeFileSync(input, content);
+
+            stripFrontmatter(input, output);
+
+            expect(fs.readFileSync(output, 'utf8')).toBe(content);
+        });
     });
 });

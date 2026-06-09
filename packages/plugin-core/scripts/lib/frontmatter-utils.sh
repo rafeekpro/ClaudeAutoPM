@@ -117,6 +117,17 @@ strip_frontmatter() {
         return 1
     fi
 
+    # Passthrough when there is no frontmatter at all. Without this guard, the
+    # awk below (which prints only after seeing two `---` delimiters) produces
+    # empty output for files with no leading `---`, which would silently
+    # produce empty GitHub issue bodies. Flagged in the PR review for #599.
+    if [[ "$(head -n 1 "$input_file")" != "---" ]]; then
+        cp "$input_file" "$output_file"
+        log_debug "No leading frontmatter in $input_file; passthrough to $output_file"
+        log_function_exit "strip_frontmatter"
+        return 0
+    fi
+
     # Remove frontmatter (everything between first two --- lines).
     # Naive `sed '1,/^---$/d; 1,/^---$/d'` is BROKEN: it counts every '---' line,
     # so it destroys the body when there is no body or when the body contains a

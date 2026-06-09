@@ -107,5 +107,10 @@ strip_frontmatter "$input_file" "$output_file"
 - Always test with a sample file containing an in-body `---` before trusting a
   new strip idiom.
 - Keep original files intact; write to a temporary output.
-- Files without frontmatter are handled gracefully — the awk produces no output
-  if the second `---` is never reached, which is correct.
+- Files without frontmatter: the inline `awk` produces no output (since `p`
+  never reaches 2). The shared `strip_frontmatter()` helper in
+  `frontmatter-utils.sh` guards against this by passing the file through
+  unchanged when the first line is not `---`. **For scripts piping to
+  `gh issue create`, prefer the helper over the inline awk** unless the input
+  is known to always have frontmatter (e.g. framework-generated epic/task
+  files).
