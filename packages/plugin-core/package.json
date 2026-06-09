@@ -1,6 +1,6 @@
 {
   "name": "@claudeautopm/plugin-core",
-  "version": "3.13.0",
+  "version": "3.13.1",
   "description": "Core framework functionality for ClaudeAutoPM - universal agents, rules, hooks, and utilities",
   "main": "index.js",
   "type": "module",
