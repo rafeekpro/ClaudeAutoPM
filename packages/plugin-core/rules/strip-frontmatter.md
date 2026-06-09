@@ -12,18 +12,51 @@ YAML frontmatter contains internal metadata that should not appear in GitHub iss
 
 ## The Solution
 
-Use sed to strip frontmatter from any markdown file:
+Use `awk` to strip ONLY the leading frontmatter block, preserving the full body
+(including any in-body `---` horizontal rules):
 
 ```bash
-# Strip frontmatter (everything between first two --- lines)
-sed '1,/^---$/d; 1,/^---$/d' input.md > output.md
+# Strip frontmatter, keep all body content (even body '---' horizontal rules).
+# ⚠️ Produces EMPTY output when the input has no leading '---' (no frontmatter).
+#    If the input may be a plain markdown file, use the `strip_frontmatter`
+#    helper in `frontmatter-utils.sh` instead — it passes such files through
+#    unchanged.
+awk 'BEGIN{p=0; done=0} /^---$/ && !done {p++; if(p==2) done=1; next} p>=2{print}' input.md > output.md
 ```
 
-This removes:
+The `done` flag freezes the delimiter counter after the second `---` is
+consumed, so later `---` lines are treated as ordinary body text.
 
-1. The opening `---` line
-2. All YAML content
-3. The closing `---` line
+## ⚠️ Do NOT use these naive idioms
+
+The following patterns look right but **silently destroy the body** (see #599):
+
+```bash
+# BROKEN — sed counts every '---', not just the frontmatter delimiters
+sed '1,/^---$/d; 1,/^---$/d' input.md > output.md
+
+# BROKEN — same root cause; counts in-body '---' as a third delimiter
+awk 'BEGIN{fm=0} /^---$/{fm++; next} fm==2{print}' input.md > output.md
+```
+
+Failure modes:
+
+1. **Body with no `---`** → the second `sed` delete-range never closes, runs
+   to EOF, and deletes the entire body. The resulting GitHub issue body is empty.
+2. **Body containing a `---` horizontal rule** → the body is truncated at the
+   first in-body `---`.
+
+### Reproduction
+
+```bash
+printf -- '---\nname: x\n---\n\n# Title\n\nBody with no horizontal rule.\n' > t.md
+sed '1,/^---$/d; 1,/^---$/d' t.md
+# => prints NOTHING (entire body deleted)
+
+printf -- '---\nname: x\n---\n\n# Title\n\nA\n\n---\n\nB\n' > t2.md
+sed '1,/^---$/d; 1,/^---$/d' t2.md
+# => prints only the lines after the in-body '---' (truncated)
+```
 
 ## When to Strip Frontmatter
 
@@ -42,16 +75,15 @@ Always strip frontmatter when:
 # Bad - includes frontmatter
 gh issue create --body-file task.md
 
-# Good - strips frontmatter
-sed '1,/^---$/d; 1,/^---$/d' task.md > /tmp/clean.md
+# Good - strips frontmatter, keeps full body
+awk 'BEGIN{p=0; done=0} /^---$/ && !done {p++; if(p==2) done=1; next} p>=2{print}' task.md > /tmp/clean.md
 gh issue create --body-file /tmp/clean.md
 ```
 
 ### Posting a comment
 
 ```bash
-# Strip frontmatter before posting
-sed '1,/^---$/d; 1,/^---$/d' progress.md > /tmp/comment.md
+awk 'BEGIN{p=0; done=0} /^---$/ && !done {p++; if(p==2) done=1; next} p>=2{print}' progress.md > /tmp/comment.md
 gh issue comment 123 --body-file /tmp/comment.md
 ```
 
@@ -59,27 +91,30 @@ gh issue comment 123 --body-file /tmp/comment.md
 
 ```bash
 for file in *.md; do
-  # Strip frontmatter from each file
-  sed '1,/^---$/d; 1,/^---$/d' "$file" > "/tmp/$(basename $file)"
-  # Use the clean version
+  awk 'BEGIN{p=0; done=0} /^---$/ && !done {p++; if(p==2) done=1; next} p>=2{print}' \
+    "$file" > "/tmp/$(basename "$file")"
 done
 ```
 
-## Alternative Approaches
+### Using the shared helper
 
-If sed is not available or you need more control:
+For scripts inside the framework, source `frontmatter-utils.sh` and call the
+`strip_frontmatter` helper instead of duplicating the awk:
 
 ```bash
-# Using awk
-awk 'BEGIN{fm=0} /^---$/{fm++; next} fm==2{print}' input.md > output.md
-
-# Using grep with line numbers
-grep -n "^---$" input.md | head -2 | tail -1 | cut -d: -f1 | xargs -I {} tail -n +$(({}+1)) input.md
+source "${SCRIPT_DIR}/../lib/frontmatter-utils.sh"
+strip_frontmatter "$input_file" "$output_file"
 ```
 
 ## Important Notes
 
-- Always test with a sample file first
-- Keep original files intact
-- Use temporary files for cleaned content
-- Some files may not have frontmatter - the command handles this gracefully
+- Always test with a sample file containing an in-body `---` before trusting a
+  new strip idiom.
+- Keep original files intact; write to a temporary output.
+- Files without frontmatter: the inline `awk` produces no output (since `p`
+  never reaches 2). The shared `strip_frontmatter()` helper in
+  `frontmatter-utils.sh` guards against this by passing the file through
+  unchanged when the first line is not `---`. **For scripts piping to
+  `gh issue create`, prefer the helper over the inline awk** unless the input
+  is known to always have frontmatter (e.g. framework-generated epic/task
+  files).

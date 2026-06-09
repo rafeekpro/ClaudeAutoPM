@@ -224,4 +224,68 @@ status: open
             expect(getFrontmatterField(testFile, 'field3')).toBe('value\\with\\backslashes');
         });
     });
+
+    // Regression: issue #599 — the previous `sed '1,/^---$/d; 1,/^---$/d'` idiom
+    // silently destroyed bodies that had no `---` or that contained a `---`
+    // horizontal rule. strip_frontmatter must preserve body content verbatim.
+    describe('strip_frontmatter (issue #599)', () => {
+        const stripFrontmatter = (inputFile, outputFile) => {
+            const script = `source ${shellEscape(frontmatterScript)} && strip_frontmatter ${shellEscape(inputFile)} ${shellEscape(outputFile)}`;
+            execSync(script, { shell: '/bin/bash', stdio: 'pipe' });
+        };
+
+        test('preserves body that contains no --- horizontal rule', () => {
+            const input = path.join(testDir, 'no-hr.md');
+            const output = path.join(testDir, 'no-hr.out');
+            fs.writeFileSync(input, '---\nname: x\n---\n\n# Title\n\nBody with no horizontal rule.\n');
+
+            stripFrontmatter(input, output);
+
+            expect(fs.readFileSync(output, 'utf8')).toBe('\n# Title\n\nBody with no horizontal rule.\n');
+        });
+
+        test('preserves body that contains a --- horizontal rule', () => {
+            const input = path.join(testDir, 'with-hr.md');
+            const output = path.join(testDir, 'with-hr.out');
+            fs.writeFileSync(input, '---\nname: x\n---\n\n# Title\n\nA\n\n---\n\nB\n');
+
+            stripFrontmatter(input, output);
+
+            expect(fs.readFileSync(output, 'utf8')).toBe('\n# Title\n\nA\n\n---\n\nB\n');
+        });
+
+        test('preserves body with multiple --- horizontal rules', () => {
+            const input = path.join(testDir, 'multi-hr.md');
+            const output = path.join(testDir, 'multi-hr.out');
+            fs.writeFileSync(input, '---\nname: x\n---\n\nA\n\n---\n\nB\n\n---\n\nC\n');
+
+            stripFrontmatter(input, output);
+
+            expect(fs.readFileSync(output, 'utf8')).toBe('\nA\n\n---\n\nB\n\n---\n\nC\n');
+        });
+
+        test('strips minimal frontmatter with single field', () => {
+            const input = path.join(testDir, 'min.md');
+            const output = path.join(testDir, 'min.out');
+            fs.writeFileSync(input, '---\nname: x\n---\nbody\n');
+
+            stripFrontmatter(input, output);
+
+            expect(fs.readFileSync(output, 'utf8')).toBe('body\n');
+        });
+
+        test('passthrough when file has no frontmatter at all', () => {
+            // Without a passthrough guard, the delimiter-counter awk produces
+            // empty output for a file with no leading `---`, silently giving
+            // an empty GitHub issue body. PR #600 review finding.
+            const input = path.join(testDir, 'no-fm.md');
+            const output = path.join(testDir, 'no-fm.out');
+            const content = '# Plain Markdown\n\nNo frontmatter here.\n\n---\n\nWith a horizontal rule too.\n';
+            fs.writeFileSync(input, content);
+
+            stripFrontmatter(input, output);
+
+            expect(fs.readFileSync(output, 'utf8')).toBe(content);
+        });
+    });
 });
