@@ -3,9 +3,10 @@
  * Sync command prompt files from plugin packages (source of truth) into the
  * installable payload (autopm/.claude/commands).
  *
- * Scope: every "*.md" file directly under packages/<plugin>/commands/ that has
- * a same-named counterpart in autopm/.claude/commands/. Plugin-only commands
- * and payload-only commands are left alone.
+ * Scope: every "*.md" file anywhere under packages/<plugin>/commands/
+ * (recursively — e.g. plugin-pm-azure keeps its files in commands/azure/)
+ * that has a same-basename counterpart in the flat autopm/.claude/commands/.
+ * Plugin-only commands and payload-only commands are left alone.
  *
  * Usage:
  *   node scripts/sync-plugin-commands.js          # copy plugin -> payload
@@ -25,14 +26,25 @@ const ROOT = path.resolve(__dirname, '..');
 const PAYLOAD_COMMANDS = path.join(ROOT, 'autopm', '.claude', 'commands');
 const PACKAGES_DIR = path.join(ROOT, 'packages');
 
+function collectMarkdownFiles(dir, result = []) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      collectMarkdownFiles(fullPath, result);
+    } else if (entry.name.endsWith('.md')) {
+      result.push(fullPath);
+    }
+  }
+  return result;
+}
+
 function pluginCommandFiles() {
   const result = [];
   for (const pkg of fs.readdirSync(PACKAGES_DIR)) {
     const commandsDir = path.join(PACKAGES_DIR, pkg, 'commands');
     if (!fs.existsSync(commandsDir) || !fs.statSync(commandsDir).isDirectory()) continue;
-    for (const file of fs.readdirSync(commandsDir)) {
-      if (!file.endsWith('.md')) continue;
-      result.push({ plugin: pkg, name: file, file: path.join(commandsDir, file) });
+    for (const file of collectMarkdownFiles(commandsDir)) {
+      result.push({ plugin: pkg, name: path.basename(file), file });
     }
   }
   return result;

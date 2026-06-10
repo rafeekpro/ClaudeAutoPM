@@ -18,15 +18,26 @@ const ROOT = path.resolve(__dirname, '..', '..');
 const PAYLOAD_COMMANDS = path.join(ROOT, 'autopm', '.claude', 'commands');
 const PACKAGES_DIR = path.join(ROOT, 'packages');
 
+function collectMarkdownFiles(dir, result = []) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      collectMarkdownFiles(fullPath, result);
+    } else if (entry.name.endsWith('.md')) {
+      result.push(fullPath);
+    }
+  }
+  return result;
+}
+
+// Recursive — plugin-pm-azure/plugin-pm-github keep commands in subdirectories
 function pluginCommandFiles() {
   const result = [];
   for (const pkg of fs.readdirSync(PACKAGES_DIR)) {
     const commandsDir = path.join(PACKAGES_DIR, pkg, 'commands');
     if (!fs.existsSync(commandsDir) || !fs.statSync(commandsDir).isDirectory()) continue;
-    for (const file of fs.readdirSync(commandsDir)) {
-      if (file.endsWith('.md')) {
-        result.push({ plugin: pkg, name: file, file: path.join(commandsDir, file) });
-      }
+    for (const file of collectMarkdownFiles(commandsDir)) {
+      result.push({ plugin: pkg, name: path.basename(file), file });
     }
   }
   return result;
