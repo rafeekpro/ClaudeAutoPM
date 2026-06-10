@@ -37,7 +37,7 @@ jobs:
       # broken or compromised npm release cannot silently enter the publish
       # path. Note: this swaps only the npm binary — the auth config written
       # by setup-node lives in $NPM_CONFIG_USERCONFIG and is unaffected.
-      - run: npm install -g npm@11.16.0
+      - run: npm install -g npm@11.16.0 --ignore-scripts
       - run: npm ci --legacy-peer-deps
       # Tests gate this job via `needs: test` above — a red suite never
       # reaches publish. NODE_AUTH_TOKEN kept as a fallback: with a Trusted
