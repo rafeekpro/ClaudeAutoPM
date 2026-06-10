@@ -18,11 +18,7 @@ Creates GitHub Actions workflows for CI/CD pipelines.
 - `mcp://context7/devops/pipeline-design` - pipeline design best practices
 - `mcp://context7/ci-cd/best-practices` - best practices best practices
 
-**Why This is Required:**
-- Ensures adherence to current industry standards and best practices
-- Prevents outdated or incorrect implementation patterns
-- Provides access to latest framework/tool documentation
-- Reduces errors from stale knowledge or assumptions
+**Why:** Documentation-first development policy — see `.claude/rules/context7-required.md`.
 
 
 **Example**: `/github:workflow-create --type=ci --stack=node --deploy-to=aws`

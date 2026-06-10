@@ -18,11 +18,7 @@ Refreshes documentation cache from context7 for specified agents and technologie
 - `mcp://context7/ai/context-management` - context management best practices
 - `mcp://context7/mcp/integration` - integration best practices
 
-**Why This is Required:**
-- Ensures adherence to current industry standards and best practices
-- Prevents outdated or incorrect implementation patterns
-- Provides access to latest framework/tool documentation
-- Reduces errors from stale knowledge or assumptions
+**Why:** Documentation-first development policy — see `.claude/rules/context7-required.md`.
 
 
 **Examples**: 

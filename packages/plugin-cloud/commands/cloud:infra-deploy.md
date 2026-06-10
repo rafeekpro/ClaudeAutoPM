@@ -18,11 +18,7 @@ Deploys infrastructure to cloud providers using Terraform.
 - `mcp://context7/devops/automation` - automation best practices
 - `mcp://context7/infrastructure/configuration` - configuration best practices
 
-**Why This is Required:**
-- Ensures adherence to current industry standards and best practices
-- Prevents outdated or incorrect implementation patterns
-- Provides access to latest framework/tool documentation
-- Reduces errors from stale knowledge or assumptions
+**Why:** Documentation-first development policy — see `.claude/rules/context7-required.md`.
 
 
 **Example**: `/cloud:infra-deploy --provider=aws --env=staging --services=eks,rds,s3`

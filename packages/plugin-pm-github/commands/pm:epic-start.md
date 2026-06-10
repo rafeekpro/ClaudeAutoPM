@@ -13,19 +13,7 @@ Launch parallel agents to work on epic tasks using the unified branch strategy.
 
 ## Required Documentation Access
 
-**MANDATORY:** Before project management workflows, query Context7 for best practices:
-
-**Documentation Queries:**
-- `mcp://context7/agile/epic-management` - epic management best practices
-- `mcp://context7/project-management/issue-tracking` - issue tracking best practices
-- `mcp://context7/agile/task-breakdown` - task breakdown best practices
-- `mcp://context7/project-management/workflow` - workflow best practices
-
-**Why This is Required:**
-- Ensures adherence to current industry standards and best practices
-- Prevents outdated or incorrect implementation patterns
-- Provides access to latest framework/tool documentation
-- Reduces errors from stale knowledge or assumptions
+**MANDATORY:** Query Context7 for project-management best practices before proceeding. Use the standard PM query set in `.claude/rules/context7-required.md`.
 
 
 ## Quick Check
@@ -54,11 +42,7 @@ Launch parallel agents to work on epic tasks using the unified branch strategy.
 
 **CRITICAL: This project follows Test-Driven Development (TDD).**
 
-Before ANY coding work begins on this epic, you MUST follow the RED-GREEN-REFACTOR cycle:
-
-1. **RED Phase**: Write failing test that describes the desired behavior
-2. **GREEN Phase**: Write minimum code to make test pass
-3. **REFACTOR Phase**: Clean up code while keeping tests green
+Before ANY coding work begins on this epic, you MUST follow the RED → GREEN → REFACTOR cycle (see `.claude/rules/tdd-reminder.md`).
 
 **For this epic:**
 - All tasks have TDD requirements section
