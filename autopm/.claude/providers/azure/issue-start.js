@@ -24,6 +24,12 @@ class AzureIssueStart {
       && !name.includes('..');
   }
 
+  // Tags are concatenated into the System.Tags field value ("a; b") — keep
+  // them to a safe charset so a tag cannot smuggle extra field assignments.
+  static isValidTag(tag) {
+    return typeof tag === 'string' && /^[A-Za-z0-9._ -]+$/.test(tag);
+  }
+
   /**
    * Execute issue start command for Azure DevOps
    * @param {Object} options - Command options
@@ -249,6 +255,10 @@ class AzureIssueStart {
    */
   async addTag(organization, project, workItemId, tag) {
     try {
+      if (!AzureIssueStart.isValidTag(tag)) {
+        console.warn(`Could not add tag: invalid tag value: ${tag}`);
+        return;
+      }
       // Get current tags
       const workItem = await this.getWorkItem(organization, project, workItemId);
       const currentTags = workItem.fields?.['System.Tags'] || '';
