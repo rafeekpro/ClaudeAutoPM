@@ -13,10 +13,11 @@
   "scripts": {
     "postinstall": "echo '🎉 ClaudeAutoPM installed! Run: autopm --help'",
     "test:old": "node scripts/test.js",
-    "test": "jest --config jest.config.quick.js --forceExit",
+    "test": "jest --forceExit",
+    "test:quick": "jest --config jest.config.quick.js --forceExit",
     "test:full": "jest --config jest.config.clean.js --forceExit",
     "test:watch": "jest --watch",
-    "test:coverage": "c8 npm test",
+    "test:coverage": "jest --coverage --forceExit",
     "test:clean": "jest --config jest.config.clean.js",
     "test:clean:coverage": "jest --config jest.config.clean.js --coverage",
     "test:clean:watch": "jest --config jest.config.clean.js --watch",
