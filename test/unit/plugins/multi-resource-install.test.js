@@ -34,7 +34,10 @@ describe('PluginManager - Multi-Resource Installation (Schema v2.0)', () => {
       pluginDir: path.join(testDir, 'node_modules'),
       agentDir: path.join(testDir, '.claude', 'agents'),
       projectRoot: testDir,
-      scopePrefix: '@claudeautopm'
+      scopePrefix: '@claudeautopm',
+      // Hermetic: no global npm discovery, no real ~/.claudeautopm registry (#608)
+      includeGlobal: false,
+      registryPath: path.join(testDir, 'registry.json')
     });
   });
 
@@ -235,7 +238,7 @@ describe('PluginManager - Multi-Resource Installation (Schema v2.0)', () => {
       expect(fs.existsSync(path.join(testDir, '.claude', 'commands', 'test-command.md'))).toBe(true);
       expect(fs.existsSync(path.join(testDir, '.claude', 'rules', 'test-rule.md'))).toBe(true);
       expect(fs.existsSync(path.join(testDir, '.claude', 'hooks', 'test-hook.js'))).toBe(true);
-      expect(fs.existsSync(path.join(testDir, 'scripts', 'test-script.sh'))).toBe(true);
+      expect(fs.existsSync(path.join(testDir, '.claude', 'scripts', 'test-script.sh'))).toBe(true);
     });
 
     it('should install dual-language hooks (JS + Shell)', async () => {
@@ -300,10 +303,10 @@ describe('PluginManager - Multi-Resource Installation (Schema v2.0)', () => {
       // Verify all files exist
       const scriptFiles = ['add.sh', 'enable.sh', 'disable.sh', 'list.sh', 'sync.sh'];
       for (const file of scriptFiles) {
-        expect(fs.existsSync(path.join(testDir, 'scripts', 'mcp', file))).toBe(true);
+        expect(fs.existsSync(path.join(testDir, '.claude', 'scripts', 'mcp', file))).toBe(true);
 
         // Verify executable
-        const stats = fs.statSync(path.join(testDir, 'scripts', 'mcp', file));
+        const stats = fs.statSync(path.join(testDir, '.claude', 'scripts', 'mcp', file));
         expect((stats.mode & 0o111) !== 0).toBe(true);
       }
     });
@@ -330,10 +333,10 @@ describe('PluginManager - Multi-Resource Installation (Schema v2.0)', () => {
       const result = await manager.installPlugin('@claudeautopm/plugin-nested-scripts');
 
       expect(result.scriptsInstalled).toBe(1);
-      expect(fs.existsSync(path.join(testDir, 'scripts', 'lib', 'datetime-utils.sh'))).toBe(true);
+      expect(fs.existsSync(path.join(testDir, '.claude', 'scripts', 'lib', 'datetime-utils.sh'))).toBe(true);
 
       // Verify executable
-      const stats = fs.statSync(path.join(testDir, 'scripts', 'lib', 'datetime-utils.sh'));
+      const stats = fs.statSync(path.join(testDir, '.claude', 'scripts', 'lib', 'datetime-utils.sh'));
       expect((stats.mode & 0o111) !== 0).toBe(true);
     });
 
@@ -451,7 +454,7 @@ describe('PluginManager - Multi-Resource Installation (Schema v2.0)', () => {
       expect(fs.existsSync(path.join(testDir, '.claude', 'commands', 'command.md'))).toBe(true);
       expect(fs.existsSync(path.join(testDir, '.claude', 'rules', 'rule.md'))).toBe(true);
       expect(fs.existsSync(path.join(testDir, '.claude', 'hooks', 'hook.js'))).toBe(true);
-      expect(fs.existsSync(path.join(testDir, 'scripts', 'script.sh'))).toBe(true);
+      expect(fs.existsSync(path.join(testDir, '.claude', 'scripts', 'script.sh'))).toBe(true);
 
       // Uninstall
       const result = await manager.uninstallPlugin('@claudeautopm/plugin-full');
@@ -468,7 +471,7 @@ describe('PluginManager - Multi-Resource Installation (Schema v2.0)', () => {
       expect(fs.existsSync(path.join(testDir, '.claude', 'commands', 'command.md'))).toBe(false);
       expect(fs.existsSync(path.join(testDir, '.claude', 'rules', 'rule.md'))).toBe(false);
       expect(fs.existsSync(path.join(testDir, '.claude', 'hooks', 'hook.js'))).toBe(false);
-      expect(fs.existsSync(path.join(testDir, 'scripts', 'script.sh'))).toBe(false);
+      expect(fs.existsSync(path.join(testDir, '.claude', 'scripts', 'script.sh'))).toBe(false);
     });
 
     it('should remove empty directories after uninstall', async () => {
@@ -495,14 +498,14 @@ describe('PluginManager - Multi-Resource Installation (Schema v2.0)', () => {
 
       // Verify directories exist
       expect(fs.existsSync(path.join(testDir, '.claude', 'agents', 'cleanup'))).toBe(true);
-      expect(fs.existsSync(path.join(testDir, 'scripts', 'mcp'))).toBe(true);
+      expect(fs.existsSync(path.join(testDir, '.claude', 'scripts', 'mcp'))).toBe(true);
 
       // Uninstall
       await manager.uninstallPlugin('@claudeautopm/plugin-cleanup');
 
       // Verify empty directories removed
       expect(fs.existsSync(path.join(testDir, '.claude', 'agents', 'cleanup'))).toBe(false);
-      expect(fs.existsSync(path.join(testDir, 'scripts', 'mcp'))).toBe(false);
+      expect(fs.existsSync(path.join(testDir, '.claude', 'scripts', 'mcp'))).toBe(false);
     });
   });
 

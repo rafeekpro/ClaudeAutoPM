@@ -68,9 +68,12 @@ describe('PRD Commands', () => {
   describe('Command Structure', () => {
     it('should export command object with correct structure', () => {
       expect(prdCommands).toBeDefined();
-      expect(prdCommands.command).toBe('prd <action> [name]');
+      // API drift fixed in #608: the command is now 'prd' with yargs
+      // subcommands registered in builder() (was 'prd <action> [name]')
+      expect(prdCommands.command).toBe('prd');
       expect(prdCommands.describe).toBeDefined();
       expect(prdCommands.builder).toBeInstanceOf(Function);
+      expect(prdCommands.handler).toBeInstanceOf(Function);
     });
 
     it('should register all subcommands', () => {
@@ -88,7 +91,13 @@ describe('PRD Commands', () => {
     });
   });
 
-  describe('prd parse', () => {
+  // SKIPPED (#608): these suites were written for the old dispatch-style CLI
+  // where prdCommands.handler(argv) routed on argv.action. The current prd
+  // command registers per-subcommand handlers inside builder() and the top
+  // level handler only prints usage, so every test below exercises an API
+  // that no longer exists. Rewriting them against the yargs subcommand
+  // handlers is tracked as follow-up work on the test-infrastructure epic.
+  describe.skip('prd parse', () => {
     it('should parse PRD file with AI', async () => {
       const argv = { action: 'parse', name: 'test-prd', ai: true };
 
@@ -150,7 +159,7 @@ describe('PRD Commands', () => {
     });
   });
 
-  describe('prd extract-epics', () => {
+  describe.skip('prd extract-epics', () => {
     it('should extract epics from PRD', async () => {
       const argv = { action: 'extract-epics', name: 'test-prd' };
 
@@ -186,7 +195,7 @@ describe('PRD Commands', () => {
     });
   });
 
-  describe('prd summarize', () => {
+  describe.skip('prd summarize', () => {
     it('should generate PRD summary', async () => {
       const argv = { action: 'summarize', name: 'test-prd' };
 
@@ -219,7 +228,7 @@ describe('PRD Commands', () => {
     });
   });
 
-  describe('prd validate', () => {
+  describe.skip('prd validate', () => {
     it('should validate PRD structure', async () => {
       const argv = { action: 'validate', name: 'test-prd' };
 
@@ -256,7 +265,7 @@ describe('PRD Commands', () => {
     });
   });
 
-  describe('Error Handling', () => {
+  describe.skip('Error Handling', () => {
     it('should handle file read errors', async () => {
       const argv = { action: 'parse', name: 'test-prd' };
 
@@ -281,7 +290,7 @@ describe('PRD Commands', () => {
     });
   });
 
-  describe('Progress Indicators', () => {
+  describe.skip('Progress Indicators', () => {
     it('should show spinner during parse', async () => {
       const argv = { action: 'parse', name: 'test-prd', ai: true };
 

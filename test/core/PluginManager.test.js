@@ -47,7 +47,11 @@ describe('PluginManager', () => {
       agentDir,
       scopePrefix: '@claudeautopm',
       minCoreVersion: '2.8.0',
-      projectRoot: tempDir
+      projectRoot: tempDir,
+      // Hermetic: do not discover globally installed @claudeautopm packages
+      // and do not read/write the real ~/.claudeautopm registry (#608)
+      includeGlobal: false,
+      registryPath: path.join(tempDir, 'registry.json')
     });
   });
 

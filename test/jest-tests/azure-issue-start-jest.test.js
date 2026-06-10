@@ -1,4 +1,4 @@
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const { AzureIssueStart } = require('../../autopm/.claude/providers/azure/issue-start');
 
 // Mock child_process
@@ -37,8 +37,8 @@ describe('AzureIssueStart', () => {
       toISOString: () => '2023-01-01T12:00:00.000Z'
     }));
 
-    // Mock execSync to return empty string by default
-    execSync.mockReturnValue('');
+    // Mock execFileSync to return empty string by default
+    execFileSync.mockReturnValue('');
   });
 
   afterEach(() => {
@@ -225,21 +225,22 @@ describe('AzureIssueStart', () => {
           'System.Tags': ''
         }
       };
-      execSync.mockReturnValue(JSON.stringify(mockWorkItem));
+      execFileSync.mockReturnValue(JSON.stringify(mockWorkItem));
     });
 
     test('should get work item details', async () => {
       const result = await azureIssueStart.getWorkItem('test-org', 'test-project', '200');
 
-      expect(execSync).toHaveBeenCalledWith(
-        'az boards work-item show --id 200 --organization test-org --project "test-project"',
+      expect(execFileSync).toHaveBeenCalledWith(
+        'az',
+        ['boards', 'work-item', 'show', '--id', '200', '--organization', 'test-org', '--project', 'test-project'],
         { encoding: 'utf8' }
       );
       expect(result.fields['System.State']).toBe('New');
     });
 
     test('should handle work item not found', async () => {
-      execSync.mockImplementation(() => {
+      execFileSync.mockImplementation(() => {
         throw new Error('Work item not found');
       });
 
@@ -251,14 +252,15 @@ describe('AzureIssueStart', () => {
     test('should update work item state', async () => {
       await azureIssueStart.updateWorkItemState('test-org', 'test-project', '201', 'Active');
 
-      expect(execSync).toHaveBeenCalledWith(
-        'az boards work-item update --id 201 --state "Active" --organization test-org --project "test-project"',
+      expect(execFileSync).toHaveBeenCalledWith(
+        'az',
+        ['boards', 'work-item', 'update', '--id', '201', '--state', 'Active', '--organization', 'test-org', '--project', 'test-project'],
         { stdio: 'inherit' }
       );
     });
 
     test('should handle state update errors gracefully', async () => {
-      execSync.mockImplementation(() => {
+      execFileSync.mockImplementation(() => {
         throw new Error('State update failed');
       });
 
@@ -269,17 +271,17 @@ describe('AzureIssueStart', () => {
 
     test('should check if branch exists', () => {
       // Mock successful branch check
-      execSync.mockReturnValue('');
+      execFileSync.mockReturnValue('');
 
       const exists = azureIssueStart.branchExists('existing-branch');
 
-      expect(execSync).toHaveBeenCalledWith('git show-ref --verify --quiet refs/heads/existing-branch');
+      expect(execFileSync).toHaveBeenCalledWith('git', ['show-ref', '--verify', '--quiet', 'refs/heads/existing-branch']);
       expect(exists).toBe(true);
     });
 
     test('should return false when branch does not exist', () => {
       // Mock failed branch check
-      execSync.mockImplementation(() => {
+      execFileSync.mockImplementation(() => {
         throw new Error('Branch not found');
       });
 
@@ -291,31 +293,31 @@ describe('AzureIssueStart', () => {
     test('should create new branch', () => {
       azureIssueStart.createBranch('feature/new-branch');
 
-      expect(execSync).toHaveBeenCalledWith('git checkout -b feature/new-branch', { stdio: 'inherit' });
+      expect(execFileSync).toHaveBeenCalledWith('git', ['checkout', '-b', 'feature/new-branch'], { stdio: 'inherit' });
     });
 
     test('should get current user from Azure CLI', async () => {
-      execSync.mockReturnValue('user@company.com\n');
+      execFileSync.mockReturnValue('user@company.com\n');
 
       const user = await azureIssueStart.getCurrentUser('test-org');
 
-      expect(execSync).toHaveBeenCalledWith('az ad signed-in-user show --query userPrincipalName -o tsv', { encoding: 'utf8' });
+      expect(execFileSync).toHaveBeenCalledWith('az', ['ad', 'signed-in-user', 'show', '--query', 'userPrincipalName', '-o', 'tsv'], { encoding: 'utf8' });
       expect(user).toBe('user@company.com');
     });
 
     test('should fallback to git config for current user', async () => {
-      execSync
+      execFileSync
         .mockImplementationOnce(() => { throw new Error('Azure CLI failed'); })
         .mockReturnValueOnce('git-user@company.com\n');
 
       const user = await azureIssueStart.getCurrentUser('test-org');
 
-      expect(execSync).toHaveBeenCalledWith('git config user.email', { encoding: 'utf8' });
+      expect(execFileSync).toHaveBeenCalledWith('git', ['config', 'user.email'], { encoding: 'utf8' });
       expect(user).toBe('git-user@company.com');
     });
 
     test('should use default user when all methods fail', async () => {
-      execSync.mockImplementation(() => { throw new Error('All methods failed'); });
+      execFileSync.mockImplementation(() => { throw new Error('All methods failed'); });
 
       const user = await azureIssueStart.getCurrentUser('test-org');
 
@@ -325,14 +327,15 @@ describe('AzureIssueStart', () => {
     test('should assign work item to user', async () => {
       await azureIssueStart.assignWorkItem('test-org', 'test-project', '203', 'user@company.com');
 
-      expect(execSync).toHaveBeenCalledWith(
-        'az boards work-item update --id 203 --assigned-to "user@company.com" --organization test-org --project "test-project"',
+      expect(execFileSync).toHaveBeenCalledWith(
+        'az',
+        ['boards', 'work-item', 'update', '--id', '203', '--assigned-to', 'user@company.com', '--organization', 'test-org', '--project', 'test-project'],
         { stdio: 'inherit' }
       );
     });
 
     test('should handle assignment errors gracefully', async () => {
-      execSync.mockImplementation(() => {
+      execFileSync.mockImplementation(() => {
         throw new Error('Assignment failed');
       });
 
@@ -346,14 +349,15 @@ describe('AzureIssueStart', () => {
       const mockWorkItem = {
         fields: { 'System.Tags': '' }
       };
-      execSync
+      execFileSync
         .mockReturnValueOnce(JSON.stringify(mockWorkItem))
         .mockReturnValueOnce('');
 
       await azureIssueStart.addTag('test-org', 'test-project', '205', 'new-tag');
 
-      expect(execSync).toHaveBeenCalledWith(
-        'az boards work-item update --id 205 --fields "System.Tags=new-tag" --organization test-org --project "test-project"',
+      expect(execFileSync).toHaveBeenCalledWith(
+        'az',
+        ['boards', 'work-item', 'update', '--id', '205', '--fields', 'System.Tags=new-tag', '--organization', 'test-org', '--project', 'test-project'],
         { stdio: 'inherit' }
       );
     });
@@ -363,20 +367,21 @@ describe('AzureIssueStart', () => {
       const mockWorkItem = {
         fields: { 'System.Tags': 'existing-tag' }
       };
-      execSync
+      execFileSync
         .mockReturnValueOnce(JSON.stringify(mockWorkItem))
         .mockReturnValueOnce('');
 
       await azureIssueStart.addTag('test-org', 'test-project', '206', 'new-tag');
 
-      expect(execSync).toHaveBeenCalledWith(
-        'az boards work-item update --id 206 --fields "System.Tags=existing-tag; new-tag" --organization test-org --project "test-project"',
+      expect(execFileSync).toHaveBeenCalledWith(
+        'az',
+        ['boards', 'work-item', 'update', '--id', '206', '--fields', 'System.Tags=existing-tag; new-tag', '--organization', 'test-org', '--project', 'test-project'],
         { stdio: 'inherit' }
       );
     });
 
     test('should handle tag addition errors gracefully', async () => {
-      execSync.mockImplementation(() => {
+      execFileSync.mockImplementation(() => {
         throw new Error('Tag addition failed');
       });
 
@@ -388,20 +393,21 @@ describe('AzureIssueStart', () => {
     test('should add comment to work item', async () => {
       await azureIssueStart.addComment('test-org', 'test-project', '208', 'Test comment');
 
-      expect(consoleSpy).toHaveBeenCalledWith('Would add comment: Test comment');
+      expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Intended comment: Test comment'));
     });
 
     test('should move work item to sprint', async () => {
       await azureIssueStart.moveToSprint('test-org', 'test-project', '209', 'Sprint 1');
 
-      expect(execSync).toHaveBeenCalledWith(
-        'az boards work-item update --id 209 --iteration "test-project\\Sprint 1" --organization test-org --project "test-project"',
+      expect(execFileSync).toHaveBeenCalledWith(
+        'az',
+        ['boards', 'work-item', 'update', '--id', '209', '--iteration', 'test-project\\Sprint 1', '--organization', 'test-org', '--project', 'test-project'],
         { stdio: 'inherit' }
       );
     });
 
     test('should handle sprint move errors gracefully', async () => {
-      execSync.mockImplementation(() => {
+      execFileSync.mockImplementation(() => {
         throw new Error('Sprint move failed');
       });
 
@@ -423,7 +429,7 @@ describe('AzureIssueStart', () => {
           'System.Title': 'Completed Item'
         }
       };
-      execSync.mockReturnValue(JSON.stringify(mockWorkItem));
+      execFileSync.mockReturnValue(JSON.stringify(mockWorkItem));
 
       const options = { id: '212' };
 
@@ -433,7 +439,7 @@ describe('AzureIssueStart', () => {
     });
 
     test('should handle work item not found during start', async () => {
-      execSync.mockReturnValue(null);
+      execFileSync.mockReturnValue(null);
 
       const options = { id: '213' };
 
@@ -454,7 +460,8 @@ describe('AzureIssueStart', () => {
 
       // Setup exec mocks for different calls
       let callCount = 0;
-      execSync.mockImplementation((cmd) => {
+      execFileSync.mockImplementation((file, args) => {
+        const cmd = [file, ...(args || [])].join(' ');
         callCount++;
 
         if (cmd.includes('work-item show')) {
@@ -505,7 +512,8 @@ describe('AzureIssueStart', () => {
       };
 
       let callCount = 0;
-      execSync.mockImplementation((cmd) => {
+      execFileSync.mockImplementation((file, args) => {
+        const cmd = [file, ...(args || [])].join(' ');
         callCount++;
 
         if (cmd.includes('work-item show')) {
@@ -536,7 +544,8 @@ describe('AzureIssueStart', () => {
         }
       };
 
-      execSync.mockImplementation((cmd) => {
+      execFileSync.mockImplementation((file, args) => {
+        const cmd = [file, ...(args || [])].join(' ');
         if (cmd.includes('work-item show')) {
           return JSON.stringify(mockWorkItem);
         }
@@ -565,7 +574,8 @@ describe('AzureIssueStart', () => {
         }
       };
 
-      execSync.mockImplementation((cmd) => {
+      execFileSync.mockImplementation((file, args) => {
+        const cmd = [file, ...(args || [])].join(' ');
         if (cmd.includes('work-item show')) {
           return JSON.stringify(mockWorkItem);
         }

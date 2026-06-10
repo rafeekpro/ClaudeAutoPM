@@ -2,7 +2,14 @@
 module.exports = {
   testEnvironment: 'node',
   testMatch: ['**/test/jest-tests/scripts/**/*.test.js'],
-  testPathIgnorePatterns: ['/node_modules/'],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '<rootDir>/.claude/worktrees/'
+  ],
+  // Keep parallel agent worktrees out of the haste-map (#608)
+  modulePathIgnorePatterns: [
+    '<rootDir>/.claude/worktrees/'
+  ],
   testTimeout: 30000,
   clearMocks: true,
   restoreMocks: true,

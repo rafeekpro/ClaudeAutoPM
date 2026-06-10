@@ -1,4 +1,6 @@
-const { describe, it, beforeEach, afterEach } = require('node:test');
+// Jest suite (uses Jest globals). Renamed with the -jest suffix so the
+// node:test runner (`npm run test:unit`) skips it — as a node:test file it
+// registered as an empty suite under Jest (#608).
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');

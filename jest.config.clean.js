@@ -17,6 +17,7 @@ module.exports = {
   // Ignore problematic tests and duplicates
   testPathIgnorePatterns: [
     '/node_modules/',
+    '<rootDir>/.claude/worktrees/',  // parallel agent worktrees (#608)
     '/test/scripts/',
     '/test/jest-tests/install-jest.test.js',  // Module loading issues
     '/test/jest-tests/self-maintenance-jest.test.js',  // Fixed but may still have issues
@@ -27,6 +28,11 @@ module.exports = {
     '/test/cli/basic-commands.test.js',  // Node.js test API - not Jest
     '/test/cli/autopm-commands.test.js'  // Node.js test API - not Jest
     // utils-jest.test.js is working perfectly - included!
+  ],
+
+  // Keep parallel agent worktrees out of the haste-map (#608)
+  modulePathIgnorePatterns: [
+    '<rootDir>/.claude/worktrees/'
   ],
 
   // Coverage settings

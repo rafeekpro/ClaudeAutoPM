@@ -13,6 +13,20 @@ const fsSync = require('fs');
 const path = require('path');
 const os = require('os');
 
+/**
+ * Format a date N days ago as YYYY-MM-DD.
+ * Period-based tests must use relative dates — hardcoded dates fall outside
+ * the rolling window and silently produce empty metrics (#608).
+ */
+function dateDaysAgo(daysAgo) {
+  const date = new Date();
+  date.setDate(date.getDate() - daysAgo);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 describe('AnalyticsEngine - Initialization', () => {
   test('should create instance with default basePath', () => {
     const engine = new AnalyticsEngine();
@@ -269,11 +283,11 @@ describe('AnalyticsEngine - Team Metrics', () => {
   test('should calculate completion rate', async () => {
     await createTestEpic(testDir, 'epic-001', {
       tasks: [
-        { id: 'task-001', status: 'completed', created: '2025-09-10', completed: '2025-09-12' },
-        { id: 'task-002', status: 'completed', created: '2025-09-11', completed: '2025-09-14' },
-        { id: 'task-003', status: 'completed', created: '2025-09-12', completed: '2025-09-15' },
-        { id: 'task-004', status: 'in_progress', created: '2025-09-13' },
-        { id: 'task-005', status: 'pending', created: '2025-09-14' }
+        { id: 'task-001', status: 'completed', created: dateDaysAgo(20), completed: dateDaysAgo(18) },
+        { id: 'task-002', status: 'completed', created: dateDaysAgo(19), completed: dateDaysAgo(16) },
+        { id: 'task-003', status: 'completed', created: dateDaysAgo(18), completed: dateDaysAgo(15) },
+        { id: 'task-004', status: 'in_progress', created: dateDaysAgo(17) },
+        { id: 'task-005', status: 'pending', created: dateDaysAgo(16) }
       ]
     });
 
@@ -288,10 +302,10 @@ describe('AnalyticsEngine - Team Metrics', () => {
   test('should calculate velocity (tasks per week)', async () => {
     await createTestEpic(testDir, 'epic-001', {
       tasks: [
-        { id: 'task-001', status: 'completed', created: '2025-09-10', completed: '2025-09-12' },
-        { id: 'task-002', status: 'completed', created: '2025-09-11', completed: '2025-09-14' },
-        { id: 'task-003', status: 'completed', created: '2025-09-12', completed: '2025-09-15' },
-        { id: 'task-004', status: 'completed', created: '2025-09-13', completed: '2025-09-18' }
+        { id: 'task-001', status: 'completed', created: dateDaysAgo(20), completed: dateDaysAgo(18) },
+        { id: 'task-002', status: 'completed', created: dateDaysAgo(19), completed: dateDaysAgo(16) },
+        { id: 'task-003', status: 'completed', created: dateDaysAgo(18), completed: dateDaysAgo(15) },
+        { id: 'task-004', status: 'completed', created: dateDaysAgo(17), completed: dateDaysAgo(12) }
       ]
     });
 
@@ -453,10 +467,10 @@ describe('AnalyticsEngine - Completion Rate', () => {
   test('should calculate completion rate for tasks', async () => {
     await createTestEpic(testDir, 'epic-001', {
       tasks: [
-        { id: 'task-001', status: 'completed', created: '2025-09-10' },
-        { id: 'task-002', status: 'completed', created: '2025-09-11' },
-        { id: 'task-003', status: 'in_progress', created: '2025-09-12' },
-        { id: 'task-004', status: 'pending', created: '2025-09-13' }
+        { id: 'task-001', status: 'completed', created: dateDaysAgo(20) },
+        { id: 'task-002', status: 'completed', created: dateDaysAgo(19) },
+        { id: 'task-003', status: 'in_progress', created: dateDaysAgo(18) },
+        { id: 'task-004', status: 'pending', created: dateDaysAgo(17) }
       ]
     });
 

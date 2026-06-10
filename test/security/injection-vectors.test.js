@@ -111,6 +111,24 @@ test('PluginManager: invalid npm package names are rejected', () => {
 });
 
 // ---------------------------------------------------------------------------
+// 5b. AzureIssueStart provider: argv exec + id/branch validation (#608 restore)
+// ---------------------------------------------------------------------------
+test('AzureIssueStart: no shell exec, id and branch names validated', () => {
+  const providerPath = path.join(ROOT, 'autopm/.claude/providers/azure/issue-start.js');
+  const src = fs.readFileSync(providerPath, 'utf8');
+  assert.ok(!/\bexecSync\(/.test(src),
+    'provider must not use execSync with command strings');
+  assert.match(src, /execFileSync\(\s*['"](az|git)['"]\s*,/,
+    'provider must execute az/git via execFileSync argv arrays');
+
+  // Validators reject shell metacharacters and option smuggling
+  const provider = require(providerPath);
+  assert.throws(() => provider.branchExists('feat; rm -rf /'), /Invalid branch name/);
+  assert.throws(() => provider.branchExists('$(whoami)'), /Invalid branch name/);
+  assert.throws(() => provider.createBranch('-oProxyCommand=evil'), /Invalid branch name/);
+});
+
+// ---------------------------------------------------------------------------
 // 6. setup-context7 validates package names before global install
 // ---------------------------------------------------------------------------
 test('setup-context7: package name validation rejects injection', () => {
