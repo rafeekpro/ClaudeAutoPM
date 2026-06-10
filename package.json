@@ -12,6 +12,8 @@
   },
   "scripts": {
     "postinstall": "echo '🎉 ClaudeAutoPM installed! Run: autopm --help'",
+    "sync:commands": "node scripts/sync-plugin-commands.js",
+    "sync:commands:check": "node scripts/sync-plugin-commands.js --check",
     "test:old": "node scripts/test.js",
     "test": "jest --config jest.config.quick.js --forceExit",
     "test:full": "jest --config jest.config.clean.js --forceExit",
