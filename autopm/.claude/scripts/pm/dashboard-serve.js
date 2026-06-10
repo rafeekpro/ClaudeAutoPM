@@ -1504,11 +1504,17 @@ server.listen(0, '127.0.0.1', () => {
 
   try {
     const { execFileSync } = require('child_process');
-    // Fix 6: Windows browser open + Fix 13: token in URL
     // Pass the URL as an argument (no shell) so the token cannot be injected.
-    if (process.platform === 'darwin') execFileSync('open', [authUrl]);
-    else if (process.platform === 'win32') execFileSync('cmd', ['/c', 'start', '', authUrl]);
-    else execFileSync('xdg-open', [authUrl]);
+    // On Windows, cmd.exe arguments are persistently visible (tasklist /v,
+    // Event Log) — never pass the token-bearing URL through a child process
+    // there; the user opens the URL from the state file instead.
+    if (process.platform === 'win32') {
+      console.log(`Open ${baseUrl}/?token=<token> — token is in the state file: ${pidFile}`);
+    } else if (process.platform === 'darwin') {
+      execFileSync('open', [authUrl]);
+    } else {
+      execFileSync('xdg-open', [authUrl]);
+    }
   } catch {
     console.log(`Could not open browser. The access URL (with token) is saved in: ${pidFile}`);
   }

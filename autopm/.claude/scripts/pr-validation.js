@@ -146,59 +146,13 @@ class PRValidation {
     return true;
   }
 
-  // Parse a command string into an argv array without invoking a shell.
-  // Handles single/double quoted segments so values with spaces survive,
-  // while shell metacharacters are treated as literal argument content.
-  parseCommand(command) {
-    const args = [];
-    let current = '';
-    let quote = null;
-    let hasToken = false;
-
-    for (let i = 0; i < command.length; i++) {
-      const ch = command[i];
-
-      if (quote) {
-        if (ch === quote) {
-          quote = null;
-        } else {
-          current += ch;
-        }
-        continue;
-      }
-
-      if (ch === '"' || ch === "'") {
-        quote = ch;
-        hasToken = true;
-        continue;
-      }
-
-      if (ch === ' ' || ch === '\t') {
-        if (hasToken) {
-          args.push(current);
-          current = '';
-          hasToken = false;
-        }
-        continue;
-      }
-
-      current += ch;
-      hasToken = true;
-    }
-
-    if (hasToken) {
-      args.push(current);
-    }
-
-    return args;
-  }
-
-  // Run Docker command with proper error handling
+  // Run Docker command with proper error handling.
+  // Commands are argv arrays — no shell and no string tokenization, so
+  // argument values can never be reinterpreted as shell syntax.
   async runDockerCommand(command, description) {
     this.print(description, 'blue');
 
-    const parts = this.parseCommand(command);
-    const [file, ...args] = parts;
+    const [file, ...args] = command;
 
     return new Promise((resolve) => {
       // Execute without a shell to avoid command injection
@@ -229,19 +183,19 @@ class PRValidation {
     const tests = [
       {
         name: 'Building development image',
-        command: 'docker-compose build'
+        command: ['docker-compose', 'build']
       },
       {
         name: 'Building production image',
-        command: 'docker build -t app:prod-test .'
+        command: ['docker', 'build', '-t', 'app:prod-test', '.']
       },
       {
         name: 'Running unit tests',
-        command: 'docker-compose run --rm app npm test'
+        command: ['docker-compose', 'run', '--rm', 'app', 'npm', 'test']
       },
       {
         name: 'Running linting',
-        command: 'docker-compose run --rm app npm run lint'
+        command: ['docker-compose', 'run', '--rm', 'app', 'npm', 'run', 'lint']
       }
     ];
 

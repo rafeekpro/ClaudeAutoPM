@@ -18,27 +18,22 @@ const fs = require('fs');
 const ROOT = path.join(__dirname, '..', '..');
 
 // ---------------------------------------------------------------------------
-// 1. pr-validation: no `sh -c`, commands parsed into argv arrays
+// 1. pr-validation: no shell, no string tokenization — commands are argv arrays
 // ---------------------------------------------------------------------------
-test('pr-validation: parseCommand tokenizes into argv array (no sh -c)', () => {
+test('pr-validation: commands are argv arrays, no tokenizer, no sh -c', () => {
   const PRValidation = require(path.join(ROOT, 'autopm/.claude/scripts/pr-validation.js'));
   const validator = new PRValidation();
 
-  assert.strictEqual(typeof validator.parseCommand, 'function',
-    'parseCommand helper must exist so commands run without a shell');
+  // The hand-rolled string tokenizer was removed — commands must be defined
+  // as argv arrays at the call site, never parsed from strings.
+  assert.strictEqual(validator.parseCommand, undefined,
+    'parseCommand string tokenizer must not exist; define commands as argv arrays');
 
-  const parts = validator.parseCommand('docker-compose run --rm app npm test');
-  assert.deepStrictEqual(parts, ['docker-compose', 'run', '--rm', 'app', 'npm', 'test']);
-
-  // Metacharacters must be treated as literal argv content, never shell syntax
-  const malicious = validator.parseCommand('docker build -t "app; rm -rf /" .');
-  assert.deepStrictEqual(malicious, ['docker', 'build', '-t', 'app; rm -rf /', '.']);
-});
-
-test('pr-validation: source no longer spawns sh -c', () => {
   const src = fs.readFileSync(path.join(ROOT, 'autopm/.claude/scripts/pr-validation.js'), 'utf8');
   assert.ok(!/spawn\(\s*['"]sh['"]\s*,\s*\[\s*['"]-c['"]/.test(src),
     "pr-validation must not use spawn('sh', ['-c', ...])");
+  assert.match(src, /command:\s*\['docker-compose',\s*'build'\]/,
+    'test commands must be argv arrays');
 });
 
 // ---------------------------------------------------------------------------
@@ -76,26 +71,27 @@ test('prd: @file path traversal outside project root is rejected', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 4. AzureDevOpsCliWrapper escapes shell metacharacters in values
+// 4. AzureDevOpsCliWrapper executes az via argv array — no shell at all
 // ---------------------------------------------------------------------------
-test('AzureDevOpsCliWrapper: values are shell-escaped, no quote breakout', () => {
+test('AzureDevOpsCliWrapper: az runs via execFileSync argv array, no shell', () => {
   const Wrapper = require(path.join(ROOT, 'lib/providers/AzureDevOpsCliWrapper.js'));
   const wrapper = new Wrapper({ token: 't', organization: 'o', project: 'p' });
 
-  assert.strictEqual(typeof wrapper._shellEscapeArg, 'function',
-    'wrapper must provide a shell-escaping helper');
+  const src = fs.readFileSync(path.join(ROOT, 'lib/providers/AzureDevOpsCliWrapper.js'), 'utf8');
+  // The shell (execSync on a command string) was eliminated entirely;
+  // every az invocation goes through execFileSync with an argv array, so
+  // newlines, quotes, $(), backticks etc. in values are inert.
+  assert.ok(!/require\(['"]child_process['"]\)[^\n]*execSync/.test(src) && !/\bexecSync\(/.test(src),
+    'wrapper must not use execSync with a command string');
+  assert.match(src, /execFileSync\(\s*['"]az['"]\s*,/,
+    'wrapper must execute az via execFileSync argv array');
 
-  const evil = 'x"; rm -rf / #';
-  const escaped = wrapper._shellEscapeArg(evil);
-  // After escaping, when embedded inside double quotes there must be no
-  // un-escaped double-quote that could terminate the quoted string early.
-  assert.ok(!/(^|[^\\])"/.test(escaped),
-    `escaped value must not contain an unescaped double quote: ${escaped}`);
-
-  // Backtick and $ must be neutralized
-  const cmdSubst = wrapper._shellEscapeArg('$(whoami)`id`');
-  assert.ok(/\\\$/.test(cmdSubst) && /\\`/.test(cmdSubst),
-    `command-substitution chars must be escaped: ${cmdSubst}`);
+  // JMESPath values are still escaped so a quote cannot alter the query az parses
+  assert.strictEqual(typeof wrapper._escapeJmesValue, 'function',
+    'wrapper must escape values embedded in JMESPath string literals');
+  const jmes = wrapper._escapeJmesValue("x') || [?name!='");
+  assert.ok(!/(^|[^\\])'/.test(jmes),
+    `JMESPath-escaped value must not contain an unescaped single quote: ${jmes}`);
 });
 
 // ---------------------------------------------------------------------------

@@ -302,7 +302,7 @@ describe('PRValidation', () => {
 
       const validator = new PRValidation();
       jest.spyOn(validator, 'print');
-      const result = await validator.runDockerCommand('docker build .', 'Building image');
+      const result = await validator.runDockerCommand(['docker', 'build', '.'], 'Building image');
 
       expect(result).toBe(true);
       expect(validator.print).toHaveBeenCalledWith('Building image', 'blue');
@@ -320,7 +320,7 @@ describe('PRValidation', () => {
 
       const validator = new PRValidation();
       jest.spyOn(validator, 'print');
-      const result = await validator.runDockerCommand('docker build .', 'Building image');
+      const result = await validator.runDockerCommand(['docker', 'build', '.'], 'Building image');
 
       expect(result).toBe(false);
     });
@@ -335,7 +335,7 @@ describe('PRValidation', () => {
 
       const validator = new PRValidation();
       jest.spyOn(validator, 'print');
-      const result = await validator.runDockerCommand('invalid-command', 'Running test');
+      const result = await validator.runDockerCommand(['invalid-command'], 'Running test');
 
       expect(result).toBe(false);
       expect(validator.print).toHaveBeenCalledWith('❌ Error: Command failed', 'red');

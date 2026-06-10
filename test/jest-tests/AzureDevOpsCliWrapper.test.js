@@ -15,10 +15,10 @@
  * - Edge cases
  */
 
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const AzureDevOpsCliWrapper = require('../../lib/providers/AzureDevOpsCliWrapper');
 
-// Mock child_process.execSync
+// Mock child_process.execFileSync (wrapper executes az via argv array, no shell)
 jest.mock('child_process');
 
 describe('AzureDevOpsCliWrapper', () => {
@@ -34,8 +34,8 @@ describe('AzureDevOpsCliWrapper', () => {
     delete process.env.AZURE_DEVOPS_ORG;
     delete process.env.AZURE_DEVOPS_PROJECT;
 
-    // Get reference to mock execSync
-    mockExecSync = execSync;
+    // Get reference to mock execFileSync
+    mockExecSync = execFileSync;
   });
 
   describe('Constructor', () => {
@@ -123,7 +123,8 @@ describe('AzureDevOpsCliWrapper', () => {
 
       expect(result).toEqual({ id: 1, name: 'test' });
       expect(mockExecSync).toHaveBeenCalledWith(
-        'az pipelines list',
+        'az',
+        ['pipelines', 'list'],
         expect.objectContaining({
           env: expect.objectContaining({
             AZURE_DEVOPS_EXT_PAT: 'test-pat'
@@ -165,7 +166,8 @@ describe('AzureDevOpsCliWrapper', () => {
       });
 
       expect(mockExecSync).toHaveBeenCalledWith(
-        'az pipelines list',
+        'az',
+        ['pipelines', 'list'],
         expect.objectContaining({
           env: expect.objectContaining({
             AZURE_DEVOPS_EXT_PAT: 'test-pat',
@@ -319,7 +321,8 @@ describe('AzureDevOpsCliWrapper', () => {
       expect(result[0].name).toBe('vg1');
       expect(result[1].name).toBe('vg2');
       expect(mockExecSync).toHaveBeenCalledWith(
-        expect.stringContaining('az pipelines variable-group list'),
+        'az',
+        expect.arrayContaining(['pipelines', 'variable-group', 'list']),
         expect.any(Object)
       );
     });
@@ -335,7 +338,8 @@ describe('AzureDevOpsCliWrapper', () => {
       expect(result).toHaveLength(1);
       expect(result[0].name).toBe('prod-vg');
       expect(mockExecSync).toHaveBeenCalledWith(
-        expect.stringContaining('--query "[?contains(name, \'prod\')]'),
+        'az',
+        expect.arrayContaining(['--query', "[?contains(name, 'prod')]"]),
         expect.any(Object)
       );
     });
@@ -381,7 +385,8 @@ describe('AzureDevOpsCliWrapper', () => {
       expect(result[0].name).toBe('github-conn');
       expect(result[1].type).toBe('dockerregistry');
       expect(mockExecSync).toHaveBeenCalledWith(
-        expect.stringContaining('az devops service-endpoint list'),
+        'az',
+        expect.arrayContaining(['devops', 'service-endpoint', 'list']),
         expect.any(Object)
       );
     });
@@ -429,7 +434,8 @@ describe('AzureDevOpsCliWrapper', () => {
       expect(result[0].name).toBe('ci-pipeline');
       expect(result[1].folder).toBe('\\release');
       expect(mockExecSync).toHaveBeenCalledWith(
-        expect.stringContaining('az pipelines list'),
+        'az',
+        expect.arrayContaining(['pipelines', 'list']),
         expect.any(Object)
       );
     });
@@ -444,9 +450,10 @@ describe('AzureDevOpsCliWrapper', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0].folder).toBe('\\build');
-      // Security: backslash is escaped for safe shell embedding
+      // Security: value passed as a discrete argv element — no shell, no escaping needed
       expect(mockExecSync).toHaveBeenCalledWith(
-        expect.stringContaining('--folder "\\\\build"'),
+        'az',
+        expect.arrayContaining(['--folder', '\\build']),
         expect.any(Object)
       );
     });
