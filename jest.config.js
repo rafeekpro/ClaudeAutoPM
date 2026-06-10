@@ -49,16 +49,16 @@ module.exports = {
   // Coverage thresholds.
   // Target per .claude/rules/coverage-thresholds.xml: 80/75/80/80
   // (statements/branches/functions/lines). The default suite currently
-  // measures 50.6/48.9/51.5/50.5 with lib/ and bin/ included — most of bin/
+  // measures 52.0/49.3/53.5/52.0 with lib/ and bin/ included — most of bin/
   // and parts of lib/ have no unit tests yet. Values below are a ratchet set
   // just under the measured coverage of `npm test -- --coverage`; raise them
-  // as suites are added, never lower them (#608, epic #605).
+  // as suites are added, never lower them (#608, #611, epic #605).
   coverageThreshold: {
     global: {
-      statements: 48,
-      branches: 46,
-      functions: 49,
-      lines: 48
+      statements: 51,
+      branches: 48,
+      functions: 52,
+      lines: 51
     }
   },
 

@@ -30,15 +30,17 @@ class LocalTestRunner {
         stdio: 'pipe'
       });
 
-      let output = '';
-      let errorOutput = '';
+      // Drain the pipes so the child cannot block on a full buffer;
+      // the collected output is intentionally unused (stdio is piped).
+      let _output = '';
+      let _errorOutput = '';
 
       child.stdout.on('data', (data) => {
-        output += data.toString();
+        _output += data.toString();
       });
 
       child.stderr.on('data', (data) => {
-        errorOutput += data.toString();
+        _errorOutput += data.toString();
       });
 
       child.on('close', (code) => {

@@ -37,29 +37,6 @@ Before delivering any solution, verify:
 - [ ] Error handling is comprehensive`
 };
 
-// Agents missing frontmatter (from analysis)
-const MISSING_FRONTMATTER = [
-  'cloud/gemini-api-expert.md',
-  'cloud/openai-python-expert.md',
-  'core/agent-manager.md',
-  'core/mcp-manager.md',
-  'data/langgraph-workflow-expert.md',
-  'devops/docker-containerization-expert.md',
-  'devops/ssh-operations-expert.md',
-  'devops/traefik-proxy-expert.md',
-  'frameworks/e2e-test-engineer.md',
-  'frameworks/react-ui-expert.md',
-  'frameworks/tailwindcss-expert.md',
-  'languages/python-backend-expert.md'
-];
-
-/**
- * Extract agent name from first markdown header
- */
-function extractAgentName(content) {
-  const match = content.match(/^#\s+(.+)$/m);
-  return match ? match[1].trim() : 'unknown-agent';
-}
 
 /**
  * Extract first paragraph as description

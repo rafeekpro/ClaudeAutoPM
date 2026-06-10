@@ -531,7 +531,7 @@ module.exports = {
           await cmd.set(argv.key, argv.value);
           break;
 
-        case 'get':
+        case 'get': {
           if (!argv.key) {
             console.error('❌ Key is required for get command');
             console.error('Usage: autopm config get <key>');
@@ -541,11 +541,13 @@ module.exports = {
           const value = argv.key.split('.').reduce((obj, key) => obj?.[key], config);
           console.log(value || 'Not set');
           break;
+        }
 
-        case 'validate':
+        case 'validate': {
           const valid = await cmd.validate();
           process.exit(valid ? 0 : 1);
           break;
+        }
 
         case 'switch':
           if (!argv.key) {

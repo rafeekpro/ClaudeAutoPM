@@ -6,10 +6,9 @@
  * WARNING: This rewrites history - use with caution!
  */
 
-const { execSync, spawn } = require('child_process');
+const { execSync } = require('child_process');
 const readline = require('readline');
 const fs = require('fs-extra');
-const path = require('path');
 const colors = require('../lib/utils/colors');
 
 class AIContributorCleaner {

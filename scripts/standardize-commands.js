@@ -49,17 +49,6 @@ function extractCategory(filePath) {
   return 'general';
 }
 
-function extractDescription(content) {
-  // Get first paragraph after title
-  const lines = content.split('\n');
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (line && !line.startsWith('#')) {
-      return line.length > 150 ? line.substring(0, 147) + '...' : line;
-    }
-  }
-  return 'PM command for project management workflow';
-}
 
 function determineCommandType(filePath, content) {
   const contentLower = content.toLowerCase();
@@ -88,7 +77,6 @@ function determineCommandType(filePath, content) {
 
 function generateFrontmatter(filePath, content) {
   const name = extractCommandName(filePath, content);
-  const description = extractDescription(content);
   const category = extractCategory(filePath);
   const type = determineCommandType(filePath, content);
 
