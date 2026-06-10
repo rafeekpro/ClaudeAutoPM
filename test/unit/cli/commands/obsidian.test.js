@@ -35,7 +35,6 @@ function getHandlers() {
 describe('Obsidian Commands', () => {
   let handlers;
   let existsSpy;
-  let exitSpy;
   let logSpy;
   let errorSpy;
   let mockChild;
@@ -52,7 +51,7 @@ describe('Obsidian Commands', () => {
     spawn.mockReturnValue(mockChild);
 
     existsSpy = jest.spyOn(fs, 'existsSync');
-    exitSpy = jest.spyOn(process, 'exit').mockImplementation((code) => {
+    jest.spyOn(process, 'exit').mockImplementation((code) => {
       throw new Error(`process.exit:${code}`);
     });
     logSpy = jest.spyOn(console, 'log').mockImplementation();
