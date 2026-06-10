@@ -7,7 +7,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync, execFileSync, spawn } = require('child_process');
+const { execFileSync } = require('child_process');
 
 // Valid npm package name (optionally scoped), per npm naming rules
 const NPM_NAME_RE = /^(@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/;

@@ -1484,8 +1484,11 @@ server.listen(0, '127.0.0.1', () => {
   const pidData = JSON.stringify({ pid: process.pid, port, token }, null, 2);
 
   if (!fs.existsSync(pmDir)) fs.mkdirSync(pmDir, { recursive: true });
-  // Owner read/write only — the state file holds the auth token
+  // Owner read/write only — the state file holds the auth token.
+  // `mode` only applies on creation, so chmod explicitly in case the file
+  // already exists from a previous run with looser permissions.
   fs.writeFileSync(pidFile, pidData + '\n', { encoding: 'utf8', mode: 0o600 });
+  fs.chmodSync(pidFile, 0o600);
 
   resetIdle();
 
