@@ -219,11 +219,14 @@ describe('WorkflowService', () => {
   describe('generateStandup()', () => {
     it('should generate standup report with all sections', async () => {
       const now = new Date();
-      const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      // 23h, not 24h: the service computes its own `now` a few ms later and
+      // filters `completed >= now - 24h` — an exact-24h timestamp lands just
+      // outside that window and made this test flake on millisecond timing
+      const within24h = new Date(now.getTime() - 23 * 60 * 60 * 1000);
 
       // Mock all issues in one call (generateStandup filters locally)
       mockIssueService.listIssues.mockResolvedValue([
-        { id: '123', title: 'Completed task', status: 'closed', completed: yesterday.toISOString() },
+        { id: '123', title: 'Completed task', status: 'closed', completed: within24h.toISOString() },
         { id: '124', title: 'In progress task', status: 'in-progress' },
         { id: '125', title: 'Blocked task', status: 'blocked', blocked_reason: 'Waiting for API' }
       ]);
