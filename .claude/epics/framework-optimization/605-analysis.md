@@ -2,8 +2,21 @@
 issue: 605
 name: framework-wide-optimization
 analyzed: 2026-06-10T11:03:46Z
-status: audit-complete
+updated: 2026-06-10T11:52:21Z
+status: p0-in-review
 ---
+
+## Progress
+
+- 2026-06-10: Audit complete; sub-issues #606–#612 created.
+- 2026-06-10: P0 implemented — PR #613 (#607 PluginManager) and PR #614 (#606 security),
+  both TDD, base `develop` (new promotion model: PRs to main only from develop).
+  Two rounds of AI-review-gate findings addressed on each; gates no longer blocking.
+  Awaiting human approval.
+- Found along the way: `autopm/.claude/providers/azure/issue-start.js` is a broken
+  stub (`throw new Error("Provider script error")`) — flagged on #605 for #608 triage.
+  `test/core/PluginManager.test.js` not hermetic (global npm plugins leak) — flagged on #608.
+- Deferred from #606: npm-audit dependency updates (separate PR to avoid churn).
 
 # Issue #605 — Audit Results & Work Stream Decomposition
 
