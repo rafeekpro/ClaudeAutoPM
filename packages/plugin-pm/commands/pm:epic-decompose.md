@@ -321,66 +321,84 @@ Creating task 002 (Database schema):
 ✓ Created
 ```
 
-### 4. Task File Format with Frontmatter
+### 4. MANDATORY: Read Issue Template Before Creating Tasks
+
+**CRITICAL**: Before creating ANY task, read the issue template:
+```
+Read .claude/templates/issue.xml
+Read .claude/rules/issue-structure.xml
+```
+
+Every task file MUST include ALL required sections from `issue.xml`. Missing sections = auto-reject.
+
+### 5. Task File Format with Frontmatter
 For each task, create a file with this exact structure:
 
 ```markdown
 ---
 name: [Task Title]
 status: open
+priority: [critical/high/medium/low]
+effort: [S/M/L/XL]
 created: [Current ISO date/time]
 updated: [Current ISO date/time]
-assigned_agent: .claude/agents/{category}/{agent-name}.md  # Specialized agent for this task
-agent_context:  # Optional: Agent-specific configuration
+assigned_agent: .claude/agents/{category}/{agent-name}.md
+agent_context:
   framework: [framework_name]
   language: [language_name]
-  approach: [implementation_approach]
 github: [Will be updated when synced to GitHub]
-depends_on: []  # List of task numbers this depends on, e.g., [001, 002]
-parallel: true  # Can this run in parallel with other tasks?
-conflicts_with: []  # Tasks that modify same files, e.g., [003, 004]
+depends_on: []
+parallel: true
+conflicts_with: []
 ---
 
 # Task: [Task Title]
 
-## Description
-Clear, concise description of what needs to be done
+## Goal
+[One sentence: WHAT this task delivers and WHY it matters]
 
-## ⚠️ TDD Requirements
-**This project uses Test-Driven Development. You MUST:**
-1. 🔴 RED: Write failing test first
-2. 🟢 GREEN: Write minimal code to make test pass
-3. 🔵 REFACTOR: Clean up code while keeping tests green
-
-See `.claude/rules/tdd.enforcement.md` for complete requirements.
+## Context
+[WHY this task exists — what triggered it, what currently works/doesn't,
+ what must be in place first. Include specific file paths, URLs, services.]
 
 ## Acceptance Criteria
-- [ ] Specific criterion 1
-- [ ] Specific criterion 2
-- [ ] Specific criterion 3
+- [ ] Specific, measurable criterion 1
+- [ ] Specific, measurable criterion 2
+- [ ] Specific, measurable criterion 3
 
-## Technical Details
-- Implementation approach
-- Key considerations
-- Code locations/files affected
+## Affected Files
+- `path/to/file.ts` — [what changes]
+- `path/to/test.ts` — [new test file]
 
-## Dependencies
-- [ ] Task/Issue dependencies
-- [ ] External dependencies
+## Related Issues
+- depends on #NNN — [why]
+- blocks #NNN — [why]
+- (or "None" if standalone)
 
-## Effort Estimate
-- Size: XS/S/M/L/XL
-- Hours: estimated hours
-- Parallel: true/false (can run in parallel with other tasks)
+## Verification Steps
+[Concrete commands to verify this task is done:]
+- `npm test -- --filter=feature` → all pass
+- `curl http://localhost:3000/api/endpoint` → 200
+- `kubectl get pods -n app` → Running
 
 ## Definition of Done
 - [ ] Tests written FIRST (RED phase)
 - [ ] Code implemented (GREEN phase)
 - [ ] Code refactored (REFACTOR phase)
 - [ ] All tests passing
-- [ ] Documentation updated
-- [ ] Code reviewed
-- [ ] Deployed to staging
+- [ ] Verification steps confirmed
+- [ ] PR approved and merged
+
+## ⚠️ TDD Requirements
+1. 🔴 RED: Write failing test first
+2. 🟢 GREEN: Write minimal code to make test pass
+3. 🔵 REFACTOR: Clean up code while keeping tests green
+
+## Technical Constraints
+[Stack, patterns, prohibitions — optional but recommended]
+
+## Out of Scope
+[What NOT to touch — prevents AI from "improving" neighbors]
 ```
 
 ### 3. Task Naming Convention

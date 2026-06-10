@@ -6,7 +6,6 @@
  */
 
 const { performance } = require('perf_hooks');
-const path = require('path');
 
 // Mock configuration
 const mockConfig = {

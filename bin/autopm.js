@@ -8,7 +8,6 @@
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 const path = require('path');
-const fs = require('fs-extra');
 
 // Get package info for version
 const packageJson = require('../package.json');
@@ -39,13 +38,14 @@ function main() {
       },
       (argv) => {
         // Delegate to install.js directly (not install.sh) to pass flags
-        const { execSync } = require('child_process');
+        const { execFileSync } = require('child_process');
         const installJsPath = path.join(__dirname, '..', 'install', 'install.js');
         const args = [];
         if (argv.force) args.push('--force');
         if (argv.scenario) args.push(`--scenario=${argv.scenario}`);
         try {
-          execSync(`node "${installJsPath}" ${args.join(' ')}`, {
+          // Pass arguments as an array (no shell) to prevent command injection
+          execFileSync('node', [installJsPath, ...args], {
             stdio: 'inherit',
             env: { ...process.env, AUTOPM_PRESET: argv.preset || '' }
           });
@@ -132,37 +132,42 @@ function main() {
             console.log('=====================================\n');
 
             switch (argv.action) {
-              case 'install':
+              case 'install': {
                 console.log(`📦 Generating Installation Guide for ${argv.platform}...\n`);
                 const installResult = await manager.generateInstallationGuide(argv.platform, argv);
                 console.log(`✅ Installation guide created: ${installResult.path}`);
                 console.log(`🖥️  Platform: ${installResult.platform}\n`);
                 break;
+              }
 
-              case 'config':
+              case 'config': {
                 console.log('⚙️  Generating Configuration Guide...\n');
                 const configResult = await manager.generateConfigGuide(argv);
                 console.log(`✅ Configuration guide created: ${configResult.path}\n`);
                 break;
+              }
 
-              case 'tutorial':
+              case 'tutorial': {
                 const topic = argv.topic || 'basics';
                 console.log(`🎓 Creating ${topic} Tutorial...\n`);
                 const tutorialResult = await manager.createTutorial(topic, argv);
                 console.log(`✅ Tutorial created: ${tutorialResult.path}\n`);
                 break;
+              }
 
-              case 'examples':
+              case 'examples': {
                 console.log('💡 Generating Code Examples...\n');
                 const examplesResult = await manager.generateExamples(argv.category || 'general', argv);
                 console.log(`✅ Examples created: ${examplesResult.path}\n`);
                 break;
+              }
 
-              case 'faq':
+              case 'faq': {
                 console.log('❓ Generating FAQ Document...\n');
                 const faqResult = await manager.generateFAQ(argv);
                 console.log(`✅ FAQ created: ${faqResult.path}\n`);
                 break;
+              }
 
               default:
                 console.log('❌ Unknown guide action. Use: autopm guide --help');

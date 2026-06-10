@@ -7,7 +7,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync, spawn } = require('child_process');
+const { execFileSync, spawn } = require('child_process');
 const readline = require('readline');
 
 class PRValidation {
@@ -78,7 +78,7 @@ class PRValidation {
 
     // Check if we're in a git repository
     try {
-      execSync('git rev-parse --git-dir', { stdio: 'ignore' });
+      execFileSync('git', ['rev-parse', '--git-dir'], { stdio: 'ignore' });
     } catch (error) {
       this.print('❌ Not in a Git repository', 'red');
       return false;
@@ -86,7 +86,7 @@ class PRValidation {
 
     // Check for uncommitted changes
     try {
-      execSync('git diff-index --quiet HEAD --');
+      execFileSync('git', ['diff-index', '--quiet', 'HEAD', '--']);
     } catch (error) {
       this.print('⚠️  You have uncommitted changes', 'yellow');
       if (!this.force) {
@@ -99,7 +99,7 @@ class PRValidation {
     }
 
     // Check current branch
-    const currentBranch = execSync('git branch --show-current', { encoding: 'utf8' }).trim();
+    const currentBranch = execFileSync('git', ['branch', '--show-current'], { encoding: 'utf8' }).trim();
     if (currentBranch === 'main' || currentBranch === 'master') {
       this.print("⚠️  You're on the main branch", 'yellow');
       if (!this.force) {
@@ -121,7 +121,7 @@ class PRValidation {
 
     // Check if Docker is running
     try {
-      execSync('docker info', { stdio: 'ignore' });
+      execFileSync('docker', ['info'], { stdio: 'ignore' });
     } catch (error) {
       this.print('❌ Docker is not running', 'red');
       return false;
@@ -146,12 +146,17 @@ class PRValidation {
     return true;
   }
 
-  // Run Docker command with proper error handling
+  // Run Docker command with proper error handling.
+  // Commands are argv arrays — no shell and no string tokenization, so
+  // argument values can never be reinterpreted as shell syntax.
   async runDockerCommand(command, description) {
     this.print(description, 'blue');
 
+    const [file, ...args] = command;
+
     return new Promise((resolve) => {
-      const child = spawn('sh', ['-c', command], {
+      // Execute without a shell to avoid command injection
+      const child = spawn(file, args, {
         stdio: 'inherit'
       });
 
@@ -178,19 +183,19 @@ class PRValidation {
     const tests = [
       {
         name: 'Building development image',
-        command: 'docker-compose build'
+        command: ['docker-compose', 'build']
       },
       {
         name: 'Building production image',
-        command: 'docker build -t app:prod-test .'
+        command: ['docker', 'build', '-t', 'app:prod-test', '.']
       },
       {
         name: 'Running unit tests',
-        command: 'docker-compose run --rm app npm test'
+        command: ['docker-compose', 'run', '--rm', 'app', 'npm', 'test']
       },
       {
         name: 'Running linting',
-        command: 'docker-compose run --rm app npm run lint'
+        command: ['docker-compose', 'run', '--rm', 'app', 'npm', 'run', 'lint']
       }
     ];
 

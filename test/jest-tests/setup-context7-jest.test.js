@@ -3,7 +3,7 @@ jest.mock('fs');
 jest.mock('child_process');
 
 const fs = require('fs');
-const { execSync, spawn } = require('child_process');
+const { execSync, execFileSync, spawn } = require('child_process');
 const SetupContext7 = require('../../autopm/.claude/scripts/setup-context7.js');
 
 describe('SetupContext7', () => {
@@ -19,8 +19,9 @@ describe('SetupContext7', () => {
     fs.copyFileSync.mockImplementation(() => {});
     fs.writeFileSync.mockImplementation(() => {});
 
-    // Mock execSync
+    // Mock execSync / execFileSync
     execSync.mockReturnValue('');
+    execFileSync.mockReturnValue('');
   });
 
   describe('Constructor', () => {
@@ -60,17 +61,18 @@ describe('SetupContext7', () => {
 
   describe('commandExists()', () => {
     it('should return true when command exists', () => {
-      execSync.mockReturnValue('/usr/bin/node');
+      execFileSync.mockReturnValue('/usr/bin/node');
 
       const setup = new SetupContext7();
       const result = setup.commandExists('node');
 
       expect(result).toBe(true);
-      expect(execSync).toHaveBeenCalledWith('which node', { stdio: 'ignore' });
+      // Security: command passed as argv array, no shell interpolation
+      expect(execFileSync).toHaveBeenCalledWith('which', ['node'], { stdio: 'ignore' });
     });
 
     it('should return false when command does not exist', () => {
-      execSync.mockImplementation(() => {
+      execFileSync.mockImplementation(() => {
         throw new Error('Command not found');
       });
 
@@ -233,7 +235,7 @@ describe('SetupContext7', () => {
       const setup = new SetupContext7();
       jest.spyOn(setup, 'commandExists').mockReturnValue(true);
       jest.spyOn(setup, 'print');
-      execSync.mockImplementation(() => {
+      execFileSync.mockImplementation(() => {
         throw new Error('Installation failed');
       });
 
@@ -251,8 +253,12 @@ describe('SetupContext7', () => {
 
       await setup.installMCPServers();
 
-      // Verify npm install commands were called for MCP packages
-      expect(execSync).toHaveBeenCalledWith(expect.stringContaining('npm install -g'), expect.any(Object));
+      // Security: npm install invoked via argv array, no shell interpolation
+      expect(execFileSync).toHaveBeenCalledWith(
+        'npm',
+        ['install', '-g', '@modelcontextprotocol/server-filesystem'],
+        expect.any(Object)
+      );
     });
   });
 

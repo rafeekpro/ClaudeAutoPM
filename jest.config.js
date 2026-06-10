@@ -1,3 +1,11 @@
+// Default Jest configuration — what `npm test` runs (#608).
+//
+// Scope: every suite under test/unit plus the stable cross-cutting suites
+// from the old 7-file quick allowlist. The other runners stay available as
+// npm scripts:
+//   test:quick → jest.config.quick.js  (smoke allowlist, explicit files)
+//   test:full  → jest.config.clean.js  (jest-tests/integration/cli — many
+//                suites still failing; repair tracked in epic #605)
 module.exports = {
   // Test environment
   testEnvironment: 'node',
@@ -7,26 +15,50 @@ module.exports = {
 
   // Test file patterns
   testMatch: [
-    '**/test/**/*.test.js',
-    '**/test/**/*.spec.js'
+    '<rootDir>/test/unit/**/*.test.js',
+    '<rootDir>/test/templates/agent-registry-consistency.test.js',
+    '<rootDir>/test/templates/template-reader.test.js',
+    '<rootDir>/test/local-mode/local-issues.test.js',
+    '<rootDir>/test/local-mode/local-prd-epic.test.js',
+    '<rootDir>/test/core/PluginManager.test.js',
+    '<rootDir>/test/installation/generate-agent-xml.test.js',
+    '<rootDir>/test/installation/e2e-scenarios.test.js'
   ],
 
-  // Coverage collection
+  // Parallel agent worktrees must never leak into test discovery or the
+  // haste-map (duplicate module names) — ignore them everywhere (#608)
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '<rootDir>/.claude/worktrees/'
+  ],
+  modulePathIgnorePatterns: [
+    '<rootDir>/.claude/worktrees/'
+  ],
+
+  // Coverage collection — lib/ and bin/ were previously invisible (#608)
   collectCoverageFrom: [
     'autopm/.claude/scripts/**/*.js',
+    'lib/**/*.js',
+    'bin/**/*.js',
     '!**/*.sh',
     '!**/node_modules/**',
     '!**/test/**',
     '!**/*.backup.js'
   ],
 
-  // Coverage thresholds - start low, increase gradually
+  // Coverage thresholds.
+  // Target per .claude/rules/coverage-thresholds.xml: 80/75/80/80
+  // (statements/branches/functions/lines). The default suite currently
+  // measures 52.0/49.3/53.5/52.0 with lib/ and bin/ included — most of bin/
+  // and parts of lib/ have no unit tests yet. Values below are a ratchet set
+  // just under the measured coverage of `npm test -- --coverage`; raise them
+  // as suites are added, never lower them (#608, #611, epic #605).
   coverageThreshold: {
     global: {
-      branches: 50,
-      functions: 50,
-      lines: 50,
-      statements: 50
+      statements: 51,
+      branches: 48,
+      functions: 52,
+      lines: 51
     }
   },
 
@@ -34,28 +66,14 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/test/setup.js'],
 
   // Test timeout
-  testTimeout: 10000,
+  testTimeout: 15000,
 
-  // Verbose output
-  verbose: true,
+  // Some suites still use process.chdir(); run serially so suites cannot
+  // race on the process-wide working directory (#608)
+  maxWorkers: 1,
 
-  // Projects for different test types
-  projects: [
-    {
-      displayName: 'unit',
-      testMatch: ['<rootDir>/test/unit/**/*.test.js']
-    },
-    {
-      displayName: 'jest-tests',
-      testMatch: ['<rootDir>/test/jest-tests/**/*.test.js'],
-      testTimeout: 15000
-    },
-    {
-      displayName: 'e2e',
-      testMatch: ['<rootDir>/test/e2e/**/*.test.js'],
-      testTimeout: 30000
-    }
-  ],
+  // Quiet by default; failures still print in full
+  verbose: false,
 
   // Coverage reporters
   coverageReporters: ['text', 'lcov', 'html', 'json-summary'],
@@ -69,7 +87,7 @@ module.exports = {
       outputName: 'junit.xml'
     }],
     ['jest-html-reporter', {
-      pageTitle: 'AUTOPM Migration Test Report',
+      pageTitle: 'AUTOPM Test Report',
       outputPath: 'test-results/report.html'
     }]
   ],

@@ -7,14 +7,42 @@
     <field name="assignee" type="string" default=""/>
     <field name="created" type="datetime" auto="true"/>
     <field name="updated" type="datetime" auto="true"/>
+    <field name="priority" type="enum" values="critical,high,medium,low" default="medium"/>
+    <field name="effort" type="enum" values="S,M,L,XL" default="M"/>
     <field name="started" type="datetime"/>
     <field name="completed" type="datetime"/>
   </frontmatter>
 
   <sections>
     <section name="goal" heading="Goal" required="true">One sentence: WHAT and WHY</section>
+    <section name="context" heading="Context" required="true">
+      Why this issue exists. Include:
+      - Problem background — what triggered this (bug report, user request, architectural gap)
+      - Current state — what works now, what doesn't, relevant infrastructure/config
+      - Dependencies — what must exist first (images, services, DNS, other issues)
+      - Access/environment — how to reproduce, where to verify (cluster, URL, CI)
+    </section>
     <section name="acceptance-criteria" heading="Acceptance Criteria" required="true">Measurable checkboxes</section>
     <section name="affected-files" heading="Affected Files" required="true">Exact file paths with change description</section>
+    <section name="related-issues" heading="Related Issues" required="true">
+      Links to blocking/blocked/related issues:
+      - depends on #NNN — must be done first
+      - blocks #NNN — this unblocks other work
+      - related to #NNN — shares context
+      - Write "None" if truly standalone
+    </section>
+    <section name="verification" heading="Verification Steps" required="true">
+      Concrete commands to verify the work is done. Examples:
+      - curl https://app.example.com → 200
+      - kubectl get pods -n app → Running
+      - npm test -- --filter=feature → pass
+    </section>
+    <section name="definition-of-done" heading="Definition of Done" required="true">
+      Checklist of quality gates that MUST pass before closing:
+      - [ ] Tests pass (unit, integration)
+      - [ ] Deployed to staging/verified
+      - [ ] PR approved and merged
+    </section>
     <section name="constraints" heading="Technical Constraints" required="false">Stack, patterns, prohibitions</section>
     <section name="out-of-scope" heading="Out of Scope" required="false">What NOT to touch</section>
     <section name="approach" heading="Suggested Approach" required="false">Brief implementation strategy</section>
@@ -22,6 +50,11 @@
 
   <validation>
     <rule>goal must be non-empty</rule>
+    <rule>context must be non-empty</rule>
+    <rule>acceptance-criteria must be non-empty</rule>
+    <rule>related-issues must be non-empty</rule>
+    <rule>verification must be non-empty</rule>
+    <rule>definition-of-done must be non-empty</rule>
     <rule>at least 1 acceptance criterion checkbox (- [ ])</rule>
   </validation>
 </template>

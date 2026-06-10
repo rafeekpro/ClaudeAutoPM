@@ -840,10 +840,12 @@ Great vision
   });
 
   describe('Constructor options', () => {
-    test('should require prdService in constructor', () => {
-      expect(() => {
-        new EpicService();
-      }).toThrow('PRDService instance is required');
+    // API drift fixed in #608: prdService is now optional — it is only
+    // required for PRD parsing operations, so the constructor no longer throws.
+    test('should allow construction without prdService (optional dependency)', () => {
+      const service = new EpicService();
+      expect(service).toBeInstanceOf(EpicService);
+      expect(service.prdService).toBeNull();
     });
 
     test('should accept PRDService via dependency injection', () => {
@@ -851,10 +853,10 @@ Great vision
       expect(service).toBeInstanceOf(EpicService);
     });
 
-    test('should throw error if prdService is not an instance of PRDService', () => {
-      expect(() => {
-        new EpicService({ prdService: {} });
-      }).toThrow('prdService must be an instance of PRDService');
+    test('should store provided prdService instance', () => {
+      const prdService = new PRDService();
+      const service = new EpicService({ prdService });
+      expect(service.prdService).toBe(prdService);
     });
   });
 });

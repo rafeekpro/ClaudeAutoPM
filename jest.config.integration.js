@@ -9,7 +9,12 @@ module.exports = {
 
   // Ignore everything else
   testPathIgnorePatterns: [
-    '/node_modules/'
+    '/node_modules/',
+    '<rootDir>/.claude/worktrees/'
+  ],
+  // Keep parallel agent worktrees out of the haste-map (#608)
+  modulePathIgnorePatterns: [
+    '<rootDir>/.claude/worktrees/'
   ],
 
   // Coverage settings

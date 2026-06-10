@@ -240,9 +240,6 @@ const commands = {
 
         // Status indicator
         const statusIcon = missingAgents.length === 0 ? '✅' : '⚠️';
-        const statusText = missingAgents.length === 0
-          ? 'ready'
-          : `${missingAgents.length} missing`;
 
         console.log(`  ${statusIcon} ${name}:`);
         console.log(`    ${config.description || 'No description'}`);
@@ -370,7 +367,7 @@ const commands = {
         const installablePlugins = [];
         const trulyMissing = [];
 
-        for (const [agentName, pluginInfo] of pluginMapping.found.entries()) {
+        for (const [, pluginInfo] of pluginMapping.found.entries()) {
           if (!pluginInfo.installed) {
             installablePlugins.push(pluginInfo);
           }

@@ -147,11 +147,11 @@ async function benchmarkConfigLoading(iterations = 50) {
     // Benchmark provider detection
     const detectStart = performance.now();
 
-    let provider = 'github'; // default
+    let _provider = 'github'; // default — only the detection cost is measured
     if (process.env.AUTOPM_PROVIDER) {
-      provider = process.env.AUTOPM_PROVIDER;
+      _provider = process.env.AUTOPM_PROVIDER;
     } else if (config.projectManagement?.provider) {
-      provider = config.projectManagement.provider;
+      _provider = config.projectManagement.provider;
     }
 
     const detectEnd = performance.now();

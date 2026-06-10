@@ -1,5 +1,11 @@
 /**
  * Unit tests for PluginManager
+ *
+ * Rewritten for the current PluginManager API (#608):
+ * - options live on `manager.options` (pluginDir, agentDir, projectRoot, ...)
+ * - registryPath/includeGlobal options keep the suite hermetic (no real
+ *   ~/.claudeautopm registry, no global npm discovery)
+ * - the old `validateMetadata()` API no longer exists; those tests were removed
  */
 
 const fs = require('fs-extra');
@@ -9,24 +15,28 @@ const PluginManager = require('../../../lib/plugins/PluginManager');
 
 describe('PluginManager', () => {
   let tempDir;
-  let pluginsDir;
+  let pluginDir;
   let projectRoot;
+  let registryPath;
   let manager;
 
   beforeEach(() => {
     // Create temporary directories
-    tempDir = path.join(os.tmpdir(), `autopm-test-${Date.now()}`);
-    pluginsDir = path.join(tempDir, 'plugins');
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'autopm-test-'));
     projectRoot = path.join(tempDir, 'project');
+    pluginDir = path.join(projectRoot, 'node_modules');
+    registryPath = path.join(tempDir, 'registry.json');
 
-    fs.ensureDirSync(pluginsDir);
-    fs.ensureDirSync(projectRoot);
+    fs.ensureDirSync(pluginDir);
     fs.ensureDirSync(path.join(projectRoot, '.claude', 'agents'));
 
-    // Create plugin manager instance
+    // Create plugin manager instance (hermetic: temp registry, no global npm)
     manager = new PluginManager({
       projectRoot,
-      pluginsDir
+      pluginDir,
+      agentDir: path.join(projectRoot, '.claude', 'agents'),
+      registryPath,
+      includeGlobal: false
     });
   });
 
@@ -40,17 +50,15 @@ describe('PluginManager', () => {
   describe('Constructor', () => {
     it('should initialize with default options', () => {
       const defaultManager = new PluginManager();
-      expect(defaultManager.projectRoot).toBe(process.cwd());
-      expect(defaultManager.pluginsDir).toContain('.claudeautopm');
+      expect(defaultManager.options.projectRoot).toBe(process.cwd());
+      expect(defaultManager.options.pluginDir).toBe(path.join(process.cwd(), 'node_modules'));
+      expect(defaultManager.registryPath).toContain('.claudeautopm');
     });
 
     it('should initialize with custom options', () => {
-      expect(manager.projectRoot).toBe(projectRoot);
-      expect(manager.pluginsDir).toBe(pluginsDir);
-    });
-
-    it('should create plugins directory if not exists', () => {
-      expect(fs.existsSync(pluginsDir)).toBe(true);
+      expect(manager.options.projectRoot).toBe(projectRoot);
+      expect(manager.options.pluginDir).toBe(pluginDir);
+      expect(manager.registryPath).toBe(registryPath);
     });
 
     it('should load registry on initialization', () => {
@@ -121,68 +129,6 @@ describe('PluginManager', () => {
       manager.saveRegistry();
       expect(manager.registry.lastUpdate).not.toBe(oldTimestamp);
       jest.useRealTimers();
-    });
-  });
-
-  describe('validateMetadata', () => {
-    it('should validate correct metadata', () => {
-      const validMetadata = {
-        name: '@claudeautopm/plugin-test',
-        version: '1.0.0',
-        displayName: 'Test Plugin',
-        description: 'A test plugin',
-        category: 'test',
-        agents: [
-          {
-            name: 'test-agent',
-            file: 'agents/test-agent.md',
-            description: 'A test agent'
-          }
-        ]
-      };
-
-      expect(() => manager.validateMetadata(validMetadata)).not.toThrow();
-    });
-
-    it('should reject metadata missing required fields', () => {
-      const invalidMetadata = {
-        name: '@claudeautopm/plugin-test',
-        version: '1.0.0'
-        // Missing other required fields
-      };
-
-      expect(() => manager.validateMetadata(invalidMetadata)).toThrow('missing required field');
-    });
-
-    it('should reject metadata with invalid agents array', () => {
-      const invalidMetadata = {
-        name: '@claudeautopm/plugin-test',
-        version: '1.0.0',
-        displayName: 'Test Plugin',
-        description: 'A test plugin',
-        category: 'test',
-        agents: 'not an array'
-      };
-
-      expect(() => manager.validateMetadata(invalidMetadata)).toThrow('must be an array');
-    });
-
-    it('should reject metadata with invalid agent structure', () => {
-      const invalidMetadata = {
-        name: '@claudeautopm/plugin-test',
-        version: '1.0.0',
-        displayName: 'Test Plugin',
-        description: 'A test plugin',
-        category: 'test',
-        agents: [
-          {
-            name: 'test-agent'
-            // Missing file and description
-          }
-        ]
-      };
-
-      expect(() => manager.validateMetadata(invalidMetadata)).toThrow('must have name, file, and description');
     });
   });
 
@@ -270,7 +216,7 @@ describe('PluginManager', () => {
 
     beforeEach(() => {
       // Create mock plugin directory structure
-      pluginPath = path.join(projectRoot, 'node_modules', '@claudeautopm', 'plugin-test');
+      pluginPath = path.join(pluginDir, '@claudeautopm', 'plugin-test');
       fs.ensureDirSync(path.join(pluginPath, 'agents'));
 
       // Create plugin metadata
@@ -280,6 +226,7 @@ describe('PluginManager', () => {
         displayName: 'Test Plugin',
         description: 'A test plugin for unit tests',
         category: 'test',
+        compatibleWith: '>=2.8.0',
         agents: [
           {
             name: 'test-agent-1',
@@ -330,6 +277,7 @@ describe('PluginManager', () => {
 
     describe('installPlugin', () => {
       it('should install plugin agents successfully', async () => {
+        await manager.initialize();
         const result = await manager.installPlugin('plugin-test');
 
         expect(result.success).toBe(true);
@@ -345,6 +293,7 @@ describe('PluginManager', () => {
       });
 
       it('should update registry after installation', async () => {
+        await manager.initialize();
         await manager.installPlugin('plugin-test');
 
         expect(manager.registry.installed).toContain('plugin-test');
@@ -352,6 +301,7 @@ describe('PluginManager', () => {
       });
 
       it('should not duplicate installed plugins', async () => {
+        await manager.initialize();
         await manager.installPlugin('plugin-test');
         await manager.installPlugin('plugin-test');
 
@@ -362,6 +312,7 @@ describe('PluginManager', () => {
         // Delete one agent file
         fs.unlinkSync(path.join(pluginPath, 'agents', 'test-agent-2.md'));
 
+        await manager.initialize();
         const result = await manager.installPlugin('plugin-test');
 
         expect(result.success).toBe(true);
@@ -372,6 +323,7 @@ describe('PluginManager', () => {
     describe('uninstallPlugin', () => {
       beforeEach(async () => {
         // Install plugin first
+        await manager.initialize();
         await manager.installPlugin('plugin-test');
       });
 
@@ -409,7 +361,7 @@ describe('PluginManager', () => {
         const results = await manager.searchPlugins('test');
 
         expect(results.length).toBeGreaterThan(0);
-        expect(results[0].name).toContain('test');
+        expect(results[0].pluginName).toContain('test');
       });
 
       it('should find plugins by description', async () => {
@@ -448,6 +400,7 @@ describe('PluginManager', () => {
       });
 
       it('should show correct installation status', async () => {
+        await manager.initialize();
         await manager.installPlugin('plugin-test');
 
         const info = await manager.getPluginInfo('plugin-test');

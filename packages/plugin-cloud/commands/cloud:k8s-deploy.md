@@ -17,11 +17,7 @@ Deploys applications to Kubernetes clusters.
 - `mcp://context7/kubernetes/best-practices` - best practices best practices
 - `mcp://context7/devops/container-orchestration` - container orchestration best practices
 
-**Why This is Required:**
-- Ensures adherence to current industry standards and best practices
-- Prevents outdated or incorrect implementation patterns
-- Provides access to latest framework/tool documentation
-- Reduces errors from stale knowledge or assumptions
+**Why:** Documentation-first development policy — see `.claude/rules/context7-required.md`.
 
 
 **Example**: `/kubernetes:deploy my-app --chart=helm --namespace=production --gitops=argocd`

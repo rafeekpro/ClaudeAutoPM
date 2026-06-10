@@ -4,7 +4,7 @@ jest.mock('child_process');
 jest.mock('readline');
 
 const fs = require('fs');
-const { execSync, spawn } = require('child_process');
+const { execFileSync, spawn } = require('child_process');
 const readline = require('readline');
 const PRValidation = require('../../autopm/.claude/scripts/pr-validation.js');
 
@@ -20,8 +20,8 @@ describe('PRValidation', () => {
     fs.existsSync.mockReturnValue(true);
     fs.readFileSync.mockReturnValue('mock content');
 
-    // Mock execSync
-    execSync.mockReturnValue('');
+    // Mock execFileSync
+    execFileSync.mockReturnValue('');
 
     // Mock spawn
     spawn.mockReturnValue({
@@ -143,7 +143,8 @@ describe('PRValidation', () => {
 
   describe('checkGitStatus()', () => {
     it('should return true when git status is clean', async () => {
-      execSync.mockImplementation((cmd) => {
+      execFileSync.mockImplementation((file, args) => {
+        const cmd = [file, ...(args || [])].join(' ');
         if (cmd === 'git branch --show-current') return 'feature-branch';
         return '';
       });
@@ -157,7 +158,8 @@ describe('PRValidation', () => {
     });
 
     it('should return false when there are uncommitted changes', async () => {
-      execSync.mockImplementation((cmd) => {
+      execFileSync.mockImplementation((file, args) => {
+        const cmd = [file, ...(args || [])].join(' ');
         if (cmd === 'git diff-index --quiet HEAD --') {
           throw new Error('Uncommitted changes');
         }
@@ -181,7 +183,7 @@ describe('PRValidation', () => {
     });
 
     it('should handle git command errors', async () => {
-      execSync.mockImplementation(() => {
+      execFileSync.mockImplementation(() => {
         throw new Error('Git not found');
       });
 
@@ -242,7 +244,7 @@ describe('PRValidation', () => {
 
   describe('checkDockerPrerequisites()', () => {
     it('should return true when Docker is available', async () => {
-      execSync.mockReturnValue(''); // docker info succeeds
+      execFileSync.mockReturnValue(''); // docker info succeeds
       fs.existsSync.mockImplementation(file => file === 'Dockerfile' || file === 'docker-compose.yml');
 
       const validator = new PRValidation();
@@ -254,7 +256,7 @@ describe('PRValidation', () => {
     });
 
     it('should return false when Docker is not available', async () => {
-      execSync.mockImplementation(() => {
+      execFileSync.mockImplementation(() => {
         throw new Error('Docker not found');
       });
 
@@ -267,7 +269,7 @@ describe('PRValidation', () => {
     });
 
     it('should return false when Docker files are missing', async () => {
-      execSync.mockReturnValue(''); // docker info succeeds
+      execFileSync.mockReturnValue(''); // docker info succeeds
       fs.existsSync.mockReturnValue(false); // no Docker files
 
       const validator = new PRValidation();
@@ -279,7 +281,7 @@ describe('PRValidation', () => {
     });
 
     it('should accept docker-compose.yaml as alternative', async () => {
-      execSync.mockReturnValue(''); // docker info succeeds
+      execFileSync.mockReturnValue(''); // docker info succeeds
       fs.existsSync.mockImplementation(file => file === 'Dockerfile' || file === 'docker-compose.yaml');
 
       const validator = new PRValidation();
@@ -302,11 +304,12 @@ describe('PRValidation', () => {
 
       const validator = new PRValidation();
       jest.spyOn(validator, 'print');
-      const result = await validator.runDockerCommand('docker build .', 'Building image');
+      const result = await validator.runDockerCommand(['docker', 'build', '.'], 'Building image');
 
       expect(result).toBe(true);
       expect(validator.print).toHaveBeenCalledWith('Building image', 'blue');
-      expect(spawn).toHaveBeenCalledWith('sh', ['-c', 'docker build .'], { stdio: 'inherit' });
+      // Security: commands run via argv array, never through `sh -c`
+      expect(spawn).toHaveBeenCalledWith('docker', ['build', '.'], { stdio: 'inherit' });
     });
 
     it('should return false when command fails', async () => {
@@ -319,7 +322,7 @@ describe('PRValidation', () => {
 
       const validator = new PRValidation();
       jest.spyOn(validator, 'print');
-      const result = await validator.runDockerCommand('docker build .', 'Building image');
+      const result = await validator.runDockerCommand(['docker', 'build', '.'], 'Building image');
 
       expect(result).toBe(false);
     });
@@ -334,7 +337,7 @@ describe('PRValidation', () => {
 
       const validator = new PRValidation();
       jest.spyOn(validator, 'print');
-      const result = await validator.runDockerCommand('invalid-command', 'Running test');
+      const result = await validator.runDockerCommand(['invalid-command'], 'Running test');
 
       expect(result).toBe(false);
       expect(validator.print).toHaveBeenCalledWith('❌ Error: Command failed', 'red');
@@ -482,7 +485,7 @@ describe('PRValidation', () => {
   describe('run()', () => {
     beforeEach(() => {
       // Setup successful defaults
-      execSync.mockReturnValue(''); // Clean git status
+      execFileSync.mockReturnValue(''); // Clean git status
     });
 
     it('should complete full validation successfully', async () => {
@@ -590,7 +593,7 @@ describe('PRValidation', () => {
     });
 
     it('should handle realistic validation workflow', async () => {
-      execSync.mockReturnValue(''); // Clean git status
+      execFileSync.mockReturnValue(''); // Clean git status
       fs.existsSync.mockReturnValue(true);
 
       const validator = new PRValidation();
@@ -604,7 +607,7 @@ describe('PRValidation', () => {
     });
 
     it('should handle complete failure scenario', async () => {
-      execSync.mockImplementation(() => {
+      execFileSync.mockImplementation(() => {
         throw new Error('Git not found');
       });
 

@@ -3,7 +3,7 @@ jest.mock('fs');
 jest.mock('child_process');
 
 const fs = require('fs');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const DockerToggle = require('../../autopm/.claude/scripts/docker-toggle.js');
 
 describe('Docker Toggle', () => {
@@ -18,7 +18,7 @@ describe('Docker Toggle', () => {
     fs.readFileSync.mockReturnValue('{}');
     fs.writeFileSync.mockImplementation(() => {});
     fs.mkdirSync.mockImplementation(() => {});
-    execSync.mockImplementation(() => {});
+    execFileSync.mockImplementation(() => {});
   });
 
   describe('DockerToggle Class', () => {
@@ -257,19 +257,19 @@ describe('Docker Toggle', () => {
       it('should check Docker engine status when running', () => {
         fs.existsSync.mockReturnValue(true);
         fs.readFileSync.mockReturnValue('{}');
-        execSync.mockImplementation(() => {}); // Docker command succeeds
+        execFileSync.mockImplementation(() => {}); // Docker command succeeds
 
         const toggle = new DockerToggle();
         toggle.showStatus();
 
         expect(console.log).toHaveBeenCalledWith('  ✅ Docker is running');
-        expect(execSync).toHaveBeenCalledWith('docker version', { stdio: 'ignore' });
+        expect(execFileSync).toHaveBeenCalledWith('docker', ['version'], { stdio: 'ignore' });
       });
 
       it('should check Docker engine status when not running', () => {
         fs.existsSync.mockReturnValue(true);
         fs.readFileSync.mockReturnValue('{}');
-        execSync.mockImplementation(() => {
+        execFileSync.mockImplementation(() => {
           throw new Error('Docker not found');
         });
 

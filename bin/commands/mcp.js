@@ -3,7 +3,6 @@
  * Manages Model Context Protocol servers, agents, and configuration
  */
 
-const path = require('path');
 const MCPHandler = require('../../scripts/mcp-handler.js');
 
 module.exports = {
@@ -196,7 +195,7 @@ module.exports = {
           handler.diagnose();
           break;
 
-        case 'test':
+        case 'test': {
           if (!argv.name && !argv.server) {
             console.error('❌ Please specify a server name: autopm mcp test <server-name>');
             process.exit(1);
@@ -209,6 +208,7 @@ module.exports = {
             process.exit(1);
           }
           break;
+        }
 
         // Visualization commands
         case 'tree':

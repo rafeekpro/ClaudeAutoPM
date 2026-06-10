@@ -47,11 +47,7 @@ Use the tailwindcss-expert agent to create a comprehensive TailwindCSS design sy
 - `mcp://context7/frontend/design-systems` - design systems best practices
 - `mcp://context7/css/frameworks` - frameworks best practices
 
-**Why This is Required:**
-- Ensures adherence to current industry standards and best practices
-- Prevents outdated or incorrect implementation patterns
-- Provides access to latest framework/tool documentation
-- Reduces errors from stale knowledge or assumptions
+**Why:** Documentation-first development policy — see `.claude/rules/context7-required.md`.
 
 
 Task: Create TailwindCSS design system with custom color palette, typography scale, and component library
