@@ -39,13 +39,14 @@ function main() {
       },
       (argv) => {
         // Delegate to install.js directly (not install.sh) to pass flags
-        const { execSync } = require('child_process');
+        const { execFileSync } = require('child_process');
         const installJsPath = path.join(__dirname, '..', 'install', 'install.js');
         const args = [];
         if (argv.force) args.push('--force');
         if (argv.scenario) args.push(`--scenario=${argv.scenario}`);
         try {
-          execSync(`node "${installJsPath}" ${args.join(' ')}`, {
+          // Pass arguments as an array (no shell) to prevent command injection
+          execFileSync('node', [installJsPath, ...args], {
             stdio: 'inherit',
             env: { ...process.env, AUTOPM_PRESET: argv.preset || '' }
           });

@@ -9,14 +9,16 @@ const testFiles = [
   'test/security/hybrid-strategy.test.js',
   'test/security/prompt-injection.test.js',
   'test/security/integration.test.js',
-  'test/security/performance.test.js'
+  'test/security/performance.test.js',
+  'test/security/injection-vectors.test.js'
 ];
 
 const testNames = [
   'Core Security Tests',
   'Prompt Injection Prevention',
   'Integration & Isolation Tests',
-  'Performance & Resource Limits'
+  'Performance & Resource Limits',
+  'Injection Vectors (shell/path/token)'
 ];
 
 async function runTest(file, name) {

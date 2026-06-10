@@ -146,12 +146,17 @@ class PRValidation {
     return true;
   }
 
-  // Run Docker command with proper error handling
+  // Run Docker command with proper error handling.
+  // Commands are argv arrays — no shell and no string tokenization, so
+  // argument values can never be reinterpreted as shell syntax.
   async runDockerCommand(command, description) {
     this.print(description, 'blue');
 
+    const [file, ...args] = command;
+
     return new Promise((resolve) => {
-      const child = spawn('sh', ['-c', command], {
+      // Execute without a shell to avoid command injection
+      const child = spawn(file, args, {
         stdio: 'inherit'
       });
 
@@ -178,19 +183,19 @@ class PRValidation {
     const tests = [
       {
         name: 'Building development image',
-        command: 'docker-compose build'
+        command: ['docker-compose', 'build']
       },
       {
         name: 'Building production image',
-        command: 'docker build -t app:prod-test .'
+        command: ['docker', 'build', '-t', 'app:prod-test', '.']
       },
       {
         name: 'Running unit tests',
-        command: 'docker-compose run --rm app npm test'
+        command: ['docker-compose', 'run', '--rm', 'app', 'npm', 'test']
       },
       {
         name: 'Running linting',
-        command: 'docker-compose run --rm app npm run lint'
+        command: ['docker-compose', 'run', '--rm', 'app', 'npm', 'run', 'lint']
       }
     ];
 

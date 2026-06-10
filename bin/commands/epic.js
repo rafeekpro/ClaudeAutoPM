@@ -13,8 +13,15 @@
  */
 
 const path = require('path');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const fs = require('fs');
+
+// Validate an epic name against a strict safe charset to prevent shell
+// injection when the value is passed to external scripts.
+// Dot-only names ('.', '..') are rejected — they are path navigation, not names.
+function isValidEpicName(name) {
+  return typeof name === 'string' && /^[a-zA-Z0-9._-]+$/.test(name) && !/^\.+$/.test(name);
+}
 
 module.exports = {
   command: 'epic <action> [name]',
@@ -121,6 +128,12 @@ function listEpics() {
 }
 
 function showEpicStatus(epicName) {
+  if (!isValidEpicName(epicName)) {
+    console.error(`Error: Invalid epic name '${epicName}'`);
+    console.error('Epic names may only contain letters, numbers, dots, hyphens and underscores.');
+    process.exit(1);
+  }
+
   const scriptPath = path.join(process.cwd(), 'scripts', 'epic-status.sh');
 
   if (!fs.existsSync(scriptPath)) {
@@ -130,7 +143,8 @@ function showEpicStatus(epicName) {
   }
 
   try {
-    execSync(`bash "${scriptPath}" "${epicName}"`, {
+    // Pass arguments as an array (no shell) to prevent command injection
+    execFileSync('bash', [scriptPath, epicName], {
       stdio: 'inherit',
       cwd: process.cwd()
     });
@@ -179,3 +193,6 @@ function showEpicBreakdown(epicName) {
 
   findTasks(epicDir);
 }
+
+// Exposed for security regression tests
+module.exports.isValidEpicName = isValidEpicName;
