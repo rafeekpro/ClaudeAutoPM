@@ -1,0 +1,34 @@
+name: Scripts Sync Check
+
+# packages/plugin-core/scripts is the single source of truth for shared
+# scripts. This check blocks PRs where the synced copies in
+# autopm/.claude/scripts or .claude/scripts have diverged.
+# Fix divergence with: npm run sync:scripts
+
+on:
+  pull_request:
+
+jobs:
+  sync-check:
+    name: Plugin-core script sync
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check script copies match plugin-core source of truth
+        run: node scripts/sync-plugin-scripts.js --check
+
+      - name: Shell syntax check (bash -n) on all script trees
+        run: |
+          status=0
+          while IFS= read -r -d '' f; do
+            if ! bash -n "$f"; then
+              echo "::error file=$f::bash -n failed"
+              status=1
+            fi
+          done < <(find packages/plugin-core/scripts autopm/.claude/scripts .claude/scripts -type f -name '*.sh' -print0)
+          exit $status
