@@ -41,12 +41,14 @@ fi
 
 # Build all services
 echo "🏗️  Building Docker images (no cache)..."
-if ! docker compose build --no-cache 2>&1 | tee /tmp/docker-build.log; then
+BUILD_LOG=$(mktemp -t docker-build.XXXXXX)
+trap 'rm -f "$BUILD_LOG"' EXIT
+if ! docker compose build --no-cache 2>&1 | tee "$BUILD_LOG"; then
     echo ""
     echo "❌ Docker build failed!"
     echo ""
     echo "📋 Build errors:"
-    cat /tmp/docker-build.log | grep -A 5 "ERROR"
+    grep -A 5 "ERROR" "$BUILD_LOG"
     echo ""
     echo "💡 Common fixes:"
     echo "   - Check Dockerfile syntax"
@@ -115,21 +117,26 @@ EOF
 
 chmod +x "$HOOKS_DIR/check-ports"
 
-# Create pre-commit hook that runs all infrastructure checks
+# Create pre-commit hook that runs all infrastructure checks.
+# Quoted heredoc: nothing expands at install time — the hook resolves its
+# siblings from its own installed location (.git/hooks), so it keeps working
+# regardless of where the framework source lives.
 echo "🔗 Creating pre-commit hook..."
-cat > "$HOOKS_DIR/pre-commit" << EOF
+cat > "$HOOKS_DIR/pre-commit" << 'EOF'
 #!/bin/bash
 
 # Pre-commit hook for infrastructure validation
 # Runs all infrastructure checks before allowing commit
 
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+
 echo "🛡️  Running infrastructure protection checks..."
 
 # Run port conflict check
-"$SCRIPT_DIR/check-ports" || exit 1
+"$HOOK_DIR/check-ports" || exit 1
 
 # Run Docker build validation
-"$SCRIPT_DIR/docker-build-validation" || exit 1
+"$HOOK_DIR/docker-build-validation" || exit 1
 
 echo "✅ All infrastructure checks passed"
 EOF

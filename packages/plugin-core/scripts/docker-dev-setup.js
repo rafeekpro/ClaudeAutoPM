@@ -8,7 +8,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 
 class DockerDevSetup {
   constructor() {
@@ -531,7 +531,7 @@ Dockerfile.dev`;
   // Check Docker installation
   checkDocker() {
     try {
-      execSync('docker version', { stdio: 'ignore' });
+      execFileSync('docker', ['version'], { stdio: 'ignore' });
       return true;
     } catch (error) {
       this.print('Docker is not installed or not running', 'red');
