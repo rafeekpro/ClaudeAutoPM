@@ -22,13 +22,17 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      # OIDC for npm trusted publishing — replaces the expiring NPM_TOKEN.
+      # Requires a Trusted Publisher configured for the package on npmjs.com
+      # (repository: this repo, workflow: npm-publish.yml).
+      id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
+      # Trusted publishing requires npm >= 11.5.1
+      - run: npm install -g npm@latest
       - run: npm ci --legacy-peer-deps
       - run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
