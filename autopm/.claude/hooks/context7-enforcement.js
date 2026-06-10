@@ -47,6 +47,8 @@ function findCommandFile(category, command) {
   const baseDir = path.join(process.cwd(), '.claude', 'commands');
 
   const candidates = [
+    // Flat layout used by the installed payload (e.g. pm:issue-reopen.md)
+    path.join(baseDir, `${category}:${command}.md`),
     path.join(baseDir, category, `${command}.md`),
     path.join(baseDir, category, `${command.replace(/-/g, '_')}.md`)
   ];
@@ -82,6 +84,17 @@ function findAgentFile(agentName) {
   }
 
   return searchDir(baseDir);
+}
+
+/**
+ * Since the prompt dedup (#609), commands may reference the shared rule
+ * `.claude/rules/context7-required.md` instead of carrying an inline
+ * "Documentation Queries" section. Such a reference satisfies enforcement —
+ * the shared rule mandates the standard query sets.
+ */
+function referencesSharedContextRule(filePath) {
+  const content = fs.readFileSync(filePath, 'utf8');
+  return /context7-required\.md/.test(content);
 }
 
 /**
@@ -137,8 +150,14 @@ async function main(invocation) {
   const queries = extractDocumentationQueries(targetFile);
 
   if (queries.length === 0) {
+    if (referencesSharedContextRule(targetFile)) {
+      console.log(`\nShared Context7 rule referenced (.claude/rules/context7-required.md).`);
+      console.log(`Standard query sets from the shared rule apply. Proceeding.\n`);
+      return;
+    }
     console.log(`\nNo Documentation Queries found in file.`);
-    console.log(`ALL ${parsed.type}s MUST have Documentation Queries section.\n`);
+    console.log(`ALL ${parsed.type}s MUST have a Documentation Queries section`);
+    console.log(`or reference .claude/rules/context7-required.md.\n`);
     process.exit(1);
   }
 
@@ -160,6 +179,7 @@ if (require.main === module) {
 
 module.exports = {
   parseInvocation,
+  referencesSharedContextRule,
   findCommandFile,
   findAgentFile,
   extractDocumentationQueries
