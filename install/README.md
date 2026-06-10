@@ -335,6 +335,47 @@ ls -la .autopm_backup_*
 3. **Manual merge**: Use `merge-claude.sh` separately
 4. **Reset**: Delete `.autopm_backup_*` and re-run
 
+## 🗂️ Shared Scripts Architecture (Source of Truth)
+
+Shared scripts exist in three locations in this repository:
+
+| Location | Role |
+|----------|------|
+| `packages/plugin-core/scripts/` | **Single source of truth** — edit scripts ONLY here |
+| `autopm/.claude/scripts/` | Installer payload — copied into user projects by `autopm install` (generated, do not edit) |
+| `.claude/scripts/` | This repo's own installed copy — consumer (generated, do not edit) |
+
+The two consumer trees are refreshed from plugin-core by an automated sync.
+Files that exist only in a consumer tree (e.g. the payload's `pm/*.js`
+command implementations) are not managed by the sync and live where they are.
+
+### Sync Commands
+
+```bash
+npm run sync:scripts        # copy plugin-core/scripts → both consumer trees
+npm run sync:scripts:check  # report divergence without writing (CI uses this)
+```
+
+The `Scripts Sync Check` workflow (`.github/workflows/scripts-sync-check.yml`)
+fails any PR where a consumer copy diverges (content, mode, or missing file)
+from plugin-core, and runs `bash -n` over every `.sh` file in all three trees.
+
+### Adding a New Shared Script
+
+1. Create the script under `packages/plugin-core/scripts/` (use the correct
+   subdirectory: `lib/`, `mcp/`, `config/`, `hooks/`, or root). Make `.sh`
+   files executable (`chmod +x`).
+2. Register it in `packages/plugin-core/plugin.json` under `scripts`.
+3. Run `npm run sync:scripts` and commit all three copies together.
+4. Never edit the copies in `autopm/.claude/scripts/` or `.claude/scripts/`
+   directly — the CI check will reject the PR.
+
+### Repo-Only Scripts
+
+Repo maintenance scripts in `scripts/` at the repository root (build, CI,
+migration tooling) are not part of the framework payload and are maintained
+independently.
+
 ## 📖 Related Documentation
 
 - [`PLAYBOOK.md`](../PLAYBOOK.md) - ClaudeAutoPM usage guide
