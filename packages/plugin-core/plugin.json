@@ -220,6 +220,20 @@
       "priority": "high",
       "description": "Test execution patterns and standards",
       "tags": ["testing", "execution"]
+    },
+    {
+      "name": "context7-required",
+      "file": "rules/context7-required.md",
+      "priority": "high",
+      "description": "Shared Context7 documentation-first policy referenced by commands",
+      "tags": ["context7", "documentation", "mcp"]
+    },
+    {
+      "name": "tdd-reminder",
+      "file": "rules/tdd-reminder.md",
+      "priority": "high",
+      "description": "Shared RED-GREEN-REFACTOR reminder referenced by commands",
+      "tags": ["tdd", "testing"]
     }
   ],
   "hooks": [
