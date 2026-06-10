@@ -1,14 +1,29 @@
 #!/usr/bin/env node
 
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
 /**
  * Azure DevOps Provider - Issue Start Implementation
  * Starts work on an Azure DevOps work item (task/user story)
+ *
+ * All external commands run via execFileSync argv arrays (no shell), and the
+ * two caller-controlled values that reach git (work item id, branch name)
+ * are validated against strict patterns first.
  */
 class AzureIssueStart {
+  static isValidWorkItemId(id) {
+    return /^\d+$/.test(String(id));
+  }
+
+  static isValidBranchName(name) {
+    return typeof name === 'string'
+      && /^[A-Za-z0-9._/-]+$/.test(name)
+      && !name.startsWith('-')
+      && !name.includes('..');
+  }
+
   /**
    * Execute issue start command for Azure DevOps
    * @param {Object} options - Command options
@@ -37,6 +52,16 @@ class AzureIssueStart {
     if (!process.env.AUTOPM_USE_REAL_API) {
       console.log('📊 Using mock implementation (set AUTOPM_USE_REAL_API=true for real API)');
       return this.mockStartWorkItem(options, organization, project);
+    }
+
+    // Real-API path: the id reaches `az --id` and derives the git branch
+    // name, and a custom branch reaches `git checkout -b` — validate both.
+    if (!AzureIssueStart.isValidWorkItemId(options.id)) {
+      throw new Error(`Invalid work item ID (digits only): ${options.id}`);
+    }
+
+    if (options.branch && !AzureIssueStart.isValidBranchName(options.branch)) {
+      throw new Error(`Invalid branch name: ${options.branch}`);
     }
 
     try {
@@ -127,9 +152,10 @@ class AzureIssueStart {
    */
   async getWorkItem(organization, project, workItemId) {
     try {
-      const cmd = `az boards work-item show --id ${workItemId} ` +
-                  `--organization ${organization} --project "${project}"`;
-      const output = execSync(cmd, { encoding: 'utf8' });
+      const output = execFileSync('az', ['boards', 'work-item', 'show',
+        '--id', String(workItemId),
+        '--organization', organization, '--project', project],
+      { encoding: 'utf8' });
       return JSON.parse(output);
     } catch (error) {
       return null;
@@ -141,10 +167,10 @@ class AzureIssueStart {
    */
   async updateWorkItemState(organization, project, workItemId, state) {
     try {
-      const cmd = `az boards work-item update --id ${workItemId} ` +
-                  `--state "${state}" ` +
-                  `--organization ${organization} --project "${project}"`;
-      execSync(cmd, { stdio: 'inherit' });
+      execFileSync('az', ['boards', 'work-item', 'update',
+        '--id', String(workItemId), '--state', state,
+        '--organization', organization, '--project', project],
+      { stdio: 'inherit' });
     } catch (error) {
       console.warn('Could not update work item state:', error.message);
     }
@@ -154,8 +180,11 @@ class AzureIssueStart {
    * Check if branch exists
    */
   branchExists(branchName) {
+    if (!AzureIssueStart.isValidBranchName(branchName)) {
+      throw new Error(`Invalid branch name: ${branchName}`);
+    }
     try {
-      execSync(`git show-ref --verify --quiet refs/heads/${branchName}`);
+      execFileSync('git', ['show-ref', '--verify', '--quiet', `refs/heads/${branchName}`]);
       return true;
     } catch (error) {
       return false;
@@ -166,7 +195,10 @@ class AzureIssueStart {
    * Create and checkout new branch
    */
   createBranch(branchName) {
-    execSync(`git checkout -b ${branchName}`, { stdio: 'inherit' });
+    if (!AzureIssueStart.isValidBranchName(branchName)) {
+      throw new Error(`Invalid branch name: ${branchName}`);
+    }
+    execFileSync('git', ['checkout', '-b', branchName], { stdio: 'inherit' });
   }
 
   /**
@@ -184,13 +216,13 @@ class AzureIssueStart {
   async getCurrentUser(organization) {
     try {
       // Get current user from Azure CLI
-      const cmd = `az ad signed-in-user show --query userPrincipalName -o tsv`;
-      const output = execSync(cmd, { encoding: 'utf8' });
+      const output = execFileSync('az', ['ad', 'signed-in-user', 'show',
+        '--query', 'userPrincipalName', '-o', 'tsv'], { encoding: 'utf8' });
       return output.trim();
     } catch (error) {
       // Fallback to git config
       try {
-        const email = execSync('git config user.email', { encoding: 'utf8' });
+        const email = execFileSync('git', ['config', 'user.email'], { encoding: 'utf8' });
         return email.trim();
       } catch (error) {
         return 'current-user@company.com';
@@ -203,10 +235,10 @@ class AzureIssueStart {
    */
   async assignWorkItem(organization, project, workItemId, username) {
     try {
-      const cmd = `az boards work-item update --id ${workItemId} ` +
-                  `--assigned-to "${username}" ` +
-                  `--organization ${organization} --project "${project}"`;
-      execSync(cmd, { stdio: 'inherit' });
+      execFileSync('az', ['boards', 'work-item', 'update',
+        '--id', String(workItemId), '--assigned-to', username,
+        '--organization', organization, '--project', project],
+      { stdio: 'inherit' });
     } catch (error) {
       console.warn('Could not assign work item:', error.message);
     }
@@ -222,10 +254,10 @@ class AzureIssueStart {
       const currentTags = workItem.fields?.['System.Tags'] || '';
       const newTags = currentTags ? `${currentTags}; ${tag}` : tag;
 
-      const cmd = `az boards work-item update --id ${workItemId} ` +
-                  `--fields "System.Tags=${newTags}" ` +
-                  `--organization ${organization} --project "${project}"`;
-      execSync(cmd, { stdio: 'inherit' });
+      execFileSync('az', ['boards', 'work-item', 'update',
+        '--id', String(workItemId), '--fields', `System.Tags=${newTags}`,
+        '--organization', organization, '--project', project],
+      { stdio: 'inherit' });
     } catch (error) {
       console.warn('Could not add tag:', error.message);
     }
@@ -235,16 +267,9 @@ class AzureIssueStart {
    * Add comment to work item
    */
   async addComment(organization, project, workItemId, comment) {
-    try {
-      const cmd = `az boards work-item relation add --id ${workItemId} ` +
-                  `--relation-type "System.LinkTypes.Hierarchy-Reverse" ` +
-                  `--target-id ${workItemId} ` +
-                  `--organization ${organization} --project "${project}"`;
-      // Note: Azure CLI doesn't have direct comment add, would use REST API
-      console.log(`Would add comment: ${comment}`);
-    } catch (error) {
-      console.warn('Could not add comment:', error.message);
-    }
+    // Azure CLI has no work-item comment command — posting one requires the
+    // Azure DevOps REST API. Say so honestly instead of pretending to post.
+    console.warn(`Comment NOT posted (az CLI lacks comment support; REST API needed). Intended comment: ${comment}`);
   }
 
   /**
@@ -253,10 +278,10 @@ class AzureIssueStart {
   async moveToSprint(organization, project, workItemId, sprint) {
     try {
       const iterationPath = `${project}\\${sprint}`;
-      const cmd = `az boards work-item update --id ${workItemId} ` +
-                  `--iteration "${iterationPath}" ` +
-                  `--organization ${organization} --project "${project}"`;
-      execSync(cmd, { stdio: 'inherit' });
+      execFileSync('az', ['boards', 'work-item', 'update',
+        '--id', String(workItemId), '--iteration', iterationPath,
+        '--organization', organization, '--project', project],
+      { stdio: 'inherit' });
     } catch (error) {
       console.warn('Could not move to sprint:', error.message);
     }
