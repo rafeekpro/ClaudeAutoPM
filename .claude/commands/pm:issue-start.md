@@ -67,7 +67,7 @@ ISSUE_FILE=$(find .claude/issues -name "${ISSUE_ID}.md" 2>/dev/null | head -1)
      task_file=$(find .claude/epics -name "$ISSUE_NUMBER.md" 2>/dev/null | head -1)
    fi
    ```
-   - If not found: "❌ No local task for issue #$ISSUE_NUMBER. This issue may have been created outside the PM system."
+   - If not found: "❌ No local task for issue #$ISSUE_NUMBER. Import it first: /pm:import $ISSUE_NUMBER — then run /pm:issue-start $ISSUE_NUMBER again."
    - Use `$task_file` as the canonical path for ALL subsequent steps
 
 3. **Check for analysis (when NOT using --analyze flag):**
@@ -96,11 +96,7 @@ ISSUE_FILE=$(find .claude/issues -name "${ISSUE_ID}.md" 2>/dev/null | head -1)
 
 **CRITICAL: This project follows Test-Driven Development (TDD).**
 
-Before ANY coding work begins, you MUST follow the RED-GREEN-REFACTOR cycle:
-
-1. **RED Phase**: Write failing test that describes the desired behavior
-2. **GREEN Phase**: Write minimum code to make test pass
-3. **REFACTOR Phase**: Clean up code while keeping tests green
+Before ANY coding work begins, you MUST follow the RED → GREEN → REFACTOR cycle (see `.claude/rules/tdd-reminder.md`).
 
 **For this issue:**
 - Read the task requirements from the task file

@@ -18,11 +18,7 @@ Configures Model Context Protocol (MCP) servers and context sharing between agen
 - `mcp://context7/ai/context-management` - context management best practices
 - `mcp://context7/mcp/integration` - integration best practices
 
-**Why This is Required:**
-- Ensures adherence to current industry standards and best practices
-- Prevents outdated or incorrect implementation patterns
-- Provides access to latest framework/tool documentation
-- Reduces errors from stale knowledge or assumptions
+**Why:** Documentation-first development policy — see `.claude/rules/context7-required.md`.
 
 
 **Example**: `/mcp:context-setup --server=context7 --pool-name=project-context --agents=python-backend-engineer,azure-devops-specialist --max-size=50MB`

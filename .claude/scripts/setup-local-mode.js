@@ -13,8 +13,9 @@ async function setupLocalDirectories() {
   const directories = [
     'prds',       // Product Requirements Documents
     'epics',      // Epic definitions and task breakdowns
-    'context',    // Project context files (NEW)
-    'logs'        // Verification and operation logs (NEW)
+    'issues',     // Local issue tracking
+    'context',    // Project context files
+    'logs'        // Verification and operation logs
   ];
 
   for (const dir of directories) {
