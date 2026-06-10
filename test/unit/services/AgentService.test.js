@@ -12,16 +12,75 @@
 const AgentService = require('../../../lib/services/AgentService');
 const MockClaudeProvider = require('../../mocks/MockClaudeProvider');
 const fs = require('fs').promises;
+const fsSync = require('fs');
 const path = require('path');
+const os = require('os');
 
 describe('AgentService', () => {
   let service;
   let mockAI;
-  const fixturesDir = path.join(__dirname, '../fixtures/agents');
+  let tempDir;
 
   beforeEach(() => {
     mockAI = new MockClaudeProvider();
     service = new AgentService(mockAI);
+
+    // Hermetic agent fixtures (#608): AgentService resolves agents from
+    // process.cwd()/.claude/agents, which made this suite depend on whatever
+    // agents the host project happened to have. Point the service at a temp
+    // directory with known fixtures instead.
+    tempDir = fsSync.mkdtempSync(path.join(os.tmpdir(), 'agent-service-test-'));
+    const agentsDir = path.join(tempDir, '.claude', 'agents');
+    fsSync.mkdirSync(path.join(agentsDir, 'core'), { recursive: true });
+    fsSync.mkdirSync(path.join(agentsDir, 'cloud'), { recursive: true });
+
+    fsSync.writeFileSync(
+      path.join(agentsDir, 'core', 'test-agent.md'),
+      [
+        '# Test Agent',
+        '',
+        '**Specialization:** Test automation and validation',
+        '',
+        '**Documentation Queries:**',
+        '- `mcp://context7/testing/best-practices` - Testing best practices',
+        '',
+        '**Methodologies:**',
+        '- Test-Driven Development (TDD)',
+        '',
+        '**Tools:** Read, Write, Bash',
+        ''
+      ].join('\n')
+    );
+
+    // Malformed: missing the required `# Title` heading
+    fsSync.writeFileSync(
+      path.join(agentsDir, 'core', 'malformed-agent.md'),
+      '**Specialization:** Broken agent without a title heading\n'
+    );
+
+    fsSync.writeFileSync(
+      path.join(agentsDir, 'cloud', 'aws-cloud-architect.md'),
+      [
+        '# AWS Cloud Architect',
+        '',
+        '**Specialization:** AWS infrastructure design and architecture',
+        '',
+        '**Documentation Queries:**',
+        '- `mcp://context7/aws/compute` - EC2, EKS, Lambda',
+        '- `mcp://context7/aws/networking` - VPC, ELB, CloudFront',
+        '',
+        '**Tools:** Read, Write, Bash',
+        ''
+      ].join('\n')
+    );
+
+    service.agentsBaseDir = agentsDir;
+  });
+
+  afterEach(() => {
+    if (tempDir && fsSync.existsSync(tempDir)) {
+      fsSync.rmSync(tempDir, { recursive: true, force: true });
+    }
   });
 
   describe('loadAgent', () => {

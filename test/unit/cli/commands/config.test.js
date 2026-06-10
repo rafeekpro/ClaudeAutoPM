@@ -13,8 +13,9 @@ const configCommands = require('../../../../lib/cli/commands/config');
 const ConfigManager = require('../../../../lib/config/ConfigManager');
 const inquirer = require('inquirer');
 
-// Mock inquirer
-jest.mock('inquirer');
+// Mock inquirer with a factory: inquirer v9+ is ESM-only, so Jest's
+// automock cannot parse the real module (#608)
+jest.mock('inquirer', () => ({ prompt: jest.fn() }));
 
 // Mock ConfigManager
 jest.mock('../../../../lib/config/ConfigManager');

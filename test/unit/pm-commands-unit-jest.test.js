@@ -304,7 +304,7 @@ description: Test description
 
     test('issue-start should be loadable', () => {
       expect(() => {
-        IssueStart = require('../../autopm/.claude/scripts/pm/issue-start.js');
+        IssueStart = require('../../autopm/.claude/scripts/pm/issue-start.cjs');
       }).not.toThrow();
     });
 
