@@ -104,6 +104,18 @@ describe('PluginManager bug fixes (#607)', () => {
       expect(pm.isCompatible('2.9.0', '2.8.0')).toBe(true);
       expect(pm.isCompatible('2.7.0', '2.8.0')).toBe(false);
     });
+
+    test('handles partial versions: ~2 allows any 2.x, ^0 allows any 0.x', () => {
+      expect(pm.isCompatible('2.9.0', '~2')).toBe(true);
+      expect(pm.isCompatible('3.0.0', '~2')).toBe(false);
+      expect(pm.isCompatible('0.9.1', '^0')).toBe(true);
+      expect(pm.isCompatible('1.0.0', '^0')).toBe(false);
+    });
+
+    test('handles ^0.0.x — only the exact patch is compatible', () => {
+      expect(pm.isCompatible('0.0.3', '^0.0.3')).toBe(true);
+      expect(pm.isCompatible('0.0.4', '^0.0.3')).toBe(false);
+    });
   });
 
   describe('file I/O error resilience', () => {
@@ -112,8 +124,12 @@ describe('PluginManager bug fixes (#607)', () => {
       const errors = [];
       pm.on('install:file-error', (e) => errors.push(e));
 
-      jest.spyOn(fs, 'copyFileSync').mockImplementationOnce(() => {
-        throw new Error('EACCES: permission denied');
+      const realCopy = fs.copyFileSync.bind(fs);
+      jest.spyOn(fs, 'copyFileSync').mockImplementation((src, dest) => {
+        if (String(src).endsWith('tool.sh')) {
+          throw new Error('EACCES: permission denied');
+        }
+        return realCopy(src, dest);
       });
 
       const installed = await pm.installScripts(plugin, pluginPath);
@@ -144,8 +160,12 @@ describe('PluginManager bug fixes (#607)', () => {
       const errors = [];
       pm.on('install:file-error', (e) => errors.push(e));
 
-      jest.spyOn(fs, 'copyFileSync').mockImplementationOnce(() => {
-        throw new Error('EIO: i/o error');
+      const realCopy = fs.copyFileSync.bind(fs);
+      jest.spyOn(fs, 'copyFileSync').mockImplementation((src, dest) => {
+        if (String(src).endsWith('a.md')) {
+          throw new Error('EIO: i/o error');
+        }
+        return realCopy(src, dest);
       });
 
       const installed = await pm.installCommands(plugin, pluginPath);
@@ -162,8 +182,12 @@ describe('PluginManager bug fixes (#607)', () => {
       const errors = [];
       pm.on('uninstall:file-error', (e) => errors.push(e));
 
-      jest.spyOn(fs, 'unlinkSync').mockImplementationOnce(() => {
-        throw new Error('EPERM: operation not permitted');
+      const realUnlink = fs.unlinkSync.bind(fs);
+      jest.spyOn(fs, 'unlinkSync').mockImplementation((p) => {
+        if (String(p).endsWith('tool.sh')) {
+          throw new Error('EPERM: operation not permitted');
+        }
+        return realUnlink(p);
       });
 
       const result = await pm.uninstallPlugin('plugin-x');
@@ -172,6 +196,54 @@ describe('PluginManager bug fixes (#607)', () => {
       expect(errors).toHaveLength(1);
       // Files after the failing one are still removed
       expect(fs.existsSync(path.join(tempDir, '.claude', 'scripts', 'lib', 'util.sh'))).toBe(false);
+      // The failed script must NOT be reported as removed; the others are
+      expect(result.scripts).not.toContain('tool');
+      expect(result.scripts).toEqual(expect.arrayContaining(['other', 'libs']));
+    });
+
+    test('uninstallPlugin does not report a hook as removed when its unlink fails', async () => {
+      const pluginPath = path.join(tempDir, 'plugin-hooks');
+      fs.mkdirSync(path.join(pluginPath, 'hooks'), { recursive: true });
+      fs.writeFileSync(path.join(pluginPath, 'hooks', 'pre.sh'), '#!/bin/bash\n');
+      const plugin = {
+        name: '@claudeautopm/plugin-hooks',
+        path: pluginPath,
+        metadata: {
+          name: '@claudeautopm/plugin-hooks',
+          hooks: [{ name: 'pre', file: 'hooks/pre.sh' }]
+        }
+      };
+      pm.plugins.set(plugin.name, plugin);
+      await pm.installHooks(plugin, pluginPath);
+      expect(fs.existsSync(path.join(tempDir, '.claude', 'hooks', 'pre.sh'))).toBe(true);
+
+      jest.spyOn(fs, 'unlinkSync').mockImplementation(() => {
+        throw new Error('EPERM: operation not permitted');
+      });
+
+      const result = await pm.uninstallPlugin('plugin-hooks');
+
+      expect(result.success).toBe(true);
+      expect(result.hooks).not.toContain('pre');
+      expect(result.hooksRemoved).toBe(0);
+    });
+
+    test('_safeCopy rolls back the copied file when chmod fails', async () => {
+      const { pluginPath, plugin } = createScriptsPlugin(tempDir);
+      const errors = [];
+      pm.on('install:file-error', (e) => errors.push(e));
+
+      jest.spyOn(fs, 'chmodSync').mockImplementation(() => {
+        throw new Error('EPERM: operation not permitted');
+      });
+
+      const installed = await pm.installScripts(plugin, pluginPath);
+
+      // chmod failed for every .sh file → nothing reported installed,
+      // and no half-installed files left behind ("already exists" trap)
+      expect(installed).toHaveLength(0);
+      expect(errors.length).toBeGreaterThan(0);
+      expect(fs.existsSync(path.join(tempDir, '.claude', 'scripts', 'tool.sh'))).toBe(false);
     });
   });
 
