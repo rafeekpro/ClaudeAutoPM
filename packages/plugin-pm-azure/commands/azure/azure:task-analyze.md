@@ -24,11 +24,7 @@ Analyze Task patterns and metrics in Azure DevOps to identify bottlenecks and im
 - `mcp://context7/agile/estimation` - estimation best practices
 - `mcp://context7/azure-devops/tasks` - tasks best practices
 
-**Why This is Required:**
-- Ensures adherence to current industry standards and best practices
-- Prevents outdated or incorrect implementation patterns
-- Provides access to latest framework/tool documentation
-- Reduces errors from stale knowledge or assumptions
+**Why:** Documentation-first development policy — see `.claude/rules/context7-required.md`.
 
 
 ## Description

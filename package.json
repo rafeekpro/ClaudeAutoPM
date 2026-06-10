@@ -12,6 +12,8 @@
   },
   "scripts": {
     "postinstall": "echo '🎉 ClaudeAutoPM installed! Run: autopm --help'",
+    "sync:commands": "node scripts/sync-plugin-commands.js",
+    "sync:commands:check": "node scripts/sync-plugin-commands.js --check",
     "sync:scripts": "node scripts/sync-plugin-scripts.js",
     "sync:scripts:check": "node scripts/sync-plugin-scripts.js --check",
     "test:old": "node scripts/test.js",

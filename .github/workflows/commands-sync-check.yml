@@ -1,0 +1,30 @@
+name: Commands Sync Check
+
+# Plugin packages are the source of truth for command prompts that also ship
+# in the installable payload (autopm/.claude/commands). This check fails when
+# a shared command file diverges between the two locations (issue #609).
+# Fix: edit the plugin copy, then run `npm run sync:commands` and commit.
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'autopm/.claude/commands/**'
+      - 'packages/*/commands/**'
+      - 'scripts/sync-plugin-commands.js'
+  pull_request:
+    paths:
+      - 'autopm/.claude/commands/**'
+      - 'packages/*/commands/**'
+      - 'scripts/sync-plugin-commands.js'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Check plugin/payload command sync
+        run: node scripts/sync-plugin-commands.js --check

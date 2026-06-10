@@ -49,11 +49,7 @@ AZURE_DEVOPS_PROJECT=<your-project>
 - `mcp://context7/azure-devops/user-stories` - user stories best practices
 - `mcp://context7/requirements/writing` - writing best practices
 
-**Why This is Required:**
-- Ensures adherence to current industry standards and best practices
-- Prevents outdated or incorrect implementation patterns
-- Provides access to latest framework/tool documentation
-- Reduces errors from stale knowledge or assumptions
+**Why:** Documentation-first development policy — see `.claude/rules/context7-required.md`.
 
 
 ## Instructions

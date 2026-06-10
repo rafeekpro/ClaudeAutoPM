@@ -18,11 +18,7 @@ Creates a complete React application with TypeScript and modern tooling.
 - `mcp://context7/frontend/tooling` - tooling best practices
 - `mcp://context7/react/best-practices` - best practices best practices
 
-**Why This is Required:**
-- Ensures adherence to current industry standards and best practices
-- Prevents outdated or incorrect implementation patterns
-- Provides access to latest framework/tool documentation
-- Reduces errors from stale knowledge or assumptions
+**Why:** Documentation-first development policy — see `.claude/rules/context7-required.md`.
 
 
 **Example**: `/react:app-scaffold dashboard-app --framework=vite --styling=tailwind --state=zustand`
