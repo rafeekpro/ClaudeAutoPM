@@ -352,6 +352,51 @@
       "description": "MCP server management scripts",
       "type": "utility",
       "tags": ["mcp", "management"]
+    },
+    {
+      "name": "tools",
+      "subdirectory": "scripts/",
+      "files": [
+        "check-clear-reminder.sh",
+        "docker-dev-setup.sh",
+        "docker-dev-setup.js",
+        "docker-toggle.sh",
+        "docker-toggle.js",
+        "install-hooks.sh",
+        "install-hooks.js",
+        "pr-validation.sh",
+        "pr-validation.js",
+        "setup-context7.sh",
+        "setup-context7.js",
+        "test-and-log.sh",
+        "test-and-log.js"
+      ],
+      "description": "Standalone setup and workflow tools (sh wrappers + js implementations)",
+      "type": "utility",
+      "tags": ["tools", "setup", "workflow"]
+    },
+    {
+      "name": "config",
+      "subdirectory": "scripts/config/",
+      "files": [
+        "toggle-features.sh",
+        "toggle-features.js"
+      ],
+      "description": "Feature toggle configuration scripts",
+      "type": "utility",
+      "tags": ["config", "features"]
+    },
+    {
+      "name": "hooks",
+      "subdirectory": "scripts/hooks/",
+      "files": [
+        "check-ports.sh",
+        "docker-build-validation.sh",
+        "install-infrastructure-hooks.sh"
+      ],
+      "description": "Docker infrastructure protection git hooks",
+      "type": "utility",
+      "tags": ["hooks", "docker", "infrastructure"]
     }
   ],
   "dependencies": {

@@ -13,7 +13,8 @@ module.exports = {
     '**/test/installation/generate-agent-xml.test.js',
     '**/test/installation/e2e-scenarios.test.js',
     '**/test/templates/template-reader.test.js',
-    '**/test/unit/plugin-command-sync.test.js'
+    '**/test/unit/plugin-command-sync.test.js',
+    '**/test/unit/sync-plugin-scripts.test.js'
   ],
 
   testPathIgnorePatterns: [

@@ -1,8 +1,8 @@
 #!/bin/bash
-# Wrapper for test-and-log.sh - delegates to Node.js implementation
+# Wrapper for docker-dev-setup.sh - delegates to Node.js implementation
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-NODE_SCRIPT="$SCRIPT_DIR/test-and-log.js"
+NODE_SCRIPT="$SCRIPT_DIR/docker-dev-setup.js"
 
 if [ -f "$NODE_SCRIPT" ] && command -v node >/dev/null 2>&1; then
   exec node "$NODE_SCRIPT" "$@"
