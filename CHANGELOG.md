@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.25.6] - 2026-06-10
+
+Framework-wide optimization epic (#605) — all seven sub-issues (#606–#612).
+
+### Security (#606, PRs #614/#615)
+- Eliminated shell-injection vectors across the CLI and the distributed payload: `pr-validation.js` no longer runs commands through `sh -c` (argv arrays), `bin/autopm.js` and `bin/commands/epic.js` use `execFileSync` with validated inputs, `setup-context7.js` validates package names, `AzureDevOpsCliWrapper` executes `az` exclusively via argv arrays and rejects command strings
+- Path traversal blocked in `prd --content @file` (confined to project root); dashboard auth token no longer printed to stdout or passed through `cmd.exe` on Windows; state file chmod 0600
+- `npm audit --omit=dev`: 0 production vulnerabilities (was 7, incl. 1 high)
+
+### Fixed (#607, PR #613)
+- **PluginManager**: uninstall removed scripts from `projectRoot/scripts` while install wrote to `.claude/scripts` (orphaned files); semver ranges `^`/`~`/partial versions now handled correctly (previously everything degraded to `>=`); single file I/O failures no longer abort whole installs (`install:file-error`/`uninstall:file-error` events, chmod rollback)
+- **azure/issue-start provider**: restored real implementation (a stub overwrote it in an old commit) and hardened it (argv exec, work-item id/branch/tag validation)
+
+### Changed (#608–#612, PRs #617–#621)
+- **Tests** (#608): default `npm test` runs 54 suites / 1600+ tests (was a 7-file allowlist); 11 failing unit suites repaired; hermetic PluginManager tests (`includeGlobal`, `registryPath` options); coverage measured over `lib/`+`bin/` with ratcheting thresholds
+- **Prompts** (#609): 48 command files deduplicated — plugin packages are the source of truth, payload copies synced (`sync:commands` + CI check); shared rules `context7-required.md`/`tdd-reminder.md` replace copy-pasted boilerplate (−13.9% tokens on the hand-maintained corpus)
+- **Scripts** (#610): `packages/plugin-core/scripts` is the single source of truth, synced to payload and repo (`sync:scripts` + CI divergence gate); infrastructure hooks now ship in the payload; pre-commit hook fixed (quoted heredoc, per-invocation mktemp log)
+- **CLI** (#611): first JS lint baseline (ESLint 9 flat config, 88 errors fixed, CI-enforced); PluginManager install methods deduplicated behind `installResources` with promise-based I/O; shared `lib/cli/utils.js` + logger across CLI commands; tests for previously untested `obsidian`/`context`/`plugin` commands
+- **Repo config** (#612): root `.claude/` classified and refreshed as a framework consumer (`.claude/README.md`); 8 orphaned files removed; context7-enforcement hook accepts the shared-rule reference and finds flat-layout commands
+
+### CI
+- npm publish switched to OIDC-ready flow with pinned npm and token fallback (#616); release pipeline restored after token expiry (#603)
+
 ## [3.25.5] - 2026-06-09
 
 ### Fixed
