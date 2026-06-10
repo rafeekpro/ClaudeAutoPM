@@ -18,8 +18,9 @@ const fs = require('fs');
 
 // Validate an epic name against a strict safe charset to prevent shell
 // injection when the value is passed to external scripts.
+// Dot-only names ('.', '..') are rejected — they are path navigation, not names.
 function isValidEpicName(name) {
-  return typeof name === 'string' && /^[a-zA-Z0-9._-]+$/.test(name);
+  return typeof name === 'string' && /^[a-zA-Z0-9._-]+$/.test(name) && !/^\.+$/.test(name);
 }
 
 module.exports = {

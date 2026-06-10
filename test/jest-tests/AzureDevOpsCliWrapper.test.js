@@ -119,7 +119,7 @@ describe('AzureDevOpsCliWrapper', () => {
       const mockOutput = JSON.stringify({ id: 1, name: 'test' });
       mockExecSync.mockReturnValue(Buffer.from(mockOutput));
 
-      const result = wrapper.execute('pipelines list');
+      const result = wrapper.execute(['pipelines', 'list']);
 
       expect(result).toEqual({ id: 1, name: 'test' });
       expect(mockExecSync).toHaveBeenCalledWith(
@@ -142,7 +142,7 @@ describe('AzureDevOpsCliWrapper', () => {
       });
 
       expect(() => {
-        wrapper.execute('az pipelines list');
+        wrapper.execute(['pipelines', 'list']);
       }).toThrow('Azure CLI command failed');
     });
 
@@ -154,14 +154,14 @@ describe('AzureDevOpsCliWrapper', () => {
       });
 
       expect(() => {
-        wrapper.execute('az pipelines list');
+        wrapper.execute(['pipelines', 'list']);
       }).toThrow();
     });
 
     test('should pass custom environment variables', () => {
       mockExecSync.mockReturnValue(Buffer.from('{"id": 1}'));
 
-      wrapper.execute('pipelines list', {
+      wrapper.execute(['pipelines', 'list'], {
         env: { CUSTOM_VAR: 'value' }
       });
 
@@ -185,8 +185,15 @@ describe('AzureDevOpsCliWrapper', () => {
       });
 
       expect(() => {
-        wrapper.execute('az pipelines list');
+        wrapper.execute(['pipelines', 'list']);
       }).toThrow();
+    });
+
+    test('should reject command strings (argv arrays only)', () => {
+      expect(() => {
+        wrapper.execute('pipelines list');
+      }).toThrow(TypeError);
+      expect(mockExecSync).not.toHaveBeenCalled();
     });
   });
 
@@ -204,7 +211,7 @@ describe('AzureDevOpsCliWrapper', () => {
     test('should succeed on first attempt', async () => {
       mockExecSync.mockReturnValue(Buffer.from('{"id": 1}'));
 
-      const result = await wrapper.executeWithRetry('az pipelines list');
+      const result = await wrapper.executeWithRetry(['pipelines', 'list']);
 
       expect(result).toEqual({ id: 1 });
       expect(mockExecSync).toHaveBeenCalledTimes(1);
@@ -225,7 +232,7 @@ describe('AzureDevOpsCliWrapper', () => {
         })
         .mockReturnValueOnce(Buffer.from('{"id": 1}'));
 
-      const result = await wrapper.executeWithRetry('az pipelines list');
+      const result = await wrapper.executeWithRetry(['pipelines', 'list']);
 
       expect(result).toEqual({ id: 1 });
       expect(mockExecSync).toHaveBeenCalledTimes(3);
@@ -252,7 +259,7 @@ describe('AzureDevOpsCliWrapper', () => {
         return Buffer.from('{"id": 1}');
       });
 
-      const result = await testWrapper.executeWithRetry('az pipelines list');
+      const result = await testWrapper.executeWithRetry(['pipelines', 'list']);
 
       expect(result).toEqual({ id: 1 });
       expect(mockExecSync).toHaveBeenCalledTimes(3);
@@ -277,7 +284,7 @@ describe('AzureDevOpsCliWrapper', () => {
         throw error;
       });
 
-      await expect(testWrapper.executeWithRetry('az pipelines list')).rejects.toThrow('Persistent failure');
+      await expect(testWrapper.executeWithRetry(['pipelines', 'list'])).rejects.toThrow('Persistent failure');
 
       expect(mockExecSync).toHaveBeenCalledTimes(3); // 1 initial + 2 retries
       expect(attemptCount).toBe(3);
@@ -292,7 +299,7 @@ describe('AzureDevOpsCliWrapper', () => {
         throw error;
       });
 
-      await expect(wrapper.executeWithRetry('az pipelines list')).rejects.toThrow('Not found');
+      await expect(wrapper.executeWithRetry(['pipelines', 'list'])).rejects.toThrow('Not found');
 
       expect(mockExecSync).toHaveBeenCalledTimes(1);
       expect(attemptCount).toBe(1);
@@ -484,7 +491,7 @@ describe('AzureDevOpsCliWrapper', () => {
       });
 
       expect(() => {
-        wrapper.execute('az pipelines list');
+        wrapper.execute(['pipelines', 'list']);
       }).toThrow('Azure CLI is not installed');
     });
 
@@ -492,7 +499,7 @@ describe('AzureDevOpsCliWrapper', () => {
       mockExecSync.mockReturnValue(Buffer.from('invalid json'));
 
       expect(() => {
-        wrapper.execute('az pipelines list');
+        wrapper.execute(['pipelines', 'list']);
       }).toThrow();
     });
 
@@ -503,7 +510,7 @@ describe('AzureDevOpsCliWrapper', () => {
       });
 
       expect(() => {
-        wrapper.execute('az pipelines list');
+        wrapper.execute(['pipelines', 'list']);
       }).toThrow();
     });
   });
@@ -524,7 +531,7 @@ describe('AzureDevOpsCliWrapper', () => {
       });
       mockExecSync.mockReturnValue(Buffer.from(mockOutput));
 
-      const result = wrapper.execute('az pipelines list');
+      const result = wrapper.execute(['pipelines', 'list']);
 
       expect(result.name).toBe('test"with"quotes');
       expect(result.value).toBe('test\\with\\backslashes');
@@ -535,7 +542,7 @@ describe('AzureDevOpsCliWrapper', () => {
       const mockOutput = JSON.stringify(largeArray);
       mockExecSync.mockReturnValue(Buffer.from(mockOutput));
 
-      const result = wrapper.execute('az pipelines list');
+      const result = wrapper.execute(['pipelines', 'list']);
 
       expect(result).toHaveLength(1000);
     });
@@ -547,7 +554,7 @@ describe('AzureDevOpsCliWrapper', () => {
       });
       mockExecSync.mockReturnValue(Buffer.from(mockOutput));
 
-      const result = wrapper.execute('az pipelines list');
+      const result = wrapper.execute(['pipelines', 'list']);
 
       expect(result.name).toBe('中文-日本語-한국어');
       expect(result.emoji).toBe('🚀');
