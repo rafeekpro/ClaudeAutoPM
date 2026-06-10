@@ -8,8 +8,6 @@
 
 const { execSync } = require('child_process');
 const readline = require('readline');
-const fs = require('fs-extra');
-const path = require('path');
 const colors = require('../lib/utils/colors');
 
 class WorktreeMigrator {

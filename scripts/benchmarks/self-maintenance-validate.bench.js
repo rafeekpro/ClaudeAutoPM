@@ -103,7 +103,7 @@ async function benchmarkFileScan(iterations = 10) {
   for (let i = 0; i < iterations; i++) {
     const startTime = performance.now();
 
-    const files = scanDirectorySequential(agentsDir, '.md');
+    scanDirectorySequential(agentsDir, '.md');
 
     const endTime = performance.now();
     results.sequential.push(endTime - startTime);

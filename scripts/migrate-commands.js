@@ -86,7 +86,6 @@ class CommandMigrator {
 
     // Parse usage to extract positional args and options
     const usageParts = metadata.usage.match(/\/[^\/]+\/(\S+)\s*(.*)/);
-    const baseCommand = usageParts ? usageParts[1] : commandName;
     const args = usageParts && usageParts[2] ? usageParts[2] : '';
 
     // Determine positional arguments

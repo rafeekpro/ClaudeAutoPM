@@ -123,12 +123,13 @@ Usage:
           }
           await handleDisable(manager, argv.name, argv);
           break;
-        case 'update':
+        case 'update': {
           // argv.name is optional - if not provided, update all
           // argv._ contains additional arguments after the command
           const pluginsToUpdate = argv.name ? [argv.name, ...(argv._.slice(3) || [])] : null;
           await handleUpdate(manager, pluginsToUpdate, argv);
           break;
+        }
         default:
           console.error(chalk.red(`Unknown action: ${argv.action}`));
           process.exit(1);
