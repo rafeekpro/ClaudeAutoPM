@@ -35,12 +35,12 @@ echo ""
 
 # Create temp log file
 LOG_FILE=$(mktemp)
+trap 'rm -f "$LOG_FILE"' EXIT
 
 # Build all services
 if docker compose build --no-cache 2>&1 | tee "$LOG_FILE"; then
     echo ""
     echo -e "${GREEN}✅ Docker build successful!${NC}"
-    rm "$LOG_FILE"
     exit 0
 else
     echo ""
@@ -105,6 +105,7 @@ else
     echo "   Review with: cat $LOG_FILE"
     echo ""
 
-    rm "$LOG_FILE"
+    # Keep the log for post-mortem review on failure
+    trap - EXIT
     exit 1
 fi

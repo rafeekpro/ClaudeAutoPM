@@ -132,4 +132,5 @@ __pycache__/
 *.so
 .mcp.json
 .claude/templates/
-status/*.claude/worktrees/
+status/*
+.claude/worktrees/

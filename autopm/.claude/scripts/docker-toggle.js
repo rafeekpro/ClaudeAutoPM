@@ -7,7 +7,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 
 class DockerToggle {
   constructor() {
@@ -173,7 +173,7 @@ class DockerToggle {
     console.log('Docker Engine:');
 
     try {
-      execSync('docker version', { stdio: 'ignore' });
+      execFileSync('docker', ['version'], { stdio: 'ignore' });
       console.log('  ✅ Docker is running');
     } catch (error) {
       console.log('  ❌ Docker is not running or not installed');

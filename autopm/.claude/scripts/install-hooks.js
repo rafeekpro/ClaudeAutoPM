@@ -7,7 +7,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const readline = require('readline');
 
 class InstallHooks {
@@ -37,7 +37,7 @@ class InstallHooks {
   // Check if we're in a git repository
   checkGitRepo() {
     try {
-      execSync('git rev-parse --git-dir', { stdio: 'ignore' });
+      execFileSync('git', ['rev-parse', '--git-dir'], { stdio: 'ignore' });
       return true;
     } catch (error) {
       this.print('❌ Not in a Git repository', 'red');
