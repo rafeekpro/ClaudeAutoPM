@@ -146,12 +146,63 @@ class PRValidation {
     return true;
   }
 
+  // Parse a command string into an argv array without invoking a shell.
+  // Handles single/double quoted segments so values with spaces survive,
+  // while shell metacharacters are treated as literal argument content.
+  parseCommand(command) {
+    const args = [];
+    let current = '';
+    let quote = null;
+    let hasToken = false;
+
+    for (let i = 0; i < command.length; i++) {
+      const ch = command[i];
+
+      if (quote) {
+        if (ch === quote) {
+          quote = null;
+        } else {
+          current += ch;
+        }
+        continue;
+      }
+
+      if (ch === '"' || ch === "'") {
+        quote = ch;
+        hasToken = true;
+        continue;
+      }
+
+      if (ch === ' ' || ch === '\t') {
+        if (hasToken) {
+          args.push(current);
+          current = '';
+          hasToken = false;
+        }
+        continue;
+      }
+
+      current += ch;
+      hasToken = true;
+    }
+
+    if (hasToken) {
+      args.push(current);
+    }
+
+    return args;
+  }
+
   // Run Docker command with proper error handling
   async runDockerCommand(command, description) {
     this.print(description, 'blue');
 
+    const parts = this.parseCommand(command);
+    const [file, ...args] = parts;
+
     return new Promise((resolve) => {
-      const child = spawn('sh', ['-c', command], {
+      // Execute without a shell to avoid command injection
+      const child = spawn(file, args, {
         stdio: 'inherit'
       });
 

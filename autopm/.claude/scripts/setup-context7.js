@@ -7,7 +7,10 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync, spawn } = require('child_process');
+const { execSync, execFileSync, spawn } = require('child_process');
+
+// Valid npm package name (optionally scoped), per npm naming rules
+const NPM_NAME_RE = /^(@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/;
 
 class SetupContext7 {
   constructor() {
@@ -30,10 +33,20 @@ class SetupContext7 {
     }
   }
 
+  // Validate an npm package name against npm naming rules
+  isValidPackageName(name) {
+    return typeof name === 'string' && NPM_NAME_RE.test(name);
+  }
+
   // Check if command exists
   commandExists(command) {
+    // Only allow simple command tokens; reject anything with shell metacharacters
+    if (typeof command !== 'string' || !/^[a-zA-Z0-9._-]+$/.test(command)) {
+      return false;
+    }
     try {
-      execSync(`which ${command}`, { stdio: 'ignore' });
+      // Pass as an argument array (no shell) to avoid command injection
+      execFileSync('which', [command], { stdio: 'ignore' });
       return true;
     } catch (error) {
       return false;
@@ -111,9 +124,14 @@ CONTEXT7_WORKSPACE=your-context7-workspace-here
     ];
 
     for (const pkg of packages) {
+      if (!this.isValidPackageName(pkg)) {
+        this.print(`❌ Refusing to install invalid package name: ${pkg}`, 'red');
+        continue;
+      }
       try {
         console.log(`Installing ${pkg}...`);
-        execSync(`npm install -g ${pkg}`, { stdio: 'inherit' });
+        // Pass as an argument array (no shell) to avoid command injection
+        execFileSync('npm', ['install', '-g', pkg], { stdio: 'inherit' });
         this.print(`✅ Installed ${pkg}`, 'green');
       } catch (error) {
         this.print(`❌ Failed to install ${pkg}`, 'red');

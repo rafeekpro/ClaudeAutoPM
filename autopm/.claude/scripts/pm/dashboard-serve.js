@@ -1484,28 +1484,33 @@ server.listen(0, '127.0.0.1', () => {
   const pidData = JSON.stringify({ pid: process.pid, port, token }, null, 2);
 
   if (!fs.existsSync(pmDir)) fs.mkdirSync(pmDir, { recursive: true });
-  fs.writeFileSync(pidFile, pidData + '\n', 'utf8');
+  // Owner read/write only — the state file holds the auth token
+  fs.writeFileSync(pidFile, pidData + '\n', { encoding: 'utf8', mode: 0o600 });
 
   resetIdle();
 
   const baseUrl = `http://127.0.0.1:${port}`;
   const authUrl = `${baseUrl}/?token=${token}`;
+  // Security: never print the raw auth token (or the URL containing it) to
+  // stdout/logs. The token is persisted to the local state file with
+  // owner-only access; the browser is opened directly with the auth URL.
   console.log(`## Config Dashboard Server\n`);
-  console.log(`URL:   ${authUrl}`);
-  console.log(`Token: ${token}`);
+  console.log(`URL:   ${baseUrl}`);
+  console.log(`Token: stored in state file (do not share)`);
   console.log(`PID:   ${process.pid}`);
   console.log(`State: ${pidFile}`);
   console.log(`\nAuto-shutdown: 5 min idle`);
   console.log(`Opening browser...`);
 
   try {
-    const { execSync } = require('child_process');
+    const { execFileSync } = require('child_process');
     // Fix 6: Windows browser open + Fix 13: token in URL
-    if (process.platform === 'darwin') execSync(`open "${authUrl}"`);
-    else if (process.platform === 'win32') execSync(`cmd /c start "" "${authUrl}"`);
-    else execSync(`xdg-open "${authUrl}"`);
+    // Pass the URL as an argument (no shell) so the token cannot be injected.
+    if (process.platform === 'darwin') execFileSync('open', [authUrl]);
+    else if (process.platform === 'win32') execFileSync('cmd', ['/c', 'start', '', authUrl]);
+    else execFileSync('xdg-open', [authUrl]);
   } catch {
-    console.log(`Could not open browser. Open manually: ${authUrl}`);
+    console.log(`Could not open browser. The access URL (with token) is saved in: ${pidFile}`);
   }
 });
 

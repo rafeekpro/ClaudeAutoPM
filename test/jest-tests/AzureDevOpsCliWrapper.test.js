@@ -444,8 +444,9 @@ describe('AzureDevOpsCliWrapper', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0].folder).toBe('\\build');
+      // Security: backslash is escaped for safe shell embedding
       expect(mockExecSync).toHaveBeenCalledWith(
-        expect.stringContaining('--folder "\\build"'),
+        expect.stringContaining('--folder "\\\\build"'),
         expect.any(Object)
       );
     });

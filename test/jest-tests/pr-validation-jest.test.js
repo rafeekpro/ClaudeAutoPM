@@ -306,7 +306,8 @@ describe('PRValidation', () => {
 
       expect(result).toBe(true);
       expect(validator.print).toHaveBeenCalledWith('Building image', 'blue');
-      expect(spawn).toHaveBeenCalledWith('sh', ['-c', 'docker build .'], { stdio: 'inherit' });
+      // Security: commands run via argv array, never through `sh -c`
+      expect(spawn).toHaveBeenCalledWith('docker', ['build', '.'], { stdio: 'inherit' });
     });
 
     it('should return false when command fails', async () => {
