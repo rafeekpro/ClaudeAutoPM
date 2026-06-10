@@ -259,9 +259,16 @@ class AzureIssueStart {
         console.warn(`Could not add tag: invalid tag value: ${tag}`);
         return;
       }
-      // Get current tags
+      // Get current tags. The remote value is untrusted input — keep only
+      // entries matching the same safe pattern as the new tag, so a corrupted
+      // or malicious stored value cannot smuggle extra field syntax into the
+      // System.Tags assignment below.
       const workItem = await this.getWorkItem(organization, project, workItemId);
-      const currentTags = workItem.fields?.['System.Tags'] || '';
+      const currentTags = (workItem.fields?.['System.Tags'] || '')
+        .split(';')
+        .map(t => t.trim())
+        .filter(t => t && AzureIssueStart.isValidTag(t))
+        .join('; ');
       const newTags = currentTags ? `${currentTags}; ${tag}` : tag;
 
       execFileSync('az', ['boards', 'work-item', 'update',
