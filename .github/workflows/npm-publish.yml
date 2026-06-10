@@ -27,18 +27,23 @@ jobs:
       # (repository: this repo, workflow: npm-publish.yml).
       id-token: write
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v6
+      # Actions pinned to immutable commit SHAs (supply-chain hardening).
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
       # Trusted publishing requires npm >= 11.5.1; pinned (not @latest) so a
-      # broken or compromised npm release cannot silently enter the publish path
+      # broken or compromised npm release cannot silently enter the publish
+      # path. Note: this swaps only the npm binary — the auth config written
+      # by setup-node lives in $NPM_CONFIG_USERCONFIG and is unaffected.
       - run: npm install -g npm@11.16.0
       - run: npm ci --legacy-peer-deps
-      # NODE_AUTH_TOKEN kept as a fallback: with a Trusted Publisher configured
-      # on npmjs.com, npm >= 11.5.1 uses OIDC; until then the (rotated) token
-      # keeps releases working. Remove the env once OIDC is confirmed live.
+      # Tests gate this job via `needs: test` above — a red suite never
+      # reaches publish. NODE_AUTH_TOKEN kept as a fallback: with a Trusted
+      # Publisher configured on npmjs.com, npm >= 11.5.1 uses OIDC; until
+      # then the (rotated) token keeps releases working. Remove the env once
+      # OIDC is confirmed live.
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
