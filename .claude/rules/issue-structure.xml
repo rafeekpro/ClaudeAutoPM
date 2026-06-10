@@ -6,13 +6,18 @@
 
   <template>
     <section name="goal" required="true">One sentence: WHAT and WHY</section>
-    <section name="context" required="true">Architecture location, files, dependencies</section>
+    <section name="context" required="true">
+      WHY this issue exists — problem background, current state, dependencies, environment.
+      Must answer: what triggered this, what works/doesn't, what must exist first.
+    </section>
     <section name="acceptance-criteria" required="true">Measurable checkboxes, not prose</section>
-    <section name="technical-constraints" required="false">Stack, patterns, prohibitions</section>
     <section name="affected-files" required="true">Exact file paths with change description</section>
+    <section name="related-issues" required="true">depends on / blocks / related to #NNN, or "None"</section>
+    <section name="verification" required="true">Concrete commands to verify (curl, kubectl, npm test, etc.)</section>
+    <section name="definition-of-done" required="true">Quality gate checkboxes — tests, deploy, PR merged</section>
+    <section name="constraints" required="false">Stack, patterns, prohibitions</section>
     <section name="out-of-scope" required="false">What NOT to touch</section>
     <section name="suggested-approach" required="false">Brief implementation strategy</section>
-    <section name="definition-of-done" required="false">Quality gates (tests, lint, coverage)</section>
   </template>
 
   <title-convention>
@@ -40,8 +45,12 @@
   </key-principles>
 
   <violations enforcement="auto-reject">
+    <violation>Creating issues without Context section (why it exists, current state)</violation>
     <violation>Creating issues without Acceptance Criteria</violation>
     <violation>Creating issues without Affected Files section</violation>
+    <violation>Creating issues without Verification Steps</violation>
+    <violation>Creating issues without Definition of Done</violation>
     <violation>Vague goal without concrete deliverable</violation>
+    <violation>Missing Related Issues (must list links or "None")</violation>
   </violations>
 </rule>

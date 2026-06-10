@@ -43,11 +43,7 @@ Do not bother the user with preflight checks progress ("I'm not going to ..."). 
 - `mcp://context7/llm/prompt-engineering` - prompt engineering best practices
 - `mcp://context7/ai/rag-systems` - rag systems best practices
 
-**Why This is Required:**
-- Ensures adherence to current industry standards and best practices
-- Prevents outdated or incorrect implementation patterns
-- Provides access to latest framework/tool documentation
-- Reduces errors from stale knowledge or assumptions
+**Why:** Documentation-first development policy — see `.claude/rules/context7-required.md`.
 
 
 ## Instructions
