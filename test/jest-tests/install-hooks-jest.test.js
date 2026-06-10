@@ -4,7 +4,7 @@ jest.mock('child_process');
 jest.mock('readline');
 
 const fs = require('fs');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const readline = require('readline');
 const InstallHooks = require('../../autopm/.claude/scripts/install-hooks.js');
 
@@ -21,7 +21,7 @@ describe('Install Hooks', () => {
     fs.unlinkSync.mockImplementation(() => {});
     fs.symlinkSync.mockImplementation(() => {});
     fs.chmodSync.mockImplementation(() => {});
-    execSync.mockImplementation(() => {});
+    execFileSync.mockImplementation(() => {});
 
     // Mock readline
     readline.createInterface.mockReturnValue({
@@ -68,17 +68,17 @@ describe('Install Hooks', () => {
 
     describe('checkGitRepo()', () => {
       it('should return true when in git repository', () => {
-        execSync.mockImplementation(() => {}); // Success
+        execFileSync.mockImplementation(() => {}); // Success
 
         const installer = new InstallHooks();
         const result = installer.checkGitRepo();
 
         expect(result).toBe(true);
-        expect(execSync).toHaveBeenCalledWith('git rev-parse --git-dir', { stdio: 'ignore' });
+        expect(execFileSync).toHaveBeenCalledWith('git', ['rev-parse', '--git-dir'], { stdio: 'ignore' });
       });
 
       it('should exit when not in git repository', () => {
-        execSync.mockImplementation(() => {
+        execFileSync.mockImplementation(() => {
           throw new Error('Not a git repository');
         });
 
@@ -337,7 +337,7 @@ describe('Install Hooks', () => {
     describe('run()', () => {
       beforeEach(() => {
         // Setup default successful scenario
-        execSync.mockImplementation(() => {}); // Git repo check passes
+        execFileSync.mockImplementation(() => {}); // Git repo check passes
         fs.existsSync.mockImplementation(path => {
           if (path.includes('.git/hooks')) return true;
           if (path.includes('.claude/hooks/')) return true;
@@ -505,7 +505,7 @@ describe('Install Hooks', () => {
       require.main = { filename: require.resolve('../../autopm/.claude/scripts/install-hooks.js') };
       process.argv = ['node', 'install-hooks.js'];
 
-      execSync.mockImplementation(() => {});
+      execFileSync.mockImplementation(() => {});
       fs.existsSync.mockReturnValue(false);
       process.exit.mockImplementation((code) => {
         throw new Error(`Process exit with code ${code}`);
@@ -530,7 +530,7 @@ describe('Install Hooks', () => {
       process.argv = ['node', 'install-hooks.js'];
 
       // Mock critical error
-      execSync.mockImplementation(() => {
+      execFileSync.mockImplementation(() => {
         throw new Error('Git command failed');
       });
 
@@ -564,7 +564,7 @@ describe('Install Hooks', () => {
     });
 
     it('should handle realistic installation scenario', async () => {
-      execSync.mockImplementation(() => {}); // Git repo check passes
+      execFileSync.mockImplementation(() => {}); // Git repo check passes
       fs.existsSync.mockImplementation(path => {
         if (path.includes('.git/hooks')) return true;
         if (path.includes('.claude/hooks/pre-push-docker-tests.sh')) return true;
@@ -594,7 +594,7 @@ describe('Install Hooks', () => {
 
     it('should handle edge cases and errors gracefully', async () => {
       // Mix of success and failure scenarios
-      execSync.mockImplementation(() => {}); // Git repo check passes
+      execFileSync.mockImplementation(() => {}); // Git repo check passes
       fs.existsSync.mockImplementation(path => {
         if (path.includes('.git/hooks')) return true;
         if (path.includes('.claude/hooks/pre-push-docker-tests.sh')) return true;
@@ -624,7 +624,7 @@ describe('Install Hooks', () => {
     });
 
     it('should work with different argument combinations', async () => {
-      execSync.mockImplementation(() => {});
+      execFileSync.mockImplementation(() => {});
       fs.existsSync.mockImplementation(path => {
         if (path.includes('.git/hooks')) return true;
         if (path.includes('.claude/hooks/')) return true;
