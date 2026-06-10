@@ -135,7 +135,7 @@ describe('sync-plugin-scripts', () => {
       `${targetA}:root.sh:content`,
       `${targetB}:config/tool.js:mode`,
       `${targetB}:lib/utils.sh:missing`
-    ]);
+    ].sort());
 
     // --check must not repair anything.
     assert.strictEqual(fs.readFileSync(path.join(targetA, 'root.sh'), 'utf8'), 'tampered\n');
