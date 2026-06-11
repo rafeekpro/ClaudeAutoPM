@@ -122,6 +122,23 @@ class PostInstallChecker {
 
     const provider = this.config.provider;
 
+    // Lite-scenario installs (and any local-only install) deliberately have no
+    // provider plugin. Treating absence of provider as a failed *essential*
+    // component there is misleading — see #627. Detect via installedPlugins.
+    const installedPlugins = this.config.installedPlugins || [];
+    const hasProviderPlugin = installedPlugins.some(
+      p => p && (p.name === 'plugin-pm-github' || p.name === 'plugin-pm-azure')
+    );
+
+    if (provider === 'local' || (!provider && !hasProviderPlugin)) {
+      this.results.optional.push({
+        name: 'Provider setup',
+        status: true,
+        message: 'Local mode — provider sync not configured (optional)'
+      });
+      return;
+    }
+
     if (!provider) {
       this.results.essential.push({
         name: 'Provider setup',
