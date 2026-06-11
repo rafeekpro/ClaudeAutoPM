@@ -54,19 +54,20 @@ jobs:
       - name: Publish ${{ matrix.plugin }}
         working-directory: packages/${{ matrix.plugin }}
         # Skip if the local version is already on npm, but fail loudly on any
-        # other error. The previous `|| echo "Already published or error"`
-        # swallowed network/auth/packaging failures and made the matrix
-        # green even when nothing was published.
+        # other error. Querying `<pkg>@<ver>` (not `<pkg>`) returns a single
+        # value when the exact version exists and empty otherwise — more
+        # robust than parsing the wider `npm view <pkg> version` response,
+        # which can emit multiple lines for some packages/npm versions.
         run: |
           set -euo pipefail
           pkg_name=$(node -p "require('./package.json').name")
           local_ver=$(node -p "require('./package.json').version")
-          remote_ver=$(npm view "$pkg_name" version 2>/dev/null || true)
-          if [ "$local_ver" = "$remote_ver" ]; then
+          exists=$(npm view "$pkg_name@$local_ver" version 2>/dev/null || true)
+          if [ -n "$exists" ]; then
             echo "::notice::$pkg_name@$local_ver already on npm, skipping"
             exit 0
           fi
-          echo "Publishing $pkg_name@$local_ver (remote: ${remote_ver:-none})"
+          echo "Publishing $pkg_name@$local_ver"
           npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -87,6 +88,19 @@ jobs:
       - run: npm install -g npm@11.16.0 --ignore-scripts
       - name: Publish ${{ inputs.plugin }}
         working-directory: packages/${{ inputs.plugin }}
-        run: npm publish --access public
+        # Same precheck as publish-all so a re-dispatch of an already-published
+        # plugin skips cleanly with a notice instead of failing on npm's
+        # "version exists" error. Any other publish error still fails loudly.
+        run: |
+          set -euo pipefail
+          pkg_name=$(node -p "require('./package.json').name")
+          local_ver=$(node -p "require('./package.json').version")
+          exists=$(npm view "$pkg_name@$local_ver" version 2>/dev/null || true)
+          if [ -n "$exists" ]; then
+            echo "::notice::$pkg_name@$local_ver already on npm, skipping"
+            exit 0
+          fi
+          echo "Publishing $pkg_name@$local_ver"
+          npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
