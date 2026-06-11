@@ -227,28 +227,64 @@ describe('PostInstallChecker', () => {
       }
     });
 
-    it('should handle local provider', () => {
-      const config = { provider: 'local' };
-      checker.config = config;
+    it('should handle local provider explicitly set', () => {
+      checker.config = { provider: 'local' };
 
       checker.checkProvider();
 
-      const providerCheck = checker.results.essential.find(r => r.name === 'Provider setup');
-      if (providerCheck) {
-        expect(providerCheck.status).toBe(true);
-        expect(providerCheck.message).toContain('Local mode');
-      } else {
-        expect(checker.results.essential.length).toBeGreaterThanOrEqual(0);
-      }
+      // Local-only is not a missing essential — it's an intentional choice.
+      const essentialEntry = checker.results.essential.find(r => r.name === 'Provider setup');
+      expect(essentialEntry).toBeUndefined();
+
+      const optionalEntry = checker.results.optional.find(r => r.name === 'Provider setup');
+      expect(optionalEntry).toBeDefined();
+      expect(optionalEntry.status).toBe(true);
+      expect(optionalEntry.message).toContain('Local mode');
+
+      // No GitHub/Azure next-step nag.
+      expect(checker.results.nextSteps.some(s => /github\|azure/.test(s))).toBe(false);
     });
 
-    it('should handle no provider configured', () => {
-      checker.config = {};
+    it('should treat Lite install (no provider plugin, no provider config) as local mode', () => {
+      // Lite scenario installs only plugin-core + plugin-pm — no provider plugin.
+      // Absence of provider config is intentional, not a failure. Issue #627.
+      checker.config = {
+        installedPlugins: [
+          { name: 'plugin-core' },
+          { name: 'plugin-pm' }
+        ]
+      };
+
+      checker.checkProvider();
+
+      const essentialEntry = checker.results.essential.find(r => r.name === 'Provider setup');
+      expect(essentialEntry).toBeUndefined();
+
+      const optionalEntry = checker.results.optional.find(r => r.name === 'Provider setup');
+      expect(optionalEntry).toBeDefined();
+      expect(optionalEntry.status).toBe(true);
+      expect(optionalEntry.message).toMatch(/local|optional/i);
+
+      expect(checker.results.nextSteps.some(s => /github\|azure/.test(s))).toBe(false);
+    });
+
+    it('should still flag missing provider config when a provider plugin IS installed', () => {
+      // User installed plugin-pm-github (provider integration) but never ran
+      // `autopm config set provider github` — that IS a missing essential.
+      checker.config = {
+        installedPlugins: [
+          { name: 'plugin-core' },
+          { name: 'plugin-pm' },
+          { name: 'plugin-pm-github' }
+        ]
+      };
 
       checker.checkProvider();
 
       const providerCheck = checker.results.essential.find(r => r.name === 'Provider setup');
+      expect(providerCheck).toBeDefined();
       expect(providerCheck.status).toBe(false);
+      expect(checker.results.nextSteps.some(s => s.includes('autopm config set provider'))).toBe(true);
     });
   });
 
