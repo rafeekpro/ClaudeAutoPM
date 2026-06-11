@@ -14,6 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      # OIDC for npm trusted publishing — replaces the expiring NPM_TOKEN.
+      # Requires a Trusted Publisher configured for every @claudeautopm/*
+      # package on npmjs.com (repository: this repo, workflow: plugin-publish.yml).
       id-token: write
     strategy:
       max-parallel: 1
@@ -37,11 +40,35 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
+      # Trusted publishing requires npm >= 11.5.1; pinned (not @latest) so a
+      # broken or compromised npm release cannot silently enter the publish
+      # path. Note: this swaps only the npm binary — the auth config written
+      # by setup-node lives in $NPM_CONFIG_USERCONFIG and is unaffected.
+      - run: npm install -g npm@11.16.0 --ignore-scripts
+      # NODE_AUTH_TOKEN kept as a fallback: with a Trusted Publisher configured
+      # on npmjs.com, npm >= 11.5.1 uses OIDC; until then the (rotated) token
+      # keeps releases working. Remove the env once OIDC is confirmed live for
+      # all @claudeautopm/* packages.
       - name: Publish ${{ matrix.plugin }}
         working-directory: packages/${{ matrix.plugin }}
-        run: npm publish --access public || echo "Already published or error"
+        # Skip if the local version is already on npm, but fail loudly on any
+        # other error. Querying `<pkg>@<ver>` (not `<pkg>`) returns a single
+        # value when the exact version exists and empty otherwise — more
+        # robust than parsing the wider `npm view <pkg> version` response,
+        # which can emit multiple lines for some packages/npm versions.
+        run: |
+          set -euo pipefail
+          pkg_name=$(node -p "require('./package.json').name")
+          local_ver=$(node -p "require('./package.json').version")
+          exists=$(npm view "$pkg_name@$local_ver" version 2>/dev/null || true)
+          if [ -n "$exists" ]; then
+            echo "::notice::$pkg_name@$local_ver already on npm, skipping"
+            exit 0
+          fi
+          echo "Publishing $pkg_name@$local_ver"
+          npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -50,15 +77,30 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      # See publish-all for OIDC rationale.
       id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
+      - run: npm install -g npm@11.16.0 --ignore-scripts
       - name: Publish ${{ inputs.plugin }}
         working-directory: packages/${{ inputs.plugin }}
-        run: npm publish --access public
+        # Same precheck as publish-all so a re-dispatch of an already-published
+        # plugin skips cleanly with a notice instead of failing on npm's
+        # "version exists" error. Any other publish error still fails loudly.
+        run: |
+          set -euo pipefail
+          pkg_name=$(node -p "require('./package.json').name")
+          local_ver=$(node -p "require('./package.json').version")
+          exists=$(npm view "$pkg_name@$local_ver" version 2>/dev/null || true)
+          if [ -n "$exists" ]; then
+            echo "::notice::$pkg_name@$local_ver already on npm, skipping"
+            exit 0
+          fi
+          echo "Publishing $pkg_name@$local_ver"
+          npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
