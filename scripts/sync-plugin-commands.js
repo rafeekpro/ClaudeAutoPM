@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
  * Sync command prompt files from plugin packages (source of truth) into the
- * installable payload (autopm/.claude/commands).
+ * installable payload at `autopm/` + `.claude/commands`.
  *
  * Scope: every "*.md" file anywhere under packages/<plugin>/commands/
  * (recursively — e.g. plugin-pm-azure keeps its files in commands/azure/)
- * that has a same-basename counterpart in the flat autopm/.claude/commands/.
+ * that has a same-basename counterpart in the flat payload commands dir.
  * Plugin-only commands and payload-only commands are left alone.
  *
  * Usage:
@@ -74,7 +74,7 @@ function main() {
     }
 
     if (checkOnly) {
-      diverged.push(`${name}  (packages/${plugin}/commands -> autopm/.claude/commands)`);
+      diverged.push(`${name}  (packages/${plugin}/commands -> payload)`);
     } else {
       fs.writeFileSync(payloadFile, pluginContent);
       console.log(`synced: ${name}  (from packages/${plugin}/commands)`);
