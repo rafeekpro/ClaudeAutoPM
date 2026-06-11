@@ -89,7 +89,8 @@ jobs:
               .replace(new RegExp(`<!--\\s*${TTAG}:true\\s*-->`, 'gi'), '');
             const redact = (s) => (s || '')
               .replace(/sk-ant-[A-Za-z0-9_-]{20,}/g, '[REDACTED-ANTHROPIC-KEY]')
-              .replace(/sk-[A-Za-z0-9]{20,}/g, '[REDACTED-OPENAI-KEY]')
+              .replace(/sk-or-[A-Za-z0-9_-]{20,}/g, '[REDACTED-OPENROUTER-KEY]')
+              .replace(/sk-[A-Za-z0-9_-]{20,}/g, '[REDACTED-OPENAI-KEY]')
               .replace(/AKIA[0-9A-Z]{16}/g, '[REDACTED-AWS-KEY]')
               .replace(/AIza[0-9A-Za-z_-]{35}/g, '[REDACTED-GOOGLE-KEY]')
               .replace(/gh[pousr]_[A-Za-z0-9]{36,}/g, '[REDACTED-GH-TOKEN]')
