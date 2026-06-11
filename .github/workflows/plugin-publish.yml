@@ -53,7 +53,21 @@ jobs:
       # all @claudeautopm/* packages.
       - name: Publish ${{ matrix.plugin }}
         working-directory: packages/${{ matrix.plugin }}
-        run: npm publish --access public || echo "Already published or error"
+        # Skip if the local version is already on npm, but fail loudly on any
+        # other error. The previous `|| echo "Already published or error"`
+        # swallowed network/auth/packaging failures and made the matrix
+        # green even when nothing was published.
+        run: |
+          set -euo pipefail
+          pkg_name=$(node -p "require('./package.json').name")
+          local_ver=$(node -p "require('./package.json').version")
+          remote_ver=$(npm view "$pkg_name" version 2>/dev/null || true)
+          if [ "$local_ver" = "$remote_ver" ]; then
+            echo "::notice::$pkg_name@$local_ver already on npm, skipping"
+            exit 0
+          fi
+          echo "Publishing $pkg_name@$local_ver (remote: ${remote_ver:-none})"
+          npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
