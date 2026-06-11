@@ -3,8 +3,8 @@
  * Sync shared scripts from the single source of truth
  * (packages/plugin-core/scripts) into its two consumers:
  *
- *   - autopm/.claude/scripts  (installer payload shipped to user projects)
- *   - .claude/scripts         (this repo's own installed copy)
+ *   - the installer payload at `autopm/` + `.claude/scripts` (shipped to user projects)
+ *   - this repo's own installed copy at `.claude/scripts`
  *
  * Usage:
  *   node scripts/sync-plugin-scripts.js            # copy (repair) targets
