@@ -70,6 +70,9 @@ jobs:
             const os = require('os');
             const path = require('path');
             const { execFile, execFileSync } = require('child_process');
+            // NOTE: `core` (and github/context/exec/glob/io) are injected as globals by
+            // github-script@v7 — do NOT `const core = require('@actions/core')`: that's a
+            // redeclaration → "Identifier 'core' has already been declared" at runtime (#21/#27).
 
             // ---- config (rendered per-repo into env; JS body stays identical) ----
             const CHECK_NAME = process.env.CHECK_NAME;
@@ -78,6 +81,11 @@ jobs:
             const DISPLAY_NAME = process.env.DISPLAY_NAME;
             const MAX_DIFF_CHARS = parseInt(process.env.MAX_DIFF_CHARS || '200000', 10);
             const PER_CALL_TIMEOUT_MS = parseInt(process.env.PER_CALL_TIMEOUT_MS || '300000', 10);
+            // pr-review-gate#17: chunk large diffs instead of truncate-then-pass. A diff is
+            // split at file boundaries into <= MAX_CHUNKS chunks of <= PER_CHUNK_CHARS,
+            // each reviewed and the verdicts/findings aggregated. ~90k chars ≈ ~22k tokens.
+            const PER_CHUNK_CHARS = parseInt(process.env.PER_CHUNK_CHARS || '90000', 10);
+            const MAX_CHUNKS = parseInt(process.env.MAX_CHUNKS || '8', 10);
             const MARK = process.env.MARKER_PREFIX;              // e.g. gemini-ai-review
             const VTAG = process.env.VERDICT_PREFIX;             // e.g. gemini-verdict
             const TTAG = process.env.TRUNCATED_PREFIX;           // e.g. gemini-truncated
@@ -133,6 +141,33 @@ jobs:
               return null;
             }
 
+            // ---- pr-review-gate#17: split a diff into review chunks at file boundaries,
+            //      packing file-diffs into blocks of <= perChunkChars. A single file
+            //      bigger than the budget is hard-split. Reviewing chunks separately
+            //      (then aggregating) covers arbitrarily large PRs without dropping text. ----
+            function splitDiffByFiles(diffText, perChunkChars) {
+              const parts = String(diffText || '').split(/(?=^diff --git )/m).filter(Boolean);
+              const chunks = []; let cur = '';
+              for (const part of parts) {
+                if (part.length > perChunkChars) {
+                  if (cur) { chunks.push(cur); cur = ''; }
+                  // A single file bigger than the budget is hard-split; prepend the
+                  // `diff --git` header + an offset note to every continuation slice so
+                  // the model keeps file context instead of seeing a bare fragment.
+                  const fileHeader = (part.match(/^diff --git [^\n]*/) || [''])[0];
+                  for (let i = 0; i < part.length; i += perChunkChars) {
+                    const slice = part.slice(i, i + perChunkChars);
+                    chunks.push(i === 0 ? slice : `${fileHeader}\n# [file continued at char offset +${i}]\n${slice}`);
+                  }
+                  continue;
+                }
+                if (cur && (cur.length + part.length) > perChunkChars) { chunks.push(cur); cur = ''; }
+                cur += part;
+              }
+              if (cur) chunks.push(cur);
+              return chunks.length ? chunks : [String(diffText || '')];
+            }
+
             // ---- per-repo project brief (the ONLY per-repo part of the prompt) ----
             function projectBrief() {
               try { return fs.readFileSync('.github/review-context.md', 'utf8').trim(); }
@@ -140,6 +175,18 @@ jobs:
             }
 
             // ---- the GENERIC rubric (identical every repo; rubric/constitution.md) ----
+            // #23: the output contract says findings[] elements are STRINGS, and the
+            // severity sort / formatFinding / redact paths all assume that. A model COULD
+            // emit object findings; coerce any non-string into a meaningful single line so
+            // the string-assuming code downstream stays correct instead of getting "[object Object]".
+            function coerceFinding(f) {
+              if (typeof f === 'string') return f;
+              if (f && typeof f === 'object') {
+                const parts = [f.severity, f.confidence, f.location || f.file, f.issue || f.title || f.message || f.finding, f.fix && ('Fix: ' + f.fix), f.evidence && ('Evidence: ' + f.evidence)].filter(Boolean);
+                return parts.length ? parts.join(' ') : JSON.stringify(f);
+              }
+              return String(f);
+            }
             function buildPrompt(brief, title, body, diff) {
               const safeTitle = sanitize(title).slice(0, 500);
               const safeBody = sanitize(body).slice(0, 8000) || '(no description)';
@@ -168,6 +215,7 @@ jobs:
                 '5. Cap at 8 findings; order by severity (CRITICAL first).',
                 '6. Evidence MUST be quoted from the diff and show a concrete behaviour/security/correctness/deployability risk.',
                 '7. No cosmetic refactors or naming-only nits unless the diff creates a concrete bug.',
+                '8. Do NOT list a finding you then conclude needs no change ("investigated → fine / no change needed"). If it requires no concrete fix, drop it entirely — every listed finding must demand an action.',
                 '',
                 '## Verdict',
                 'REQUEST_CHANGES only if at least one finding is CRITICAL or HIGH at Confidence=HIGH with evidence of a concrete bug/security issue/deploy break. APPROVE otherwise (MEDIUM may be listed but MUST NOT block).',
@@ -235,17 +283,25 @@ jobs:
             async function review(brief, title, body, diff) {
               if (MODE !== 'council') return callModel(buildPrompt(brief, title, body, diff));
               const specResults = await Promise.all(SPECIALISTS.map(async (spec) => ({ name: spec.name, r: await callModel(specialistPrompt(spec, brief, title, body, diff)) })));
-              let anyOk = false, anyRate = false;
+              let anyOk = false, anyRate = false, okCount = 0;
               const findings = [];
               for (const { name, r } of specResults) {
                 if (r.status === 'ok') {
-                  anyOk = true;
+                  anyOk = true; okCount++;
                   let p = null; try { p = JSON.parse(stripAnsi(r.text)); } catch (e) { p = extractJsonObject(stripAnsi(r.text)); }
-                  if (p && Array.isArray(p.findings)) for (const f of p.findings) findings.push(`(${name}) ${String(f)}`);
+                  if (p && Array.isArray(p.findings)) for (const f of p.findings) findings.push(`(${name}) ${coerceFinding(f)}`);
                 } else if (r.status === 'ratelimit') anyRate = true;
                 // one specialist erroring is non-fatal — the arbiter proceeds with the rest
               }
               if (!anyOk) return { status: anyRate ? 'ratelimit' : 'error', error: 'all council specialists failed' };
+              // #20: when only SOME specialists ran (the rest rate-limited/errored on the shared
+              // subscription), the arbiter must not silently APPROVE on partial coverage. Tell it
+              // coverage is partial; if the MAJORITY of dimensions are missing, the council can't be
+              // trusted to clear the PR — fall to neutral (human review; the cron retries next tick).
+              if (okCount < SPECIALISTS.length) {
+                findings.unshift(`(Meta) WARNING: only ${okCount}/${SPECIALISTS.length} specialists succeeded — review coverage is PARTIAL; entire dimensions went unreviewed, so treat a clean result with suspicion.`);
+                if (okCount * 2 < SPECIALISTS.length) return { status: 'ratelimit' };
+              }
               return callModel(arbiterPrompt(findings, brief, title, body));
             }
 
@@ -260,7 +316,9 @@ jobs:
                 const env = { ...process.env };
                 for (const k of ['CLAUDECODE', 'CLAUDE_CODE_ENTRYPOINT', 'CLAUDE_CODE_SESSION', 'CLAUDE_CODE_PARENT_SESSION', 'ANTHROPIC_API_KEY', 'ANTHROPIC_AUTH_TOKEN', 'ANTHROPIC_BASE_URL']) delete env[k];
                 const child = execFile('claude',
-                  ['--model', REVIEW_MODEL, '--allowedTools', '', '--max-turns', '1'],
+                  // pr-review-gate#17: one turn cannot ingest a large diff AND emit the
+                  // JSON verdict — give the model room to read before responding.
+                  ['--model', REVIEW_MODEL, '--allowedTools', '', '--max-turns', '6'],
                   { cwd: scratchDir, env, timeout: PER_CALL_TIMEOUT_MS, maxBuffer: 16 * 1024 * 1024 },
                   (err, stdout, stderr) => {
                     try { fs.rmSync(scratchDir, { recursive: true, force: true }); } catch (e) {}
@@ -334,6 +392,9 @@ jobs:
 
             for (const ref of prRefs) {
               try {
+                // #21: on cron/dispatch the pulls.list summary already carries head.repo, so skip
+                // fork-head PRs (FORK_POLICY=skip) here — before spending a pulls.get on each one.
+                if (process.env.FORK_POLICY === 'skip' && ref.head && ref.head.repo && ref.head.repo.full_name && ref.head.repo.full_name !== `${owner}/${repo}`) continue;
                 const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number: ref.number });
                 if (pr.draft) continue;
                 // Public repos (FORK_POLICY=skip): do not review fork-head PRs — secrets are
@@ -370,32 +431,52 @@ jobs:
                   await postCheck(headSha, 'neutral', `${DISPLAY_NAME} — could not fetch diff; human review required`);
                   continue;
                 }
-                const truncated = diff.length > MAX_DIFF_CHARS;
-                if (truncated) diff = diff.slice(0, MAX_DIFF_CHARS) + '\n\n…[diff truncated for token budget]';
+                // pr-review-gate#17: chunk the diff, review each block, aggregate
+                // (fail-closed). Replaces truncate-then-pass. Over MAX_CHUNKS -> neutral.
+                const allChunks = splitDiffByFiles(diff, PER_CHUNK_CHARS);
+                const overLimit = allChunks.length > MAX_CHUNKS;
+                const truncated = overLimit;   // reuse the truncated marker for "too many chunks"
+                const chunks = overLimit ? allChunks.slice(0, MAX_CHUNKS) : allChunks;
 
-                // call the model
-                const res = await review(projectBrief(), pr.title, pr.body, diff);
-
-                // map result -> conclusion (fail-closed on genuine error; neutral on infra/malformed)
-                let conclusion, title, verdict = 'malformed', summary = '', findings = [];
-                if (res.status === 'error') {
-                  conclusion = 'failure'; title = `❌ REVIEW FAILED (fail-closed) — ${DISPLAY_NAME}; human review required`;
-                } else if (res.status === 'ratelimit') {
-                  conclusion = 'neutral'; title = `⚠️ HUMAN REVIEW REQUIRED — ${DISPLAY_NAME} rate-limited`;
-                } else {
+                // pr-review-gate#17 + council MODE: review each chunk via review()
+                // (which is single-call or council internally), aggregate fail-closed.
+                let anyReject = false, anyError = false, anyRateLimit = false, anyMalformed = false, anyOk = false;
+                let lastError = '';
+                const summaries = [];
+                let findings = [];
+                for (let ci = 0; ci < chunks.length; ci++) {
+                  const res = await review(projectBrief(), pr.title, pr.body, chunks[ci]);
+                  if (res.status === 'ratelimit') { anyRateLimit = true; break; }   // transient — stop early
+                  if (res.status === 'error') { anyError = true; lastError = res.error || 'error'; continue; }
                   const cleaned = stripAnsi(res.text);
                   let parsed = null;
                   try { parsed = JSON.parse(cleaned); } catch (e) { parsed = extractJsonObject(cleaned); }
                   const schemaOk = parsed && ['APPROVE', 'REQUEST_CHANGES'].includes(parsed.verdict) && Array.isArray(parsed.findings) && typeof parsed.summary === 'string';
-                  if (!schemaOk) { conclusion = 'neutral'; title = `⚠️ HUMAN REVIEW REQUIRED — ${DISPLAY_NAME} response malformed`; verdict = 'malformed'; }
-                  else {
-                    verdict = parsed.verdict; summary = parsed.summary; findings = parsed.findings;
-                    const isReject = verdict === 'REQUEST_CHANGES';
-                    if (truncated && !isReject) { conclusion = 'neutral'; title = `⚠️ HUMAN REVIEW REQUIRED — diff truncated, only the prefix was reviewed`; }
-                    else if (isReject) { conclusion = 'failure'; title = `❌ CHANGES REQUESTED — ${DISPLAY_NAME}`; }
-                    else { conclusion = 'success'; title = `✅ APPROVED — ${DISPLAY_NAME}`; }
-                  }
+                  if (!schemaOk) { anyMalformed = true; continue; }
+                  anyOk = true;
+                  if (parsed.summary) summaries.push(parsed.summary);
+                  for (const f of parsed.findings) findings.push(coerceFinding(f));   // #23: keep findings[] strings so sevRank/formatFinding stay correct
+                  if (parsed.verdict === 'REQUEST_CHANGES') anyReject = true;
                 }
+                // Sort by severity BEFORE the cap so a CRITICAL/HIGH from a later chunk
+                // (which set anyReject) is never dropped in favour of earlier NITs — the
+                // operator must be able to see the finding that actually failed the review.
+                const SEV_ORDER = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3, NIT: 4 };
+                const sevRank = (f) => SEV_ORDER[(String(f).match(/\b(CRITICAL|HIGH|MEDIUM|LOW|NIT)\b/) || [])[1]] ?? 5;
+                findings.sort((a, b) => sevRank(a) - sevRank(b));
+                findings = findings.slice(0, 8);
+
+                // aggregate -> conclusion. Priority (fail-closed):
+                //   reject -> failure ; hard error (review didn't run) -> failure ;
+                //   rate-limit -> neutral ; over MAX_CHUNKS -> neutral(truncated) ;
+                //   malformed -> neutral ; all clean -> success
+                let conclusion, title, verdict = 'malformed', summary = summaries.join(' ');
+                if (anyReject) { conclusion = 'failure'; title = `❌ CHANGES REQUESTED — ${DISPLAY_NAME}`; verdict = 'REQUEST_CHANGES'; }
+                else if (anyError) { conclusion = 'failure'; title = `❌ REVIEW FAILED (fail-closed) — ${DISPLAY_NAME}; human review required`; verdict = 'malformed'; }
+                else if (anyRateLimit) { conclusion = 'neutral'; title = `⚠️ HUMAN REVIEW REQUIRED — ${DISPLAY_NAME} rate-limited`; verdict = 'malformed'; }
+                else if (overLimit) { conclusion = 'neutral'; title = `⚠️ HUMAN REVIEW REQUIRED — diff too large (${allChunks.length} chunks > ${MAX_CHUNKS}); reviewed first ${MAX_CHUNKS}`; verdict = 'APPROVE'; }
+                else if (anyMalformed) { conclusion = 'neutral'; title = `⚠️ HUMAN REVIEW REQUIRED — ${DISPLAY_NAME} response malformed`; verdict = 'malformed'; }
+                else { conclusion = 'success'; title = `✅ APPROVED — ${DISPLAY_NAME}`; verdict = 'APPROVE'; }
 
                 // assemble the review body (always carries the marker so cron can skip)
                 const SEV_EMOJI = { CRITICAL: '🔴', HIGH: '🟠', MEDIUM: '🟡', LOW: '🔵', NIT: '⚪' };
@@ -418,13 +499,17 @@ jobs:
                 const lines = [vtag];
                 if (truncated) lines.push(truncatedTag);
                 lines.push(marker, header, `🤖 _${DISPLAY_NAME} (${REVIEW_MODEL}) via ${TRANSPORT}_`, '');
-                if (res.status === 'error') lines.push(`⚠️ Review call failed (fail-closed): ${redact(res.error || '')} — a maintainer must review.`);
-                else if (res.status === 'ratelimit') lines.push('⚠️ Engine rate-limited; will retry on the next cron tick. A maintainer may review meanwhile.');
+                if (anyError && !anyOk) lines.push(`⚠️ Review call failed (fail-closed): ${redact(lastError || '')} — a maintainer must review.`);
+                else if (anyRateLimit && !anyOk) lines.push('⚠️ Engine rate-limited; will retry on the next cron tick. A maintainer may review meanwhile.');
                 else {
                   if (summary) lines.push(redact(summary), '');
                   if (findings.length) { lines.push(`**${findings.length} finding${findings.length > 1 ? 's' : ''}:**`, ''); for (const f of findings) lines.push(formatFinding(f)); }
                   else lines.push('_No blocking findings — clean diff._');
-                  if (truncated) lines.push('', '⚠️ Diff was truncated; only the prefix was reviewed.');
+                  const notes = [];
+                  if (anyError) notes.push('⚠️ The engine failed on one or more chunks — review is partial; check failed closed.');
+                  if (anyMalformed) notes.push('⚠️ One or more chunks returned unparseable output.');
+                  if (overLimit) notes.push(`⚠️ Diff split into ${allChunks.length} chunks; only the first ${MAX_CHUNKS} were reviewed.`);
+                  if (notes.length) lines.push('', notes.join('\n'));
                 }
                 lines.push('', '---', `Gate wrong or a false positive? **Do not edit this workflow** to pass — open an issue on [lagowski/pr-review-gate](https://github.com/lagowski/pr-review-gate/issues).`);
                 const reviewBody = lines.join('\n');
