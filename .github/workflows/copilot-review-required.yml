@@ -27,13 +27,17 @@ on:
     # workflow cannot change what the cron reviews (a backstop against gate-tampering).
     - cron: "*/5 * * * *"
   workflow_dispatch:
+  # GitHub merge queue: dispatches on merge_group and requires CHECK_NAME to report on
+  # the merge_group ref, or the queue entry stalls. The merge_group block below reviews
+  # the queued batch's combined diff (base_sha..head_sha) and posts the check.
+  merge_group:
 
 # PR-event ticks group by PR number (a fresh push cancels the in-flight review on the
 # old sha). Cron/dispatch ticks share one stable key so back-to-back ticks queue rather
 # than race. (Deliberately NOT run_id — that allows unlimited parallel cron runs racing
 # the same check_run; cfd #158 fixed that and we keep the fix.)
 concurrency:
-  group: ${{ github.event.pull_request.number && format('copilot-review-{0}', github.event.pull_request.number) || 'copilot-review-cron' }}
+  group: ${{ github.event.pull_request.number && format('copilot-review-{0}', github.event.pull_request.number) || (github.event.merge_group && format('copilot-review-mq-{0}', github.event.merge_group.head_sha)) || 'copilot-review-cron' }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
@@ -325,10 +329,15 @@ jobs:
                 for (const k of ['CLAUDECODE', 'CLAUDE_CODE_ENTRYPOINT', 'CLAUDE_CODE_SESSION', 'CLAUDE_CODE_PARENT_SESSION', 'ANTHROPIC_API_KEY', 'ANTHROPIC_AUTH_TOKEN', 'ANTHROPIC_BASE_URL']) delete env[k];
                 const child = execFile('claude',
                   // pr-review-gate#17: one turn cannot ingest a large diff AND emit the
-                  // JSON verdict — give the model room to read before responding. `--allowedTools ''`
-                  // is an EMPTY allowlist = NO tools (verified across the rollout: the model never
-                  // invokes one). Even so, Anthropic env auth is scrubbed above and cwd is an empty
-                  // scratch dir, so the 6-turn budget has nothing to act on (#30).
+                  // JSON verdict — give the model room to read before responding (#30).
+                  // `--allowedTools ''` CONTRACT (adversarially verified on CLI 2.1.170, #35):
+                  // an explicit EMPTY allowlist — NOT "unset -> defaults". This invocation is
+                  // non-interactive (prompt piped via stdin, no TTY), so the CLI can never
+                  // prompt for permission: every permissioned tool is DENIED even when the model attempts
+                  // it: Bash (inside or outside cwd), Write/Edit, WebFetch (no exfil channel),
+                  // Read outside cwd. Only default read-only tools INSIDE cwd remain usable —
+                  // and cwd is this fresh empty scratch dir, so an injected payload has nothing
+                  // to read, run, or exfiltrate; Anthropic env auth is scrubbed above as well.
                   ['--model', REVIEW_MODEL, '--allowedTools', '', '--max-turns', '6'],
                   { cwd: scratchDir, env, timeout: PER_CALL_TIMEOUT_MS, maxBuffer: 16 * 1024 * 1024 },
                   (err, stdout, stderr) => {
@@ -372,7 +381,11 @@ jobs:
                   }),
                   signal: ctrl.signal,
                 });
-                if (resp.status === 429) return { status: 'ratelimit' };
+                // #40: 402 (credits exhausted) is the same class as 429 — the engine is
+                // administratively down for EVERY chunk/PR, not a per-chunk genuine error
+                // (the fail-closed case, 5eacb0a). ratelimit -> neutral: humans still gate,
+                // and the cron re-reviews + flips the check once credits are topped up.
+                if (resp.status === 429 || resp.status === 402) return { status: 'ratelimit' };
                 if (!resp.ok) return { status: 'error', error: `OpenRouter HTTP ${resp.status}` };
                 const data = await resp.json();
                 const text = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
@@ -398,6 +411,59 @@ jobs:
               if (c === 'failure') return `${DISPLAY_NAME} requested changes (cached)`;
               if (c === 'neutral') return `${DISPLAY_NAME} — human review required (cached)`;
               return `${DISPLAY_NAME} review passed (cached)`;
+            }
+
+            // ---- merge_group: GitHub merge queue path ----------------------------------
+            // The merge queue dispatches on `merge_group` and requires CHECK_NAME to report
+            // on the merge_group head_sha, or the queue entry stalls. No PR exists here, so we
+            // fetch the queued batch's combined diff (base_sha..head_sha), chunk + review it,
+            // and post ONLY the check (no PR comment). Same fail-closed aggregation as the PR
+            // path; returns early so the PR/cron path below is untouched.
+            if (context.eventName === 'merge_group') {
+              const mg = context.payload.merge_group || {};
+              const headSha = mg.head_sha;
+              try {
+                if (!headSha) { core.warning('merge_group event without head_sha'); return; }
+                await loadBrief();
+                let diff = '';
+                try {
+                  const cmp = await github.request('GET /repos/{owner}/{repo}/compare/{basehead}', { owner, repo, basehead: `${mg.base_sha}...${mg.head_sha}`, mediaType: { format: 'diff' } });
+                  diff = typeof cmp.data === 'string' ? cmp.data : String(cmp.data);
+                } catch (e) {
+                  core.warning(`merge_group diff fetch failed: ${e.message}`);
+                  await postCheck(headSha, 'neutral', `${DISPLAY_NAME} — could not fetch merge-group diff; human review required`);
+                  return;
+                }
+                if (!diff.trim()) { await postCheck(headSha, 'success', `${DISPLAY_NAME} — empty merge-group diff`); return; }
+                const allChunks = splitDiffByFiles(diff, PER_CHUNK_CHARS);
+                const overLimit = allChunks.length > MAX_CHUNKS;
+                const chunks = overLimit ? allChunks.slice(0, MAX_CHUNKS) : allChunks;
+                let anyReject = false, anyError = false, anyRateLimit = false, anyMalformed = false;
+                for (let ci = 0; ci < chunks.length; ci++) {
+                  const res = await review(projectBrief(), `merge-group ${String(headSha).slice(0, 7)}`, '', chunks[ci]);
+                  if (res.status === 'ratelimit') { anyRateLimit = true; break; }
+                  if (res.status === 'error') { anyError = true; continue; }
+                  let parsed = null;
+                  try { parsed = JSON.parse(stripAnsi(res.text)); } catch (e) { parsed = extractJsonObject(stripAnsi(res.text)); }
+                  const schemaOk = parsed && ['APPROVE', 'REQUEST_CHANGES'].includes(parsed.verdict) && Array.isArray(parsed.findings) && typeof parsed.summary === 'string';
+                  if (!schemaOk) { anyMalformed = true; continue; }
+                  if (parsed.verdict === 'REQUEST_CHANGES') anyReject = true;
+                }
+                // Fail-closed, same priority as the PR path: reject/hard-error -> failure;
+                // ratelimit/over-limit/malformed -> neutral; all clean -> success.
+                let conclusion, title;
+                if (anyReject) { conclusion = 'failure'; title = `❌ CHANGES REQUESTED — ${DISPLAY_NAME} (merge queue)`; }
+                else if (anyError) { conclusion = 'failure'; title = `❌ REVIEW FAILED (fail-closed) — ${DISPLAY_NAME}; human review required`; }
+                else if (anyRateLimit) { conclusion = 'neutral'; title = `⚠️ HUMAN REVIEW REQUIRED — ${DISPLAY_NAME} rate-limited / quota exhausted`; }
+                else if (overLimit) { conclusion = 'neutral'; title = `⚠️ HUMAN REVIEW REQUIRED — merge-group diff too large (${allChunks.length} chunks > ${MAX_CHUNKS})`; }
+                else if (anyMalformed) { conclusion = 'neutral'; title = `⚠️ HUMAN REVIEW REQUIRED — ${DISPLAY_NAME} response malformed`; }
+                else { conclusion = 'success'; title = `✅ APPROVED — ${DISPLAY_NAME} (merge queue)`; }
+                await postCheck(headSha, conclusion, title);
+              } catch (e) {
+                core.warning(`merge_group review error: ${e.message}`);
+                try { if (headSha) await postCheck(headSha, 'failure', `${DISPLAY_NAME} merge-group review crashed (fail-closed) — human review required`); } catch (e2) {}
+              }
+              return;
             }
 
             // load the per-repo brief from the default branch (tamper-proof) before reviewing
@@ -457,7 +523,7 @@ jobs:
 
                 // pr-review-gate#17 + council MODE: review each chunk via review()
                 // (which is single-call or council internally), aggregate fail-closed.
-                let anyReject = false, anyError = false, anyRateLimit = false, anyMalformed = false, anyOk = false;
+                let anyReject = false, anyError = false, anyRateLimit = false, anyMalformed = false, anyChunkOk = false;
                 let lastError = '';
                 const summaries = [];
                 let findings = [];
@@ -470,7 +536,7 @@ jobs:
                   try { parsed = JSON.parse(cleaned); } catch (e) { parsed = extractJsonObject(cleaned); }
                   const schemaOk = parsed && ['APPROVE', 'REQUEST_CHANGES'].includes(parsed.verdict) && Array.isArray(parsed.findings) && typeof parsed.summary === 'string';
                   if (!schemaOk) { anyMalformed = true; continue; }
-                  anyOk = true;
+                  anyChunkOk = true;
                   if (parsed.summary) summaries.push(parsed.summary);
                   for (const f of parsed.findings) findings.push(coerceFinding(f));   // #23: keep findings[] strings so sevRank/formatFinding stay correct
                   if (parsed.verdict === 'REQUEST_CHANGES') anyReject = true;
@@ -489,13 +555,13 @@ jobs:
                 //   malformed -> neutral ; all clean -> success
                 let conclusion, title, verdict = 'malformed', summary = summaries.join(' ');
                 if (anyReject) { conclusion = 'failure'; title = `❌ CHANGES REQUESTED — ${DISPLAY_NAME}`; verdict = 'REQUEST_CHANGES'; }
-                // FAIL-CLOSED BY DESIGN (intentional — not a missing `!anyOk` guard): ANY genuine
+                // FAIL-CLOSED BY DESIGN (intentional — not a missing `!anyChunkOk` guard): ANY genuine
                 // chunk error → failure, even if other chunks approved. An un-reviewed chunk may
                 // hide a critical bug, so a security gate must NOT auto-pass it; the cron re-reviews
                 // the errored chunk next tick and flips to ✅ if clean. `neutral` would let
                 // un-reviewed code merge — deliberately rejected here.
                 else if (anyError) { conclusion = 'failure'; title = `❌ REVIEW FAILED (fail-closed) — ${DISPLAY_NAME}; human review required`; verdict = 'malformed'; }
-                else if (anyRateLimit) { conclusion = 'neutral'; title = `⚠️ HUMAN REVIEW REQUIRED — ${DISPLAY_NAME} rate-limited`; verdict = 'malformed'; }
+                else if (anyRateLimit) { conclusion = 'neutral'; title = `⚠️ HUMAN REVIEW REQUIRED — ${DISPLAY_NAME} rate-limited / quota exhausted`; verdict = 'malformed'; }
                 else if (overLimit) { conclusion = 'neutral'; title = `⚠️ HUMAN REVIEW REQUIRED — diff too large (${allChunks.length} chunks > ${MAX_CHUNKS}); reviewed first ${MAX_CHUNKS}`; verdict = 'APPROVE'; }
                 else if (anyMalformed) { conclusion = 'neutral'; title = `⚠️ HUMAN REVIEW REQUIRED — ${DISPLAY_NAME} response malformed`; verdict = 'malformed'; }
                 else { conclusion = 'success'; title = `✅ APPROVED — ${DISPLAY_NAME}`; verdict = 'APPROVE'; }
@@ -521,8 +587,8 @@ jobs:
                 const lines = [vtag];
                 if (overLimit) lines.push(truncatedTag);
                 lines.push(marker, header, `🤖 _${DISPLAY_NAME} (${REVIEW_MODEL}) via ${TRANSPORT}_`, '');
-                if (anyError && !anyOk) lines.push(`⚠️ Review call failed (fail-closed): ${redact(lastError || '')} — a maintainer must review.`);
-                else if (anyRateLimit && !anyOk) lines.push('⚠️ Engine rate-limited; will retry on the next cron tick. A maintainer may review meanwhile.');
+                if (anyError && !anyChunkOk) lines.push(`⚠️ Review call failed (fail-closed): ${redact(lastError || '')} — a maintainer must review.`);
+                else if (anyRateLimit && !anyChunkOk) lines.push('⚠️ Engine rate-limited or out of credits; will retry on the next cron tick. A maintainer may review meanwhile.');
                 else {
                   if (summary) lines.push(redact(summary), '');
                   if (findings.length) { lines.push(`**${findings.length} finding${findings.length > 1 ? 's' : ''}:**`, ''); for (const f of findings) lines.push(formatFinding(f)); }
