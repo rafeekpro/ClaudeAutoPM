@@ -67,7 +67,7 @@ jobs:
       # #16: no checkout — the brief is loaded from the DEFAULT branch via the API (tamper-proof;
       # a PR can't weaken its own review by editing review-context.md). The claude CLI runs from a
       # fresh scratch dir and openrouter is a plain fetch, so nothing else needs the workspace.
-      - uses: actions/github-script@v7
+      - uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');
