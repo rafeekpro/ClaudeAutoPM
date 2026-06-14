@@ -145,7 +145,7 @@
     "inquirer": "^13.3.2",
     "js-yaml": "^4.1.0",
     "markdown-it": "^14.1.0",
-    "marked": "^17.0.6",
+    "marked": "^18.0.5",
     "moment": "^2.29.4",
     "ora": "~5.4.1",
     "simple-git": "^3.20.0",
