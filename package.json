@@ -173,7 +173,7 @@
     "mocha": "^11.7.2",
     "nock": "^14.0.10",
     "prettier": "^3.0.0",
-    "sinon": "^21.0.0"
+    "sinon": "^22.0.0"
   },
   "optionalDependencies": {
     "@playwright/mcp": "^0.0.76",
