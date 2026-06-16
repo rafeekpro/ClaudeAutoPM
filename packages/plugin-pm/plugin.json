@@ -39,6 +39,18 @@
       ]
     },
     {
+      "name": "backlog",
+      "description": "Show prioritized open GitHub issues and suggest the next issue",
+      "type": "workflow",
+      "category": "issue-management",
+      "tags": [
+        "backlog",
+        "github",
+        "prioritization",
+        "workflow"
+      ]
+    },
+    {
       "name": "blocked",
       "file": "scripts/pm/blocked.js",
       "description": "Manage blocked issues and dependencies",
