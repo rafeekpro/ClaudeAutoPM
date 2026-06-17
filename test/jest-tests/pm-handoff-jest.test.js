@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { parseCommandFrontmatter } = require('../helpers/parse-command-frontmatter');
+const { assertRealTimestamp } = require('../helpers/assert-real-timestamp');
 
 const COMMAND_FILE = path.resolve(__dirname, '../../autopm/.claude/commands/handoff.md');
 
@@ -33,12 +34,7 @@ describe('handoff command file', () => {
   });
 
   it('test_handoff_writes_to_tmp_with_real_timestamp_pattern — uses real timestamp, no placeholder', () => {
-    expect(content).toContain('/tmp/handoff-');
-    const hasDateCmd = content.includes('date') || content.includes('%Y%m%d');
-    expect(hasDateCmd).toBe(true);
-    expect(content).not.toContain('YYYY');
-    expect(content).not.toContain('<timestamp>');
-    expect(content).not.toContain('[timestamp]');
+    assertRealTimestamp(content);
   });
 
   // ── GREEN tests (pass after implementation) ──────────────────────────────
@@ -50,12 +46,7 @@ describe('handoff command file', () => {
   });
 
   it('test_handoff_writes_to_tmp_with_real_timestamp_no_placeholder — /tmp/handoff- with real date cmd, no placeholder strings', () => {
-    expect(content).toContain('/tmp/handoff-');
-    const hasDateCmd = content.includes('date') || content.includes('%Y%m%d');
-    expect(hasDateCmd).toBe(true);
-    expect(content).not.toContain('YYYY');
-    expect(content).not.toContain('<timestamp>');
-    expect(content).not.toContain('[timestamp]');
+    assertRealTimestamp(content);
   });
 
   it('test_handoff_primer_includes_context_branch_next_saved_to_lines — primer has required fields', () => {
