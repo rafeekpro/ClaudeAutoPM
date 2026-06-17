@@ -10,6 +10,8 @@ describe('pm:issue-finish command file', () => {
   beforeAll(() => {
     if (fs.existsSync(COMMAND_FILE)) {
       content = fs.readFileSync(COMMAND_FILE, 'utf8');
+    } else {
+      content = '';
     }
   });
 

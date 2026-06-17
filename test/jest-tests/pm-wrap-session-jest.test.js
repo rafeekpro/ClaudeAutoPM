@@ -12,6 +12,9 @@ describe('wrap-session command file', () => {
     if (fs.existsSync(COMMAND_FILE)) {
       content = fs.readFileSync(COMMAND_FILE, 'utf8');
       fm = parseCommandFrontmatter(content);
+    } else {
+      content = '';
+      fm = {};
     }
   });
 
