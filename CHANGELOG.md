@@ -18,8 +18,8 @@ Seven new `pm:*` / session-management commands shipped via the Cortex pipeline (
 
 ### Added — Session-management commands (#653, #654, #658, #659)
 - `/wrap-session` (#653 / PR #664): full pre-compact ritual — captures memory types, runs idempotent 200-line guard, emits a fenced primer + `Next:` line.
-- `/handoff` (#654 / PR #665): post-compact context primer; delegates to step 5 of `/wrap-session` to avoid duplicating the primer template.
-- `/quality-gate` (#658 / PR #666): pre-PR full quality check; delegates to `pm:issue-finish` for the gate logic.
+- `/handoff` (#654 / PR #665): post-compact context primer (current branch, modified files, recent commits, next steps, < 200 words). `/wrap-session` step 5 delegates to `/handoff` so the primer template lives in one place.
+- `/quality-gate` (#658 / PR #666): pre-PR full quality check covering lint, tests, and per-metric coverage thresholds. `pm:issue-finish` delegates to it as a blocking pre-commit gate.
 - `/session-health` (#659 / PR #667): context-window efficiency check with new `sessionHealth` config defaults.
 
 ### CI
