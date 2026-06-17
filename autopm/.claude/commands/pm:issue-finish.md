@@ -43,46 +43,13 @@ fi
 echo "Issue: #$ISSUE_NUMBER  Branch: $CURRENT_BRANCH"
 ```
 
-### 2. Quality gate — tests
+### 2. Quality gate
 
-Delegate to `@test-runner`:
+Run `/quality-gate` — it checks lint, tests, and coverage with per-metric thresholds.
 
-```
-Run the full test suite: npm test
-Do not proceed if any tests fail.
-```
+**BLOCK on failure** — if `/quality-gate` exits non-zero, stop here. No PR created.
 
-**BLOCK on failure** — if tests fail, stop here and report which tests are failing. No PR created.
-
-### 3. Quality gate — coverage
-
-```bash
-npm run test:coverage -- --coverageReporters=json-summary 2>/dev/null
-LINES=$(node -e "const c=require('./coverage/coverage-summary.json').total; console.log(c.lines.pct)")
-BRANCHES=$(node -e "const c=require('./coverage/coverage-summary.json').total; console.log(c.branches.pct)")
-FUNCTIONS=$(node -e "const c=require('./coverage/coverage-summary.json').total; console.log(c.functions.pct)")
-STATEMENTS=$(node -e "const c=require('./coverage/coverage-summary.json').total; console.log(c.statements.pct)")
-
-# Thresholds: lines >= 80%, branches >= 75%, functions >= 80%, statements >= 80%
-LINES_OK=$(node -e "process.exit(parseFloat('$LINES') >= 80 ? 0 : 1)" && echo "✅" || echo "❌")
-BRANCHES_OK=$(node -e "process.exit(parseFloat('$BRANCHES') >= 75 ? 0 : 1)" && echo "✅" || echo "❌")
-FUNCTIONS_OK=$(node -e "process.exit(parseFloat('$FUNCTIONS') >= 80 ? 0 : 1)" && echo "✅" || echo "❌")
-STATEMENTS_OK=$(node -e "process.exit(parseFloat('$STATEMENTS') >= 80 ? 0 : 1)" && echo "✅" || echo "❌")
-
-if [ "$LINES_OK" = "❌" ] || [ "$BRANCHES_OK" = "❌" ] || [ "$FUNCTIONS_OK" = "❌" ] || [ "$STATEMENTS_OK" = "❌" ]; then
-  echo "❌ Coverage below threshold — no PR created. Add tests to meet minimums."
-  exit 1
-fi
-```
-
-### 4. Linters
-
-```bash
-npx eslint . || { echo "❌ ESLint failed — fix linting errors before creating PR"; exit 1; }
-npx prettier --check . || { echo "❌ Prettier check failed — run: npx prettier --write ."; exit 1; }
-```
-
-### 5. Commit unstaged changes
+### 3. Commit unstaged changes
 
 ```bash
 git diff --quiet && git diff --staged --quiet || {
@@ -91,13 +58,13 @@ git diff --quiet && git diff --staged --quiet || {
 }
 ```
 
-### 6. Push branch
+### 4. Push branch
 
 ```bash
 git push origin "$CURRENT_BRANCH" || { echo "❌ Push failed: git push origin $CURRENT_BRANCH"; exit 1; }
 ```
 
-### 7. Get issue title
+### 5. Get issue title
 
 ```bash
 ISSUE_TITLE=$(gh issue view "$ISSUE_NUMBER" --json title -q .title) || {
@@ -106,26 +73,17 @@ ISSUE_TITLE=$(gh issue view "$ISSUE_NUMBER" --json title -q .title) || {
 }
 ```
 
-### 8. Create PR
+### 6. Create PR
 
 ```bash
 gh pr create \
   --title "$ISSUE_TITLE" \
   --base develop \
-  --body "## Coverage
-
-| Metric     | Result         | Threshold | Status         |
-|------------|----------------|-----------|----------------|
-| Lines      | ${LINES}%      | 80%       | $LINES_OK      |
-| Branches   | ${BRANCHES}%   | 75%       | $BRANCHES_OK   |
-| Functions  | ${FUNCTIONS}%  | 80%       | $FUNCTIONS_OK  |
-| Statements | ${STATEMENTS}% | 80%       | $STATEMENTS_OK |
-
-Closes #$ISSUE_NUMBER" \
+  --body "Closes #$ISSUE_NUMBER" \
   --label "in-progress"
 ```
 
-### 9. Output
+### 7. Output
 
 ```
 ✅ PR created: <PR_URL>
@@ -136,7 +94,5 @@ Waiting for review. Run /pm:review-fix after Copilot comments.
 
 - On main/develop: `❌ Must be on a feature branch, not main/develop`
 - No issue number: `❌ Cannot detect issue number from '<branch>'. Usage: /pm:issue-finish <number>`
-- Tests fail: stop and report failing tests, no PR created
-- Coverage gate: `❌ Coverage below threshold — no PR created. Add tests to meet minimums.`
-- Linter fails: `❌ ESLint failed` / `❌ Prettier check failed`
+- Quality gate fails: `/quality-gate` exits non-zero — fix failures and re-run
 - Push fails: `❌ Push failed: git push origin <branch>`
