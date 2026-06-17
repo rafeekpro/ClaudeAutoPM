@@ -1,0 +1,11 @@
+# ⚠️ Managed by lagowski/pr-review-gate — deployed to every gated repo as .github/CODEOWNERS.
+# Locks the review gate + its inputs so a PR can't silently weaken the gate (the "blind it"
+# from the security design). ADVISORY (auto-requests owners) until "Require review from Code
+# Owners" is enabled in branch protection — issue #11.
+#
+# Owners = the 3 org owners as individuals (no @lagowski/maintainers team needed → no admin:org
+# blocker). Switch to `@lagowski/maintainers` once that team exists. With 3 owners, a PR author
+# who is an owner can still be approved by another owner.
+/.github/workflows/        @rlagowski @Dixter999 @rafeekpro
+/.github/CODEOWNERS        @rlagowski @Dixter999 @rafeekpro
+/.github/review-context.md @rlagowski @Dixter999 @rafeekpro

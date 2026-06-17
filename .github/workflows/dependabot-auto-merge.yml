@@ -1,0 +1,39 @@
+# Scoped Dependabot auto-merge (lagowski/pr-review-gate#1 hardening — routine deps
+# shouldn't need a human, but the dangerous ones still must).
+#
+# Auto-merges ONLY: npm ecosystem, semver patch/minor. It approves + enables auto-merge,
+# so GitHub still holds the PR until required checks pass (the copilot-review gate + CI)
+# — auto-merge is "the gate is the reviewer," not "no checks."
+#
+# Deliberately NEVER auto-merged (left for a human):
+#   - github-actions ecosystem  → those edit .github/workflows/** (CODEOWNERS-locked) and
+#     are infra-critical, e.g. the gate's own actions/github-script (a node24 major bump).
+#   - any semver-major           → breaking-change risk.
+name: Dependabot auto-merge
+
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    if: ${{ github.event.pull_request.user.login == 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dependabot metadata
+        id: meta
+        uses: dependabot/fetch-metadata@v3
+
+      - name: Approve + enable auto-merge (npm patch/minor only)
+        if: >-
+          ${{ steps.meta.outputs.package-ecosystem == 'npm' &&
+              (steps.meta.outputs.update-type == 'version-update:semver-patch' ||
+               steps.meta.outputs.update-type == 'version-update:semver-minor') }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          gh pr review --approve "$PR_URL"
+          gh pr merge --auto --squash "$PR_URL"
