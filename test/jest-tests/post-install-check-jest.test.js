@@ -242,7 +242,7 @@ describe('PostInstallChecker', () => {
       expect(optionalEntry.message).toContain('Local mode');
 
       // No GitHub/Azure next-step nag.
-      expect(checker.results.nextSteps.some(s => /github\|azure/.test(s))).toBe(false);
+      expect(checker.results.nextSteps.some(s => /github|azure/.test(s))).toBe(false);
     });
 
     it('should treat Lite install (no provider plugin, no provider config) as local mode', () => {
@@ -265,7 +265,7 @@ describe('PostInstallChecker', () => {
       expect(optionalEntry.status).toBe(true);
       expect(optionalEntry.message).toMatch(/local|optional/i);
 
-      expect(checker.results.nextSteps.some(s => /github\|azure/.test(s))).toBe(false);
+      expect(checker.results.nextSteps.some(s => /github|azure/.test(s))).toBe(false);
     });
 
     it('should still flag missing provider config when a provider plugin IS installed', () => {
