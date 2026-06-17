@@ -45,9 +45,9 @@ echo "Issue: #$ISSUE_NUMBER  Branch: $CURRENT_BRANCH"
 
 ### 2. Quality gate
 
-Run `/quality-gate` — it checks lint, tests, and coverage with per-metric thresholds.
-
-**BLOCK on failure** — if `/quality-gate` exits non-zero, stop here. No PR created.
+```bash
+/quality-gate || exit 1
+```
 
 ### 3. Commit unstaged changes
 
@@ -76,10 +76,21 @@ ISSUE_TITLE=$(gh issue view "$ISSUE_NUMBER" --json title -q .title) || {
 ### 6. Create PR
 
 ```bash
+COVERAGE_TABLE="| Metric | Threshold | Status |
+|--------|-----------|--------|
+| Lines | 80% | ✅/❌ |
+| Branches | 75% | ✅/❌ |
+| Functions | 80% | ✅/❌ |
+| Statements | 80% | ✅/❌ |"
+
 gh pr create \
   --title "$ISSUE_TITLE" \
   --base develop \
-  --body "Closes #$ISSUE_NUMBER" \
+  --body "Closes #$ISSUE_NUMBER
+
+## Coverage
+
+$COVERAGE_TABLE" \
   --label "in-progress"
 ```
 

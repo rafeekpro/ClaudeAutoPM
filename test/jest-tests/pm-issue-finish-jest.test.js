@@ -53,22 +53,20 @@ describe('pm:issue-finish command file', () => {
     expect(hasArgs).toBe(true);
   });
 
-  it('test_pm_issue_finish_blocks_pr_when_tests_fail — npm test before gh pr create with block on failure', () => {
-    expect(content).toContain('npm test');
-    const testIdx = content.indexOf('npm test');
+  it('test_pm_issue_finish_blocks_pr_when_tests_fail — /quality-gate before gh pr create with block on failure', () => {
+    expect(content).toContain('/quality-gate || exit 1');
+    const gateIdx = content.indexOf('/quality-gate || exit 1');
     const prIdx = content.indexOf('gh pr create');
-    expect(testIdx).toBeGreaterThan(-1);
+    expect(gateIdx).toBeGreaterThan(-1);
     expect(prIdx).toBeGreaterThan(-1);
-    expect(testIdx).toBeLessThan(prIdx);
+    expect(gateIdx).toBeLessThan(prIdx);
     const lower = content.toLowerCase();
     const hasBlock = lower.includes('block') || lower.includes('exit 1') || lower.includes('no pr');
     expect(hasBlock).toBe(true);
   });
 
-  it('test_pm_issue_finish_blocks_pr_when_coverage_below_threshold — threshold checks for all four metrics', () => {
-    expect(content).toContain('npm run test:coverage');
-    expect(content).toContain('>= 80');
-    expect(content).toContain('>= 75');
+  it('test_pm_issue_finish_blocks_pr_when_coverage_below_threshold — /quality-gate as quality-gate mechanism', () => {
+    expect(content).toContain('/quality-gate || exit 1');
     const lower = content.toLowerCase();
     const hasBlock = lower.includes('exit 1') || lower.includes('no pr');
     expect(hasBlock).toBe(true);
