@@ -62,5 +62,9 @@
       "docker compose",
       "make"
     ]
+  },
+  "sessionHealth": {
+    "green": 60,
+    "yellow": 85
   }
 }
