@@ -58,11 +58,7 @@ Skip this step silently if no candidates are found.
 
 ### Step 5 — Print compact primer
 
-Produce a ready-to-paste context primer covering:
-- Active branch and issue number
-- Key decisions from this session
-- What was completed and what remains
-- Any critical gotchas
+Run `/handoff` to generate and print the context primer. The `/handoff` command captures current branch, modified files, recent commits, and next steps, then prints a ready-to-paste block under 200 words.
 
 ## Output Format
 

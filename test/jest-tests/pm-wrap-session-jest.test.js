@@ -88,4 +88,8 @@ describe('wrap-session command file', () => {
     expect(lower).toContain('hooks');
     expect(lower).toContain('primer');
   });
+
+  it('test_wrap_session_step5_delegates_to_handoff_command — step 5 references /handoff', () => {
+    expect(content).toContain('/handoff');
+  });
 });
