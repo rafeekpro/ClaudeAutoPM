@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.25.7] - 2026-06-17
+
+Seven new `pm:*` / session-management commands shipped via the Cortex pipeline (one PR per issue, all `ai-ready`).
+
+### Added — PM commands (#655, #656, #657)
+- `pm:backlog` (#657 / PR #661): `getBacklog` / `sortIssues` / `hasOpenDependency` helpers plus `autopm/.claude/scripts/pm/backlog.js`. Sorts open issues by priority, type, effort, assignment, and dependency state.
+- `pm:review-fix` (#656 / PR #662): command file delegates to `@test-runner`, enforces error-first comment order, blocks push when reviewer status is non-success.
+- `pm:issue-finish` (#655 / PR #663): branch guard + quality gates + coverage table + automated PR creation steps; the command files were previously documented in `pm-commands.md` but missing from the payload.
+
+### Added — Session-management commands (#653, #654, #658, #659)
+- `/wrap-session` (#653 / PR #664): full pre-compact ritual — captures memory types, runs idempotent 200-line guard, emits a fenced primer + `Next:` line.
+- `/handoff` (#654 / PR #665): post-compact context primer; delegates to step 5 of `/wrap-session` to avoid duplicating the primer template.
+- `/quality-gate` (#658 / PR #666): pre-PR full quality check; delegates to `pm:issue-finish` for the gate logic.
+- `/session-health` (#659 / PR #667): context-window efficiency check with new `sessionHealth` config defaults.
+
+### CI
+- Tests now run on PRs targeting `develop`, not just `main` (#647).
+- Dependabot auto-merge scoped + grouped, removing per-dep noise (#642).
+- `chore: sync AI review gate from pr-review-gate` rolled in three times (#630, #632, #641) keeping the council prompts current.
+
+### Reverted
+- ESLint 9 → 10 bump reverted (#648): the 10.x rule set surfaced too many violations against the existing codebase to land in a single PR (original bump in #645, `@eslint/js` companion in #637).
+
+### Dependencies
+- `@anthropic-ai/sdk` 0.100.1 → 0.104.1 (#638)
+- `@playwright/mcp` 0.0.75 → 0.0.76 (#639)
+- `@upstash/context7-mcp` 2.1.6 → 3.2.1 (#652)
+- `inquirer` 13.4.1 → 14.0.2 (#651)
+- `marked` 17.0.6 → 18.0.5 (#646)
+- `jest` 29.7.0 → 30.4.2 (#650)
+- `jest-junit` 16.0.0 → 17.0.0 (#649)
+- `sinon` 21.0.3 → 22.0.0 (#636)
+- dev-minor-patch group bump — 4 updates (#644)
+- `actions/setup-node` 4 → 6 (#634)
+- `actions/github-script` 7 → 9 (#633)
+- `dependabot/fetch-metadata` 2 → 3 (#643)
+
+### Internal
+- `ci(plugin-publish)`: migrate to npm trusted publishing (OIDC) backport from #622 (#629).
+- `fix(post-install-check)`: treat Lite installs as local mode (#627 / PR #628).
+
 ## [3.25.6] - 2026-06-10
 
 Framework-wide optimization epic (#605) — all seven sub-issues (#606–#612).
