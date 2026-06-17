@@ -1,23 +1,8 @@
 const fs = require('fs');
 const path = require('path');
+const { parseCommandFrontmatter } = require('../helpers/parse-command-frontmatter');
 
 const COMMAND_FILE = path.resolve(__dirname, '../../autopm/.claude/commands/pm:review-fix.md');
-
-function parseFrontmatter(content) {
-  if (!content.startsWith('---')) return {};
-  const end = content.indexOf('\n---', 3);
-  if (end === -1) return {};
-  const yaml = content.slice(4, end);
-  const result = {};
-  for (const line of yaml.split('\n')) {
-    const colon = line.indexOf(':');
-    if (colon === -1) continue;
-    const key = line.slice(0, colon).trim();
-    const value = line.slice(colon + 1).trim();
-    result[key] = value;
-  }
-  return result;
-}
 
 describe('pm:review-fix command file', () => {
   let content;
@@ -35,7 +20,7 @@ describe('pm:review-fix command file', () => {
   });
 
   it('test_review_fix_frontmatter_includes_allowed_tools_bash_read_edit — frontmatter allowed-tools', () => {
-    const fm = parseFrontmatter(content);
+    const fm = parseCommandFrontmatter(content);
     expect(fm['allowed-tools']).toBe('Bash, Read, Edit');
   });
 
@@ -60,7 +45,7 @@ describe('pm:review-fix command file', () => {
   });
 
   it('test_review_fix_frontmatter_allowed_tools_is_bash_read_edit — AC: frontmatter matches pattern', () => {
-    const fm = parseFrontmatter(content);
+    const fm = parseCommandFrontmatter(content);
     expect(fm['allowed-tools']).toBe('Bash, Read, Edit');
   });
 
