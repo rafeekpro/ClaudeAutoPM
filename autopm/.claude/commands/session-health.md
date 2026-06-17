@@ -85,7 +85,7 @@ fi
 ### Step 3 — Score health (green / yellow / red)
 
 ```bash
-if [ "$PCT" -ge "$YELLOW_THRESHOLD" ]; then
+if [ "$PCT" -gt "$YELLOW_THRESHOLD" ]; then
   STATUS="red"
   ICON="🔴"
   ADVICE="compact now"
