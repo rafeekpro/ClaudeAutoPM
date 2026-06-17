@@ -92,6 +92,26 @@ describe('pm-backlog', () => {
       const sorted = sortIssues(issues);
       expect(sorted.map(i => i.number)).toEqual([2, 3, 1, 4]);
     });
+
+    it('should sort unassigned before assigned when priority and effort are equal', () => {
+      const { sortIssues } = require('../../autopm/.claude/scripts/pm/backlog.js');
+      const issues = [
+        makeIssue(1, 'assigned', ['bug', 'effort:S'], ['alice'], '2024-01-01T00:00:00Z'),
+        makeIssue(2, 'unassigned', ['bug', 'effort:S'], [], '2024-01-01T00:00:00Z')
+      ];
+      const sorted = sortIssues(issues);
+      expect(sorted[0].number).toBe(2);
+    });
+
+    it('should sort unassigned before assigned even when the assigned issue was created earlier', () => {
+      const { sortIssues } = require('../../autopm/.claude/scripts/pm/backlog.js');
+      const issues = [
+        makeIssue(1, 'assigned-older', ['bug', 'effort:S'], ['alice'], '2024-01-01T00:00:00Z'),
+        makeIssue(2, 'unassigned-newer', ['bug', 'effort:S'], [], '2024-06-01T00:00:00Z')
+      ];
+      const sorted = sortIssues(issues);
+      expect(sorted[0].number).toBe(2);
+    });
   });
 
   describe('hasOpenDependency()', () => {

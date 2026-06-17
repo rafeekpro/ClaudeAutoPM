@@ -31,6 +31,10 @@ function sortIssues(issues) {
     if (pa !== pb) return pa - pb;
     const ea = getEffortRank(a), eb = getEffortRank(b);
     if (ea !== eb) return ea - eb;
+    // unassigned-first: surfaces actionable work before in-progress items
+    const ua = a.assignees.length === 0 ? 0 : 1;
+    const ub = b.assignees.length === 0 ? 0 : 1;
+    if (ua !== ub) return ua - ub;
     return new Date(a.createdAt) - new Date(b.createdAt);
   });
 }
