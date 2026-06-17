@@ -90,4 +90,39 @@ describe('session-health command file', () => {
       content.includes('sessionHealth');
     expect(hasRef).toBe(true);
   });
+
+  // ── Threshold operator and boundary tests (#674) ──────────────────────────
+
+  it('test_session_health_red_branch_operator_is_strict_gt — red branch uses -gt not -ge', () => {
+    expect(content).toContain('-gt "$YELLOW_THRESHOLD"');
+  });
+
+  it('test_session_health_threshold_85_classified_as_yellow_not_red — PCT=85 is yellow per docstring', () => {
+    const match = content.match(/\[ "\$PCT" (-g[et]) "\$YELLOW_THRESHOLD" \]/);
+    const op = match ? match[1] : '-ge';
+    const pct = 85, yellowThreshold = 85, greenThreshold = 60;
+    const isRed = op === '-gt' ? pct > yellowThreshold : pct >= yellowThreshold;
+    const result = isRed ? 'red' : pct >= greenThreshold ? 'yellow' : 'green';
+    expect(result).toBe('yellow');
+  });
+
+  describe('threshold classification boundary values', () => {
+    function classify(pct, green = 60, yellow = 85) {
+      const match = content.match(/\[ "\$PCT" (-g[et]) "\$YELLOW_THRESHOLD" \]/);
+      const op = match ? match[1] : '-ge';
+      const isRed = op === '-gt' ? pct > yellow : pct >= yellow;
+      if (isRed) return 'red';
+      if (pct >= green) return 'yellow';
+      return 'green';
+    }
+
+    it.each([
+      ['test_session_health_threshold_59_is_green', 59, 'green'],
+      ['test_session_health_threshold_60_is_yellow', 60, 'yellow'],
+      ['test_session_health_threshold_85_is_yellow', 85, 'yellow'],
+      ['test_session_health_threshold_86_is_red', 86, 'red'],
+    ])('%s', (_name, pct, expected) => {
+      expect(classify(pct)).toBe(expected);
+    });
+  });
 });
