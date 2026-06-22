@@ -1,6 +1,6 @@
 {
   "name": "claude-autopm",
-  "version": "3.25.7",
+  "version": "4.0.0",
   "description": "Autonomous Project Management Framework for Claude Code - Advanced AI-powered development automation",
   "main": "bin/autopm.js",
   "workspaces": [
@@ -11,7 +11,7 @@
     "autopm-poc": "./bin/autopm-poc.js"
   },
   "scripts": {
-    "postinstall": "echo '🎉 ClaudeAutoPM installed! Run: autopm --help'",
+    "postinstall": "echo '\ud83c\udf89 ClaudeAutoPM installed! Run: autopm --help'",
     "sync:commands": "node scripts/sync-plugin-commands.js",
     "sync:commands:check": "node scripts/sync-plugin-commands.js --check",
     "sync:scripts": "node scripts/sync-plugin-scripts.js",
@@ -116,8 +116,8 @@
     "url": "https://github.com/rafeekpro/ClaudeAutoPM/issues"
   },
   "engines": {
-    "node": ">=16.0.0",
-    "npm": ">=8.0.0"
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
   },
   "preferGlobal": true,
   "files": [
@@ -132,7 +132,7 @@
     "README.md"
   ],
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.104.1",
+    "@anthropic-ai/sdk": "^0.105.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@octokit/rest": "^22.0.0",
     "azure-devops-node-api": "^15.1.1",
@@ -169,7 +169,7 @@
     "jest-html-reporter": "^4.3.0",
     "jest-junit": "^17.0.0",
     "jest-watch-typeahead": "^3.0.1",
-    "markdownlint-cli": "^0.48.0",
+    "markdownlint-cli": "^0.49.0",
     "mocha": "^11.7.2",
     "nock": "^14.0.10",
     "prettier": "^3.0.0",
