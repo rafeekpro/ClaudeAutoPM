@@ -1,6 +1,6 @@
 {
   "name": "@claudeautopm/plugin-ml",
-  "version": "3.13.0",
+  "version": "4.0.0",
   "description": "Comprehensive Machine Learning plugin with 10 specialist agents: TensorFlow/Keras, PyTorch, RL, Scikit-learn, Neural Architecture, Gradient Boosting, Computer Vision, NLP Transformers, Time Series, and AutoML. Context7-verified patterns.",
   "main": "plugin.json",
   "scripts": {
@@ -44,7 +44,7 @@
     "@claudeautopm/plugin-core": "^3.0.0"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.0.0"
   },
   "publishConfig": {
     "access": "public"

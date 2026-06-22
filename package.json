@@ -1,6 +1,6 @@
 {
   "name": "claude-autopm",
-  "version": "3.25.7",
+  "version": "4.0.0",
   "description": "Autonomous Project Management Framework for Claude Code - Advanced AI-powered development automation",
   "main": "bin/autopm.js",
   "workspaces": [
@@ -11,7 +11,7 @@
     "autopm-poc": "./bin/autopm-poc.js"
   },
   "scripts": {
-    "postinstall": "echo '🎉 ClaudeAutoPM installed! Run: autopm --help'",
+    "postinstall": "echo '\ud83c\udf89 ClaudeAutoPM installed! Run: autopm --help'",
     "sync:commands": "node scripts/sync-plugin-commands.js",
     "sync:commands:check": "node scripts/sync-plugin-commands.js --check",
     "sync:scripts": "node scripts/sync-plugin-scripts.js",
@@ -116,8 +116,8 @@
     "url": "https://github.com/rafeekpro/ClaudeAutoPM/issues"
   },
   "engines": {
-    "node": ">=16.0.0",
-    "npm": ">=8.0.0"
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
   },
   "preferGlobal": true,
   "files": [

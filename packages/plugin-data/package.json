@@ -1,6 +1,6 @@
 {
   "name": "@claudeautopm/plugin-data",
-  "version": "3.13.0",
+  "version": "4.0.0",
   "description": "Complete data engineering plugin with Airflow, Kedro, LangGraph, Kafka, dbt, pandas experts, data quality rules, and example scripts for ClaudeAutoPM",
   "main": "plugin.json",
   "type": "module",
@@ -44,8 +44,8 @@
     "url": "https://github.com/rafeekpro/ClaudeAutoPM/issues"
   },
   "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=8.0.0"
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
   },
   "publishConfig": {
     "access": "public",

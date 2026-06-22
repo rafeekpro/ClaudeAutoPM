@@ -1,7 +1,7 @@
 {
   "name": "@claudeautopm/plugin-obsidian",
-  "version": "1.0.0",
-  "description": "Obsidian vault integration plugin for ClaudeAutoPM — sync, Dataview, Mermaid, and Excalidraw support",
+  "version": "2.0.0",
+  "description": "Obsidian vault integration plugin for ClaudeAutoPM \u2014 sync, Dataview, Mermaid, and Excalidraw support",
   "main": "plugin.json",
   "type": "module",
   "files": [
@@ -39,7 +39,7 @@
   },
   "homepage": "https://github.com/rafeekpro/ClaudeAutoPM/tree/main/packages/plugin-obsidian#readme",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.0.0"
   },
   "peerDependencies": {
     "@claudeautopm/plugin-core": "^3.0.0"
