@@ -1,6 +1,6 @@
 {
   "name": "@claudeautopm/plugin-pm-github",
-  "version": "3.13.2",
+  "version": "4.0.0",
   "description": "GitHub provider for ClaudeAutoPM PM system",
   "main": "plugin.json",
   "files": [
@@ -16,7 +16,7 @@
     "@claudeautopm/plugin-core": "^3.0.0"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.0.0"
   },
   "license": "MIT",
   "repository": {

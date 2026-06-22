@@ -1,6 +1,6 @@
 {
   "name": "@claudeautopm/plugin-cloud",
-  "version": "3.13.0",
+  "version": "4.0.0",
   "description": "Complete cloud infrastructure plugin with agents for AWS, Azure, GCP, Kubernetes, Terraform, and infrastructure automation for ClaudeAutoPM",
   "main": "plugin.json",
   "type": "module",
@@ -57,7 +57,7 @@
   },
   "homepage": "https://github.com/rafeekpro/ClaudeAutoPM/tree/main/packages/plugin-cloud#readme",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.0.0"
   },
   "peerDependencies": {
     "@claudeautopm/plugin-core": "^3.0.0"
