@@ -26,11 +26,40 @@ jobs:
         id: meta
         uses: dependabot/fetch-metadata@v3
 
-      - name: Approve + enable auto-merge (npm patch/minor only)
-        if: >-
-          ${{ steps.meta.outputs.package-ecosystem == 'npm' &&
-              (steps.meta.outputs.update-type == 'version-update:semver-patch' ||
-               steps.meta.outputs.update-type == 'version-update:semver-minor') }}
+      # Grouped-aware gate. `fetch-metadata`'s top-level `package-ecosystem` /
+      # `update-type` outputs are populated only for single-dep PRs; grouped
+      # PRs (dependabot's *-minor-patch groups) leave those empty and put every
+      # updated dependency under `updated-dependencies-json` — a JSON array of
+      # {packageEcosystem, updateType, dependencyName, ...}. The previous
+      # single-dep-only gate therefore skipped every grouped PR (see #689/#690).
+      # New rule: approve iff EVERY entry is npm AND NONE is semver-major.
+      # `github-actions` is excluded implicitly (not npm); majors are held.
+      - name: Decide auto-merge (grouped-aware)
+        id: gate
+        uses: actions/github-script@v7
+        env:
+          UPDATES: ${{ steps.meta.outputs.updated-dependencies-json }}
+        with:
+          script: |
+            const updates = JSON.parse(process.env.UPDATES || '[]');
+            if (updates.length === 0) {
+              core.setOutput('approve', 'false');
+              core.info('No updates in metadata; nothing to gate.');
+              return;
+            }
+            const allNpm = updates.every(u => u.packageEcosystem === 'npm');
+            const anyMajor = updates.some(u => u.updateType === 'version-update:semver-major');
+            const approve = allNpm && !anyMajor;
+            core.setOutput('approve', String(approve));
+            core.info(
+              `Gate: approve=${approve} (deps=${updates.length}, allNpm=${allNpm}, anyMajor=${anyMajor})`
+            );
+            for (const u of updates) {
+              core.info(`  - ${u.dependencyName} (${u.packageEcosystem}, ${u.updateType})`);
+            }
+
+      - name: Approve + enable auto-merge
+        if: steps.gate.outputs.approve == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_URL: ${{ github.event.pull_request.html_url }}
