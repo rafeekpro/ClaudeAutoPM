@@ -24,6 +24,16 @@ updates:
       # ora 9.x is pure ESM, incompatible with our CommonJS codebase
       - dependency-name: "ora"
         update-types: ["version-update:semver-major"]
+      # js-yaml 5.x is a breaking major: yaml.load() throws on empty input
+      # (was undefined in 4.x), default schema shifts YAML 1.1 -> 1.2
+      # (CORE_SCHEMA), !!set/!!merge semantics changed. Three load() call-sites
+      # need audited empty-input guards + schema review before we can migrate:
+      #   lib/services/UtilityService.js:770
+      #   autopm/.claude/scripts/start-parallel-streams.js:42
+      #   autopm/.claude/scripts/decompose-issue.js:320
+      # Closed #691 per owner go-ahead; migration deferred to a dedicated PR.
+      - dependency-name: "js-yaml"
+        update-types: ["version-update:semver-major"]
     
   # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
