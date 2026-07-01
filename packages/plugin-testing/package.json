@@ -35,6 +35,6 @@
     "README.md"
   ],
   "peerDependencies": {
-    "claude-autopm": ">=2.8.0"
+    "claude-autopm": "*"
   }
 }
