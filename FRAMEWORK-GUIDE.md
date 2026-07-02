@@ -231,13 +231,14 @@ npm link  # Symlink for local development
 autopm install
 
 # 2. Choose your scenario:
-#    0. Lite (core + PM)
-#    1. Standard (core + languages + PM) - DEFAULT
-#    2. Azure (Standard + Azure DevOps)
-#    3. Docker (containerized dev)
-#    4. Full DevOps (complete CI/CD)
-#    5. Performance (max parallelization)
+#    0. Lite (core + PM, local only)
+#    1. GitHub (core + languages + PM + GitHub sync) - DEFAULT without Docker/kubectl
+#    2. Azure (core + languages + PM + Azure DevOps sync)
+#    3. Docker (containerized dev, GitHub included)
+#    4. Full DevOps (complete CI/CD) - DEFAULT with Docker + kubectl
+#    5. Performance (max parallelization, all plugins except Azure)
 #    6. Custom (choose your plugins)
+#    7. Obsidian (core + PM + Obsidian vault sync)
 
 # 3. Follow the prompts
 # ClaudeAutoPM will:
@@ -278,7 +279,7 @@ your-project/
 mkdir my-awesome-project
 cd my-awesome-project
 autopm install
-# Choose scenario 1 (Standard)
+# Choose scenario 1 (GitHub)
 ```
 
 #### Step 2: Initialize Project Management
@@ -506,7 +507,7 @@ docker compose up -d
 
 ```bash
 # 1. Configure testing framework
-/testing:prime
+/test:test-setup
 
 # This detects:
 # - Jest, Vitest, Pytest, etc.
@@ -518,7 +519,7 @@ docker compose up -d
 Analyze src/auth/login.js and suggest test cases
 
 # 3. Run tests
-/testing:run
+@test-runner run all tests
 
 # This will:
 # - Use test-runner agent
@@ -530,8 +531,8 @@ Analyze src/auth/login.js and suggest test cases
 ### Example 4: Database Schema Changes
 
 ```bash
-# 1. Create migration task
-/pm:task-new Add user preferences table
+# 1. Create migration task (decompose from epic)
+/pm:epic-decompose user-preferences
 
 # 2. Generate with Python agent
 @python-backend-engineer
@@ -599,12 +600,12 @@ const prompt = builder.build('dev/microservice-api.xml', {
 │ 3. IMPLEMENTATION                                           │
 │    /pm:epic-start → Launch parallel agents                 │
 │    /pm:epic-status → Monitor progress                       │
-│    /pm:task-show → View task details                       │
+│    /pm:issue-show → View issue details                     │
 └─────────────────────────────────────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
 │ 4. VALIDATION                                              │
-│    /testing:run → Execute all tests                        │
+│    @test-runner → Execute all tests                        │
 │    Docker compose build → Verify infrastructure            │
 │    Pre-commit hooks → Automatic validation                 │
 └─────────────────────────────────────────────────────────────┘
@@ -635,7 +636,7 @@ const prompt = builder.build('dev/microservice-api.xml', {
 
 **End of Day:**
 ```bash
-/testing:run             # Verify all tests pass
+@test-runner run all tests  # Verify all tests pass
 /pm:status               # Review accomplishments
 git commit               # Hooks validate automatically
 ```
@@ -670,10 +671,10 @@ git commit               # Hooks validate automatically
 /pm:epic-decompose feature-name
 
 # Review tasks
-/pm:task-list
+/pm:epic-show feature-name
 
 # See task details
-/pm:task-show task-id
+autopm task list feature-name
 ```
 
 **Created:**
@@ -707,7 +708,7 @@ git commit               # Hooks validate automatically
 /pm:epic-status feature-name
 
 # Run tests
-/testing:run
+@test-runner run all tests
 
 # Verify infrastructure
 docker compose build --no-cache
@@ -742,10 +743,10 @@ docker compose up -d
 autopm install plugin-pm-azure
 
 # Configure
-/config:set-provider azure
+autopm config set provider azure
 
-# Set API key
-/config:set-api-key azure
+# Set API token in .claude/.env
+# AZURE_DEVOPS_PAT=your-azure-devops-pat
 ```
 
 **Commands:**
@@ -753,11 +754,11 @@ autopm install plugin-pm-azure
 # Sync epic to Azure Boards
 /pm:epic-sync feature-name
 
-# Create work items
-/pm:task-new --sync-azure
+# Sync an issue to Azure work items
+/pm:issue-sync issue-id
 
-# Update status
-/pm:task-status --sync-azure
+# Sync all local changes
+/pm:sync
 ```
 
 **Features:**
@@ -770,8 +771,8 @@ autopm install plugin-pm-azure
 
 **Setup:**
 ```bash
-/config:set-provider github
-/config:set-api-key github
+autopm config set provider github
+# Set GITHUB_TOKEN in .claude/.env
 ```
 
 **Commands:**
@@ -1215,12 +1216,12 @@ done
 autopm install plugin-pm-azure
 
 # 2. Configure Azure
-/config:set-provider azure
-/config:set-api-key azure
+autopm config set provider azure
+# Set AZURE_DEVOPS_PAT in .claude/.env
 
 # 3. All developers use /pm commands
-/pm:task-new --sync-azure  # Creates task + Azure work item
-/pm:task-status --sync-azure  # Syncs status bidirectionally
+/pm:issue-sync issue-id  # Syncs issue to Azure work item
+/pm:sync                 # Syncs all local changes with Azure
 
 # 4. Automated reporting
 /pm:standup              # Daily standup automation
@@ -1287,7 +1288,7 @@ autopm install
 # Your repo has hooks:
 
 # .git/hooks/pre-commit:
-# - /testing:run (all tests must pass)
+# - npm test (all tests must pass)
 # - npm run lint (code style)
 # - Docker build validation
 
@@ -1539,11 +1540,11 @@ npm run setup:githooks
 # 1. Check provider
 cat .claude/config.json
 
-# 2. Set API key
-/config:set-api-key azure
+# 2. Set API token in .claude/.env
+# AZURE_DEVOPS_PAT=your-azure-devops-pat
 
-# 3. Verify connection
-/pm:sync-test
+# 3. Verify configuration
+autopm validate
 
 # 4. Check Azure token
 az account get-access-token
@@ -1571,10 +1572,10 @@ autopm --help
 /pm:help
 
 # Context commands
-/context:help
+/context:create, /context:prime, /context:update
 
-# Testing commands
-/testing:help
+# Testing commands (plugin-testing)
+/test:test-setup, /test:test-coverage
 ```
 
 ### Agent Reference
