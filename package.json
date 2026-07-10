@@ -132,7 +132,7 @@
     "README.md"
   ],
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.109.0",
+    "@anthropic-ai/sdk": "^0.110.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@octokit/rest": "^22.0.0",
     "azure-devops-node-api": "^15.1.1",
@@ -176,7 +176,7 @@
     "sinon": "^22.0.0"
   },
   "optionalDependencies": {
-    "@playwright/mcp": "^0.0.77",
+    "@playwright/mcp": "^0.0.78",
     "@upstash/context7-mcp": "^3.2.1"
   },
   "publishConfig": {
