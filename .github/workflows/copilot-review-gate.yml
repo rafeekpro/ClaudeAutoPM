@@ -1,0 +1,136 @@
+# copilot-review-gate — keep a PR YELLOW until GitHub Copilot has code-reviewed it.
+#
+# GENERATED from lagowski/pr-review-gate (templates/copilot-review-gate.yml) — do not
+# edit in place; change the template and re-deploy. Only ubuntu-latest is per-repo.
+#
+# Native Copilot code review is ADVISORY: it posts a review (as
+# `copilot-pull-request-reviewer`) but never a status check, so branch protection
+# has nothing to wait on and a PR can go green before Copilot ever looks at it.
+# This gate synthesises the missing `copilot-review` status check:
+#   * `pull_request` (open / push / ready): post `copilot-review` = pending unless
+#     Copilot has already reviewed the current head commit -> success.
+#   * `schedule` backstop: re-evaluate every open PR and flip to success once a
+#     Copilot review for the current head has landed.
+# Make `copilot-review` a REQUIRED status check and merge is blocked while yellow.
+#
+# WHY A SCHEDULE, NOT the review event: a run triggered by Copilot submitting its
+# review (`pull_request_review`) is bot-initiated, and GitHub holds bot-triggered
+# runs as `action_required` — they never execute and can't be API-approved
+# ("not from a fork pull request or queued by the Actions bot"). So we can't green
+# on the review event; the cron backstop is the reliable greener. The block is
+# always correct regardless of latency: pending == not-yet-reviewed == not mergeable.
+#
+# TRIGGER for the review itself: Copilot can't be requested via REST (422). It is
+# AUTO-requested by the separate `copilot-auto-review` branch ruleset
+# (`copilot_code_review`, review_on_push), deployed by the same tool — this gate
+# only waits for that review.
+#
+# Gates on "Copilot has reviewed", NOT "findings resolved" — that stays
+# required_conversation_resolution + human approval (the option-A flow).
+#
+# Zero LLM calls; short-lived runs on the configured runner (self-hosted by default → no
+# GitHub minutes; a repo without a self-hosted runner overrides ubuntu-latest to ubuntu-latest,
+# which IS metered — the job is seconds-long, so the cost is negligible).
+name: copilot-review-gate
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+  schedule:
+    # Backstop greener. Scheduled runs can be delayed by GitHub under load, so this
+    # is "green within a few minutes", not instant — fine, since blocking is exact.
+    - cron: '*/5 * * * *'
+  workflow_dispatch: {}
+
+permissions:
+  statuses: write        # post the copilot-review commit status
+  pull-requests: read    # enumerate open PRs (schedule) + read reviews
+
+concurrency:
+  # Per-PR for pull_request events; a single constant group for the scheduled sweep (and manual
+  # dispatch). cancel-in-progress: only the latest state matters, so a newer run SUPERSEDES an
+  # older one in the same group — this also prevents a run stuck waiting for a runner from
+  # blocking every later run behind it (cancel-in-progress: false pile-up). No status races
+  # either: at most one run per group is ever live.
+  group: copilot-review-gate-${{ github.event.pull_request.number && format('pr-{0}', github.event.pull_request.number) || 'sweep' }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    # Skip FORK PRs on the pull_request event — a fork shouldn't occupy a self-hosted runner, and
+    # the schedule sweep (default-branch, writable token) posts their status anyway. Non-PR events
+    # (schedule / workflow_dispatch) always run.
+    if: >-
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    # Bound the worst case: a run that hangs on a self-hosted runner can't linger (belt-and-
+    # braces with cancel-in-progress, which already supersedes a stuck run on the next trigger).
+    timeout-minutes: 5
+    steps:
+      - name: Evaluate Copilot-review gate
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            // Match the Copilot reviewer by EXACT bot identity, not a substring — a human
+            // login that merely contains "copilot" must never satisfy the required check.
+            const isCopilot = (u) =>
+              !!u && u.type === 'Bot' &&
+              (u.login || '').toLowerCase().replace(/\[bot\]$/, '') === 'copilot-pull-request-reviewer';
+
+            // Post copilot-review = success once Copilot has reviewed THIS head commit,
+            // else pending. A new push moves the head, so a stale review on an older
+            // commit no longer counts. Only writes when the state actually changes, so
+            // the cron doesn't spam status history.
+            async function evaluate(pr) {
+              if (pr.draft) return;                    // drafts can't be reviewed by Copilot
+              const sha = pr.head.sha;
+              const reviews = await github.paginate(github.rest.pulls.listReviews, {
+                owner, repo, pull_number: pr.number, per_page: 100,
+              });
+              // Only a genuinely-SUBMITTED review counts. listReviews keeps DISMISSED reviews,
+              // and can surface a PENDING (started-but-not-submitted) review — neither means
+              // "Copilot reviewed this commit", so exclude both. Real Copilot reviews are COMMENTED.
+              const reviewed = reviews.some(
+                (r) => isCopilot(r.user) && r.commit_id === sha
+                  && r.state !== 'DISMISSED' && r.state !== 'PENDING',
+              );
+              const want = reviewed ? 'success' : 'pending';
+
+              const combined = await github.rest.repos.getCombinedStatusForRef({ owner, repo, ref: sha });
+              const cur = combined.data.statuses.find((s) => s.context === 'copilot-review')?.state;
+              if (cur === want) return;
+
+              try {
+                await github.rest.repos.createCommitStatus({
+                  owner, repo, sha, state: want, context: 'copilot-review',
+                  description: reviewed ? 'Copilot has reviewed this commit' : 'Waiting for Copilot code review…',
+                });
+                core.info(`#${pr.number} ${sha.slice(0, 8)} copilot-review=${want}`);
+              } catch (e) {
+                // A fork-PR pull_request run gets a read-only GITHUB_TOKEN → this POST 403s;
+                // that's EXPECTED and the scheduled sweep (writable, default-branch token) covers
+                // it. Any OTHER status is unexpected — surface it loudly (core.warning) so it's not
+                // silently swallowed. Either way don't fail the job: a not-yet-posted required
+                // check is still blocking == correct.
+                const expectedForkDenial = e.status === 403;
+                const log = expectedForkDenial ? core.info : core.warning;
+                log(`could not post status for #${pr.number} (${e.status})` +
+                  (expectedForkDenial ? ' — fork read-only token; scheduled sweep will cover it' : ' — UNEXPECTED'));
+              }
+            }
+
+            if (context.payload.pull_request) {
+              await evaluate(context.payload.pull_request);
+            } else {
+              // schedule / manual: sweep every open PR. Isolate each PR — one PR's API failure
+              // must NOT abort the whole sweep and strand the others' statuses until next run.
+              const prs = await github.paginate(github.rest.pulls.list, {
+                owner, repo, state: 'open', per_page: 100,
+              });
+              for (const pr of prs) {
+                try { await evaluate(pr); }
+                catch (e) { core.warning(`#${pr.number}: evaluate failed — ${e.message}`); }
+              }
+            }
