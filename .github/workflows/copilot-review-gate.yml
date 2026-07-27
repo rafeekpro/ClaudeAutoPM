@@ -86,13 +86,27 @@ jobs:
             async function evaluate(pr) {
               if (pr.draft) return;                    // drafts can't be reviewed by Copilot
               const sha = pr.head.sha;
-              const reviews = await github.paginate(github.rest.pulls.listReviews, {
+              // Dependency-update bots (dependabot, renovate) are NEVER reviewed by Copilot —
+              // GitHub excludes bot PRs from Copilot code review — so a required copilot-review
+              // would deadlock them forever. Worse, a human/manual green is posted by a DIFFERENT
+              // app and can't satisfy an app-pinned required check, so there is NO manual escape.
+              // Pass them here, from THIS workflow (the very app the required check is pinned to),
+              // so the check is satisfiable. Bumps stay gated by CI + auto-merge, their own
+              // required checks — this only lifts the copilot-review deadlock.
+              // ALLOWLIST, not "any Bot": bypassing every user.type==='Bot' PR would let ANY
+              // GitHub App (github-actions[bot], a random third-party App) skip the Copilot gate
+              // entirely. Only these known dependency bots — trusted, low-risk, Copilot-excluded —
+              // are exempted; any other bot PR still waits for a real Copilot review.
+              const DEP_BOTS = new Set(['dependabot', 'dependabot-preview', 'renovate', 'renovate-bot']);
+              const login = (pr.user && pr.user.login || '').toLowerCase().replace(/\[bot\]$/, '');
+              const isBot = !!pr.user && pr.user.type === 'Bot' && DEP_BOTS.has(login);
+              const reviews = isBot ? [] : await github.paginate(github.rest.pulls.listReviews, {
                 owner, repo, pull_number: pr.number, per_page: 100,
               });
               // Only a genuinely-SUBMITTED review counts. listReviews keeps DISMISSED reviews,
               // and can surface a PENDING (started-but-not-submitted) review — neither means
               // "Copilot reviewed this commit", so exclude both. Real Copilot reviews are COMMENTED.
-              const reviewed = reviews.some(
+              const reviewed = isBot || reviews.some(
                 (r) => isCopilot(r.user) && r.commit_id === sha
                   && r.state !== 'DISMISSED' && r.state !== 'PENDING',
               );
@@ -105,7 +119,9 @@ jobs:
               try {
                 await github.rest.repos.createCommitStatus({
                   owner, repo, sha, state: want, context: 'copilot-review',
-                  description: reviewed ? 'Copilot has reviewed this commit' : 'Waiting for Copilot code review…',
+                  description: isBot
+                    ? 'Bot PR — Copilot does not review bot PRs; gated by CI'
+                    : (reviewed ? 'Copilot has reviewed this commit' : 'Waiting for Copilot code review…'),
                 });
                 core.info(`#${pr.number} ${sha.slice(0, 8)} copilot-review=${want}`);
               } catch (e) {
