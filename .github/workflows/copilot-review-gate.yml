@@ -28,6 +28,32 @@
 # Gates on "Copilot has reviewed", NOT "findings resolved" — that stays
 # required_conversation_resolution + human approval (the option-A flow).
 #
+# WHEN COPILOT STOPS REVIEWING (#311). `copilot-review` is a REQUIRED check whose
+# producer is a metered third-party service on an AI-credit budget. If Copilot stops
+# reviewing — budget exhausted, outage, or a PR it simply never picks up — the check
+# would stay yellow forever and NOTHING in the repository could clear it. Copilot cannot
+# be asked directly either: POST /pulls/N/requested_reviewers answers 422, because the
+# bot is not a collaborator. Observed 2026-07-28 in this fleet: CI green, no review on two
+# successive head commits, 30+ minutes each, at 75% of a $10 monthly AI-credit allowance.
+# Pushing an empty commit does not help either — a new SHA with no diff does not wake the
+# reviewer, and a draft is never reviewed at all.
+#
+# So the gate distinguishes "not reviewed yet" from "not going to be reviewed":
+#   * under COPILOT_REVIEW_STALE_MIN (default 60) -> pending, "Waiting for Copilot…"
+#   * past it                                     -> FAILURE, naming the wait and the
+#                                                    budget as the thing to check
+#   * label `copilot-review-unavailable`          -> success, and the description says
+#                                                    plainly that Copilot did NOT review
+#
+# The failure is not a verdict on the code; it is the gate refusing to keep spinning about
+# something that will not resolve itself. And the label is the ONE sanctioned way past —
+# GitHub records who applied it and when, so the bypass leaves a trace. Disabling the
+# ruleset to force a merge does not; it also unprotects the branch while it is off.
+#
+# What the gate must NEVER do is infer a review from elapsed time. Success comes from a
+# real Copilot review, a dependency-bot exemption, or a human's explicit label — waiting
+# longer is not evidence.
+#
 # Zero LLM calls; short-lived runs on the configured runner (self-hosted by default → no
 # GitHub minutes; a repo without a self-hosted runner overrides ubuntu-latest to ubuntu-latest,
 # which IS metered — the job is seconds-long, so the cost is negligible).
@@ -35,7 +61,7 @@ name: copilot-review-gate
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize, ready_for_review]
+    types: [opened, reopened, synchronize, ready_for_review, labeled, unlabeled]
   schedule:
     # Backstop greener. Scheduled runs can be delayed by GitHub under load, so this
     # is "green within a few minutes", not instant — fine, since blocking is exact.
@@ -70,6 +96,11 @@ jobs:
     steps:
       - name: Evaluate Copilot-review gate
         uses: actions/github-script@v7
+        env:
+          # Minutes to wait for a Copilot review before the gate says it is not coming.
+          # Set the repository variable COPILOT_REVIEW_STALE_MIN to tune; 0 disables the
+          # stale state entirely and restores the old indefinite yellow.
+          COPILOT_REVIEW_STALE_MIN: ${{ vars.COPILOT_REVIEW_STALE_MIN || '60' }}
         with:
           script: |
             const { owner, repo } = context.repo;
@@ -110,10 +141,42 @@ jobs:
                 (r) => isCopilot(r.user) && r.commit_id === sha
                   && r.state !== 'DISMISSED' && r.state !== 'PENDING',
               );
-              const want = reviewed ? 'success' : 'pending';
+              // THE ONE WAY OUT when Copilot will not review (#311). An operator applies
+              // the label; the gate honours it and SAYS SO. GitHub records who applied it and
+              // when, so the bypass carries its own audit trail — unlike disabling the ruleset,
+              // which leaves the repository briefly unprotected and nothing behind.
+              const BYPASS_LABEL = 'copilot-review-unavailable';
+              const bypassed = (pr.labels || []).some(
+                (l) => (l.name || '').toLowerCase() === BYPASS_LABEL);
 
               const combined = await github.rest.repos.getCombinedStatusForRef({ owner, repo, ref: sha });
-              const cur = combined.data.statuses.find((s) => s.context === 'copilot-review')?.state;
+              const existing = combined.data.statuses.find((s) => s.context === 'copilot-review');
+              const cur = existing?.state;
+
+              // How long has this commit been waiting? Measured from when WE first posted
+              // pending for this sha — not from the commit's own date, which a rebase makes
+              // arbitrarily old and would declare a fresh push stale on arrival. Costs no
+              // extra API call: the status we already fetched carries its own created_at.
+              const STALE_MIN = Number(process.env.COPILOT_REVIEW_STALE_MIN || '60');
+              const staleEnabled = Number.isFinite(STALE_MIN) && STALE_MIN > 0;
+              const waitedMin = (existing && existing.state === 'pending')
+                ? (Date.now() - Date.parse(existing.created_at)) / 60000
+                : 0;
+              // STICKY. Once the gate has said "not coming", it keeps saying it until a
+              // review or the label actually arrives. Without this the next sweep reads
+              // its own `failure`, measures a 0-minute wait, and flips back to `pending`
+              // — the check would oscillate failure -> pending -> failure forever and the
+              // distinct state would mean nothing. Setting STALE_MIN=0 still disables it
+              // entirely, including un-sticking an existing failure.
+              const alreadyStale = !!existing && existing.state === 'failure';
+              const stale = !reviewed && !bypassed && staleEnabled
+                && (alreadyStale || waitedMin >= STALE_MIN);
+
+              // NEVER green on an absent review. Success comes from a real Copilot review, a
+              // dependency-bot exemption, or an operator's explicit label — never from waiting
+              // long enough. `failure` here is not a verdict on the code: it is the gate saying
+              // this will not clear on its own, which `pending` cannot express.
+              const want = (reviewed || bypassed) ? 'success' : (stale ? 'failure' : 'pending');
               if (cur === want) return;
 
               try {
@@ -121,7 +184,13 @@ jobs:
                   owner, repo, sha, state: want, context: 'copilot-review',
                   description: isBot
                     ? 'Bot PR — Copilot does not review bot PRs; gated by CI'
-                    : (reviewed ? 'Copilot has reviewed this commit' : 'Waiting for Copilot code review…'),
+                    : bypassed
+                      ? `Bypassed via "${BYPASS_LABEL}" — Copilot did NOT review this commit`
+                      : reviewed
+                        ? 'Copilot has reviewed this commit'
+                        : stale
+                          ? `No Copilot review after ${Math.round(waitedMin)} min — check the AI-credit budget, then label "${BYPASS_LABEL}"`
+                          : 'Waiting for Copilot code review…',
                 });
                 core.info(`#${pr.number} ${sha.slice(0, 8)} copilot-review=${want}`);
               } catch (e) {
