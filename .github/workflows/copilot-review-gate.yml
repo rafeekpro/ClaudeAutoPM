@@ -71,6 +71,10 @@ on:
 permissions:
   statuses: write        # post the copilot-review commit status
   pull-requests: read    # enumerate open PRs (schedule) + read reviews
+  issues: read           # the #157 never-asked check reads the issue timeline; without this
+                         # scope the call 403s and the gate silently falls back to the generic
+                         # stale message — present but useless. Caught in review on the PR
+                         # that added the check.
 
 concurrency:
   # Per-PR for pull_request events; a single constant group for the scheduled sweep (and manual
@@ -172,6 +176,35 @@ jobs:
               const stale = !reviewed && !bypassed && staleEnabled
                 && (alreadyStale || waitedMin >= STALE_MIN);
 
+              // #157: "not asked" and "asked and silent" are different failures with different
+              // fixes, and the old message sent half its readers to the wrong one. The ruleset
+              // requests Copilot at PR OPEN (+1s, measured on five PRs); review_on_push only
+              // re-requests where Copilot is already a reviewer. A PR opened during an outage
+              // therefore NEVER gets a request, and nothing recovers it — not a push, not a
+              // reopen (four attempts measured on one stuck PR, over six hours, with Copilot
+              // demonstrably reviewing elsewhere). Telling that reader to "check the AI-credit
+              // budget" points at a budget that is already fine.
+              //
+              // Timeline read only on the stale path — the rare case pays, the common one not.
+              let neverAsked = false;
+              if (stale) {
+                try {
+                  const tl = await github.paginate(github.rest.issues.listEventsForTimeline,
+                    { owner, repo, issue_number: pr.number, per_page: 100 });
+                  // The REQUEST names the reviewer 'Copilot' (measured live: five PRs, every
+                  // timeline shows requested_reviewer.login === 'Copilot'); the REVIEW is later
+                  // submitted by 'copilot-pull-request-reviewer[bot]'. Two identities, one bot.
+                  // Both are accepted here so a GitHub-side rename of either never silently
+                  // turns every stale PR into "never asked".
+                  const copilotLogins = ['copilot', 'copilot-pull-request-reviewer'];
+                  neverAsked = !tl.some((e) => e.event === 'review_requested'
+                    && copilotLogins.includes((e.requested_reviewer?.login || '').toLowerCase().replace(/\[bot\]$/, '')));
+                } catch (e) {
+                  // Cannot tell the two apart -> keep the generic message rather than guess.
+                  core.warning(`#${pr.number}: timeline unreadable (${e.message}) — cannot distinguish never-asked from silent`);
+                }
+              }
+
               // NEVER green on an absent review. Success comes from a real Copilot review, a
               // dependency-bot exemption, or an operator's explicit label — never from waiting
               // long enough. `failure` here is not a verdict on the code: it is the gate saying
@@ -189,7 +222,9 @@ jobs:
                       : reviewed
                         ? 'Copilot has reviewed this commit'
                         : stale
-                          ? `No Copilot review after ${Math.round(waitedMin)} min — check the AI-credit budget, then label "${BYPASS_LABEL}"`
+                          ? (neverAsked
+                            ? `Copilot was never asked (outage at open?) — pushes cannot fix it: open a NEW PR from this branch, or label "${BYPASS_LABEL}"`
+                            : `No Copilot review after ${Math.round(waitedMin)} min — check the AI-credit budget, then label "${BYPASS_LABEL}"`)
                           : 'Waiting for Copilot code review…',
                 });
                 core.info(`#${pr.number} ${sha.slice(0, 8)} copilot-review=${want}`);
