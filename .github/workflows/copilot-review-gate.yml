@@ -99,7 +99,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Evaluate Copilot-review gate
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         env:
           # Minutes to wait for a Copilot review before the gate says it is not coming.
           # Set the repository variable COPILOT_REVIEW_STALE_MIN to tune; 0 disables the
