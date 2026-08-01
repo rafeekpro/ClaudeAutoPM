@@ -1,7 +1,7 @@
 # copilot-review-gate — keep a PR YELLOW until GitHub Copilot has code-reviewed it.
 #
 # GENERATED from lagowski/pr-review-gate (templates/copilot-review-gate.yml) — do not
-# edit in place; change the template and re-deploy. Only ubuntu-latest is per-repo.
+# edit in place; change the template and re-deploy. Only "ubuntu-latest" is per-repo.
 #
 # Native Copilot code review is ADVISORY: it posts a review (as
 # `copilot-pull-request-reviewer`) but never a status check, so branch protection
@@ -55,12 +55,23 @@
 # longer is not evidence.
 #
 # Zero LLM calls; short-lived runs on the configured runner (self-hosted by default → no
-# GitHub minutes; a repo without a self-hosted runner overrides ubuntu-latest to ubuntu-latest,
+# GitHub minutes; a repo without a self-hosted runner overrides "ubuntu-latest" to ubuntu-latest,
 # which IS metered — the job is seconds-long, so the cost is negligible).
 name: copilot-review-gate
 
 on:
-  pull_request:
+  # pull_request_TARGET, not pull_request (#136). On `pull_request`, GitHub evaluates the
+  # workflow definition from the PR's own HEAD for same-repo PRs — so a PR could edit THIS FILE
+  # to post `state: 'success'` unconditionally and satisfy the required check that exists to
+  # judge it. CODEOWNERS on `.github/workflows/` meant such an edit could not merge unreviewed,
+  # but that is a human noticing a diff, not the gate being unbypassable.
+  #
+  # `pull_request_target` runs the definition from the PROTECTED BASE BRANCH while still
+  # receiving the PR payload, so a PR cannot alter the logic evaluating it. Safe here for one
+  # specific reason, which must stay true: THIS JOB NEVER CHECKS OUT OR EXECUTES PR CODE. It
+  # only reads reviews/statuses through the API. Adding a checkout of the PR head to this file
+  # would hand a fork's code a writable token — do not.
+  pull_request_target:
     types: [opened, reopened, synchronize, ready_for_review, labeled, unlabeled]
   schedule:
     # Backstop greener. Scheduled runs can be delayed by GitHub under load, so this
@@ -87,19 +98,37 @@ concurrency:
 
 jobs:
   gate:
-    # Skip FORK PRs on the pull_request event — a fork shouldn't occupy a self-hosted runner, and
-    # the schedule sweep (default-branch, writable token) posts their status anyway. Non-PR events
-    # (schedule / workflow_dispatch) always run.
-    if: >-
-      github.event_name != 'pull_request' ||
-      github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: ubuntu-latest
+    # NO `if:` AT ALL — every trigger above should reach this job, and a job without a condition
+    # always runs. The fork skip that used to live here is gone deliberately: it existed because
+    # a fork's `pull_request` run got a read-only token, so the status POST 403'd and the
+    # scheduled sweep had to cover those PRs minutes later. `pull_request_target` carries a
+    # writable base-repo token even for forks, so a fork PR now gets its status immediately, by
+    # the same path as any other — one less case where the answer arrives late and reads as a
+    # dead gate.
+    #
+    # Written as an absent key rather than `if: true`, which YAML parses as a boolean where
+    # Actions wants an expression string, and rather than `${{ true }}`, which is ceremony
+    # around the absence of a condition.
+    # FORK PRs GO TO A GITHUB-HOSTED RUNNER. Under `pull_request_target` this job runs for fork
+    # PRs too (that is the point — they get their status immediately instead of waiting for the
+    # sweep), but on a PUBLIC repo anyone can open one, and each would occupy a runner from the
+    # shared self-hosted pool. That is a queue any stranger can fill.
+    #
+    # Measured when this was written: the only two public repos in the org already run this gate
+    # on ubuntu-latest, so exposure was zero — by coincidence, not by design. Making a private
+    # repo public, or giving either of those a self-hosted runner, would have silently removed
+    # the protection. Expressed here so it holds regardless.
+    #
+    # The condition names the fork case explicitly rather than negating "same repo", because on
+    # schedule and workflow_dispatch there is no pull_request payload at all and a negation
+    # would send every sweep to a hosted runner.
+    runs-on: ${{ (github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name != github.repository) && 'ubuntu-latest' || fromJSON('"ubuntu-latest"') }}
     # Bound the worst case: a run that hangs on a self-hosted runner can't linger (belt-and-
     # braces with cancel-in-progress, which already supersedes a stuck run on the next trigger).
     timeout-minutes: 5
     steps:
       - name: Evaluate Copilot-review gate
-        uses: actions/github-script@v9
+        uses: actions/github-script@v7
         env:
           # Minutes to wait for a Copilot review before the gate says it is not coming.
           # Set the repository variable COPILOT_REVIEW_STALE_MIN to tune; 0 disables the
@@ -108,6 +137,11 @@ jobs:
         with:
           script: |
             const { owner, repo } = context.repo;
+            // The interval PROMISED in the pending status text. It is asserted against the cron
+            // in TC-GATE-2, because a promise that can drift away from the schedule keeping it is
+            // worse than no promise: it would tell a blocked human to wait for a tick that never
+            // comes.
+            const RECHECK_MIN = 5;
             // Match the Copilot reviewer by EXACT bot identity, not a substring — a human
             // login that merely contains "copilot" must never satisfy the required check.
             const isCopilot = (u) =>
@@ -176,6 +210,20 @@ jobs:
               const stale = !reviewed && !bypassed && staleEnabled
                 && (alreadyStale || waitedMin >= STALE_MIN);
 
+
+              // NEVER green on an absent review. Success comes from a real Copilot review, a
+              // dependency-bot exemption, or an operator's explicit label — never from waiting
+              // long enough. `failure` here is not a verdict on the code: it is the gate saying
+              // this will not clear on its own, which `pending` cannot express.
+              const want = (reviewed || bypassed) ? 'success' : (stale ? 'failure' : 'pending');
+              // BEFORE the timeline read below, on purpose. `failure` is sticky, so a stale PR
+              // is re-evaluated every sweep for as long as it lives — and the never-asked
+              // lookup used to run before this return, paying a timeline read per sweep per
+              // stuck PR forever, to compute a description that would never be posted. Caught
+              // in review on the fleet deploy. The read now happens exactly once: at the
+              // pending -> failure transition, where the description is actually chosen.
+              if (cur === want) return;
+
               // #157: "not asked" and "asked and silent" are different failures with different
               // fixes, and the old message sent half its readers to the wrong one. The ruleset
               // requests Copilot at PR OPEN (+1s, measured on five PRs); review_on_push only
@@ -189,28 +237,71 @@ jobs:
               let neverAsked = false;
               if (stale) {
                 try {
-                  const tl = await github.paginate(github.rest.issues.listEventsForTimeline,
-                    { owner, repo, issue_number: pr.number, per_page: 100 });
+                  // Page-by-page with an EARLY EXIT, not github.paginate: one matching event
+                  // answers the question, and paginate fetches the WHOLE timeline regardless.
+                  // The difference bites exactly when this code runs — an outage means many
+                  // stale PRs on one sweep, and full-timeline reads there multiply API calls
+                  // toward the rate limit. Caught in review on the fleet deploy.
                   // The REQUEST names the reviewer 'Copilot' (measured live: five PRs, every
                   // timeline shows requested_reviewer.login === 'Copilot'); the REVIEW is later
                   // submitted by 'copilot-pull-request-reviewer[bot]'. Two identities, one bot.
                   // Both are accepted here so a GitHub-side rename of either never silently
                   // turns every stale PR into "never asked".
                   const copilotLogins = ['copilot', 'copilot-pull-request-reviewer'];
-                  neverAsked = !tl.some((e) => e.event === 'review_requested'
-                    && copilotLogins.includes((e.requested_reviewer?.login || '').toLowerCase().replace(/\[bot\]$/, '')));
+                  const askedFor = (e) => e.event === 'review_requested'
+                    && copilotLogins.includes((e.requested_reviewer?.login || '').toLowerCase().replace(/\[bot\]$/, ''));
+                  // ONE SOURCE FOR THE CAP. The probe below has to ask for the first event
+                  // PAST everything this loop could have seen, so the two are arithmetically
+                  // bound. Written as separate literals they can drift apart silently, and
+                  // the drift is not symmetric: SHRINKING the cap would make the probe ask
+                  // beyond the real scan, come back empty, and let the gate declare "Copilot
+                  // was never asked" about events it never looked at — a confident wrong
+                  // verdict that sends someone to close a recoverable PR. Derived here so
+                  // that cannot happen.
+                  const TIMELINE_PAGE_SIZE = 100;
+                  const TIMELINE_MAX_PAGES = 10;
+                  const TIMELINE_CAP_EVENTS = TIMELINE_PAGE_SIZE * TIMELINE_MAX_PAGES;
+                  let asked = false;
+                  let sawEnd = false;
+                  for (let page = 1; page <= TIMELINE_MAX_PAGES && !asked; page++) {
+                    const { data: tl } = await github.rest.issues.listEventsForTimeline(
+                      { owner, repo, issue_number: pr.number, per_page: TIMELINE_PAGE_SIZE, page });
+                    asked = tl.some(askedFor);
+                    if (tl.length < TIMELINE_PAGE_SIZE) { sawEnd = true; break; }
+                  }
+                  // "Never asked" is a claim about the WHOLE timeline, so it may only be made
+                  // after seeing the end of it. A scan that hits the page cap without finding
+                  // the event proves nothing — the request may sit on page 11 — and the wrong
+                  // verdict here sends someone to close a perfectly recoverable PR. Incomplete
+                  // scan -> unknown -> the generic message, same as an unreadable timeline.
+                  // A timeline whose length is EXACTLY the cap fills the last page completely,
+                  // so the loop ends with sawEnd false and reads identical to a truncated scan
+                  // — even though nothing was missed. Costing a PR its specific remedy, and
+                  // logging a warning that is simply untrue, on an exact multiple of the page
+                  // size is a bad trade against one cheap request made only in that rare case:
+                  // ask for a single event past the cap. Empty means the timeline really did
+                  // end there.
+                  //
+                  // Stated without numbers on purpose. An earlier draft said "exactly 1000
+                  // events" and "page 10" — restating in prose the very constants that were
+                  // just extracted so they could not drift apart. A comment carrying its own
+                  // copy of the arithmetic goes stale the same way the literals would have,
+                  // except nothing fails when it does.
+                  if (!asked && !sawEnd) {
+                    const { data: past } = await github.rest.issues.listEventsForTimeline(
+                      { owner, repo, issue_number: pr.number, per_page: 1, page: TIMELINE_CAP_EVENTS + 1 });
+                    sawEnd = past.length === 0;
+                  }
+                  if (asked || sawEnd) {
+                    neverAsked = !asked;
+                  } else {
+                    core.warning(`#${pr.number}: timeline exceeds the scan cap — cannot confirm never-asked; keeping the generic stale message`);
+                  }
                 } catch (e) {
                   // Cannot tell the two apart -> keep the generic message rather than guess.
                   core.warning(`#${pr.number}: timeline unreadable (${e.message}) — cannot distinguish never-asked from silent`);
                 }
               }
-
-              // NEVER green on an absent review. Success comes from a real Copilot review, a
-              // dependency-bot exemption, or an operator's explicit label — never from waiting
-              // long enough. `failure` here is not a verdict on the code: it is the gate saying
-              // this will not clear on its own, which `pending` cannot express.
-              const want = (reviewed || bypassed) ? 'success' : (stale ? 'failure' : 'pending');
-              if (cur === want) return;
 
               try {
                 await github.rest.repos.createCommitStatus({
@@ -223,21 +314,40 @@ jobs:
                         ? 'Copilot has reviewed this commit'
                         : stale
                           ? (neverAsked
-                            ? `Copilot was never asked (outage at open?) — pushes cannot fix it: open a NEW PR from this branch, or label "${BYPASS_LABEL}"`
+                            ? `Copilot was never asked (outage at open?) — close this PR, open a new one from the branch, or label "${BYPASS_LABEL}"`
                             : `No Copilot review after ${Math.round(waitedMin)} min — check the AI-credit budget, then label "${BYPASS_LABEL}"`)
-                          : 'Waiting for Copilot code review…',
+                          // SAY THAT IT IS ALIVE. This text is all a human gets while blocked, and
+                          // "Waiting…" cannot distinguish a gate that will clear itself in two
+                          // minutes from one that is dead — it reads identically in both cases, so
+                          // the rational move is to go ask an operator. That is exactly what kept
+                          // happening. The greener is the CRON, not the review event (see the
+                          // header: bot-triggered runs are held as `action_required` and never
+                          // execute), so a few minutes of yellow AFTER Copilot finishes is the
+                          // design working, not a fault. Naming the interval turns an unbounded
+                          // unknown into a bounded wait.
+                          // "about", not "every". The schedule below is a REQUEST: GitHub
+                          // delays cron under load, as the header of this file says plainly.
+                          // The point of this text is to turn an unbounded unknown into a
+                          // bounded wait, and a bound that quietly fails to hold does the
+                          // opposite — the operator who waited six minutes for a promised
+                          // five now has fresh reason to think the gate is dead. Naming the
+                          // interval as approximate keeps the reassurance and drops the claim
+                          // I cannot keep.
+                          : `Waiting for Copilot code review… (rechecked about every ${RECHECK_MIN} min; yellow until then is normal)`,
                 });
                 core.info(`#${pr.number} ${sha.slice(0, 8)} copilot-review=${want}`);
               } catch (e) {
-                // A fork-PR pull_request run gets a read-only GITHUB_TOKEN → this POST 403s;
-                // that's EXPECTED and the scheduled sweep (writable, default-branch token) covers
-                // it. Any OTHER status is unexpected — surface it loudly (core.warning) so it's not
-                // silently swallowed. Either way don't fail the job: a not-yet-posted required
-                // check is still blocking == correct.
-                const expectedForkDenial = e.status === 403;
-                const log = expectedForkDenial ? core.info : core.warning;
-                log(`could not post status for #${pr.number} (${e.status})` +
-                  (expectedForkDenial ? ' — fork read-only token; scheduled sweep will cover it' : ' — UNEXPECTED'));
+                // Don't fail the job on a failed POST: a not-yet-posted required check is
+                // still blocking, which is the correct state to be in while something is wrong.
+                // A 403 USED to be routine: a fork's `pull_request` run got a read-only token,
+                // the POST was denied, and the scheduled sweep covered it minutes later. Under
+                // `pull_request_target` (#136) every run — fork included — carries a writable
+                // base-repo token, so that reason is gone and a denial now means something real:
+                // a revoked permission, an org policy, a token scope change. Downgrading it to
+                // info would keep the gate quiet about the one failure that stops it posting at
+                // all, which is how a broken gate reads as a working one.
+                core.warning(`could not post status for #${pr.number} (${e.status}) — UNEXPECTED; ` +
+                  'pull_request_target carries a writable token, so this is not the old fork denial');
               }
             }
 
