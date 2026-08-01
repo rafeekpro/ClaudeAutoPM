@@ -128,7 +128,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Evaluate Copilot-review gate
-        uses: actions/github-script@v7
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           # Minutes to wait for a Copilot review before the gate says it is not coming.
           # Set the repository variable COPILOT_REVIEW_STALE_MIN to tune; 0 disables the
@@ -260,7 +260,6 @@ jobs:
                   // that cannot happen.
                   const TIMELINE_PAGE_SIZE = 100;
                   const TIMELINE_MAX_PAGES = 10;
-                  const TIMELINE_CAP_EVENTS = TIMELINE_PAGE_SIZE * TIMELINE_MAX_PAGES;
                   let asked = false;
                   let sawEnd = false;
                   for (let page = 1; page <= TIMELINE_MAX_PAGES && !asked; page++) {
@@ -278,9 +277,9 @@ jobs:
                   // so the loop ends with sawEnd false and reads identical to a truncated scan
                   // — even though nothing was missed. Costing a PR its specific remedy, and
                   // logging a warning that is simply untrue, on an exact multiple of the page
-                  // size is a bad trade against one cheap request made only in that rare case:
-                  // ask for a single event past the cap. Empty means the timeline really did
-                  // end there.
+                  // size is a bad trade against one extra request made only in that rare case:
+                  // ask for the page AFTER the last one scanned. Empty means the timeline
+                  // really did end there.
                   //
                   // Stated without numbers on purpose. An earlier draft said "exactly 1000
                   // events" and "page 10" — restating in prose the very constants that were
@@ -288,8 +287,14 @@ jobs:
                   // copy of the arithmetic goes stale the same way the literals would have,
                   // except nothing fails when it does.
                   if (!asked && !sawEnd) {
+                    // THE NEXT PAGE, not a deep offset. This asked for `per_page: 1,
+                    // page: 1001` — arithmetically the same position, but expressed as the
+                    // thousand-and-first single-item page rather than the page after the last
+                    // one scanned. Same answer, a request shape the API is actually built for,
+                    // and one fewer derived constant to keep in step.
                     const { data: past } = await github.rest.issues.listEventsForTimeline(
-                      { owner, repo, issue_number: pr.number, per_page: 1, page: TIMELINE_CAP_EVENTS + 1 });
+                      { owner, repo, issue_number: pr.number,
+                        per_page: TIMELINE_PAGE_SIZE, page: TIMELINE_MAX_PAGES + 1 });
                     sawEnd = past.length === 0;
                   }
                   if (asked || sawEnd) {
@@ -346,8 +351,13 @@ jobs:
                 // a revoked permission, an org policy, a token scope change. Downgrading it to
                 // info would keep the gate quiet about the one failure that stops it posting at
                 // all, which is how a broken gate reads as a working one.
-                core.warning(`could not post status for #${pr.number} (${e.status}) — UNEXPECTED; ` +
-                  'pull_request_target carries a writable token, so this is not the old fork denial');
+                // `e.status` alone is not enough: a network failure, a DNS problem or an
+                // unexpected exception carries no status at all, so the warning read
+                // "could not post status (undefined)" — true, useless, and on the one path that
+                // silences the gate entirely. The message is what says which of those it was.
+                core.warning(`could not post status for #${pr.number} (status=${e.status ?? 'none'}): ` +
+                  `${e.message || e} — UNEXPECTED; pull_request_target carries a writable token, ` +
+                  'so this is not the old fork denial');
               }
             }
 
