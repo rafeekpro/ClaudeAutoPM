@@ -34,6 +34,18 @@ updates:
       # Closed #691 per owner go-ahead; migration deferred to a dedicated PR.
       - dependency-name: "js-yaml"
         update-types: ["version-update:semver-major"]
+      # chalk 5.x+ is pure ESM — same wall as ora above. `require('chalk')` in a
+      # CommonJS file throws `SyntaxError: Cannot use import statement outside a
+      # module` at load time, so the bump does not fail a test, it fails every
+      # entry point that colours output. Ten call-sites today:
+      #   bin/commands/plugin.js, lib/cli/commands/{pm,task,epic,issue,context,prd,agent}.js,
+      #   test/integration/test-{azure,github}-manual.js
+      # 6.0.0 also raises the floor to Node 22, which drops the 22.x/24.x matrix
+      # to a single row. Closed #716; taking chalk 5+ means moving the package to
+      # ESM or swapping in a CJS-compatible colour library, which is a deliberate
+      # migration and not a dependency bump.
+      - dependency-name: "chalk"
+        update-types: ["version-update:semver-major"]
     
   # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
