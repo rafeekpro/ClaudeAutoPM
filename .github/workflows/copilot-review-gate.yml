@@ -45,6 +45,13 @@
 #   * label `copilot-review-unavailable`          -> success, and the description says
 #                                                    plainly that Copilot did NOT review
 #
+# AND FROM "reviewed" ITSELF (#200). Out of credit, Copilot does not go quiet — it SUBMITS a
+# review whose body says it could not review, in state COMMENTED, on the right commit. Counted
+# as a review it produced `success — "Copilot has reviewed this commit"` about a commit nobody
+# had looked at: 13 PRs on one repo in one day, four of them production promotions. So a review
+# that says it is not a review is not one, and because that is an ANSWER rather than silence it
+# goes to FAILURE immediately, without waiting out a clock that measures patience.
+#
 # The failure is not a verdict on the code; it is the gate refusing to keep spinning about
 # something that will not resolve itself. And the label is the ONE sanctioned way past —
 # GitHub records who applied it and when, so the bypass leaves a trace. Disabling the
@@ -175,10 +182,74 @@ jobs:
               // Only a genuinely-SUBMITTED review counts. listReviews keeps DISMISSED reviews,
               // and can surface a PENDING (started-but-not-submitted) review — neither means
               // "Copilot reviewed this commit", so exclude both. Real Copilot reviews are COMMENTED.
-              const reviewed = isBot || reviews.some(
+              const submitted = isBot ? [] : reviews.filter(
                 (r) => isCopilot(r.user) && r.commit_id === sha
                   && r.state !== 'DISMISSED' && r.state !== 'PENDING',
               );
+              // …and a SUBMITTED review is still not necessarily a review (#200). When Copilot
+              // cannot review, it says so BY SUBMITTING A REVIEW that says so — state COMMENTED,
+              // correct commit_id, genuinely from the Copilot bot. Every property the gate used
+              // to test is satisfied by a refusal, because a refusal really is Copilot really
+              // answering about this commit. The body is the only thing left that differs.
+              // Two shapes measured live, both on real fleet PRs:
+              //   "Copilot was unable to review this pull request because the user who requested
+              //    the review has reached their quota limit."   — 13 PRs on one repo in one day,
+              //                                                   all merged on a green check
+              //   "Copilot wasn't able to review any files in this pull request."
+              // Counting either makes the check assert "Copilot has reviewed this commit" when
+              // Copilot said the opposite in the very object being counted. That is strictly
+              // worse than the bypass label below: the label also greens, but it states plainly
+              // that no review happened and records who decided that.
+              //
+              // THE FIRST LINE, not the whole body. Every genuine review measured (100+, eight
+              // repos) opens with a markdown heading — "## Pull request overview", "### 🟢 Ready
+              // to approve" — while a refusal IS its first sentence, alone. Testing the whole
+              // body would let a PR that merely DISCUSSES quota limits produce a review whose
+              // summary quotes the phrase, and the gate would refuse to green a PR for the
+              // subject it is about. Length is not usable as a signal: a real review 119 bytes
+              // long and a refusal 119 bytes long are both in the measured set.
+              // Two alternatives, deliberately. The first catches the refusal SHAPE whatever the
+              // reason turns out to be; the second catches a reason stated without that shape
+              // ("Copilot has reached its quota limit for this repository"), which the first
+              // would read as a normal review. A refusal wording this gate does not recognise
+              // is a false green — the failure this whole change exists to remove — so the
+              // detector is built to over-reach slightly rather than to miss.
+              // NO \b BEFORE THE CONTRACTION. `\bn't able` cannot match inside "wasn't": the
+              // position between `s` and `n` sits between two word characters, so there is no
+              // boundary there, and the alternative silently never fires. Written with the
+              // boundary it read as correct and passed nothing — caught by testing the second
+              // measured refusal shape rather than only the common one.
+              const QUOTA_RE = /\b(?:quota|rate)[ -]?limits?\b/i;
+              const DECLINED_RE = new RegExp([
+                /\bunable\s+to\s+review\b/.source,
+                /(?:n[’']t|not|never)\s+able\s+to\s+review\b/.source,
+                /\b(?:cannot|can[’']t|could\s*not|couldn[’']t|will\s*not|won[’']t)\s+review\b/.source,
+                QUOTA_RE.source,
+              ].join('|'), 'i');
+              const firstLine = (b) => String(b || '').trim().split('\n')[0].trim();
+              // Kept as TEXT, not a boolean: it is Copilot's own sentence, and an operator
+              // reading the run log should see the reason in the words the producer used rather
+              // than a classification of them.
+              const declined = submitted.map((r) => firstLine(r.body)).find((l) => DECLINED_RE.test(l)) || null;
+              // AN EMPTY BODY IS NOT A REVIEW EITHER, and it has to be excluded explicitly:
+              // `DECLINED_RE.test('')` is false, so a blank first line would sail through the
+              // negation below and green the check on a review that says nothing at all. That
+              // is the same false green this whole change removes, re-entering through the one
+              // input the detector cannot classify. Unobserved in 300 Copilot reviews measured
+              // across the fleet — every one carries a body — so failing closed here costs
+              // nothing today; failing open would cost exactly what #200 cost. If it ever does
+              // happen the PR goes yellow and then stale, which is the honest state for "we
+              // have no usable review", and the label is the way past. Caught in review.
+              const reviewed = isBot || submitted.some((r) => {
+                const line = firstLine(r.body);
+                return !!line && !DECLINED_RE.test(line);
+              });
+              // Say which of the two it was. "Copilot answered with nothing" and "Copilot never
+              // answered" produce the same yellow, and without this line the run log cannot tell
+              // an operator which one they are looking at.
+              if (!reviewed && !declined && submitted.length) {
+                core.warning(`#${pr.number}: Copilot submitted ${submitted.length} review(s) for this head with an EMPTY body — not counted as a review`);
+              }
               // THE ONE WAY OUT when Copilot will not review (#311). An operator applies
               // the label; the gate honours it and SAYS SO. GitHub records who applied it and
               // when, so the bypass carries its own audit trail — unlike disabling the ruleset,
@@ -207,8 +278,16 @@ jobs:
               // distinct state would mean nothing. Setting STALE_MIN=0 still disables it
               // entirely, including un-sticking an existing failure.
               const alreadyStale = !!existing && existing.state === 'failure';
-              const stale = !reviewed && !bypassed && staleEnabled
-                && (alreadyStale || waitedMin >= STALE_MIN);
+              // A REFUSAL SKIPS THE CLOCK, and does so regardless of staleEnabled. The clock
+              // measures patience — how long a review may be late before the gate calls it
+              // absent — and a refusal is not lateness, it is the answer. Waiting the full
+              // window for a commit Copilot has already declined buys an hour of yellow and
+              // then says exactly what it could have said at minute zero. STALE_MIN=0 turns
+              // off the TIMEOUT, which is a judgement the gate makes about silence; it cannot
+              // turn off a fact the producer stated. The way past a refusal is the label —
+              // honest, audited — not a knob that makes the gate stop mentioning it.
+              const stale = !reviewed && !bypassed
+                && (!!declined || (staleEnabled && (alreadyStale || waitedMin >= STALE_MIN)));
 
 
               // NEVER green on an absent review. Success comes from a real Copilot review, a
@@ -222,7 +301,20 @@ jobs:
               // stuck PR forever, to compute a description that would never be posted. Caught
               // in review on the fleet deploy. The read now happens exactly once: at the
               // pending -> failure transition, where the description is actually chosen.
-              if (cur === want) return;
+              // …and it keys on STATE ALONE, which is not always the whole of what changed.
+              // A PR the stale clock already failed sits at `failure`; if Copilot then submits
+              // an explicit refusal, `want` is still `failure`, this returns, and the operator
+              // keeps reading "No Copilot review after N min — check the AI-credit budget" while
+              // the gate knows Copilot answered and why. Same state, different fact — and the
+              // fact is the one they act on, since a quota refusal and a "no files I can review"
+              // refusal have different remedies and neither is "wait". Caught in review.
+              //
+              // Narrow on purpose: only a decline that has not been said yet reopens the write.
+              // Comparing full descriptions instead would repost on every sweep, because the
+              // stale text carries the elapsed minutes and those keep changing — spam is exactly
+              // what this early return exists to prevent.
+              const declineAlreadySaid = /DECLINED/.test(existing?.description || '');
+              if (cur === want && (!declined || declineAlreadySaid)) return;
 
               // #157: "not asked" and "asked and silent" are different failures with different
               // fixes, and the old message sent half its readers to the wrong one. The ruleset
@@ -235,7 +327,11 @@ jobs:
               //
               // Timeline read only on the stale path — the rare case pays, the common one not.
               let neverAsked = false;
-              if (stale) {
+              // NOT on the refusal path. A refusal is proof of the opposite — Copilot cannot
+              // decline a review nobody asked it for — so the question the timeline answers is
+              // already answered, and paying up to eleven timeline requests to re-derive a
+              // `false` would be the same waste the placement of this block exists to avoid.
+              if (stale && !declined) {
                 try {
                   // Page-by-page with an EARLY EXIT, not github.paginate: one matching event
                   // answers the question, and paginate fetches the WHOLE timeline regardless.
@@ -287,11 +383,15 @@ jobs:
                   // copy of the arithmetic goes stale the same way the literals would have,
                   // except nothing fails when it does.
                   if (!asked && !sawEnd) {
-                    // THE NEXT PAGE, not a deep offset. This asked for `per_page: 1,
-                    // page: 1001` — arithmetically the same position, but expressed as the
-                    // thousand-and-first single-item page rather than the page after the last
-                    // one scanned. Same answer, a request shape the API is actually built for,
-                    // and one fewer derived constant to keep in step.
+                    // THE NEXT PAGE, not a deep offset. An EARLIER VERSION of these two lines
+                    // asked for the thousand-and-first single-item page — arithmetically the
+                    // same position as the page after the last one scanned, but expressed in a
+                    // shape the API is not built for. The request below is that same position,
+                    // said plainly, and it costs one fewer derived constant to keep in step.
+                    //
+                    // Written in the past tense on purpose: the previous wording opened with
+                    // "This asked for …" and read as a description of the code directly beneath
+                    // it, which is the one thing a comment must never be wrong about.
                     const { data: past } = await github.rest.issues.listEventsForTimeline(
                       { owner, repo, issue_number: pr.number,
                         per_page: TIMELINE_PAGE_SIZE, page: TIMELINE_MAX_PAGES + 1 });
@@ -304,9 +404,16 @@ jobs:
                   }
                 } catch (e) {
                   // Cannot tell the two apart -> keep the generic message rather than guess.
-                  core.warning(`#${pr.number}: timeline unreadable (${e.message}) — cannot distinguish never-asked from silent`);
+                  core.warning(`#${pr.number}: timeline unreadable (${e?.message ?? String(e)}) — cannot distinguish never-asked from silent`);
                 }
               }
+
+              // VERBATIM, in the run log, because a status description is capped at 140 bytes
+              // and the remediation has to fit inside it. Copilot's own sentence names the
+              // account and the limit; classifying it down to "declined" and dropping the words
+              // is how an operator ends up asking whether it is a bug or a real limit — an hour
+              // lost to exactly that, on this gate, is why the log keeps the original.
+              if (stale && declined) core.warning(`#${pr.number}: Copilot DECLINED this commit — "${declined}"`);
 
               try {
                 await github.rest.repos.createCommitStatus({
@@ -317,10 +424,19 @@ jobs:
                       ? `Bypassed via "${BYPASS_LABEL}" — Copilot did NOT review this commit`
                       : reviewed
                         ? 'Copilot has reviewed this commit'
-                        : stale
-                          ? (neverAsked
-                            ? `Copilot was never asked (outage at open?) — close this PR, open a new one from the branch, or label "${BYPASS_LABEL}"`
-                            : `No Copilot review after ${Math.round(waitedMin)} min — check the AI-credit budget, then label "${BYPASS_LABEL}"`)
+                        // Named separately from the ordinary stale message because the remedies
+                        // differ, the same way never-asked differs from silent. A quota refusal
+                        // points at the budget; a "no files I can review" refusal will never
+                        // change for this commit no matter what the budget does, and sending
+                        // that reader to check billing wastes the trip.
+                        : declined
+                          ? (QUOTA_RE.test(declined)
+                            ? `Copilot DECLINED this commit — quota/rate limit; check the AI-credit budget, then label "${BYPASS_LABEL}"`
+                            : `Copilot DECLINED to review this commit — it will not clear itself; label "${BYPASS_LABEL}" to proceed`)
+                          : stale
+                            ? (neverAsked
+                              ? `Copilot was never asked (outage at open?) — close this PR, open a new one from the branch, or label "${BYPASS_LABEL}"`
+                              : `No Copilot review after ${Math.round(waitedMin)} min — check the AI-credit budget, then label "${BYPASS_LABEL}"`)
                           // SAY THAT IT IS ALIVE. This text is all a human gets while blocked, and
                           // "Waiting…" cannot distinguish a gate that will clear itself in two
                           // minutes from one that is dead — it reads identically in both cases, so
@@ -338,7 +454,7 @@ jobs:
                           // five now has fresh reason to think the gate is dead. Naming the
                           // interval as approximate keeps the reassurance and drops the claim
                           // I cannot keep.
-                          : `Waiting for Copilot code review… (rechecked about every ${RECHECK_MIN} min; yellow until then is normal)`,
+                            : `Waiting for Copilot code review… (rechecked about every ${RECHECK_MIN} min; yellow until then is normal)`,
                 });
                 core.info(`#${pr.number} ${sha.slice(0, 8)} copilot-review=${want}`);
               } catch (e) {
@@ -355,8 +471,16 @@ jobs:
                 // unexpected exception carries no status at all, so the warning read
                 // "could not post status (undefined)" — true, useless, and on the one path that
                 // silences the gate entirely. The message is what says which of those it was.
-                core.warning(`could not post status for #${pr.number} (status=${e.status ?? 'none'}): ` +
-                  `${e.message || e} — UNEXPECTED; pull_request_target carries a writable token, ` +
+                // OPTIONAL CHAINING, because JavaScript lets you throw anything — including
+                // null and undefined. `e.status` on a thrown null is a TypeError raised INSIDE
+                // the handler whose entire job is to keep a failed POST from failing the run:
+                // the catch would take down the thing it exists to protect, and the original
+                // error would never be printed. Verified: reading .status off a thrown null
+                // raises TypeError.
+                const status = e?.status ?? 'none';
+                const detail = e?.message ?? String(e);
+                core.warning(`could not post status for #${pr.number} (status=${status}): ` +
+                  `${detail} — UNEXPECTED; pull_request_target carries a writable token, ` +
                   'so this is not the old fork denial');
               }
             }
@@ -371,6 +495,9 @@ jobs:
               });
               for (const pr of prs) {
                 try { await evaluate(pr); }
-                catch (e) { core.warning(`#${pr.number}: evaluate failed — ${e.message}`); }
+                // Same optional chaining as the POST handler below: this catch is the sweep's
+                // isolation boundary — one PR's failure must not abort the others — so it must
+                // survive a thrown null, which reading `.message` directly does not.
+                catch (e) { core.warning(`#${pr.number}: evaluate failed — ${e?.message ?? String(e)}`); }
               }
             }
