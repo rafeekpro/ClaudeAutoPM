@@ -40,10 +40,14 @@ updates:
       # entry point that colours output. Ten call-sites today:
       #   bin/commands/plugin.js, lib/cli/commands/{pm,task,epic,issue,context,prd,agent}.js,
       #   test/integration/test-{azure,github}-manual.js
-      # 6.0.0 also raises the floor to Node 22, which drops the 22.x/24.x matrix
-      # to a single row. Closed #716; taking chalk 5+ means moving the package to
-      # ESM or swapping in a CJS-compatible colour library, which is a deliberate
-      # migration and not a dependency bump.
+      # The ESM wall is the WHOLE reason. 6.0.0 also raises its floor to Node 22,
+      # but that costs nothing here: engines.node is already ">=22.0.0" and the CI
+      # matrix is [22.x, 24.x], so both rows satisfy it. (An earlier draft of this
+      # comment claimed the floor would collapse the matrix — it would not, and
+      # review caught it. A wrong reason attached to a right rule is how the rule
+      # gets reverted by someone who checks it.)
+      # Closed #716; taking chalk 5+ means moving the package to ESM or swapping
+      # in a CJS-compatible colour library — a deliberate migration, not a bump.
       - dependency-name: "chalk"
         update-types: ["version-update:semver-major"]
     
