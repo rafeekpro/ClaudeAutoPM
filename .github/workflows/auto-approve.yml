@@ -59,7 +59,7 @@ permissions:
 jobs:
   approve:
     if: github.event_name != 'schedule' || vars.AUTO_APPROVE_ENABLED != 'false'
-    uses: lagowski/pr-review-gate/.github/workflows/fleet-auto-approve.yml@07aa324b002f9b9ff900130a11f5006c6536dec3
+    uses: lagowski/pr-review-gate/.github/workflows/fleet-auto-approve.yml@724c6cd46e2582db59a00aa75816bfc9675f90c8
     with:
       runs_on: '["self-hosted","Linux","X64","build"]'
       protected_paths: '[".github/workflows/",".github/CODEOWNERS",".github/review-context.md",".github/scripts/"]'
@@ -68,6 +68,10 @@ jobs:
       # branch is a change to what may be merged unattended, and belongs in the reviewed
       # registry rather than in a repo setting anyone with admin can flip.
       base_branch: 'develop'
+      # Empty unless the repo runs sprint branches (veracrew#408). A PR into a matching
+      # branch is auto-approvable on the SAME terms as one into the trunk; the sprint ->
+      # trunk PR is not, because its base is the trunk.
+      sprint_base_pattern: ''
       # Rendered from `auto_approve_mechanical`; '[]' — no exception — is the default everywhere.
       mechanical_rules: '["canon_sync"]'
       max_changed_lines: ${{ vars.AUTO_APPROVE_MAX_LINES || '400' }}
