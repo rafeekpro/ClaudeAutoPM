@@ -1,0 +1,67 @@
+# auto-approve — CALLER. The logic lives in lagowski/pr-review-gate.
+#
+# GENERATED from lagowski/pr-review-gate (templates/auto-approve.yml) — do not edit in place;
+# change the template and re-deploy. drift-check.js reports any local edit.
+#
+# Approves what a human was approving without reading anyway — but only when every condition
+# holds, and it says which one failed when it declines. It never approves a PR that touches
+# the machinery judging it: `[".github/workflows/",".github/CODEOWNERS",".github/review-context.md",".github/scripts/"]` is rendered from THIS repo's protected set,
+# and an empty set fails the job rather than approving with nothing protected.
+#
+# `mechanical_rules` is the one narrow exception, and it is opt-in per repo: a class of PR
+# whose diff can be REPRODUCED FROM CANON (a pin bump, a faithful deployer sync) carries no new
+# decision, so the protected-path refusal and the size cap are lifted for the files the rule
+# proved — and nothing else is. '[]' means no exception at all.
+#
+#   AUTO_APPROVE_ENABLED   set to "false" to stop it without editing this file
+name: auto-approve
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: 'PR number to evaluate (blank = every open PR)'
+        required: false
+      dry_run:
+        description: 'evaluate and report, but do NOT approve'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  # `write` here as well as in the reusable workflow: a called workflow can only NARROW the
+  # caller's token, never widen it, so `read` here would cap the merge out of existence no
+  # matter what the fleet file asks for.
+  contents: write
+  pull-requests: write
+  statuses: read
+  checks: read
+
+jobs:
+  approve:
+    if: github.event_name != 'schedule' || vars.AUTO_APPROVE_ENABLED != 'false'
+    uses: lagowski/pr-review-gate/.github/workflows/fleet-auto-approve.yml@07aa324b002f9b9ff900130a11f5006c6536dec3
+    with:
+      runs_on: '["self-hosted","Linux","X64","build"]'
+      protected_paths: '[".github/workflows/",".github/CODEOWNERS",".github/review-context.md",".github/scripts/"]'
+      authors: ${{ vars.AUTO_APPROVE_AUTHORS || 'rafeekpro,Dixter999,rlagowski' }}
+      # This repo's TRUNK, from the registry. NOT a variable: pointing approval at another
+      # branch is a change to what may be merged unattended, and belongs in the reviewed
+      # registry rather than in a repo setting anyone with admin can flip.
+      base_branch: 'develop'
+      # Rendered from `auto_approve_mechanical`; '[]' — no exception — is the default everywhere.
+      mechanical_rules: '["canon_sync"]'
+      max_changed_lines: ${{ vars.AUTO_APPROVE_MAX_LINES || '400' }}
+      # The loop's LAST link: approve alone left PRs sitting APPROVED+green until a human
+      # clicked merge. Set AUTO_MERGE_ENABLED=false to get the old behaviour back.
+      enable_auto_merge: ${{ vars.AUTO_MERGE_ENABLED || 'true' }}
+      pr: ${{ github.event.inputs.pr || '' }}
+      dry_run: ${{ (github.event.inputs.dry_run || 'false') != 'false' }}
+    secrets:
+      # NAMED, never `secrets: inherit` — see the responder caller for why. Read-only access to
+      # the canon repo, used by the `canon_sync` rule to re-render what this PR claims to be.
+      # Absent (the usual case) means canon_sync can prove nothing and therefore refuses; it can
+      # never make an approval MORE likely by being missing.
+      canon_read_token: ${{ secrets.FLEET_DEPLOY_TOKEN }}
