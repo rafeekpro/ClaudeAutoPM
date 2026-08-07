@@ -17,8 +17,25 @@
 name: auto-approve
 
 on:
+  # THE SWEEP IS THE BACKSTOP, NOT THE CLOCK. This caller has always declared `*/5`, and the
+  # observed firing on 2026-08-07 was HOURLY — 17:31, 16:33, 15:36. GitHub throttles
+  # scheduled workflows under org load (the review gate's own `*/5` fires hourly for the
+  # same reason), so no cron value here buys latency. A mechanical PR opened at 17:52 waited
+  # for a sweep that had already run at 17:31.
   schedule:
     - cron: '*/5 * * * *'
+  # ...so the LATENCY comes from an event instead. `check_suite: completed` fires exactly
+  # when the answer can change from "not yet" to "approve": the gate has finished and the PR
+  # is green or it is not. Everything the run then does is unchanged — same allowlist, same
+  # mechanical proof, same protected-path refusal — it simply happens seconds after the
+  # checks rather than up to an hour later.
+  #
+  # KEEPING BOTH IS THE POINT, and it is the pattern the fleet already runs on: the event
+  # gives speed, the sweep gives completeness. A missed webhook, a PR whose checks finished
+  # while this workflow was itself being deployed, a repo that went quiet mid-flight — the
+  # hourly pass still finds them. Approval is idempotent, so the overlap costs nothing.
+  check_suite:
+    types: [completed]
   workflow_dispatch:
     inputs:
       pr:
