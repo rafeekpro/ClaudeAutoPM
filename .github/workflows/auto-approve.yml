@@ -13,7 +13,9 @@
 # decision, so the protected-path refusal and the size cap are lifted for the files the rule
 # proved — and nothing else is. '[]' means no exception at all.
 #
-#   AUTO_APPROVE_ENABLED   set to "false" to stop it without editing this file
+#   AUTO_APPROVE_ENABLED   set to "false" to stop it without editing this file — gates
+#                          EVERY trigger (cron, check_suite, dispatch); a human overrides
+#                          a stopped switch with the `force` dispatch input
 name: auto-approve
 
 on:
@@ -38,6 +40,11 @@ on:
     types: [completed]
   workflow_dispatch:
     inputs:
+      force:
+        description: 'run even when AUTO_APPROVE_ENABLED=false (human override)'
+        required: false
+        type: boolean
+        default: false
       pr:
         description: 'PR number to evaluate (blank = every open PR)'
         required: false
@@ -58,8 +65,15 @@ permissions:
 
 jobs:
   approve:
-    if: github.event_name != 'schedule' || vars.AUTO_APPROVE_ENABLED != 'false'
-    uses: lagowski/pr-review-gate/.github/workflows/fleet-auto-approve.yml@724c6cd46e2582db59a00aa75816bfc9675f90c8
+    # Opt-OUT gating EVERY trigger. The old form (`event_name != 'schedule' || vars...`)
+    # short-circuited TRUE for check_suite and workflow_dispatch, so the flag was consulted
+    # only for the cron — and check_suite:completed is the PRIMARY path (the comments above
+    # call the sweep "the backstop, not the clock"). An operator hitting the documented
+    # emergency stop could not stop the two triggers that actually approve. Same defect
+    # copilot-comment-responder.yml already fixed: a kill switch that kills nothing.
+    # A human still overrides with `force`, so turning it off never blocks a person.
+    if: vars.AUTO_APPROVE_ENABLED != 'false' || github.event.inputs.force == 'true'
+    uses: lagowski/pr-review-gate/.github/workflows/fleet-auto-approve.yml@941c05bdc396111430091cee4fb465c911a0ac44
     with:
       runs_on: '["self-hosted","Linux","X64","build"]'
       protected_paths: '[".github/workflows/",".github/CODEOWNERS",".github/review-context.md",".github/scripts/"]'

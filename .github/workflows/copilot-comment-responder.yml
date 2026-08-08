@@ -73,7 +73,7 @@ jobs:
     # that kills nothing. A human overrides with the `force` input, so turning it off still
     # never blocks a person.
     if: vars.RESPONDER_SCHEDULE_ENABLED != 'false' || github.event.inputs.force == 'true'
-    uses: lagowski/pr-review-gate/.github/workflows/fleet-copilot-comment-responder.yml@724c6cd46e2582db59a00aa75816bfc9675f90c8
+    uses: lagowski/pr-review-gate/.github/workflows/fleet-copilot-comment-responder.yml@941c05bdc396111430091cee4fb465c911a0ac44
     with:
       runs_on: '["self-hosted","claude-bridge"]'
       pr: ${{ github.event.inputs.pr || '' }}
