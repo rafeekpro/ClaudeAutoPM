@@ -73,7 +73,7 @@ jobs:
     # copilot-comment-responder.yml already fixed: a kill switch that kills nothing.
     # A human still overrides with `force`, so turning it off never blocks a person.
     if: vars.AUTO_APPROVE_ENABLED != 'false' || github.event.inputs.force == 'true'
-    uses: lagowski/pr-review-gate/.github/workflows/fleet-auto-approve.yml@096a574dba9c4decccca92726a40159cc8ba6b96
+    uses: lagowski/pr-review-gate/.github/workflows/fleet-auto-approve.yml@a2b45ab09af511ce83f46dcb8ebd559e0b39c142
     with:
       runs_on: '["self-hosted","Linux","X64","build"]'
       protected_paths: '[".github/workflows/",".github/CODEOWNERS",".github/review-context.md",".github/scripts/"]'
