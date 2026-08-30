@@ -12,9 +12,11 @@ const defaultProject = {
   description: 'Test Project'
 };
 
-// Create the mock WIT API
+// Create the mock WIT API.
+// NOTE: only methods that genuinely exist on WorkItemTrackingApi belong here.
+// getProject lives on CoreApi — mocking it here previously made a broken
+// authenticate() look correct in every test. See test/unit/azure-api-surface.test.js.
 const mockWorkItemTrackingApi = {
-  getProject: jest.fn(),
   getWorkItem: jest.fn(),
   getWorkItems: jest.fn(),
   createWorkItem: jest.fn(),
@@ -27,11 +29,17 @@ const mockWorkItemTrackingApi = {
   queryByWiql: jest.fn()
 };
 
-// Set default resolved value for getProject
-mockWorkItemTrackingApi.getProject.mockResolvedValue(defaultProject);
+// Create the mock Core API (project lookup lives here).
+const mockCoreApi = {
+  getProject: jest.fn(),
+  getProjects: jest.fn()
+};
+
+mockCoreApi.getProject.mockResolvedValue(defaultProject);
 
 const mockWebApi = jest.fn().mockImplementation(() => ({
-  getWorkItemTrackingApi: jest.fn().mockResolvedValue(mockWorkItemTrackingApi)
+  getWorkItemTrackingApi: jest.fn().mockResolvedValue(mockWorkItemTrackingApi),
+  getCoreApi: jest.fn().mockResolvedValue(mockCoreApi)
 }));
 
 const mockPersonalAccessTokenHandler = jest.fn().mockImplementation((token) => ({
@@ -42,7 +50,7 @@ const mockPersonalAccessTokenHandler = jest.fn().mockImplementation((token) => (
 
 // Export a reset function to restore default mocks
 const resetMocks = () => {
-  mockWorkItemTrackingApi.getProject.mockResolvedValue(defaultProject);
+  mockCoreApi.getProject.mockResolvedValue(defaultProject);
 };
 
 module.exports = {
@@ -50,5 +58,6 @@ module.exports = {
   getPersonalAccessTokenHandler: mockPersonalAccessTokenHandler,
   // Export the mock API for direct access in tests
   __mockWorkItemTrackingApi: mockWorkItemTrackingApi,
+  __mockCoreApi: mockCoreApi,
   __resetMocks: resetMocks
 };
