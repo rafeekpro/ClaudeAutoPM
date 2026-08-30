@@ -56,8 +56,8 @@ Want to contribute?
 
 ### Prerequisites
 
-- Node.js >= 16.0.0
-- npm >= 8.0.0
+- Node.js >= 22.0.0
+- npm >= 10.0.0
 - Git
 - Claude Code CLI (for testing)
 
