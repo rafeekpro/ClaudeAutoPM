@@ -1,6 +1,6 @@
 {
   "name": "@claudeautopm/plugin-languages",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Complete programming languages plugin with Python, JavaScript, Node.js, Bash experts, language rules, and example scripts for ClaudeAutoPM",
   "main": "plugin.json",
   "type": "module",
@@ -56,7 +56,7 @@
     "npm": ">=10.0.0"
   },
   "peerDependencies": {
-    "@claudeautopm/plugin-core": "^3.0.0"
+    "@claudeautopm/plugin-core": "^4.0.0"
   },
   "publishConfig": {
     "access": "public",

@@ -102,7 +102,7 @@ Query Context7 before implementing|mcp://context7/[lib]/[topic]
 
 <rule id="quality" priority="HIGH">
 No partial implementations|No TODOs without tests|100% coverage for new code
-📖 .claude/rules/naming-conventions.md
+📖 .claude/rules/naming-conventions.xml
 </rule>
 
 <rule id="git" priority="MEDIUM">

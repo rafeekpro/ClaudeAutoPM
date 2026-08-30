@@ -43,7 +43,7 @@ describe('AzureDevOpsClient', () => {
 
     mockWorkApi = {
       getTeamIterations: jest.fn(),
-      getCapacities: jest.fn()
+      getCapacitiesWithIdentityRefAndTotals: jest.fn()
     };
 
     // Mock connection
@@ -394,12 +394,12 @@ describe('AzureDevOpsClient', () => {
       const mockCapacity = [{ teamMember: { displayName: 'User 1' }, activities: [] }];
 
       mockWorkApi.getTeamIterations.mockResolvedValue([mockIteration]);
-      mockWorkApi.getCapacities.mockResolvedValue(mockCapacity);
+      mockWorkApi.getCapacitiesWithIdentityRefAndTotals.mockResolvedValue(mockCapacity);
 
       const result = await client.getTeamCapacity();
 
       expect(result).toBe(mockCapacity);
-      expect(mockWorkApi.getCapacities).toHaveBeenCalledWith(
+      expect(mockWorkApi.getCapacitiesWithIdentityRefAndTotals).toHaveBeenCalledWith(
         { project: 'test-project', team: 'test-team' },
         'iter1'
       );

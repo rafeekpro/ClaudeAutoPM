@@ -129,7 +129,7 @@ Show the command syntax:
 
 Validate prerequisites (minimal checks only):
 
-```markdown
+````markdown
 ## Quick Check
 
 ```bash
@@ -144,7 +144,7 @@ test -f .pm/config.json || echo "Missing config. Run: /pm:init"
 - Check only critical prerequisites
 - Trust the system (do not over-validate)
 - Provide exact fix commands
-```
+````
 
 ### 5. Instructions Section
 
@@ -206,7 +206,7 @@ Document common issues:
 
 Define expected output:
 
-```markdown
+````markdown
 ## Output
 
 ### Success (table format)
@@ -242,13 +242,13 @@ Next: /pm:epic-show authentication
 No epics found.
 Create one with: /pm:epic-create <name>
 ```
-```
+````
 
 ### 8. Examples Section
 
 Show practical usage:
 
-```markdown
+````markdown
 ## Examples
 
 ### List all epics
@@ -274,7 +274,7 @@ Show practical usage:
 ```
 /pm:epic-list --status backlog --format markdown
 ```
-```
+````
 
 ### 9. Arguments Marker
 
@@ -491,7 +491,7 @@ Wait for agent response before proceeding.
 
 ## Complete Example: epic-show
 
-```markdown
+````markdown
 ---
 allowed-tools: Read, LS, Glob
 ---
@@ -625,7 +625,7 @@ Next: /pm:issue-start authentication-6
 ```
 
 $ARGUMENTS
-```
+````
 
 ## Command Categories
 

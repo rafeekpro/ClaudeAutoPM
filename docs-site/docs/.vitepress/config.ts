@@ -4,6 +4,10 @@ export default defineConfig({
   title: 'ClaudeAutoPM',
   description: 'AI-Powered Project Management Framework for Claude Code',
 
+  // GitHub Pages project site: https://lagowski.github.io/ClaudeAutoPM/
+  // Without this every absolute asset and link 404s in production.
+  base: '/ClaudeAutoPM/',
+
   head: [
     ['link', { rel: 'icon', href: '/favicon.ico' }]
   ],

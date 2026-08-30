@@ -24,6 +24,32 @@ updates:
       # ora 9.x is pure ESM, incompatible with our CommonJS codebase
       - dependency-name: "ora"
         update-types: ["version-update:semver-major"]
+      # js-yaml 5.x is a breaking major: yaml.load() throws on empty input
+      # (was undefined in 4.x), default schema shifts YAML 1.1 -> 1.2
+      # (CORE_SCHEMA), !!set/!!merge semantics changed. Three load() call-sites
+      # need audited empty-input guards + schema review before we can migrate:
+      #   lib/services/UtilityService.js:770
+      #   autopm/.claude/scripts/start-parallel-streams.js:42
+      #   autopm/.claude/scripts/decompose-issue.js:320
+      # Closed #691 per owner go-ahead; migration deferred to a dedicated PR.
+      - dependency-name: "js-yaml"
+        update-types: ["version-update:semver-major"]
+      # chalk 5.x+ is pure ESM — same wall as ora above. `require('chalk')` in a
+      # CommonJS file throws `SyntaxError: Cannot use import statement outside a
+      # module` at load time, so the bump does not fail a test, it fails every
+      # entry point that colours output. Ten call-sites today:
+      #   bin/commands/plugin.js, lib/cli/commands/{pm,task,epic,issue,context,prd,agent}.js,
+      #   test/integration/test-{azure,github}-manual.js
+      # The ESM wall is the WHOLE reason. 6.0.0 also raises its floor to Node 22,
+      # but that costs nothing here: engines.node is already ">=22.0.0" and the CI
+      # matrix is [22.x, 24.x], so both rows satisfy it. (An earlier draft of this
+      # comment claimed the floor would collapse the matrix — it would not, and
+      # review caught it. A wrong reason attached to a right rule is how the rule
+      # gets reverted by someone who checks it.)
+      # Closed #716; taking chalk 5+ means moving the package to ESM or swapping
+      # in a CJS-compatible colour library — a deliberate migration, not a bump.
+      - dependency-name: "chalk"
+        update-types: ["version-update:semver-major"]
     
   # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"

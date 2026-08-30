@@ -13,6 +13,8 @@ ClaudeAutoPM transforms your development workflow with intelligent automation, s
 
 ## Quick Install
 
+Requires Node.js >= 22 and npm >= 10.
+
 ```bash
 npm install -g claude-autopm
 cd your-project
@@ -23,13 +25,13 @@ Choose your scenario during installation:
 
 | Scenario | Agents | Use case |
 |----------|--------|----------|
-| **Lite** | 7 core | Minimal token footprint |
+| **Lite** | 7 core | Local PM only, minimal token footprint |
 | **GitHub** | 12 | Core + languages for GitHub projects |
-| **Azure** | 14 | Core + languages + Azure DevOps |
-| **Docker** | 16 | Core + DevOps + containers |
-| **Obsidian** | 12 | PM + Obsidian vault integration |
-| **Full** | 44+ | All plugins, all agents |
-| **Performance** | 44+ | Full + max parallelization |
+| **Azure** | 12 | Core + languages + Azure DevOps sync |
+| **Docker** | 26 | Core + languages + frameworks + testing + DevOps |
+| **Obsidian** | 7 core | PM + Obsidian vault integration |
+| **Full** | 45+ | Complete CI/CD: cloud, databases, AI included |
+| **Performance** | 55+ | All plugins (incl. data + ML) + max parallelization |
 
 ---
 
@@ -41,14 +43,14 @@ ClaudeAutoPM uses a **plugin architecture** for token efficiency. Only 7 core ag
 
 ```
 autopm/.claude/agents/       ← 7 core agents (always available)
-packages/plugin-*/agents/    ← 37+ specialized agents (per plugin)
+packages/plugin-*/agents/    ← 50+ specialized agents (per plugin)
 ```
 
 **Token savings**: Lite installs use 73% fewer agent tokens vs full.
 
 ### XML Rules Engine
 
-7 critical rules auto-loaded via `@include` in XML format:
+8 critical rules auto-loaded via `@include` in XML format:
 
 | Rule | Enforcement |
 |------|-------------|
@@ -59,6 +61,7 @@ packages/plugin-*/agents/    ← 37+ specialized agents (per plugin)
 | `github-operations.xml` | Repo protection + mandatory issue footer |
 | `naming-conventions.xml` | Naming prohibitions + code quality |
 | `command-pipelines.xml` | 5 mandatory command sequences |
+| `issue-structure.xml` | Standard GitHub issue structure (goal, criteria, verification) |
 
 3 MD operational guides: `standard-patterns.md`, `frontmatter-operations.md`, `git-strategy.md`
 
@@ -101,13 +104,13 @@ packages/plugin-*/agents/    ← 37+ specialized agents (per plugin)
 |--------|--------|----------|
 | **plugin-languages** | 5 | python-backend-engineer, nodejs-backend-engineer, bash-scripting-expert |
 | **plugin-frameworks** | 6 | react-frontend-engineer, tailwindcss-expert, e2e-test-engineer |
-| **plugin-cloud** | 8 | aws-cloud-architect, kubernetes-orchestrator, terraform-expert |
-| **plugin-devops** | 7 | docker-expert, github-operations-specialist, observability-engineer |
+| **plugin-cloud** | 8 | aws-cloud-architect, kubernetes-orchestrator, terraform-infrastructure-expert |
+| **plugin-devops** | 7 | docker-containerization-expert, github-operations-specialist, observability-engineer |
 | **plugin-databases** | 5 | postgresql-expert, mongodb-expert, redis-expert |
 | **plugin-ai** | 8 | openai-python-expert, gemini-api-expert, langchain-expert |
 | **plugin-data** | 3 | airflow-orchestration-expert, kedro-pipeline-expert |
-| **plugin-testing** | 2 | frontend-testing-engineer, e2e specialists |
-| **plugin-ml** | 2 | ML workflow agents |
+| **plugin-testing** | 1 | frontend-testing-engineer |
+| **plugin-ml** | 10 | pytorch-expert, tensorflow-keras-expert, scikit-learn-expert |
 | **plugin-pm** | — | 29 PM commands (PRD, epic, issue management) |
 
 ---
@@ -119,11 +122,11 @@ All commands run inside Claude Code (not terminal):
 ```bash
 # Initialize context and testing
 /context:create
-/testing:prime
+/test:test-setup
 
 # PM workflow
 /pm:issue-start 42
-/pm:issue-finish 42
+/pm:issue-close 42
 
 # Working with agents
 @python-backend-engineer Build FastAPI endpoint
@@ -148,7 +151,8 @@ All commands run inside Claude Code (not terminal):
 - **DevOps** — Docker, Kubernetes, Traefik, SSH, observability
 - **Cloud** — AWS, Azure, GCP, Terraform, serverless
 - **Databases** — PostgreSQL, MongoDB, BigQuery, CosmosDB, Redis
-- **AI/ML** — OpenAI, Gemini, LangChain, HuggingFace
+- **AI** — OpenAI, Gemini, Claude, LangChain, HuggingFace
+- **ML** — PyTorch, TensorFlow/Keras, scikit-learn, AutoML
 - **Data** — Airflow, Kedro, LangGraph
 
 ### Provider Integration
@@ -181,8 +185,8 @@ All commands run inside Claude Code (not terminal):
 |---------|--------------|-------------------|
 | AI-native | Built for Claude Code | Adapted/retrofitted |
 | Token-efficient | Plugin system, install what you need | Monolithic |
-| Agents | 44+ specialized, load on demand | Generic or none |
-| Rules | 7 XML auto-enforced (TDD, coverage, Context7) | Manual checklists |
+| Agents | 50+ specialized, load on demand | Generic or none |
+| Rules | 8 XML auto-enforced (TDD, coverage, Context7) | Manual checklists |
 | Integration | GitHub + Azure DevOps | Limited |
 | Documentation | Context7-verified, always current | Often outdated |
 

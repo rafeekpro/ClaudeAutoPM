@@ -330,7 +330,7 @@ autopm validate
 
 ## Related Pages
 
-- [Configuration Options](Configuration-Options)
-- [Feature Toggles](Feature-Toggles)
-- [Azure DevOps Integration](Azure-DevOps-Integration)
-- [GitHub Actions](GitHub-Actions)
+- [Configuration Options](/reference/configuration)
+- [Feature Toggles](/reference/feature-toggles)
+- [Azure DevOps Integration](/commands/azure-devops)
+- GitHub Actions

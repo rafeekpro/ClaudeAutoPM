@@ -26,6 +26,7 @@ const azdev = require('azure-devops-node-api');
 describe('AzureDevOpsProvider', () => {
   let provider;
   let mockWitApi;
+  let mockCoreApi;
 
   beforeEach(() => {
     // Clear all mocks before each test
@@ -38,6 +39,8 @@ describe('AzureDevOpsProvider', () => {
 
     // Get reference to mock WIT API
     mockWitApi = azdev.__mockWorkItemTrackingApi;
+    // Project lookup is a Core API call, not Work Item Tracking.
+    mockCoreApi = azdev.__mockCoreApi;
 
     // Restore default mock implementations
     azdev.__resetMocks();
@@ -143,7 +146,7 @@ describe('AzureDevOpsProvider', () => {
 
       await provider.authenticate();
 
-      expect(mockWitApi.getProject).toHaveBeenCalledWith('test-project');
+      expect(mockCoreApi.getProject).toHaveBeenCalledWith('test-project');
     });
 
     test('should throw error if project not found', async () => {
@@ -153,7 +156,7 @@ describe('AzureDevOpsProvider', () => {
         project: 'nonexistent-project'
       });
 
-      mockWitApi.getProject.mockResolvedValue(null);
+      mockCoreApi.getProject.mockResolvedValue(null);
 
       await expect(provider.authenticate()).rejects.toThrow(
         'Project not found or access denied'
