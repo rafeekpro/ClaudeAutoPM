@@ -749,7 +749,7 @@ autopm validate --repair
 
 ## Related Pages
 
-- [Installation Guide](Installation-Guide) - Proper installation steps
-- [Configuration Options](Configuration-Options) - Configuration reference
-- [GitHub Actions](GitHub-Actions) - CI/CD troubleshooting
-- [Testing Strategies](Testing-Strategies) - Test troubleshooting
+- [Installation Guide](/getting-started/installation) - Proper installation steps
+- [Configuration Options](/reference/configuration) - Configuration reference
+- GitHub Actions - CI/CD troubleshooting
+- [Testing Strategies](/developer-guide/testing) - Test troubleshooting

@@ -513,7 +513,7 @@ Create custom aliases in `.claude/commands/pm/aliases.md`:
 
 ## Related Pages
 
-- [Azure DevOps Integration](Azure-DevOps-Integration)
-- [Configuration Options](Configuration-Options)
-- [Agent Selection Guide](Agent-Selection-Guide)
-- [Testing Strategies](Testing-Strategies)
+- [Azure DevOps Integration](/commands/azure-devops)
+- [Configuration Options](/reference/configuration)
+- [Agent Selection Guide](/agents/selection-guide)
+- [Testing Strategies](/developer-guide/testing)

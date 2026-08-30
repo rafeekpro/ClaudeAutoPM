@@ -598,10 +598,10 @@ autopm config
 
 ## 📖 Related Documentation
 
-- **[Configuration Options](Configuration-Options.md)** - Detailed configuration guide
-- **[Installation Guide](Installation-Guide.md)** - Step-by-step installation
-- **[Feature Toggles](Feature-Toggles.md)** - Feature management
-- **[Troubleshooting](Troubleshooting.md)** - Common issues and solutions
+- **[Configuration Options](/reference/configuration)** - Detailed configuration guide
+- **[Installation Guide](/getting-started/installation)** - Step-by-step installation
+- **[Feature Toggles](/reference/feature-toggles)** - Feature management
+- **[Troubleshooting](/reference/troubleshooting)** - Common issues and solutions
 
 ## 💡 Tips & Tricks
 

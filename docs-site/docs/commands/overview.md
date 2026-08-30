@@ -334,7 +334,7 @@ autopm pm:epic-new -i
 
 ## Next Steps
 
-- Learn specific [Core Commands](/commands/guide)
-- Explore [Project Management Commands](/commands/pm-init)
-- Understand [Azure DevOps Commands](/commands/azure-init)
-- Read about [CLI Usage](/commands/cli-usage) patterns
+- Learn specific [Core Commands](/commands/cli-reference)
+- Explore [Project Management Commands](/commands/pm-commands)
+- Understand [Azure DevOps Commands](/commands/azure-devops)
+- Read about [CLI Usage](/commands/cli-reference) patterns

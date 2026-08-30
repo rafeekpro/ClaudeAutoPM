@@ -374,7 +374,7 @@ bash .claude/scripts/config/toggle-features.sh
 
 ## Related Pages
 
-- [Configuration Options](Configuration-Options)
-- [Environment Variables](Environment-Variables)
-- [Docker First Development](Docker-First-Development)
-- [Kubernetes Integration](Kubernetes-Integration)
+- [Configuration Options](/reference/configuration)
+- [Environment Variables](/reference/environment-vars)
+- Docker First Development
+- Kubernetes Integration

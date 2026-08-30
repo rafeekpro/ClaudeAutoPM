@@ -487,7 +487,7 @@ steps:
 
 ## Related Pages
 
-- [PM Commands](PM-Commands)
-- [Configuration Options](Configuration-Options)
-- [GitHub Actions](GitHub-Actions)
-- [Testing Strategies](Testing-Strategies)
+- [PM Commands](/commands/pm-commands)
+- [Configuration Options](/reference/configuration)
+- GitHub Actions
+- [Testing Strategies](/developer-guide/testing)
