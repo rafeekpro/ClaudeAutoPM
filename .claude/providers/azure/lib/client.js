@@ -165,7 +165,7 @@ class AzureDevOpsClient {
       team: this.team
     };
 
-    return await work.getCapacities(
+    return await work.getCapacitiesWithIdentityRefAndTotals(
       teamContext,
       iteration.id
     );
