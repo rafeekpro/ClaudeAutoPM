@@ -69,7 +69,7 @@
     "npm": ">=10.0.0"
   },
   "peerDependencies": {
-    "@claudeautopm/plugin-core": "^3.0.0"
+    "@claudeautopm/plugin-core": "^4.0.0"
   },
   "publishConfig": {
     "access": "public",
