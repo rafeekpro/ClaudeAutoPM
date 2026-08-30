@@ -1,30 +1,34 @@
 ## Project Management
 
-This project uses local development workflow without CI/CD automation.
+> **FILL IN — generated placeholder.** The installer could not determine this
+> project's CI/CD arrangement, so it made no assumption. Replace this section
+> with what is actually true: name the provider (GitHub Actions, Azure
+> Pipelines, GitLab CI, …) and how it is triggered, or state plainly that the
+> project runs no CI and verification is manual.
 
 ### Development Workflow
 
 1. **Local Development**
    - Make changes locally
-   - Run tests manually
-   - Commit when ready
+   - Run tests before pushing
+   - Keep commits small and focused
 
-2. **Manual Testing**
-   - Test changes locally before committing
-   - Use project-specific test commands
-   - Verify functionality manually
+2. **Verification**
+   - FILL IN: the commands that must pass before a change is proposed
+   - FILL IN: whether they run locally, in CI, or both
 
 3. **Deployment**
-   - Deploy manually as needed
-   - Follow project-specific deployment procedures
-   - Coordinate with team for releases
+   - FILL IN: how a change reaches production, and who triggers it
 
 ### Version Control
-```bash
-# Standard git workflow
-git add .
-git commit -m "Your message"
-git push origin main
-```
 
-Focus on code quality and manual verification before commits.
+Branch-based workflow (see the git rules and prohibitions above — direct
+commits to the default branch are not permitted):
+
+```bash
+git checkout -b feature/{description}
+git add .
+git commit -m "{type}({scope}): {description}"
+git push -u origin feature/{description}
+# Open a PR for review
+```
