@@ -1,6 +1,7 @@
 ---
 # https://vitepress.dev/reference/default-theme-home-page
 layout: home
+markdownStyles: false
 
 hero:
   name: "ClaudeAutoPM"
@@ -9,10 +10,10 @@ hero:
   actions:
     - theme: brand
       text: Get Started
-      link: /guide/getting-started
+      link: /getting-started/
     - theme: alt
       text: Interactive Setup
-      link: /guide/interactive-setup
+      link: /getting-started/installation
     - theme: alt
       text: View on GitHub
       link: https://github.com/rafeekpro/ClaudeAutoPM
@@ -83,7 +84,7 @@ features:
 
 .content-container strong {
   font-weight: 600;
-  color: var(--vp-c-brand);
+  color: var(--vp-c-brand-1);
 }
 </style>
 
