@@ -13,7 +13,7 @@
     "registry": "https://registry.npmjs.org"
   },
   "peerDependencies": {
-    "@claudeautopm/plugin-core": "^3.0.0"
+    "@claudeautopm/plugin-core": "^4.0.0"
   },
   "engines": {
     "node": ">=22.0.0"
