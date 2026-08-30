@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Plugin peer ranges on `@claudeautopm/plugin-core` corrected from `^3.0.0` to `^4.0.0` in the twelve plugins that declare one (PR #758). The 4.0.0 release bumped every package's `version` and `engines` but not the peer ranges, so `npm ci` failed with `ERESOLVE` — npm tried to satisfy the peer with the stale `plugin-core@3.13.1` tarball instead of the workspace link. Hidden since 2026-06-22 because every CI workflow installs with `--legacy-peer-deps`, which skips peer resolution.
+- `test/unit/plugin-peer-versions.test.js` added as a regression guard: each declared peer range must match `plugin-core`'s current major, and no plugin may silently lack a peer.
+
+### Changed
+- The twelve affected plugins bumped to `4.0.1` (`plugin-obsidian` to `2.0.1`) so the corrected peer range reaches npm. The published `4.0.0` / `2.0.0` tarballs carry the broken `^3.0.0` peer, and npm does not allow overwriting a published version — users installing a plugin alongside `plugin-core@4` hit `ERESOLVE` until these ship.
+- `plugin-core` and `plugin-testing` are deliberately **not** bumped: neither declares a `plugin-core` peer range, so their published tarballs are correct and need no republish.
+
 ## [4.0.0] - 2026-06-22
 
 **Breaking — Node.js floor raised to 22.0.0.**
