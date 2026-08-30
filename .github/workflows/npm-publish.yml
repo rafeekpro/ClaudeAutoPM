@@ -14,7 +14,7 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: '22'
-      - run: npm ci --legacy-peer-deps
+      - run: npm ci
       - run: npm test
 
   publish:
@@ -37,7 +37,7 @@ jobs:
       # path. Note: this swaps only the npm binary — the auth config written
       # by setup-node lives in $NPM_CONFIG_USERCONFIG and is unaffected.
       - run: npm install -g npm@11.16.0 --ignore-scripts
-      - run: npm ci --legacy-peer-deps
+      - run: npm ci
       # Tests gate this job via `needs: test` above — a red suite never
       # reaches publish. NODE_AUTH_TOKEN kept as a fallback: with a Trusted
       # Publisher configured on npmjs.com, npm >= 11.5.1 uses OIDC; until
