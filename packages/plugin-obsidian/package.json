@@ -1,6 +1,6 @@
 {
   "name": "@claudeautopm/plugin-obsidian",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Obsidian vault integration plugin for ClaudeAutoPM \u2014 sync, Dataview, Mermaid, and Excalidraw support",
   "main": "plugin.json",
   "type": "module",

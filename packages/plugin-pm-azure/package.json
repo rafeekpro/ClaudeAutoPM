@@ -1,6 +1,6 @@
 {
   "name": "@claudeautopm/plugin-pm-azure",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Azure DevOps provider for ClaudeAutoPM PM system",
   "main": "plugin.json",
   "files": [
