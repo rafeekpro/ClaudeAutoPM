@@ -1,17 +1,17 @@
 ---
 title: Architecture
-description: ClaudeAutoPM v3.14.0 project architecture, plugin system, providers, and XML rules
+description: ClaudeAutoPM v4.0.0 project architecture, plugin system, providers, and XML rules
 ---
 
 # Project Architecture
 
-ClaudeAutoPM v3.14.0 follows a plugin-based architecture with 13 npm packages, a provider router for issue tracking, and an XML rules system for token-efficient context loading.
+ClaudeAutoPM v4.0.0 follows a plugin-based architecture with 13 npm packages, a provider router for issue tracking, and an XML rules system for token-efficient context loading.
 
 ## High-Level Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     ClaudeAutoPM v3.14.0                        │
+│                     ClaudeAutoPM v4.0.0                         │
 ├─────────────────────────────────────────────────────────────────┤
 │  CLI Layer (bin/)                                               │
 │  ├── autopm.js (main entry point)                               │

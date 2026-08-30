@@ -1,11 +1,11 @@
 ---
 title: Installation
-description: Complete installation guide for ClaudeAutoPM v3.14.0 with all scenarios and configuration options
+description: Complete installation guide for ClaudeAutoPM v4.0.0 with all scenarios and configuration options
 ---
 
 # Installation Guide
 
-This guide covers npm/npx installation methods and configuration options for ClaudeAutoPM v3.14.0. For the shell-based installer, see `install/install.sh`.
+This guide covers npm/npx installation methods and configuration options for ClaudeAutoPM v4.0.0. For the shell-based installer, see `install/install.sh`.
 
 ## System Requirements
 
@@ -13,8 +13,8 @@ This guide covers npm/npx installation methods and configuration options for Cla
 
 | Requirement | Minimum Version |
 |-------------|-----------------|
-| Node.js | >= 16.0.0 (>= 18.0.0 recommended; plugins require 18+) |
-| npm | >= 8.0.0 |
+| Node.js | >= 22.0.0 |
+| npm | >= 10.0.0 |
 | Git | Latest stable |
 
 ### Platform Support

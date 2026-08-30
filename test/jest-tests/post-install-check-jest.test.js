@@ -398,8 +398,11 @@ describe('PostInstallChecker', () => {
 
       const nodeCheck = checker.results.optional.find(r => r.name === 'Node.js version');
       expect(nodeCheck).toBeDefined();
-      // Should always pass as test is running in Node
-      expect(nodeCheck.status).toBe(true);
+      // The gate mirrors engines.node (>=22), so the expected result depends on
+      // the runtime running this suite — it is not a constant. Asserting `true`
+      // silently assumed the old >=18 floor and fails on Node 20.
+      const major = Number(process.versions.node.split('.')[0]);
+      expect(nodeCheck.status).toBe(major >= 22);
     });
   });
 

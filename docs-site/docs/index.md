@@ -6,7 +6,7 @@ markdownStyles: false
 hero:
   name: "ClaudeAutoPM"
   text: "Plugin-Based AI Project Management"
-  tagline: Ship faster with spec-driven development, 7 core agents, and 13 optional plugins — v3.14.0
+  tagline: Ship faster with spec-driven development, 7 core agents, and 13 optional plugins — v4.0.0
   actions:
     - theme: brand
       text: Get Started

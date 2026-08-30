@@ -359,7 +359,7 @@ MIT © ClaudeAutoPM Team
 
 ## 🎯 Compatibility
 
-- **Node.js:** >= 16.0.0
+- **Node.js:** >= 22.0.0
 - **ClaudeAutoPM:** >= 3.0.0
 - **Plugin Core:** ^2.0.0
 
