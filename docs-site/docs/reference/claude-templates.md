@@ -426,7 +426,7 @@ diff CLAUDE.md.backup CLAUDE.md
 
 ## Related Pages
 
-- [Configuration Options](Configuration-Options)
-- [First Project](First-Project)
-- [Custom Agents](Custom-Agents)
-- [Docker First Development](Docker-First-Development)
+- [Configuration Options](/reference/configuration)
+- [First Project](/getting-started/first-project)
+- [Custom Agents](/agents/custom-agents)
+- Docker First Development

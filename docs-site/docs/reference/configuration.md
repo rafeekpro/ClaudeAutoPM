@@ -318,7 +318,7 @@ Your configuration automatically affects:
 
 ## 📋 Next Steps
 
-- **[Quick Start](Quick-Start.md)** - Set up your first project
-- **[Docker-First Development](Docker-First-Development.md)** - Learn Docker workflow
-- **[Kubernetes Integration](Kubernetes-Integration.md)** - Master K8s testing
-- **[Feature Toggles](Feature-Toggles.md)** - Detailed toggle documentation
+- **[Quick Start](/getting-started/first-project)** - Set up your first project
+- **Docker-First Development** - Learn Docker workflow
+- **Kubernetes Integration** - Master K8s testing
+- **[Feature Toggles](/reference/feature-toggles)** - Detailed toggle documentation

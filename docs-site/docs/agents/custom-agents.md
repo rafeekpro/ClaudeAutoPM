@@ -644,7 +644,7 @@ grep "my-agent" .claude/agents/AGENT-REGISTRY.md
 
 ## Related Pages
 
-- [Agent Registry](Agent-Registry) - Complete list of available agents
-- [Agent Selection Guide](Agent-Selection-Guide) - How to choose agents
-- [Configuration Options](Configuration-Options) - Agent configuration
-- [Testing Strategies](Testing-Strategies) - Testing custom agents
+- [Agent Registry](/agents/registry) - Complete list of available agents
+- [Agent Selection Guide](/agents/selection-guide) - How to choose agents
+- [Configuration Options](/reference/configuration) - Agent configuration
+- [Testing Strategies](/developer-guide/testing) - Testing custom agents

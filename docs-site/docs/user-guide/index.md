@@ -99,7 +99,7 @@ Before diving into this guide, ensure you have:
 - A project initialized with `/pm:init`
 - Provider credentials set up (GitHub or Azure DevOps)
 
-For installation help, see the [Getting Started Guide](/guide/getting-started).
+For installation help, see the [Getting Started Guide](/getting-started/).
 
 ## Getting Help
 
