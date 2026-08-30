@@ -184,8 +184,8 @@ After ClaudeAutoPM:
 
 ### Prerequisites
 
-- **Node.js**: >= 16.0.0
-- **npm**: >= 8.0.0
+- **Node.js**: >= 22.0.0
+- **npm**: >= 10.0.0
 - **Git**: Latest version
 - **Claude Code**: Desktop app or CLI access
 - **Docker** (optional): For containerized development

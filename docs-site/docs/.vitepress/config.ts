@@ -8,13 +8,15 @@ export default defineConfig({
   // Without this every absolute asset and link 404s in production.
   base: '/ClaudeAutoPM/',
 
-  head: [
-    ['link', { rel: 'icon', href: '/favicon.ico' }]
-  ],
+  // No favicon/logo asset ships with this repo, so the previous
+  // head icon link and themeConfig.logo both 404'd in production.
+  // To restore: drop the real files into docs-site/docs/public/ and re-add
+  //   head: [['link', { rel: 'icon', href: '/ClaudeAutoPM/favicon.ico' }]]
+  //   themeConfig.logo: '/logo.svg'
+  // Note the asymmetry: `base` is NOT prepended to raw `head` tags (spell it
+  // out there), but IS prepended to themeConfig.logo (keep that root-relative).
 
   themeConfig: {
-    logo: '/logo.svg',
-
     nav: [
       { text: 'Guide', link: '/getting-started/' },
       { text: 'User Guide', link: '/user-guide/' },

@@ -1,6 +1,6 @@
 ---
 title: PM Workflow
-description: Complete project management workflow using ClaudeAutoPM v3.14.0 with local, GitHub, and Azure providers.
+description: Complete project management workflow using ClaudeAutoPM v4.0.0 with local, GitHub, and Azure providers.
 ---
 
 # PM Workflow

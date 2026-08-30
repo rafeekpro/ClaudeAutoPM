@@ -339,18 +339,18 @@ class PostInstallChecker {
   checkNodeVersion() {
     const version = process.version;
     const major = parseInt(version.split('.')[0].substring(1));
-    const isSupported = major >= 18;
+    const isSupported = major >= 22;
 
     this.results.optional.push({
       name: 'Node.js version',
       status: isSupported,
       message: isSupported
         ? `${version} (supported)`
-        : `${version} (upgrade recommended)`
+        : `${version} (unsupported - requires v22 or higher)`
     });
 
     if (!isSupported) {
-      this.results.nextSteps.push('Upgrade Node.js to v18 or higher');
+      this.results.nextSteps.push('Upgrade Node.js to v22 or higher');
     }
   }
 

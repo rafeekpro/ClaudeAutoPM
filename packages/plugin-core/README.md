@@ -252,7 +252,7 @@ No configuration needed - all core features are always enabled.
 ## Compatibility
 
 - **Minimum ClaudeAutoPM version:** 3.0.0
-- **Node.js:** >= 18.0.0
+- **Node.js:** >= 22.0.0
 - **Platform:** Cross-platform (macOS, Linux, Windows)
 
 ---

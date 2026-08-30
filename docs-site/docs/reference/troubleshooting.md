@@ -85,7 +85,7 @@ npm install -g claude-autopm@latest
 
 **Problem**: `Node.js version not supported` error
 
-**Requirements**: Node.js ≥ 16.0.0, npm ≥ 8.0.0
+**Requirements**: Node.js ≥ 22.0.0, npm ≥ 10.0.0
 
 **Solution**:
 ```bash

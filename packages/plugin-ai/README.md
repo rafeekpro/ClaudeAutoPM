@@ -274,8 +274,8 @@ with mlflow.start_run():
 
 ## Requirements
 
-- **Node.js**: >=16.0.0
-- **npm**: >=8.0.0
+- **Node.js**: >=22.0.0
+- **npm**: >=10.0.0
 - **Python**: >=3.8 (for example scripts)
 - **API Keys**: OpenAI, Gemini (as needed)
 
