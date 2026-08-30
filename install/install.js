@@ -894,6 +894,51 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
     return content;
   }
 
+  /**
+   * Resolve the CI/CD provider from config.
+   *
+   * Historically this read `cicd.provider` only — a key nothing in the repo
+   * ever writes, which made the github/azure/gitlab branches unreachable and
+   * silently stamped every scaffolded repo with a "no CI/CD" CLAUDE.md. We now
+   * check the keys that are actually populated, most explicit first.
+   *
+   * @returns {'github'|'azure'|'gitlab'|null} null when nothing indicates a provider
+   */
+  resolveCicdProvider(config) {
+    if (!config) return null;
+
+    const normalize = (value) => {
+      if (typeof value !== 'string') return null;
+      const v = value.trim().toLowerCase();
+      if (v === 'none' || v === 'no' || v === 'false') return null;
+      if (v.startsWith('github')) return 'github';
+      if (v.startsWith('azure')) return 'azure';
+      if (v.startsWith('gitlab')) return 'gitlab';
+      return null;
+    };
+
+    // 1. Explicit declaration wins.
+    if (typeof config.cicd?.provider === 'string') {
+      return normalize(config.cicd.provider);
+    }
+
+    // 2. The key the rest of the CLI reads/writes (bin/commands/config.js).
+    if (typeof config.features?.cicd === 'string') {
+      return normalize(config.features.cicd);
+    }
+
+    // 3. Infer from the GitHub Actions signals the config templates do set.
+    //    Unlike `kubernetes`, the github_actions block carries no `enabled`
+    //    key, so only a truthy toggle counts as evidence — an all-false block
+    //    means "no GHA features on", not "GitHub Actions is the provider".
+    if (config.features?.github_actions_k8s === true) return 'github';
+    if (config.github_actions && typeof config.github_actions === 'object') {
+      if (Object.values(config.github_actions).some(Boolean)) return 'github';
+    }
+
+    return null;
+  }
+
   getRequiredAddons() {
     const addons = [];
 
@@ -912,13 +957,17 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
         addons.push('devops-agents', 'devops-workflow');
       }
 
-      if (this.currentConfig.cicd?.provider === 'github') {
-        addons.push('github-actions');
-      } else if (this.currentConfig.cicd?.provider === 'azure') {
-        addons.push('azure-devops');
-      } else if (this.currentConfig.cicd?.provider === 'gitlab') {
-        addons.push('gitlab-ci');
-      } else {
+      const cicdAddon = {
+        github: 'github-actions',
+        azure: 'azure-devops',
+        gitlab: 'gitlab-ci'
+      }[this.resolveCicdProvider(this.currentConfig)];
+
+      // An unresolved provider adds nothing: the scaffold must not assert a
+      // CI/CD arrangement it has no evidence for. `no-cicd` is opt-in only.
+      if (cicdAddon) {
+        addons.push(cicdAddon);
+      } else if (this.currentConfig.cicd?.emitPlaceholder) {
         addons.push('no-cicd');
       }
 
@@ -1137,6 +1186,62 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
     }
   }
 
+  /**
+   * Basenames of the rules the given plugins currently ship.
+   */
+  collectPluginRuleNames(packagesDir, pluginNames) {
+    const names = new Set();
+
+    for (const pluginName of pluginNames) {
+      const pluginJsonPath = path.join(packagesDir, pluginName, 'plugin.json');
+      if (!fs.existsSync(pluginJsonPath)) continue;
+
+      try {
+        const metadata = JSON.parse(fs.readFileSync(pluginJsonPath, 'utf-8'));
+        for (const rule of metadata.rules || []) {
+          if (rule.file) names.add(path.basename(rule.file));
+        }
+      } catch {
+        // A malformed plugin.json is reported by the install loop below; here
+        // we just decline to treat its rules as removable.
+      }
+    }
+
+    return [...names];
+  }
+
+  /**
+   * Remove stale plugin rules from the target, preserving framework rules.
+   *
+   * The previous implementation deleted every file in `.claude/rules/`, which
+   * also removed the framework `.xml` rules installFramework() had copied
+   * moments earlier — leaving base.md and the quick-ref docs pointing at files
+   * that no longer existed. Framework-owned rules are now never deleted.
+   */
+  cleanPluginRules(pluginRuleNames = []) {
+    const rulesDir = path.join(this.targetDir, '.claude', 'rules');
+    if (!fs.existsSync(rulesDir)) return;
+
+    const frameworkRulesDir = path.join(this.autopmDir, '.claude', 'rules');
+    const frameworkRules = fs.existsSync(frameworkRulesDir)
+      ? new Set(fs.readdirSync(frameworkRulesDir))
+      : new Set();
+    const currentPluginRules = new Set(pluginRuleNames);
+
+    const stale = fs.readdirSync(rulesDir).filter(file =>
+      !frameworkRules.has(file) &&
+      !currentPluginRules.has(file) &&
+      fs.statSync(path.join(rulesDir, file)).isFile()
+    );
+
+    if (stale.length === 0) return;
+
+    this.printStep(`Removing ${stale.length} stale plugin rule(s)...`);
+    for (const file of stale) {
+      fs.unlinkSync(path.join(rulesDir, file));
+    }
+  }
+
   async installPlugins() {
     if (!this.currentConfig || !this.currentConfig.plugins) {
       this.printStep('No plugins configured for this scenario');
@@ -1159,21 +1264,10 @@ See: https://github.com/rafeekpro/ClaudeAutoPM
     const installedPlugins = [];
     const failedPlugins = [];
 
-    // Clean rules directory before installing plugins
-    // This removes old/archived rules that are no longer in plugin.json
-    const rulesDir = path.join(this.targetDir, '.claude', 'rules');
-    if (fs.existsSync(rulesDir)) {
-      const oldRules = fs.readdirSync(rulesDir);
-      if (oldRules.length > 0) {
-        this.printStep('Cleaning rules directory for fresh install...');
-        for (const file of oldRules) {
-          const filePath = path.join(rulesDir, file);
-          if (fs.statSync(filePath).isFile()) {
-            fs.unlinkSync(filePath);
-          }
-        }
-      }
-    }
+    // Drop plugin rules that are no longer shipped, keeping the framework
+    // rules installFramework() just laid down (base.md and the quick-ref docs
+    // point at those; wiping them left the pointers dangling).
+    this.cleanPluginRules(this.collectPluginRuleNames(packagesDir, pluginsToInstall));
 
     // Install each plugin directly
     for (const pluginName of pluginsToInstall) {
