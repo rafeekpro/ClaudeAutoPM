@@ -79,6 +79,14 @@ from a different account than you expected: not the PR author's, not this sessio
 and (since 2026-10-08, owner rule) the account that pushed the latest commit can't approve it either
 (`require_last_push_approval: true` on every org ruleset; pr-review-gate `rulesets/branch-protection.md`).
 
+**Who may approve (owner rule 2026-10-15).** The PR's creator and every account that committed to it
+can't approve it; any other of the three accounts can. Usually one account creates the PR and makes every
+commit, so the other two can approve; if two accounts committed, the third still can. `rlagowski` is not a
+mandatory approver: rlagowski can create a PR and Dixter999 approve it. So keep **one identity per PR**:
+create, commit and push follow-ups as the same account, and never push to a PR as an account that should
+approve it — that turns an approver into a committer. Auto-approve approves as `github-actions[bot]`, which
+is never a committer.
+
 A session may merge a PR itself once all of these hold:
 - an APPROVED review from one of those three accounts is on the PR's **current head commit** (a
   push that changes the diff dismisses it);
