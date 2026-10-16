@@ -162,7 +162,7 @@
     "jest-junit": "^17.0.0",
     "jest-watch-typeahead": "^3.0.1",
     "markdownlint-cli": "^0.49.0",
-    "nock": "^14.0.10",
+    "nock": "^15.0.1",
     "prettier": "^3.0.0"
   },
   "optionalDependencies": {
