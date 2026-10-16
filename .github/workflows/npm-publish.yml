@@ -6,6 +6,13 @@ on:
       - 'v*'
   workflow_dispatch:
 
+# Deploys run one at a time, newest wins (owner 2026-10-15): with cancel-in-progress false GitHub keeps
+# the running deploy and ONE pending run, and drops older pending ones, so an out-of-order queue can
+# never deploy an older commit last and roll the site back.
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+
 jobs:
   test:
     runs-on: ubuntu-latest
