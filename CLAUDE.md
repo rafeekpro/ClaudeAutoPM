@@ -88,3 +88,12 @@ A session may merge a PR itself once all of these hold:
 
 Merge with `gh pr merge <n> --match-head-commit <approved-sha>`, using this repo's merge method.
 Never use `--admin` to get past a missing approval or a missing check.
+
+## GitHub API polling (fleet rule, owner 2026-10-15)
+
+REST core is **5000 calls/hour per USER**, shared by every token and every session of that user. On 2026-10-15 Dixter999 and rlagowski were exhausted for most of the day.
+- No REST poller faster than every **120 s**. Prefer GraphQL (`gh pr view --json statusCheckRollup,reviews,mergeStateStatus`) over `gh run list/view`, `gh api repos/...` and REST `gh pr checks`.
+- For repeated reads, use `gh api --cache 60s`.
+- Every waiter or watcher has an **iteration cap** and **stops on a 403 / "rate limit exceeded"**. Don't retry; report it.
+- Never leave a background loop running past its purpose: kill it when the PR merges or the task ends. A 23.7 h orphan loop was found.
+- On DIXTER and dixter-pc, `gh` **reads** go out as rafeekpro via a shim; writes stay on your account. Don't work around it.
